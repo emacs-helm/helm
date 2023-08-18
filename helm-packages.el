@@ -178,6 +178,13 @@ Arg PACKAGES is a list of strings."
                                 ""))
            collect (cons disp c)))
 
+(defun helm-packages-quit-an-find-file (source)
+  (let* ((sel (helm-get-selection nil nil source))
+         (pkg (package-get-descriptor (intern sel))))
+    (if (and pkg (package-installed-p pkg))
+        (expand-file-name (package-desc-dir pkg))
+      package-user-dir)))
+
 ;;;###autoload
 (defun helm-packages (&optional arg)
   "Helm interface to manage packages.
@@ -195,6 +202,7 @@ packages no more availables."
     (helm :sources (list
                     (helm-build-sync-source "Availables for upgrade"
                       :candidates upgrades
+                      :find-file-target #'helm-packages-quit-an-find-file
                       :filtered-candidate-transformer
                       (lambda (candidates _source)
                         (cl-loop for c in candidates
@@ -207,6 +215,7 @@ packages no more availables."
                     (helm-build-sync-source "Packages to delete"
                       :candidates removables
                       :coerce #'helm-symbolify
+                      :find-file-target #'helm-packages-quit-an-find-file
                       :filtered-candidate-transformer
                       (lambda (candidates _source)
                         (cl-loop for c in candidates
@@ -218,6 +227,7 @@ packages no more availables."
                     (helm-build-in-buffer-source "Installed packages"
                       :data (mapcar #'car package-alist)
                       :coerce #'helm-symbolify
+                      :find-file-target #'helm-packages-quit-an-find-file
                       :filtered-candidate-transformer
                       '(helm-packages-transformer
                         (lambda (candidates _source)
@@ -239,6 +249,7 @@ packages no more availables."
                                                 (and id (assoc sym package--builtins)))
                                      nconc (list (car p)))
                       :coerce #'helm-symbolify
+                      :find-file-target #'helm-packages-quit-an-find-file
                       :filtered-candidate-transformer
                       '(helm-packages-transformer
                         (lambda (candidates _source)
@@ -255,6 +266,7 @@ packages no more availables."
                                      when (package-desc-p (package-get-descriptor (car p)))
                                      collect (car p))
                       :coerce #'helm-symbolify
+                      :find-file-target #'helm-packages-quit-an-find-file
                       :filtered-candidate-transformer
                       '(helm-packages-transformer
                         (lambda (candidates _source)
