@@ -1,0 +1,51 @@
+#+STARTUP:showall
+
+* NEWS
+
+** Version 3.9.4
+
+*** Add two new alists to allow extending completions-detailed
+
+This allows providing detailed completions in more places, see
+`helm-completing-read-extra-metadata` and
+`helm-completing-read-command-categories`.
+They are not provided as user variables as it may be tricky to provide
+the corresponding affixations functions.
+As of now we have detailed completions in
+describe-function/variable/symbol/command/package,
+find-function/variable, switch-to-buffer,
+customize-variable/group, package-(vc)install, package-vc-checkout.
+
+*** New helm packages manager
+
+The old helm-elisp-package has been replaced by helm-packages.
+The old one was too slow, taking lot of memory and even crashing Emacs
+especially with last Emacs-29.
+
+** Version 3.9.3
+
+*** Ensure to use affixation functions provided by caller in helm-mode
+
+** Version 3.9.2
+
+*** New progress bar for Rsync action from helm-find-files
+*** Describe-* commands with completions-detailed are now fast
+*** Use Wfnames package as dependency to replace Wdired
+
+** Version 3.9.1
+
+*** helm-config file has been removed
+
+Therefore (require 'helm-config) will return an error, don't use this
+anymore. If installing from source use instead (require 'helm-autoloads), otherwise from a package install, the autoloads file
+will be automatically loaded.
+
+
+*** Allow using helm-completion-styles-alist by command
+
+*** New mode for editing large vars
+
+Will be used automatically when using the set variable action from
+helm-apropos.
+
+*** Improve all-the-icons in many places
