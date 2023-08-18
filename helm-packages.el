@@ -148,7 +148,12 @@ as dependencies."
 
 ;;;###autoload
 (defun helm-packages (&optional arg)
-  "Helm interface to list packages."
+  "Helm interface to manage packages.
+
+With a prefix arg ARG refresh package list.
+
+When installing ensure to refresh the package list to avoid errors with outdated
+packages no more availables."
   (interactive "P")
   (package-initialize)
   (when arg
