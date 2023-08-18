@@ -11,9 +11,9 @@
 ;;                         Thierry Volpiatto
 
 ;; Author: Thierry Volpiatto <thievol@posteo.net>
-;; Version: 3.9.3
+;; Version: 3.9.4
 ;; URL: https://emacs-helm.github.io/helm/
-;; Package-Requires: ((helm-core "3.9.3") (wfnames "1.1") (popup "0.5.3"))
+;; Package-Requires: ((helm-core "3.9.4") (wfnames "1.1") (popup "0.5.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
