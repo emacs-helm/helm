@@ -28,7 +28,11 @@
 (defun helm-packages-upgrade (_candidate)
   "Helm action for upgrading marked packages."
   (let ((mkd (helm-marked-candidates)))
-    (mapc #'package-upgrade mkd)))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      (mapcar #'symbol-name mkd)
+      (when (y-or-n-p (format "Upgrade %s packages? " (length mkd)))
+        (mapc #'package-upgrade mkd)))))
 
 (defun helm-packages-describe (candidate)
   "Helm action for describing package CANDIDATE."
@@ -49,7 +53,11 @@
 (defun helm-packages-package-reinstall (_candidate)
   "Helm action for reinstalling marked packages."
   (let ((mkd (helm-marked-candidates)))
-    (mapc #'package-reinstall mkd)))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      (mapcar #'symbol-name mkd)
+      (when (y-or-n-p (format "Reinstall %s packages? " (length mkd)))
+        (mapc #'package-reinstall mkd)))))
 
 (defun helm-packages-delete-1 (packages &optional force)
   "Run `package-delete' on PACKAGES.
@@ -63,24 +71,40 @@ If FORCE is non nil force deleting packages."
 Unlike `helm-packages-delete' this will refuse to delete packages when they are
 needed by others packages as dependencies."
   (let ((mkd (helm-marked-candidates)))
-    (helm-packages-delete-1 mkd)))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      (mapcar #'symbol-name mkd)
+      (when (y-or-n-p (format "Uninstall %s packages? " (length mkd)))
+        (helm-packages-delete-1 mkd)))))
 
 (defun helm-packages-delete (_candidate)
   "Helm action for deleting marked packages.
 Unlike `helm-packages-uninstall' this delete packages even when they are needed
 as dependencies."
   (let ((mkd (helm-marked-candidates)))
-    (helm-packages-delete-1 mkd 'force)))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      (mapcar #'symbol-name mkd)
+      (when (y-or-n-p (format "Delete %s packages? " (length mkd)))
+        (helm-packages-delete-1 mkd 'force)))))
 
 (defun helm-packages-recompile (_candidate)
   "Helm action for recompiling marked packages."
   (let ((mkd (helm-marked-candidates)))
-    (mapc #'package-recompile mkd)))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      (mapcar #'symbol-name mkd)
+      (when (y-or-n-p (format "Recompile %s packages? " (length mkd)))
+        (mapc #'package-recompile mkd)))))
 
 (defun helm-packages-install (_candidate)
   "Helm action for installing marked packages."
   (let ((mkd (helm-marked-candidates)))
-    (mapc #'package-install mkd)))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      (mapcar #'symbol-name mkd)
+      (when (y-or-n-p (format "Install %s packages? " (length mkd)))
+        (mapc #'package-install mkd)))))
 
 ;;; Transformer
 ;;
