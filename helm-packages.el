@@ -104,7 +104,9 @@ as dependencies."
       helm-marked-buffer-name
       (mapcar #'symbol-name mkd)
       (when (y-or-n-p (format "Install %s packages? " (length mkd)))
-        (mapc #'package-install mkd)))))
+        (condition-case err
+            (mapc #'package-install mkd)
+          (error "%S:\n Please refresh package list before installing" err))))))
 
 ;;; Transformer
 ;;
