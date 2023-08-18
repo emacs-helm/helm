@@ -361,7 +361,7 @@ The Helm project has a current unresolved
 Please feel free to fix any of them; send a pull request.
 
 Most issues come from a wrong configuration or a use of Helm modified externally by third party package e.g. Spacemacs.
-Some other Helm packages that are no more maintained (or badly maintained) and use deprecated Helm code will clash also with recent Helm
+Some other Helm packages that are no more maintained (or badly maintained) and use deprecated Helm code will clash also with recent Helm,
 be aware.
 
 # Contributors
@@ -379,7 +379,10 @@ itself.
 
 One way to ascertain that the bugs are helm-related, recreate the
 error either by using `Emacs -Q` or by running the included package
-script `./emacs-helm.sh` located in the helm directory.
+script `./emacs-helm.sh` located in the helm directory.  You can now
+also run M-x helm-packages and from the installed packages source run
+the "Isolate packages" action after having selected helm, this of
+course if you have installed Helm from package.
 
 Helm comes now with a template for filling bugs, when reporting issues,
 be sure to fill all sections and to run helm from a minimal install as
