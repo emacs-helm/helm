@@ -108,6 +108,38 @@ as dependencies."
             (mapc #'package-install mkd)
           (error "%S:\n Please refresh package list before installing" err))))))
 
+(defun helm-packages-isolate-1 (packages)
+    "Start an Emacs with only PACKAGES loaded.
+Arg PACKAGES is a list of strings."
+    (let* ((name (concat "package-isolate-" (mapconcat #'identity packages "_")))
+           (deps (cl-loop for p in packages
+                          for sym = (intern p)
+                          nconc (package--dependencies sym))))
+      (apply #'start-process name nil
+             (list (expand-file-name invocation-name invocation-directory)
+                   "-Q" "--debug-init"
+                   (format "--eval=%S"
+                           `(progn
+                              (require 'package)
+                              (setq package-load-list
+                                    ',(append (mapcar (lambda (p) (list (intern p) t))
+                                                      packages)
+                                              (mapcar (lambda (p) (list p t)) deps)))
+                              (package-initialize)))))))
+
+(defun helm-packages-isolate (_candidate)
+  "Start a new Emacs with only marked packages loaded."
+  (let* ((mkd (helm-marked-candidates))
+         (pkg-names (mapcar #'symbol-name mkd))
+         (isolate (if (fboundp 'package-isolate)
+                      #'package-isolate
+                    #'helm-packages-isolate-1)))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      pkg-names
+      (when (y-or-n-p "Start a new Emacs with only package(s)? ")
+        (funcall isolate pkg-names)))))
+
 ;;; Transformer
 ;;
 ;;
@@ -194,7 +226,8 @@ packages no more availables."
                                 ("Visit homepage" . helm-packages-visit-homepage)
                                 ("Reinstall package(s)" . helm-packages-package-reinstall)
                                 ("Recompile package(s)" . helm-packages-recompile)
-                                ("Uninstall package(s)" . helm-packages-uninstall)))
+                                ("Uninstall package(s)" . helm-packages-uninstall)
+                                ("Isolate package(s)" . helm-packages-isolate)))
                     (helm-build-in-buffer-source "Available external packages"
                       :data (cl-loop for p in package-archive-contents
                                      for sym = (car p)
