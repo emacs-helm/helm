@@ -43,7 +43,11 @@ body:
         - Emacs-26.3
         - Emacs-27.1
         - Emacs-27.2
-        - Emacs-28/29
+        - Emacs-28.1
+        - Emacs-28.2
+        - Emacs-28.3
+        - Emacs-29.1
+        - Emacs-30+
     validations:
       required: true
   - type: dropdown
@@ -70,7 +74,7 @@ body:
     id: terms
     attributes:
       label: Minimal configuration
-      description: You are using either emacs-helm.sh or a minimal configuration from emacs -Q to reproduce your bug (i.e. No Spacemacs, Doom etc...)
+      description: You are using emacs -Q with only Helm package loaded to reproduce your bug (i.e. No Spacemacs, Doom etc...), use either emacs-helm.sh or the Isolate packages action from helm-packages.
       options:
         - label: I agree using a minimal configuration
           required: true
