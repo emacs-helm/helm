@@ -568,7 +568,10 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                 do (setq cands (delete d cands))
                                 when str collect str)
                        cands))
-              ((and (not (equal default ""))
+              ;; Some functions like debug-on-entry use (symbol-name sym)
+              ;; without checking if sym is non nil, so the return value become
+              ;; "nil". 
+              ((and (not (member default '("" "nil")))
                     (string= helm-pattern ""))
                (cons default (delete (helm-stringify default)
                                      cands)))
