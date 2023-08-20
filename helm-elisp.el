@@ -416,6 +416,7 @@ Argument NAME allows specifiying what function to use to display
 documentation when SYM name is the same for function and variable."
   (let ((doc (condition-case _err
                  (pcase sym
+                   ((pred class-p) (cl--class-docstring (cl--find-class sym)))
                    ((and (pred fboundp) (pred boundp))
                     (pcase name
                       ("describe-function"
