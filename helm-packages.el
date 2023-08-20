@@ -154,25 +154,34 @@ Arg PACKAGES is a list of strings."
            for version = (and id (mapconcat #'number-to-string (package-desc-version id) "."))
            for description = (and id (package-desc-summary id))
            for disp = (format "%s%s%s%s%s%s%s%s%s"
+                              ;; Package name.
                               (propertize
                                c
                                'face (if (equal status "dependency")
                                          font-lock-type-face
                                        'font-lock-keyword-face)
                                'match-part c)
+                              ;; Separator.
                               (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
                                                   (length c)))
                                            ? )
+                              ;; Package status.
                               (propertize
                                (or status "")
                                'face (if (equal status "dependency")
                                          'bold-italic
                                        'default))
+                              ;; Separator.
                               (make-string (1+ (- 10 (length status))) ? )
+                              ;; Package provider.
                               (or provider "")
+                              ;; Separator.
                               (make-string (1+ (- 10 (length provider))) ? )
+                              ;; Package version.
                               (or version "")
+                              ;; Separator.
                               (make-string (1+ (- 20 (length version))) ? )
+                              ;; Package description.
                               (if description
                                   (propertize description 'face 'font-lock-warning-face)
                                 ""))
