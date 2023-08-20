@@ -200,8 +200,9 @@ packages no more availables."
   (let ((upgrades (package--upgradeable-packages))
         (removables (package--removable-packages)))
     (helm :sources (list
-                    (helm-build-sync-source "Availables for upgrade"
-                      :candidates upgrades
+                    (helm-build-in-buffer-source "Availables for upgrade"
+                      :init (lambda ()
+                              (helm-init-candidates-in-buffer 'global upgrades))
                       :find-file-target #'helm-packages-quit-an-find-file
                       :filtered-candidate-transformer
                       (lambda (candidates _source)
@@ -212,8 +213,9 @@ packages no more availables."
                                                c)))
                       :coerce #'helm-symbolify
                       :action '(("Upgrade package(s)" . helm-packages-upgrade)))
-                    (helm-build-sync-source "Packages to delete"
-                      :candidates removables
+                    (helm-build-in-buffer-source "Packages to delete"
+                      :init (lambda ()
+                              (helm-init-candidates-in-buffer 'global removables))
                       :coerce #'helm-symbolify
                       :find-file-target #'helm-packages-quit-an-find-file
                       :filtered-candidate-transformer
@@ -225,7 +227,9 @@ packages no more availables."
                                                c)))
                       :action '(("Delete package(s)" . helm-packages-delete)))
                     (helm-build-in-buffer-source "Installed packages"
-                      :data (mapcar #'car package-alist)
+                      :init (lambda ()
+                              (helm-init-candidates-in-buffer 'global
+                                (mapcar #'car package-alist)))
                       :coerce #'helm-symbolify
                       :find-file-target #'helm-packages-quit-an-find-file
                       :filtered-candidate-transformer
