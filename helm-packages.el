@@ -22,6 +22,16 @@
 (require 'helm)
 (require 'package)
 
+(defclass helm-packages-class (helm-source-in-buffer)
+  ((coerce :initform #'helm-symbolify)
+   (find-file-target :initform #'helm-packages-quit-an-find-file)
+   (filtered-candidate-transformer
+    :initform
+    '(helm-packages-transformer
+      (lambda (candidates _source)
+        (sort candidates #'helm-generic-sort-fn)))))
+  "A class to define `helm-packages' sources.")
+
 ;;; Actions
 ;;
 ;;
@@ -140,7 +150,15 @@ Arg PACKAGES is a list of strings."
       (when (y-or-n-p "Start a new Emacs with only package(s)? ")
         (funcall isolate pkg-names)))))
 
-;;; Transformer
+(defun helm-packages-quit-an-find-file (source)
+  "`find-file-target' function for `helm-packages'."
+  (let* ((sel (helm-get-selection nil nil source))
+         (pkg (package-get-descriptor (intern sel))))
+    (if (and pkg (package-installed-p pkg))
+        (expand-file-name (package-desc-dir pkg))
+      package-user-dir)))
+
+;;; Transformers
 ;;
 ;;
 (defun helm-packages-transformer (candidates _source)
@@ -191,25 +209,7 @@ Arg PACKAGES is a list of strings."
   "Transformer function for `helm-packages' upgrade and delete sources."
   (cl-loop for c in candidates
            collect (cons (propertize c 'face 'font-lock-keyword-face) c)))
-
-(defun helm-packages-quit-an-find-file (source)
-  "`find-file-target' function for `helm-packages'."
-  (let* ((sel (helm-get-selection nil nil source))
-         (pkg (package-get-descriptor (intern sel))))
-    (if (and pkg (package-installed-p pkg))
-        (expand-file-name (package-desc-dir pkg))
-      package-user-dir)))
-
-(defclass helm-packages-class (helm-source-in-buffer)
-  ((coerce :initform #'helm-symbolify)
-   (find-file-target :initform #'helm-packages-quit-an-find-file)
-   (filtered-candidate-transformer
-    :initform
-    '(helm-packages-transformer
-      (lambda (candidates _source)
-        (sort candidates #'helm-generic-sort-fn)))))
-  "A class to define `helm-packages' sources.")
-
+
 ;;;###autoload
 (defun helm-packages (&optional arg)
   "Helm interface to manage packages.
