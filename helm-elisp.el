@@ -621,7 +621,9 @@ is only used to test DEFAULT."
   (helm-build-in-buffer-source "Variables"
     :init (lambda ()
             (helm-apropos-init
-             (lambda (x) (and (boundp x) (not (keywordp x)))) default))
+             (lambda (x)
+               (and (boundp x) (not (keywordp x)) (not (class-p x))))
+             default))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer
     (delq nil (list (and (null helm-apropos-fuzzy-match)
