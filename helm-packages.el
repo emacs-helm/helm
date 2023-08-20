@@ -21,6 +21,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'package)
+(eval-when-compile (require 'helm-utils)) ; For with-helm-display-marked-candidates.
 
 (defclass helm-packages-class (helm-source-in-buffer)
   ((coerce :initform #'helm-symbolify)
