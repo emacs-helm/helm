@@ -187,6 +187,7 @@ Arg PACKAGES is a list of strings."
                          c)))
 
 (defun helm-packages-quit-an-find-file (source)
+  "`find-file-target' function for `helm-packages'."
   (let* ((sel (helm-get-selection nil nil source))
          (pkg (package-get-descriptor (intern sel))))
     (if (and pkg (package-installed-p pkg))
@@ -200,7 +201,8 @@ Arg PACKAGES is a list of strings."
     :initform
     '(helm-packages-transformer
       (lambda (candidates _source)
-        (sort candidates #'helm-generic-sort-fn))))))
+        (sort candidates #'helm-generic-sort-fn)))))
+  "A class to define `helm-packages' sources.")
 
 ;;;###autoload
 (defun helm-packages (&optional arg)
