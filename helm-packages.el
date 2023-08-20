@@ -181,10 +181,7 @@ Arg PACKAGES is a list of strings."
 (defun helm-packages-transformer-1 (candidates _source)
   "Transformer function for `helm-packages' upgrade and delete sources."
   (cl-loop for c in candidates
-           collect (cons (propertize
-                          (symbol-name c)
-                          'face 'font-lock-keyword-face)
-                         c)))
+           collect (cons (propertize c 'face 'font-lock-keyword-face) c)))
 
 (defun helm-packages-quit-an-find-file (source)
   "`find-file-target' function for `helm-packages'."
