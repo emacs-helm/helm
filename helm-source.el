@@ -42,18 +42,17 @@
 (declare-function helm-marked-candidates "helm-core.el")
 
 ;;; Advice Emacs fn
-;;  Make Classes's docstrings more readable by removing al the
-;;  unnecessary crap.
+;;  Make Classes's docstrings more readable by removing the attempts to align
+;;  unuseful stuff and add newline for separating slot documentation, as well
+;;  slots are in bold characters.
 
 (defun helm-source--cl--print-table (&rest args)
   "Advice for `cl--print-table' to make readable class slots docstrings."
-  (cl-flet ((print-rows (rows)
-              (let ((format "%s\n\n  Initform=%s\n\n%s"))
-                (dolist (row rows)
-                  (setcar row (propertize (car row) 'face 'bold))
-                  (setcdr row (nthcdr 1 (cdr row)))
-                  (insert "\n* " (apply #'format format row) "\n")))))
-    (print-rows (cadr args))))
+  (let ((format "%s\n\n  Initform=%s\n\n%s"))
+    (dolist (row (cadr args))
+      (setcar row (propertize (car row) 'face 'bold))
+      (setcdr row (nthcdr 1 (cdr row)))
+      (insert "\n* " (apply #'format format row) "\n"))))
 
 (cl-defgeneric helm--setup-source (source)
   "Prepare slots and handle slot errors before creating a helm source.")
