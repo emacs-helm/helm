@@ -185,6 +185,15 @@ Arg PACKAGES is a list of strings."
         (expand-file-name (package-desc-dir pkg))
       package-user-dir)))
 
+(defclass helm-packages-class (helm-source-in-buffer)
+  ((coerce :initform #'helm-symbolify)
+   (find-file-target :initform #'helm-packages-quit-an-find-file)
+   (filtered-candidate-transformer
+    :initform
+    '(helm-packages-transformer
+      (lambda (candidates _source)
+        (sort candidates #'helm-generic-sort-fn))))))
+
 ;;;###autoload
 (defun helm-packages (&optional arg)
   "Helm interface to manage packages.
@@ -200,10 +209,9 @@ packages no more availables."
   (let ((upgrades (package--upgradeable-packages))
         (removables (package--removable-packages)))
     (helm :sources (list
-                    (helm-build-in-buffer-source "Availables for upgrade"
+                    (helm-make-source "Availables for upgrade" 'helm-packages-class
                       :init (lambda ()
                               (helm-init-candidates-in-buffer 'global upgrades))
-                      :find-file-target #'helm-packages-quit-an-find-file
                       :filtered-candidate-transformer
                       (lambda (candidates _source)
                         (cl-loop for c in candidates
@@ -211,13 +219,10 @@ packages no more availables."
                                                 (symbol-name c)
                                                 'face 'font-lock-keyword-face)
                                                c)))
-                      :coerce #'helm-symbolify
                       :action '(("Upgrade package(s)" . helm-packages-upgrade)))
-                    (helm-build-in-buffer-source "Packages to delete"
+                    (helm-make-source "Packages to delete" 'helm-packages-class
                       :init (lambda ()
                               (helm-init-candidates-in-buffer 'global removables))
-                      :coerce #'helm-symbolify
-                      :find-file-target #'helm-packages-quit-an-find-file
                       :filtered-candidate-transformer
                       (lambda (candidates _source)
                         (cl-loop for c in candidates
@@ -226,23 +231,17 @@ packages no more availables."
                                                 'face 'font-lock-keyword-face)
                                                c)))
                       :action '(("Delete package(s)" . helm-packages-delete)))
-                    (helm-build-in-buffer-source "Installed packages"
+                    (helm-make-source "Installed packages" 'helm-packages-class
                       :init (lambda ()
                               (helm-init-candidates-in-buffer 'global
                                 (mapcar #'car package-alist)))
-                      :coerce #'helm-symbolify
-                      :find-file-target #'helm-packages-quit-an-find-file
-                      :filtered-candidate-transformer
-                      '(helm-packages-transformer
-                        (lambda (candidates _source)
-                          (sort candidates #'helm-generic-sort-fn)))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
                                 ("Reinstall package(s)" . helm-packages-package-reinstall)
                                 ("Recompile package(s)" . helm-packages-recompile)
                                 ("Uninstall package(s)" . helm-packages-uninstall)
                                 ("Isolate package(s)" . helm-packages-isolate)))
-                    (helm-build-in-buffer-source "Available external packages"
+                    (helm-make-source "Available external packages" 'helm-packages-class
                       :data (cl-loop for p in package-archive-contents
                                      for sym = (car p)
                                      for id = (package-get-descriptor sym)
@@ -252,16 +251,10 @@ packages no more availables."
                                                          '("installed" "dependency" "source")))
                                                 (and id (assoc sym package--builtins)))
                                      nconc (list (car p)))
-                      :coerce #'helm-symbolify
-                      :find-file-target #'helm-packages-quit-an-find-file
-                      :filtered-candidate-transformer
-                      '(helm-packages-transformer
-                        (lambda (candidates _source)
-                          (sort candidates #'helm-generic-sort-fn)))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
                                 ("Install packages(s)" . helm-packages-install)))
-                    (helm-build-in-buffer-source "Available built-in packages"
+                    (helm-make-source "Available built-in packages" 'helm-packages-class
                       :data (cl-loop for p in package--builtins
                                      ;; Show only builtins that are available as
                                      ;; well on (m)elpa. Other builtins don't
@@ -269,12 +262,6 @@ packages no more availables."
                                      ;; (sym . [version reqs summary]).
                                      when (package-desc-p (package-get-descriptor (car p)))
                                      collect (car p))
-                      :coerce #'helm-symbolify
-                      :find-file-target #'helm-packages-quit-an-find-file
-                      :filtered-candidate-transformer
-                      '(helm-packages-transformer
-                        (lambda (candidates _source)
-                          (sort candidates #'helm-generic-sort-fn)))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
                                 ("Install packages(s)" . helm-packages-install))))
