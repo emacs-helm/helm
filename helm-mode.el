@@ -1191,7 +1191,8 @@ dynamically otherwise use `helm-completing-read-default-2'."
         (unless (completion-metadata-get metadata 'category)
           (setq metadata `(metadata (category . ,it))
                 category it)))
-    (helm-aif (and completions-detailed
+    (helm-aif (and (boundp 'completions-detailed)
+                   completions-detailed
                    (assoc-default category helm-completing-read-extra-metadata))
         (progn
           (setq metadata it)
