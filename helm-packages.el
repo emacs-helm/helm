@@ -178,6 +178,14 @@ Arg PACKAGES is a list of strings."
                                 ""))
            collect (cons disp c)))
 
+(defun helm-packages-transformer-1 (candidates _source)
+  "Transformer function for `helm-packages' upgrade and delete sources."
+  (cl-loop for c in candidates
+           collect (cons (propertize
+                          (symbol-name c)
+                          'face 'font-lock-keyword-face)
+                         c)))
+
 (defun helm-packages-quit-an-find-file (source)
   (let* ((sel (helm-get-selection nil nil source))
          (pkg (package-get-descriptor (intern sel))))
@@ -212,24 +220,12 @@ packages no more availables."
                     (helm-make-source "Availables for upgrade" 'helm-packages-class
                       :init (lambda ()
                               (helm-init-candidates-in-buffer 'global upgrades))
-                      :filtered-candidate-transformer
-                      (lambda (candidates _source)
-                        (cl-loop for c in candidates
-                                 collect (cons (propertize
-                                                (symbol-name c)
-                                                'face 'font-lock-keyword-face)
-                                               c)))
+                      :filtered-candidate-transformer #'helm-packages-transformer-1
                       :action '(("Upgrade package(s)" . helm-packages-upgrade)))
                     (helm-make-source "Packages to delete" 'helm-packages-class
                       :init (lambda ()
                               (helm-init-candidates-in-buffer 'global removables))
-                      :filtered-candidate-transformer
-                      (lambda (candidates _source)
-                        (cl-loop for c in candidates
-                                 collect (cons (propertize
-                                                (symbol-name c)
-                                                'face 'font-lock-keyword-face)
-                                               c)))
+                      :filtered-candidate-transformer #'helm-packages-transformer-1
                       :action '(("Delete package(s)" . helm-packages-delete)))
                     (helm-make-source "Installed packages" 'helm-packages-class
                       :init (lambda ()
