@@ -633,7 +633,8 @@ displayed in BUFNAME."
 
 (defun helm-help-quit ()
   "Quit `helm-help'."
-  (if (get-buffer-window helm-help-buffer-name 'visible)
+  (if (or (get-buffer-window helm-help-buffer-name 'visible)
+          (get-buffer-window helm-debug-output-buffer 'visible))
       (throw 'helm-help-quit nil)
     (quit-window)))
 

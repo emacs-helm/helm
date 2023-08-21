@@ -465,6 +465,7 @@ i.e. the loop is not entered after running COMMAND."
     ;; Debugging command
     (define-key map (kbd "C-h C-d")    #'helm-enable-or-switch-to-debug)
     (define-key map (kbd "C-h c")      #'helm-customize-group)
+    (define-key map (kbd "C-h d")      #'helm-debug-output)
     ;; Allow to eval keymap without errors.
     (define-key map [f1] nil)
     (define-key map (kbd "C-h C-h")    #'undefined)
@@ -1335,10 +1336,10 @@ with no args that should returns a boolean value or \\='current-source.")
   "When non-nil, quit if there are no candidates.
 This variable accepts a function.")
 
-(defvar helm-debug-variables nil
-  "A list of Helm variables that `helm-debug-output' displays.
-If nil, `helm-debug-output' includes only variables with `helm-'
-prefixes.")
+(defvar helm-debug-function #'helm-default-debug-function
+  "A Function that returns a list of values to print in `helm-debug-output' buffer.")
+
+(defvar helm-debug-output-buffer "*Helm Debug*")
 
 (defvar helm-debug-buffer "*Debug Helm Log*")
 
@@ -6354,23 +6355,30 @@ If action buffer is displayed, kill it."
 ;;
 ;;
 (defun helm-debug-output ()
-  "Show all Helm-related variables at this time."
+  "Show all Helm locals variables and output of `helm-debug-function'."
   (interactive)
   (with-helm-alive-p
-    (helm-help-internal " *Helm Debug*" 'helm-debug-output-function)))
+    (helm-help-internal helm-debug-output-buffer 'helm-debug-output-function)))
 (put 'helm-debug-output 'helm-only t)
 
-(defun helm-debug-output-function (&optional vars)
-  (message "Calculating all helm-related values...")
-  (insert "If you debug some variables or forms, set `helm-debug-variables'
-to a list of forms.\n\n")
-  (dolist (v (or vars
-                    helm-debug-variables
-                    (apropos-internal "^helm-" 'boundp)))
-    (insert "** "
-            (pp-to-string v) "\n"
-            (pp-to-string (with-current-buffer helm-buffer (eval v))) "\n"))
-  (message "Calculating all helm-related values...Done"))
+(defun helm-default-debug-function ()
+  "Collect sources of helm current session without their keymap.
+This is the default function for `helm-debug-function'."
+  (cl-loop for source in (with-helm-buffer helm-sources)
+           collect (remove (assq 'keymap source) source)))
+
+(defun helm-debug-output-function ()
+  (let ((local-vars (buffer-local-variables (get-buffer helm-buffer)))
+        (count 1))
+    (insert (format "* Helm debug from `%s' buffer\n\n" helm-buffer))
+    (insert "** Local variables\n\n#+begin_src elisp\n"
+            (pp-to-string (remove (assq 'helm-sources local-vars) local-vars))
+            "\n#+end_src\n")
+    (dolist-with-progress-reporter (v (helm-interpret-value helm-debug-function))
+        "Calculating all helm-related values..."
+      (insert (format "** Value%s\n" count)
+              "#+begin_src elisp\n" (pp-to-string v) "\n#+end_src\n")
+      (cl-incf count))))
 
 (defun helm-enable-or-switch-to-debug ()
   "First hit enable helm debugging, second hit switch to debug buffer."
