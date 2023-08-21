@@ -974,7 +974,7 @@ Where OBJECT is an instance of an eieio class."
   "Build a `helm' source named NAME with ARGS for CLASS.
 Argument NAME is a string which define the source name, so no need to use
 the keyword :name in your source, NAME will be used instead.
-Argument CLASS is an eieio class object.
+Argument CLASS is a symbol defining an eieio class object.
 Arguments ARGS are keyword value pairs as defined in CLASS."
   (declare (indent 2))
   (let ((source (apply #'make-instance class name args)))
