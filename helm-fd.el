@@ -21,6 +21,7 @@
 (require 'helm-types)
 
 (declare-function ansi-color-apply "ansi-color.el")
+(declare-function split-string-shell-command "shell.el")
 
 (defvar helm-fd-executable "fd"
   "The fd shell command executable.")
