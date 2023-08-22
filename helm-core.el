@@ -3753,6 +3753,10 @@ Argument SAVE-OR-RESTORE is either save or restore."
 (defun helm--run-init-hooks (hook sources)
   "Run after and before init hooks local to source.
 See :after-init-hook and :before-init-hook in `helm-source'."
+  ;; We handle here incorrect values of hooks to not break packages using such
+  ;; values i.e. lambda's or lists not bound to a symbol.  In the future we may
+  ;; use `helm-log-run-hook' directly which allow using add-hook, remove-hook
+  ;; etc...
   (cl-loop for s in sources
            for hv = (assoc-default hook s)
            when hv

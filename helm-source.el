@@ -1168,6 +1168,9 @@ The header line is based on one of `persistent-action-if',
                      (symbol-value it)
                    it)))
         (setf (slot-value source 'requires-pattern) val)))
+  ;; Warn when hooks are defined as something else as a symbol i.e. a lambda or
+  ;; a list, if a function an error will raise later anyway when this function
+  ;; is called with `run-hooks'.
   (let ((sname (slot-value source 'name)))
     (pcase (slot-value source 'before-init-hook)
       ((or (and val (pred (functionp)) (guard (not (symbolp val))))
