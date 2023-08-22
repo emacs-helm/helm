@@ -152,25 +152,28 @@ algorithm."
              unless (and (null ignore-props) (or (get sym 'helm-only) (get sym 'no-helm-mx)))
              collect
              (cons (cond ((and (string-match "^M-x" key) local-key)
-                          (format "%s%s%s %s"
-                                  disp
-                                  (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
-                                  (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
-                                  (propertize
-                                   " " 'display
-                                   (propertize local-key 'face 'helm-M-x-key))))
+                          (propertize (format "%s%s%s %s"
+                                              disp
+                                              (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
+                                              (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
+                                              (propertize
+                                               " " 'display
+                                               (propertize local-key 'face 'helm-M-x-key)))
+                                      'match-part disp))
                          ((string-match "^M-x" key)
-                          (format "%s%s%s"
-                                  disp
-                                  (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
-                                  (if doc (propertize doc 'face 'helm-M-x-short-doc) "")))
-                         (t (format "%s%s%s %s"
-                                    disp
-                                    (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
-                                    (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
-                                    (propertize
-                                     " " 'display
-                                     (propertize key 'face 'helm-M-x-key)))))
+                          (propertize (format "%s%s%s"
+                                              disp
+                                              (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
+                                              (if doc (propertize doc 'face 'helm-M-x-short-doc) ""))
+                                      'match-part disp))
+                         (t (propertize (format "%s%s%s %s"
+                                                disp
+                                                (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
+                                                (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
+                                                (propertize
+                                                 " " 'display
+                                                 (propertize key 'face 'helm-M-x-key)))
+                                        'match-part disp)))
                    cand)
              into ls
              finally return
