@@ -50,6 +50,7 @@
 
 (defvar helm-marked-buffer-name)
 (defvar display-buffer-function)
+(defvar minibuffer-follows-selected-frame)
 
 
 ;;; Internal Variables
