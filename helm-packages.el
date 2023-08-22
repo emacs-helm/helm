@@ -274,8 +274,8 @@ Arg PACKAGES is a list of strings."
 
 With a prefix arg ARG refresh package list.
 
-When installing ensure to refresh the package list to avoid errors with outdated
-packages no more availables."
+When installing or upgrading ensure to refresh the package list
+to avoid errors with outdated packages no more availables."
   (interactive "P")
   (package-initialize)
   (when arg
