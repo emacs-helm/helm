@@ -424,6 +424,8 @@ documentation when SYM name is the same for function and variable."
                       ("describe-variable"
                        (documentation-property sym 'variable-documentation t))
                       (_ (documentation sym t))))
+                   ((pred custom-theme-p)
+                    (documentation-property sym 'theme-documentation t))
                    ((pred helm-group-p) (documentation-property
                                          sym 'group-documentation t))
                    ((pred fboundp)  (documentation sym t))
@@ -444,7 +446,7 @@ documentation when SYM name is the same for function and variable."
         ;; Symbol exist but has no definition yet e.g.
         ;; (advice-add 'foo-test :override (lambda () (message "invalid
         ;; function"))) and foo-test is not already defined.
-        "Not already defined"))))
+        "Not already defined or loaded"))))
 
 ;;; File completion.
 ;;

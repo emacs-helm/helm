@@ -30,6 +30,7 @@
 (defvar helm-mode)
 (defvar password-cache)
 (defvar package--builtins)
+(defvar warning-suppress-types)
 
 ;; No warnings in Emacs built --without-x
 (declare-function x-file-dialog "xfns.c")
@@ -976,7 +977,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                     (category . symbol-help)))
     (package . (metadata
                 (affixation-function . helm-completion-package-affixation)
-                (category . package))))
+                (category . package)))
+    (theme . (metadata
+              (affixation-function . helm-completion-theme-affixation)
+              (category . theme))))
   "Extra metadata for completing-read.
 
 Alist composed of (CATEGORY . METADATA).
@@ -1011,7 +1015,9 @@ behavior as emacs vanilla.")
     ("package-install" . package)
     ("package-vc-install" . package)
     ("package-vc-checkout" . package)
-    ("describe-package" . package))
+    ("describe-package" . package)
+    ("load-theme" . theme)
+    ("describe-theme" . theme))
   "An alist to specify metadata category by command.
 
 Some commands provide a completion-table with no category specified in metadata,
@@ -1141,6 +1147,41 @@ is used."
                            (propertize (concat sep it) 'face 'font-lock-warning-face)
                            (propertize " " 'display it))
                 "")))))
+
+(defun helm-completion-theme-affixation (_completions)
+  (lambda (comp)
+    (let* ((sym (intern-soft comp))
+           (sep (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
+                                    (length comp)))
+                             ? ))
+           (doc (if (custom-theme-p sym)
+                    (helm-get-first-line-documentation sym)
+                  (helm--get-theme-doc-1 sym))))
+      (list comp
+            ""
+            (helm-aand (propertize (concat sep doc) 'face 'font-lock-warning-face)
+                       (propertize " " 'display it))))))
+
+(defun helm--get-theme-doc-1 (sym)
+  (let ((fn (locate-file (concat (symbol-name sym) "-theme.el")
+			 (custom-theme--load-path)
+			 '("" "c")))
+        (warning-suppress-types '((initialization)))
+        doc)
+    ;; Avoid loading theme as much as possible.
+    (with-temp-buffer
+      (insert-file-contents fn)
+      (helm-awhile (let ((read-circle nil))
+		     (condition-case nil
+			 (read (current-buffer))
+		       (end-of-file nil)))
+        (when (eq (car-safe it) 'deftheme)
+          (setq doc (cl-return (car (split-string (nth 2 it) "\n")))))))
+    ;; If deftheme not found in file (in modus themes deftheme is nested in
+    ;; eval-when-compile) load the theme without enabling it.
+    (if doc doc
+      (load-theme sym t t)
+      (helm-get-first-line-documentation sym))))
 
 ;;; Generic completing read
 ;;
