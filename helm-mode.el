@@ -1176,10 +1176,11 @@ is used."
 			 (read (current-buffer))
 		       (end-of-file nil)))
         (when (eq (car-safe it) 'deftheme)
-          (setq doc (cl-return (car (split-string (nth 2 it) "\n")))))))
+          (cl-return (setq doc (car (split-string (nth 2 it) "\n")))))))
     ;; If deftheme not found in file (in modus themes deftheme is nested in
     ;; eval-when-compile) load the theme without enabling it.
-    (if doc doc
+    (if doc
+        doc
       (load-theme sym t t)
       (helm-get-first-line-documentation sym))))
 
