@@ -1550,7 +1550,9 @@ ARG-LIST is a list of arguments to pass to HANDLER."
     (apply handler arg-list)))
 
 (defvar helm-comp-read-require-match-overrides '((describe-function . t)
-                                                 (describe-command . t))
+                                                 (describe-command . t)
+                                                 (load-theme . t)
+                                                 (describe-theme . t))
   "Allow overriding REQUIRE-MATCH completing-read arg for a specific function.")
 
 (cl-defun helm--completing-read-default
