@@ -1185,7 +1185,7 @@ is used."
           (when (eq (car-safe it) 'deftheme)
             (cl-return (setq doc (car (split-string (nth 2 it) "\n"))))))))
     ;; If deftheme not found in file (in modus themes deftheme is nested in
-    ;; eval-when-compile) load the theme without enabling it.
+    ;; eval-and-compile) load the theme without enabling it.
     (if doc
         doc
       (load-theme sym t t)
