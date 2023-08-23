@@ -240,6 +240,12 @@ A list of symbols.  `helm-mode' is rejecting all lambda's, byte-code fns
 and all functions belonging in this list from `minibuffer-setup-hook'.
 This is mainly needed to prevent \"*Completions*\" buffers to popup.")
 
+(defvar helm-comp-read-require-match-overrides '((describe-function . t)
+                                                 (describe-command . t)
+                                                 (load-theme . t)
+                                                 (describe-theme . t))
+  "Allow overriding REQUIRE-MATCH completing-read arg for a specific function.")
+
 (defface helm-mode-prefix
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        (:background "red" :foreground "black")))
@@ -1548,12 +1554,6 @@ ARG-LIST is a list of arguments to pass to HANDLER."
   ;; minibuffer-complete one time for all [1].
   (cl-letf (((symbol-function 'minibuffer-complete) #'ignore))
     (apply handler arg-list)))
-
-(defvar helm-comp-read-require-match-overrides '((describe-function . t)
-                                                 (describe-command . t)
-                                                 (load-theme . t)
-                                                 (describe-theme . t))
-  "Allow overriding REQUIRE-MATCH completing-read arg for a specific function.")
 
 (cl-defun helm--completing-read-default
     (prompt collection &optional
