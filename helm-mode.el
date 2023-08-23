@@ -1169,14 +1169,15 @@ is used."
         (warning-suppress-types '((initialization)))
         doc)
     ;; Avoid loading theme as much as possible.
-    (with-temp-buffer
-      (insert-file-contents fn)
-      (helm-awhile (let ((read-circle nil))
-		     (condition-case nil
-			 (read (current-buffer))
-		       (end-of-file nil)))
-        (when (eq (car-safe it) 'deftheme)
-          (cl-return (setq doc (car (split-string (nth 2 it) "\n")))))))
+    (when fn
+      (with-temp-buffer
+        (insert-file-contents fn)
+        (helm-awhile (let ((read-circle nil))
+		       (condition-case nil
+			   (read (current-buffer))
+		         (end-of-file nil)))
+          (when (eq (car-safe it) 'deftheme)
+            (cl-return (setq doc (car (split-string (nth 2 it) "\n"))))))))
     ;; If deftheme not found in file (in modus themes deftheme is nested in
     ;; eval-when-compile) load the theme without enabling it.
     (if doc
