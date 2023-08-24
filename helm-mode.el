@@ -1185,13 +1185,22 @@ is used."
 			   (read (current-buffer))
 		         (end-of-file nil)))
           (when (eq (car-safe it) 'deftheme)
-            (cl-return (setq doc (car (split-string (nth 2 it) "\n"))))))))
-    ;; If deftheme not found in file (in modus themes deftheme is nested in
-    ;; eval-and-compile) load the theme without enabling it.
-    (if doc
-        doc
-      (load-theme sym t t)
-      (helm-get-first-line-documentation sym))))
+            (cl-return (setq doc (car (split-string (nth 2 it) "\n"))))))
+        (unless doc
+          (setq doc (helm--get-theme-doc-from-header)))))
+    doc))
+
+(defun helm--get-theme-doc-from-header ()
+  "Extract doc in first line of theme file."
+  (goto-char (point-min))
+  (let (beg end)
+    (when (re-search-forward "--- " (pos-eol) t)
+      (setq beg (point)))
+    (if (re-search-forward " -\\*-" (pos-eol) t)
+        (setq end (match-beginning 0))
+      (setq end (pos-eol)))
+    (when (and beg end)
+      (buffer-substring beg end))))
 
 ;;; Generic completing read
 ;;
