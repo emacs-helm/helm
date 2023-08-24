@@ -165,7 +165,10 @@ than `helm-candidate-number-limit'.")
 This is used only as a let binding.")
 (defvar helm-ff--show-thumbnails nil)
 (defvar helm-ff--thumbnailed-directories nil)
-
+(defvar helm-source-find-files nil
+  "The main source to browse files.
+Should not be used among other sources.")
+(defvar helm-ff-icon-mode nil)
 
 ;;; Helm-find-files - The helm file browser.
 ;;
@@ -875,10 +878,11 @@ present in this list."
 (defcustom helm-ff-edit-marked-files-fn #'helm-ff-wfnames
   "A function to edit filenames in a special buffer.
 
-By default `wfnames' package is used to avoid wdired which doesn't
-always work with all emacs versions and also is quite clumsy about
-default-directory among other things.
-If you still want to use it, helm is still providing `helm-marked-files-in-dired'."
+By default `wfnames' package is used to avoid wdired which
+doesn't always work with all emacs versions and also is quite
+clumsy about default-directory among other things.  If you still
+want to use it, helm is still providing
+`helm-marked-files-in-dired'."
   :type '(choice (function :tag "Use Wfnames package to edit filenames."
                   helm-ff-wfnames)
                  (function :tag "Use Wdired package to edit filenames."
@@ -1046,10 +1050,6 @@ If you still want to use it, helm is still providing `helm-marked-files-in-dired
 ;;; Helm-find-files
 ;;
 ;;
-(defvar helm-source-find-files nil
-  "The main source to browse files.
-Should not be used among other sources.")
-
 (defclass helm-source-ffiles (helm-source-sync)
   ((header-name
     :initform (lambda (name)

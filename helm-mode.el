@@ -365,12 +365,12 @@ NOTE: Use a mode for a completion that will be used in a buffer
 i.e. completion-in-region, whereas you have to specify instead a command to
 affect the completing-read trigerred by this command.
 
-Each entry is a cons cell like (mode . style) where style must be a
-suitable value for `helm-completion-style'.
-When specifying emacs as style for a mode or a command, `completion-styles' can be
-specified by using a cons cell specifying completion-styles to use
-with helm emacs style, e.g. (foo-mode . (emacs helm flex)) will set
-`completion-styles' to \\='(helm flex) for foo-mode."
+Each entry is a cons cell like (mode . style) where style must be
+a suitable value for `helm-completion-style'.  When specifying
+emacs as style for a mode or a command, `completion-styles' can
+be specified by using a cons cell specifying completion-styles to
+use with helm emacs style, e.g. (foo-mode . (emacs helm flex))
+will set `completion-styles' to \\='(helm flex) for foo-mode."
   :group 'helm-mode
   :type
   `(alist :key-type (symbol :tag "Major Mode")
@@ -1027,9 +1027,10 @@ behavior as emacs vanilla.")
     ("describe-theme" . theme))
   "An alist to specify metadata category by command.
 
-Some commands provide a completion-table with no category specified in metadata,
-we allow here specifying the category of the completion provided by a specific
-command.  The command should be specified as a string and the category as a symbol.")
+Some commands provide a completion-table with no category
+specified in metadata, we allow here specifying the category of
+the completion provided by a specific command.  The command
+should be specified as a string and the category as a symbol.")
 
 (defvar helm-completing-read--buffer-lgst-mode nil)
 (defun helm-completing-read-buffer-affixation (completions)

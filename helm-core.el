@@ -4012,7 +4012,7 @@ Update is reenabled when idle 1s."
   (with-helm-alive-p
     (unless helm--suspend-update-interactive-flag
       (helm-suspend-update 1))
-    (backward-delete-char arg)
+    (delete-char (- arg))
     (run-with-idle-timer
      1 nil
      (lambda ()
