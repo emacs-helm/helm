@@ -868,8 +868,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                     :multiline multiline
                     :header-name header-name
                     :filtered-candidate-transformer
-                    (append (helm-mklist fc-transformer)
-                            '(helm-cr-default-transformer))
+                    (let ((transformers (helm-mklist fc-transformer)))
+                      (append transformers
+                              (unless (member 'helm-cr-default-transformer transformers)
+                                '(helm-cr-default-transformer))))
                     :requires-pattern requires-pattern
                     :persistent-action persistent-action
                     :fuzzy-match fuzzy
