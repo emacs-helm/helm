@@ -137,7 +137,6 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 ;; watch out!
 (defvar helm-tramp-file-name-regexp "\\`/\\([^/:|]+\\):")
 (defvar helm-ff-tramp-method-regexp "[/|]:\\([^:]*\\)")
-(defvar helm-marked-buffer-name "*helm marked*")
 (defvar helm-ff--auto-update-state nil)
 (defvar helm-ff--deleting-char-backward nil)
 (defvar helm-multi-files--toggle-locate nil)

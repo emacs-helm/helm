@@ -21,7 +21,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'package)
-(eval-when-compile (require 'helm-utils)) ; For with-helm-display-marked-candidates.
+(require 'helm-utils) ; For with-helm-display-marked-candidates.
 
 ;;; Compatibility with Emacs-29+
 ;;  Needed by helm-packages.el waiting package.el moves on Elpa.

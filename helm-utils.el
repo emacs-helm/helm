@@ -245,6 +245,8 @@ See https://www.freeformatter.com/html-entities.html")
 
 (defvar helm-find-many-files-after-hook nil
   "Hook that runs at end of `helm-find-many-files'.")
+
+(defvar helm-marked-buffer-name "*helm marked*")
 
 ;;; Faces.
 ;;
