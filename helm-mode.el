@@ -30,7 +30,6 @@
 (defvar helm-mode)
 (defvar password-cache)
 (defvar package--builtins)
-(defvar warning-suppress-types)
 
 ;; No warnings in Emacs built --without-x
 (declare-function x-file-dialog "xfns.c")
@@ -1174,7 +1173,6 @@ is used."
   (let ((fn (locate-file (concat (symbol-name sym) "-theme.el")
 			 (custom-theme--load-path)
 			 '("" "c")))
-        (warning-suppress-types '((initialization)))
         doc)
     ;; Avoid loading theme as much as possible.
     (when fn
