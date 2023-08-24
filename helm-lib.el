@@ -71,7 +71,7 @@
 (defvar ffap-machine-p-unknown)
 (defvar ffap-machine-p-local)
 (defvar ffap-machine-p-known)
-
+(defvar helm-debug-output-buffer)
 
 ;;; User vars.
 ;;
