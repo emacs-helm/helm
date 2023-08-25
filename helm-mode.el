@@ -44,6 +44,7 @@
 (declare-function package-built-in-p "package")
 (declare-function package-desc-status "package")
 (declare-function package-get-descriptor "package")
+(declare-function print-coding-system-briefly "mul-diag.el")
 
 (defgroup helm-mode nil
   "Enable helm completion."
@@ -987,7 +988,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                 (category . package)))
     (theme . (metadata
               (affixation-function . helm-completion-theme-affixation)
-              (category . theme))))
+              (category . theme)))
+    (coding-system . (metadata
+                      (affixation-function . helm-completion-coding-system-affixation)
+                      (category . coding-system))))
   "Extra metadata for completing-read.
 
 Alist composed of (CATEGORY . METADATA).
@@ -1024,7 +1028,8 @@ behavior as emacs vanilla.")
     ("package-vc-checkout" . package)
     ("describe-package" . package)
     ("load-theme" . theme)
-    ("describe-theme" . theme))
+    ("describe-theme" . theme)
+    ("describe-coding-system" . coding-system))
   "An alist to specify metadata category by command.
 
 Some commands provide a completion-table with no category
@@ -1200,6 +1205,19 @@ is used."
       (setq end (pos-eol)))
     (when (and beg end)
       (buffer-substring beg end))))
+
+(defun helm-completion-coding-system-affixation (_comps)
+  (lambda (comp)
+    (let ((doc (with-output-to-string
+                 (with-current-buffer standard-output
+                   (print-coding-system-briefly (intern comp) 'tightly))))
+          (sep (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
+                                   (length comp)))
+                            ? )))
+      (list comp "" (helm-aand (replace-regexp-in-string "^ *" "" doc)
+                               (replace-regexp-in-string "[\n]" "" it)
+                               (propertize (concat sep it) 'face 'font-lock-warning-face)
+                               (propertize " " 'display it))))))
 
 ;;; Generic completing read
 ;;
