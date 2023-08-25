@@ -1042,8 +1042,8 @@ should be specified as a string and the category as a symbol.")
 (defvar helm-completing-read--buffer-lgst-mode nil)
 (defun helm-completing-read-buffer-affixation (completions)
   (let ((len-mode (or helm-completing-read--buffer-lgst-mode
-                      (cl-loop for bname in completions
-                               maximize (with-current-buffer bname
+                      (cl-loop for bn in completions
+                               maximize (with-current-buffer bn
                                           (length (symbol-name major-mode)))))))
     (lambda (comp)
       (let* ((buf (get-buffer comp))
@@ -1060,9 +1060,12 @@ should be specified as a string and the category as a symbol.")
                      (propertize
                       (symbol-name major-mode) 'face 'font-lock-warning-face)))
              (size (helm-buffer-size buf))
-             (len (helm-in-buffer-get-longest-candidate))
+             (max-len helm-buffer-max-length)
+             (bname (truncate-string-to-width
+                     comp helm-buffer-max-length nil nil
+                     helm-buffers-end-truncated-string))
              (suffix (format "%s%s%s%s%s(in %s)"
-                             (make-string (1+ (- len (length comp))) ? )
+                             (make-string (1+ (- max-len (length bname))) ? )
                              (propertize size
                                          'face 'helm-buffer-size)
                              (make-string (- 7 (length size)) ? )
@@ -1077,7 +1080,7 @@ should be specified as a string and the category as a symbol.")
                                   (abbreviate-file-name default-directory))
                                 'face 'font-lock-doc-face)))))
         (list (propertize
-               comp 'face (if fname
+               bname 'face (if fname
                               'font-lock-builtin-face
                             'font-lock-doc-face))
               (propertize " " 'display prefix)
