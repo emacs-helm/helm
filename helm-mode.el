@@ -45,6 +45,7 @@
 (declare-function package-desc-status "package")
 (declare-function package-get-descriptor "package")
 (declare-function print-coding-system-briefly "mul-diag.el")
+(declare-function color-rgb-to-hex "color.el")
 
 (defgroup helm-mode nil
   "Enable helm completion."
@@ -992,7 +993,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
               (category . theme)))
     (coding-system . (metadata
                       (affixation-function . helm-completion-coding-system-affixation)
-                      (category . coding-system))))
+                      (category . coding-system)))
+    (color . (metadata
+              (affixation-function . helm-completion-color-affixation)
+              (category . color))))
   "Extra metadata for completing-read.
 
 Alist composed of (CATEGORY . METADATA).
@@ -1031,7 +1035,8 @@ behavior as emacs vanilla.")
     ("describe-package" . package)
     ("load-theme" . theme)
     ("describe-theme" . theme)
-    ("describe-coding-system" . coding-system))
+    ("describe-coding-system" . coding-system)
+    ("read-color" . color))
   "An alist to specify metadata category by command.
 
 Some commands provide a completion-table with no category
@@ -1223,6 +1228,26 @@ is used."
                                (replace-regexp-in-string "[\n]" "" it)
                                (propertize (concat sep it) 'face 'font-lock-warning-face)
                                (propertize " " 'display it))))))
+
+(defun helm-completion-color-affixation (_comps)
+  (lambda (comp)
+    (let ((sep (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
+                                   (length comp)))
+                            ? ))
+          (rgb (condition-case nil
+                   (helm-acase comp
+                     ("foreground at point" (with-helm-current-buffer
+                                              (foreground-color-at-point)))
+                     ("background at point" (with-helm-current-buffer
+                                              (background-color-at-point)))
+                     (t
+                      (apply #'color-rgb-to-hex (color-name-to-rgb comp))))
+                 (error "SAMPLE"))))
+      (list comp
+            ""
+            (helm-aand (propertize rgb 'face `(:background ,rgb
+                                               :distant-foreground "black"))
+                       (propertize " " 'display (concat sep it)))))))
 
 ;;; Generic completing read
 ;;
