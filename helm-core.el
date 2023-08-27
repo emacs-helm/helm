@@ -1234,7 +1234,9 @@ Set this to an empty string if you don't want prefix in margin when marking."
 (defface helm-header-line-left-margin
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "black" :background "yellow"))
-  "Face used to highlight helm-header sign in left-margin."
+  "Face used to highlight helm-header sign in left-margin.
+This face is used only when using `helm-echo-input-in-header-line' and pattern
+is wider then screen."
   :group 'helm-faces)
 
 (defface helm-minibuffer-prompt
