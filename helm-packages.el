@@ -111,6 +111,9 @@ This is done recursively."
 (defun helm-packages-upgrade (_candidate)
   "Helm action for upgrading marked packages."
   (let ((mkd (helm-marked-candidates)))
+    (when (and helm-current-prefix-arg
+               (y-or-n-p "Refresh package contents?"))
+      (package-refresh-contents))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (mapcar #'symbol-name mkd)
@@ -136,6 +139,9 @@ This is done recursively."
 (defun helm-packages-package-reinstall (_candidate)
   "Helm action for reinstalling marked packages."
   (let ((mkd (helm-marked-candidates)))
+    (when (and helm-current-prefix-arg
+               (y-or-n-p "Refresh package contents?"))
+      (package-refresh-contents))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (mapcar #'symbol-name mkd)
@@ -183,6 +189,9 @@ as dependencies."
 (defun helm-packages-install (_candidate)
   "Helm action for installing marked packages."
   (let ((mkd (helm-marked-candidates)))
+    (when (and helm-current-prefix-arg
+               (y-or-n-p "Refresh package contents?"))
+      (package-refresh-contents))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (mapcar #'symbol-name mkd)
@@ -302,7 +311,8 @@ to avoid errors with outdated packages no more availables."
                       :init (lambda ()
                               (helm-init-candidates-in-buffer 'global upgrades))
                       :filtered-candidate-transformer #'helm-packages-transformer-1
-                      :action '(("Upgrade package(s)" . helm-packages-upgrade)))
+                      :action '(("Upgrade package(s) (`C-u' refresh package contents)"
+                                 . helm-packages-upgrade)))
                     (helm-make-source "Packages to delete" 'helm-packages-class
                       :init (lambda ()
                               (helm-init-candidates-in-buffer 'global removables))
@@ -314,7 +324,8 @@ to avoid errors with outdated packages no more availables."
                                 (mapcar #'car package-alist)))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
-                                ("Reinstall package(s)" . helm-packages-package-reinstall)
+                                ("Reinstall package(s) (`C-u' refresh package contents)"
+                                 . helm-packages-package-reinstall)
                                 ("Recompile package(s)" . helm-packages-recompile)
                                 ("Uninstall package(s)" . helm-packages-uninstall)
                                 ("Isolate package(s)" . helm-packages-isolate)))
@@ -330,7 +341,8 @@ to avoid errors with outdated packages no more availables."
                                      nconc (list (car p)))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
-                                ("Install packages(s)" . helm-packages-install)))
+                                ("Install packages(s) (`C-u' refresh package contents)"
+                                 . helm-packages-install)))
                     (helm-make-source "Available built-in packages" 'helm-packages-class
                       :data (cl-loop for p in package--builtins
                                      ;; Show only builtins that are available as
@@ -341,7 +353,8 @@ to avoid errors with outdated packages no more availables."
                                      collect (car p))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
-                                ("Install packages(s)" . helm-packages-install))))
+                                ("Install packages(s) (`C-u' refresh package contents)"
+                                 . helm-packages-install))))
           :buffer "*helm packages*")))
 
 (provide 'helm-packages)
