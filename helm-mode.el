@@ -1298,6 +1298,13 @@ dynamically otherwise use `helm-completing-read-default-2'."
         (unless (completion-metadata-get metadata 'category)
           (setq metadata `(metadata (category . ,it))
                 category it)))
+    ;; FIXME: Actually we are using completions-detailed as a flag to decide if
+    ;; we add affixations or not, but as we do our own implementation probably
+    ;; we could provide this feature as well for earlier Emacs (27.2 looks a
+    ;; good target) that don't have completions-detailed.
+    ;; For this we need some compatibility fns though:
+    ;; - inline helm--symbol-class
+    ;; - for packages missing fns move all compat code from helm-packages to helm-lib. 
     (helm-aif (and (boundp 'completions-detailed)
                    completions-detailed
                    (assoc-default category helm-completing-read-extra-metadata))
