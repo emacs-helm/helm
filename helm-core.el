@@ -6861,7 +6861,8 @@ before running again the init function."
 It is a local variable set from `helm-init-candidates-in-buffer' in
 `helm-candidate-buffer'.
 Allow getting the longest length of initial candidates in transformers
-without looping again through the whole list.")
+without looping again through the whole list.
+It is useful to align extra informations after candidates in `helm-buffer'.")
 
 (defsubst helm-in-buffer-get-longest-candidate ()
   "Return the longest candidate recorded in `helm-candidate-buffer'."
@@ -6871,7 +6872,7 @@ without looping again through the whole list.")
        (get-buffer it))
     0))
 
-(defun helm-init-candidates-in-buffer (buffer-spec data)
+(defun helm-init-candidates-in-buffer (buffer-spec data &optional force-longest)
   "Register BUFFER-SPEC with DATA for a helm candidates-in-buffer session.
 
 Arg BUFFER-SPEC can be a `buffer-name' (stringp), a buffer-spec
@@ -6885,7 +6886,13 @@ Returns the resulting buffer.
 Use this in your init function to register a buffer for a
 `helm-source-in-buffer' session and feed it with DATA.  You
 probably don't want to bother with this and use the :data slot
-when initializing a source with `helm-source-in-buffer' class."
+when initializing a source with `helm-source-in-buffer' class.
+
+When inserting DATA in `helm-candidate-buffer', if DATA is a list the longest
+candidate will be recorded in `helm-candidate-buffer-longest-len' local
+variable. If DATA is a string, it is inserted directly in
+`helm-candidate-buffer' and `helm-candidate-buffer-longest-len' is not computed
+unless FORCE-LONGEST is non nil."
   (declare (indent 1))
   (let ((caching (and (or (stringp buffer-spec)
                           (bufferp buffer-spec))
@@ -6907,8 +6914,25 @@ when initializing a source with `helm-source-in-buffer' class."
                                                        (length cand)))
                                       cand))
                                   data "\n")))
-              ((stringp data) (insert data))))
+              ((stringp data)
+               (insert data)
+               (when force-longest
+                 (setq-local helm-candidate-buffer-longest-len
+                             (helm--get-longest-len-in-buffer))))))
       buf)))
+
+(defun helm--get-longest-len-in-buffer ()
+  "Return length of the longest line in buffer." 
+  (save-excursion
+    (goto-char (point-min))
+    (let ((max 0)
+          len)
+      (while (not (eobp))
+        (setq len (- (pos-eol) (pos-bol)))
+        (when (> len max)
+          (setq max len))
+        (forward-line 1))
+      max)))
 
 
 ;;; Resplit helm window
