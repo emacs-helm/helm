@@ -363,8 +363,10 @@ NOT `setq'."
   "Allow configuring `helm-completion-style' per mode or command.
 
 NOTE: Use a mode for a completion that will be used in a buffer
-i.e. completion-in-region, whereas you have to specify instead a command to
-affect the completing-read trigerred by this command.
+i.e. completion-in-region, whereas you have to specify instead a
+command to affect the completing-read trigerred by this
+command. Commands specified in `helm-completing-read-handlers-alist' take
+precedence on commands you put here.
 
 Each entry is a cons cell like (mode . style) where style must be
 a suitable value for `helm-completion-style'.  When specifying
