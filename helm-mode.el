@@ -1026,6 +1026,10 @@ behavior as emacs vanilla.")
     ("customize-set-variable" . symbol-help)
     ("customize-set-value" . symbol-help)
     ("customize-save-variable" . symbol-help)
+    ("describe-function" . symbol-help); For Emacs-27.
+    ("describe-variable" . symbol-help); For Emacs-27.
+    ("describe-symbol" . symbol-help)  ; For Emacs-27.
+    ("describe-command" . symbol-help) ; For Emacs-27.
     ("set-variable" . symbol-help)
     ("customize-group" . symbol-help)
     ("find-function" . symbol-help)
