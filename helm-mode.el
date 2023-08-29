@@ -1140,19 +1140,18 @@ is used."
          (propertize comp 'face 'helm-completion-invalid))
        ;; Prefix.
        (helm-aand (propertize
-                   (format "%-4s" (cond ((and symbol-class group)
-                                         (concat "g" symbol-class))
-                                        ((and (not (string= symbol-class ""))
-                                              symbol-class))
-                                        (group "g")
-                                        (t "i")))
+                   (cond ((and symbol-class group)
+                          (concat "g" symbol-class))
+                         ((and (not (string= symbol-class ""))
+                               symbol-class))
+                         (group "g")
+                         (t "i"))
                    'face 'completions-annotations)
-                  (propertize " " 'display it))
+                  (propertize " " 'display (format "%-4s" it)))
        ;; Suffix.
        (if doc
-           (helm-aand (propertize
-                       (format "%s%s" sep doc) 'face 'completions-annotations)
-                      (propertize " " 'display it))
+           (helm-aand (propertize doc 'face 'completions-annotations)
+                      (propertize " " 'display (concat sep it)))
          "")))))
 
 (defun helm-completion-package-affixation (_completions)
@@ -1174,8 +1173,8 @@ is used."
                "b ")
               'face 'font-lock-property-name-face)
             (or (helm-aand desc
-                           (propertize (concat sep it) 'face 'font-lock-warning-face)
-                           (propertize " " 'display it))
+                           (propertize it 'face 'font-lock-warning-face)
+                           (propertize " " 'display (concat sep it)))
                 "")))))
 
 (defun helm-completion-theme-affixation (_completions)
@@ -1189,8 +1188,8 @@ is used."
                   (helm--get-theme-doc-1 sym))))
       (list comp
             ""
-            (helm-aand (propertize (concat sep doc) 'face 'font-lock-warning-face)
-                       (propertize " " 'display it))))))
+            (helm-aand (propertize doc 'face 'font-lock-warning-face)
+                       (propertize " " 'display (concat sep it)))))))
 
 (defun helm--get-theme-doc-1 (sym)
   (let ((fn (locate-file (concat (symbol-name sym) "-theme.el")
@@ -1233,8 +1232,8 @@ is used."
                             ? )))
       (list comp "" (helm-aand (replace-regexp-in-string "^ *" "" doc)
                                (replace-regexp-in-string "[\n]" "" it)
-                               (propertize (concat sep it) 'face 'font-lock-warning-face)
-                               (propertize " " 'display it))))))
+                               (propertize it 'face 'font-lock-warning-face)
+                               (propertize " " 'display (concat sep it)))))))
 
 (defun helm-completion-color-affixation (_comps)
   (lambda (comp)
