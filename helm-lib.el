@@ -368,6 +368,33 @@ This is done recursively."
                   (deps (mapcar #'car (package-desc-reqs desc))))
         (delete-dups (apply #'nconc deps (mapcar #'package--dependencies deps)))))))
 
+;;; Provide `help--symbol-class' not available in emacs-27
+;;
+(unless (fboundp 'help--symbol-class)
+  (defun help--symbol-class (s)
+    "Return symbol class characters for symbol S."
+    (when (stringp s)
+      (setq s (intern-soft s)))
+    (concat
+     (when (fboundp s)
+       (concat
+        (cond
+          ((commandp s) "c")
+          ((eq (car-safe (symbol-function s)) 'macro) "m")
+          (t "f"))
+        (and (let ((flist (indirect-function s)))
+               (advice--p (if (eq 'macro (car-safe flist)) (cdr flist) flist)))
+             "!")
+        (and (get s 'byte-obsolete-info) "-")))
+     (when (boundp s)
+       (concat
+        (if (custom-variable-p s) "u" "v")
+        (and (local-variable-if-set-p s) "'")
+        (and (ignore-errors (not (equal (symbol-value s) (default-value s)))) "*")
+        (and (get s 'byte-obsolete-variable) "-")))
+     (and (facep s) "a")
+     (and (fboundp 'cl-find-class) (cl-find-class s) "t"))))
+
 
 ;;; Macros helper.
 ;;
