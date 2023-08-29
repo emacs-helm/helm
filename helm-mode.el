@@ -1294,10 +1294,10 @@ dynamically otherwise use `helm-completing-read-default-2'."
                      (lambda (candidates)
                        (sort candidates #'helm-generic-sort-fn)))))
          flags)
-    (helm-aif (assoc-default name helm-completing-read-command-categories)
-        (unless (completion-metadata-get metadata 'category)
-          (setq metadata `(metadata (category . ,it))
-                category it)))
+    (helm-aif (and (null category)
+                   (assoc-default name helm-completing-read-command-categories))
+        (setq metadata `(metadata (category . ,it))
+              category it))
     ;; FIXME: Actually we are using completions-detailed as a flag to decide if
     ;; we add affixations or not, but as we do our own implementation probably
     ;; we could provide this feature as well for earlier Emacs (27.2 looks a
