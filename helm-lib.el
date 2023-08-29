@@ -295,6 +295,79 @@ the leading `-' char."
   (defalias 'pos-bol 'line-beginning-position)
   (defalias 'pos-eol 'line-end-position))
 
+;;; Compatibility with < Emacs-29
+;;  Needed by helm-packages.el and affixations functions for helm-mode (27)
+;;  waiting package.el moves on Elpa.  Slightly modified to fit with
+;;  Emacs-27/28.
+(when (< emacs-major-version 29)
+  (require 'package)
+  (eval-and-compile
+    (defun package--archives-initialize ()
+      "Make sure the list of installed and remote packages are initialized."
+      (unless package--initialized
+        (package-initialize t))
+      (unless package-archive-contents
+        (package-refresh-contents)))
+
+    (defun package-get-descriptor (pkg-name)
+      "Return the `package-desc' of PKG-NAME."
+      (unless package--initialized (package-initialize 'no-activate))
+      (or (cadr (assq pkg-name package-alist))
+          (cadr (assq pkg-name package-archive-contents))))
+  
+    (defun package--upgradeable-packages ()
+      ;; Initialize the package system to get the list of package
+      ;; symbols for completion.
+      (package--archives-initialize)
+      (mapcar
+       #'car
+       (seq-filter
+        (lambda (elt)
+          (or (let ((available
+                     (assq (car elt) package-archive-contents)))
+                (and available
+                     (version-list-<
+                      (package-desc-version (cadr elt))
+                      (package-desc-version (cadr available)))))))
+        package-alist)))
+
+    (defun package-upgrade (name)
+      "Upgrade package NAME if a newer version exists."
+      (let* ((package (if (symbolp name)
+                          name
+                        (intern name)))
+             (pkg-desc (cadr (assq package package-alist))))
+        ;; `pkg-desc' will be nil when the package is an "active built-in".
+        (when pkg-desc
+          (package-delete pkg-desc 'force 'dont-unselect))
+        (package-install package
+                         ;; An active built-in has never been "selected"
+                         ;; before.  Mark it as installed explicitly.
+                         (and pkg-desc 'dont-select))))
+
+    (defun package-recompile (pkg)
+      "Byte-compile package PKG again.
+PKG should be either a symbol, the package name, or a `package-desc'
+object."
+      (let ((pkg-desc (if (package-desc-p pkg)
+                          pkg
+                        (cadr (assq pkg package-alist)))))
+        ;; Delete the old .elc files to ensure that we don't inadvertently
+        ;; load them (in case they contain byte code/macros that are now
+        ;; invalid).
+        (dolist (elc (directory-files-recursively
+                      (package-desc-dir pkg-desc) "\\.elc\\'"))
+          (delete-file elc))
+        (package--compile pkg-desc)))
+
+    (defun package--dependencies (pkg)
+      "Return a list of all dependencies PKG has.
+This is done recursively."
+      ;; Can we have circular dependencies?  Assume "nope".
+      (when-let* ((desc (cadr (assq pkg package-archive-contents)))
+                  (deps (mapcar #'car (package-desc-reqs desc))))
+        (delete-dups (apply #'nconc deps (mapcar #'package--dependencies deps)))))))
+
 
 ;;; Macros helper.
 ;;
