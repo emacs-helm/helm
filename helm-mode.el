@@ -245,6 +245,13 @@ This is mainly needed to prevent \"*Completions*\" buffers to popup.")
                                                  (load-theme . t)
                                                  (describe-theme . t))
   "Allow overriding REQUIRE-MATCH completing-read arg for a specific function.")
+
+(defcustom helm-completions-detailed (and (boundp 'completions-detailed)
+                                          completions-detailed)
+  "Allow providing `completions-detailed' for Emacs < 28.
+Not guaranteed to work with Emacs < 27."
+  :type 'boolean
+  :group 'helm-mode)
 
 (defface helm-mode-prefix
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
@@ -1298,15 +1305,8 @@ dynamically otherwise use `helm-completing-read-default-2'."
                    (assoc-default name helm-completing-read-command-categories))
         (setq metadata `(metadata (category . ,it))
               category it))
-    ;; FIXME: Actually we are using completions-detailed as a flag to decide if
-    ;; we add affixations or not, but as we do our own implementation probably
-    ;; we could provide this feature as well for earlier Emacs (27.2 looks a
-    ;; good target) that don't have completions-detailed.
-    ;; For this we need some compatibility fns though:
-    ;; - inline helm--symbol-class
-    ;; - for packages missing fns move all compat code from helm-packages to helm-lib. 
-    (helm-aif (and (boundp 'completions-detailed)
-                   completions-detailed
+    (helm-aif (and (or (and (boundp 'completions-detailed) completions-detailed)
+                       helm-completions-detailed)
                    (assoc-default category helm-completing-read-extra-metadata))
         (progn
           (setq metadata it)
