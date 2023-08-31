@@ -388,9 +388,17 @@ When GSHORTHANDS is nil use PATTERN unmodified."
               sources)))
     (nreverse sources)))
 
-(defun helm-multi-occur-1 (buffers &optional input)
+(defun helm-multi-occur-1 (buffers &optional input default)
   "Run `helm-occur' on a list of buffers.
-Each buffer's result is displayed in a separated source."
+Each buffer's result is displayed in a separated source.
+Arg INPUT if specified will be inserted as initial input in minibuffer.
+Arg DEFAULT if specified will be inserted in minibuffer with M-n.
+Arg INPUT takes precedence on DEFAULT if both are specified.
+If `helm-source-moccur' is member of `helm-sources-using-default-as-input'
+helm-occur will start immediately with DEFAULT as INPUT.
+Always prefer using DEFAULT instead of INPUT, they have the same effect but
+DEFAULT keep the minibuffer empty, allowing the user to write immediately
+without having to delete its contents before."
   (let* ((curbuf (current-buffer))
          (bufs (if helm-occur-always-search-in-current
                    (cons curbuf (remove curbuf buffers))
@@ -425,8 +433,9 @@ Each buffer's result is displayed in a separated source."
         (helm :sources sources
               :buffer "*helm moccur*"
               :history 'helm-occur-history
-              :default (helm-aif (thing-at-point 'symbol)
-                           (regexp-quote it))
+              :default (or default
+                           (helm-aif (thing-at-point 'symbol)
+                               (regexp-quote it)))
               :input input
               :truncate-lines helm-occur-truncate-lines)
       (remove-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate))))
