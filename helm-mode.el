@@ -1058,9 +1058,10 @@ should be specified as a string and the category as a symbol.")
 (defvar helm-completing-read--buffer-lgst-mode nil)
 (defun helm-completing-read-buffer-affixation (completions)
   (let ((len-mode (or helm-completing-read--buffer-lgst-mode
-                      (cl-loop for bn in completions
-                               maximize (with-current-buffer bn
-                                          (length (symbol-name major-mode)))))))
+                      (setq helm-completing-read--buffer-lgst-mode
+                            (cl-loop for bn in completions
+                                     maximize (with-current-buffer bn
+                                                (length (symbol-name major-mode))))))))
     (lambda (comp)
       (let* ((buf (get-buffer comp))
              (fname (buffer-file-name buf))
