@@ -145,7 +145,7 @@
       (progn
         (advice-add 'epa--select-keys :override #'helm-epa--select-keys)
         (advice-add 'epa--read-signature-type :override #'helm-epa--read-signature-type))
-    (advice-remove 'epa-select-keys #'helm-epa--select-keys)
+    (advice-remove 'epa--select-keys #'helm-epa--select-keys)
     (advice-remove 'epa--read-signature-type #'helm-epa--read-signature-type)))
 
 (defun helm-epa-action-transformer (actions _candidate)
