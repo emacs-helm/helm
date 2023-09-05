@@ -31,7 +31,8 @@
     :initform
     '(helm-packages-transformer
       (lambda (candidates _source)
-        (sort candidates #'helm-generic-sort-fn)))))
+        (sort candidates #'helm-generic-sort-fn))))
+   (update :initform #'helm-packages--refresh-contents))
   "A class to define `helm-packages' sources.")
 
 ;;; Actions
@@ -40,9 +41,6 @@
 (defun helm-packages-upgrade (_candidate)
   "Helm action for upgrading marked packages."
   (let ((mkd (helm-marked-candidates)))
-    (when (and helm-current-prefix-arg
-               (y-or-n-p "Refresh package contents?"))
-      (package-refresh-contents))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (mapcar #'symbol-name mkd)
@@ -68,9 +66,6 @@
 (defun helm-packages-package-reinstall (_candidate)
   "Helm action for reinstalling marked packages."
   (let ((mkd (helm-marked-candidates)))
-    (when (and helm-current-prefix-arg
-               (y-or-n-p "Refresh package contents?"))
-      (package-refresh-contents))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (mapcar #'symbol-name mkd)
@@ -118,9 +113,6 @@ as dependencies."
 (defun helm-packages-install (_candidate)
   "Helm action for installing marked packages."
   (let ((mkd (helm-marked-candidates)))
-    (when (and helm-current-prefix-arg
-               (y-or-n-p "Refresh package contents?"))
-      (package-refresh-contents))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (mapcar #'symbol-name mkd)
@@ -220,6 +212,12 @@ Arg PACKAGES is a list of strings."
   "Transformer function for `helm-packages' upgrade and delete sources."
   (cl-loop for c in candidates
            collect (cons (propertize c 'face 'font-lock-keyword-face) c)))
+
+(defvar helm-packages--updated nil)
+(defun helm-packages--refresh-contents ()
+  (unless helm-packages--updated (package-refresh-contents))
+  (helm-set-local-variable 'helm-packages--updated t))
+
 
 ;;;###autoload
 (defun helm-packages (&optional arg)
@@ -231,8 +229,7 @@ When installing or upgrading ensure to refresh the package list
 to avoid errors with outdated packages no more availables."
   (interactive "P")
   (package-initialize)
-  (when arg
-    (package-refresh-contents))
+  (when arg (helm-packages--refresh-contents))
   (let ((upgrades (package--upgradeable-packages))
         (removables (package--removable-packages)))
     (helm :sources (list
