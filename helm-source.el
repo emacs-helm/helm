@@ -1172,14 +1172,14 @@ The header line is based on one of `persistent-action-if',
   ;; a list, if a function an error will raise later anyway when this function
   ;; is called with `run-hooks'.
   (let ((sname (slot-value source 'name)))
-    (pcase (slot-value source 'before-init-hook)
-      ((or (and val (pred (functionp)) (guard (not (symbolp val))))
-           (pred (consp)))
-       (warn "Helm source `%s': before-init-hook Should be defined as a symbol" sname)))
-    (pcase (slot-value source 'after-init-hook)
-      ((or (and val (pred (functionp)) (guard (not (symbolp val))))
-           (pred (consp)))
-       (warn "Helm source `%s': after-init-hook Should be defined as a symbol" sname)))))
+    (helm-aif (slot-value source 'before-init-hook)
+        (when (or (and (functionp it) (not (symbolp it)))
+                  (consp it))
+          (warn "Helm source `%s': before-init-hook Should be defined as a symbol" sname)))
+    (helm-aif (slot-value source 'after-init-hook)
+        (when (or (and (functionp it) (not (symbolp it)))
+                  (consp it))
+          (warn "Helm source `%s': after-init-hook Should be defined as a symbol" sname)))))
 
 (cl-defmethod helm-setup-user-source ((_source helm-source)))
 
