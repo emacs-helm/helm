@@ -179,6 +179,18 @@ the customize functions e.g. `customize-set-variable' and NOT
 
 ;;; Compatibility
 ;;
+(unless (fboundp 'static-if)
+  (defmacro static-if (condition then-form &rest else-forms)
+    "A conditional compilation macro.
+Evaluate CONDITION at macro-expansion time.  If it is non-nil,
+expand the macro to THEN-FORM.  Otherwise expand it to ELSE-FORMS
+enclosed in a `progn' form.  ELSE-FORMS may be empty."
+    (declare (indent 2)
+             (debug (sexp sexp &rest sexp)))
+    (if (eval condition lexical-binding)
+        then-form
+      (cons 'progn else-forms))))
+
 (defun helm-add-face-text-properties (beg end face &optional append object)
   "Add the face property to the text from START to END.
 It is a compatibility function which behaves exactly like
@@ -299,75 +311,75 @@ the leading `-' char."
 ;;  Needed by helm-packages.el and affixations functions for helm-mode (27)
 ;;  waiting package.el moves on Elpa.  Slightly modified to fit with
 ;;  Emacs-27/28.
-(when (< emacs-major-version 29)
-  (with-no-warnings
-    (require 'package)
-    (eval-and-compile
-      (defun package--archives-initialize ()
-        "Make sure the list of installed and remote packages are initialized."
-        (unless package--initialized
-          (package-initialize t))
-        (unless package-archive-contents
-          (package-refresh-contents)))
+(static-if (< emacs-major-version 29)
+    (progn
+      (require 'package)
+      (eval-and-compile
+        (defun package--archives-initialize ()
+          "Make sure the list of installed and remote packages are initialized."
+          (unless package--initialized
+            (package-initialize t))
+          (unless package-archive-contents
+            (package-refresh-contents)))
 
-      (defun package-get-descriptor (pkg-name)
-        "Return the `package-desc' of PKG-NAME."
-        (unless package--initialized (package-initialize 'no-activate))
-        (or (cadr (assq pkg-name package-alist))
-            (cadr (assq pkg-name package-archive-contents))))
+        (defun package-get-descriptor (pkg-name)
+          "Return the `package-desc' of PKG-NAME."
+          (unless package--initialized (package-initialize 'no-activate))
+          (or (cadr (assq pkg-name package-alist))
+              (cadr (assq pkg-name package-archive-contents))))
   
-      (defun package--upgradeable-packages ()
-        ;; Initialize the package system to get the list of package
-        ;; symbols for completion.
-        (package--archives-initialize)
-        (mapcar
-         #'car
-         (seq-filter
-          (lambda (elt)
-            (or (let ((available
-                       (assq (car elt) package-archive-contents)))
-                  (and available
-                       (version-list-<
-                        (package-desc-version (cadr elt))
-                        (package-desc-version (cadr available)))))))
-          package-alist)))
+        (defun package--upgradeable-packages ()
+          ;; Initialize the package system to get the list of package
+          ;; symbols for completion.
+          (package--archives-initialize)
+          (mapcar
+           #'car
+           (seq-filter
+            (lambda (elt)
+              (or (let ((available
+                         (assq (car elt) package-archive-contents)))
+                    (and available
+                         (version-list-<
+                          (package-desc-version (cadr elt))
+                          (package-desc-version (cadr available)))))))
+            package-alist)))
 
-      (defun package-upgrade (name)
-        "Upgrade package NAME if a newer version exists."
-        (let* ((package (if (symbolp name)
-                            name
-                          (intern name)))
-               (pkg-desc (cadr (assq package package-alist))))
-          ;; `pkg-desc' will be nil when the package is an "active built-in".
-          (when pkg-desc
-            (package-delete pkg-desc 'force 'dont-unselect))
-          (package-install package
-                           ;; An active built-in has never been "selected"
-                           ;; before.  Mark it as installed explicitly.
-                           (and pkg-desc 'dont-select))))
+        (defun package-upgrade (name)
+          "Upgrade package NAME if a newer version exists."
+          (let* ((package (if (symbolp name)
+                              name
+                            (intern name)))
+                 (pkg-desc (cadr (assq package package-alist))))
+            ;; `pkg-desc' will be nil when the package is an "active built-in".
+            (when pkg-desc
+              (package-delete pkg-desc 'force 'dont-unselect))
+            (package-install package
+                             ;; An active built-in has never been "selected"
+                             ;; before.  Mark it as installed explicitly.
+                             (and pkg-desc 'dont-select))))
 
-      (defun package-recompile (pkg)
-        "Byte-compile package PKG again.
+        (defun package-recompile (pkg)
+          "Byte-compile package PKG again.
 PKG should be either a symbol, the package name, or a `package-desc'
 object."
-        (let ((pkg-desc (if (package-desc-p pkg)
-                            pkg
-                          (cadr (assq pkg package-alist)))))
-          ;; Delete the old .elc files to ensure that we don't inadvertently
-          ;; load them (in case they contain byte code/macros that are now
-          ;; invalid).
-          (dolist (elc (directory-files-recursively
-                        (package-desc-dir pkg-desc) "\\.elc\\'"))
-            (delete-file elc))
-          (package--compile pkg-desc)))
+          (let ((pkg-desc (if (package-desc-p pkg)
+                              pkg
+                            (cadr (assq pkg package-alist)))))
+            ;; Delete the old .elc files to ensure that we don't inadvertently
+            ;; load them (in case they contain byte code/macros that are now
+            ;; invalid).
+            (dolist (elc (directory-files-recursively
+                          (package-desc-dir pkg-desc) "\\.elc\\'"))
+              (delete-file elc))
+            (package--compile pkg-desc)))
 
-      (defun package--dependencies (pkg)
-        "Return a list of all dependencies PKG has.
+        (defun package--dependencies (pkg)
+          "Return a list of all dependencies PKG has.
 This is done recursively."
-        ;; Can we have circular dependencies?  Assume "nope".
-        (when-let* ((desc (cadr (assq pkg package-archive-contents)))
-                    (deps (mapcar #'car (package-desc-reqs desc))))
-          (delete-dups (apply #'nconc deps (mapcar #'package--dependencies deps))))))))
+          ;; Can we have circular dependencies?  Assume "nope".
+          (when-let* ((desc (cadr (assq pkg package-archive-contents)))
+                      (deps (mapcar #'car (package-desc-reqs desc))))
+            (delete-dups (apply #'nconc deps (mapcar #'package--dependencies deps))))))))
 
 ;;; Provide `help--symbol-class' not available in emacs-27
 ;;
