@@ -134,7 +134,7 @@
     :initform nil
     :custom function
     :documentation
-    "  Function called with no parameters at before \"init\" function
+    "  Function called with no parameters before :init function
   when `helm-force-update' is called.")
 
    (cleanup
