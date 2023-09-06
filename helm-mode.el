@@ -1144,15 +1144,16 @@ is used."
          ;; existing function.
          (propertize comp 'face 'helm-completion-invalid))
        ;; Prefix.
-       (helm-aand (propertize
-                   (cond ((and symbol-class group)
-                          (concat "g" symbol-class))
-                         ((and (not (string= symbol-class ""))
-                               symbol-class))
-                         (group "g")
-                         (t "i"))
-                   'face 'completions-annotations)
-                  (propertize " " 'display (format "%-4s" it)))
+       (helm-aand (cond ((and symbol-class group)
+                         (concat "g" symbol-class))
+                        ((and (not (string= symbol-class ""))
+                              symbol-class))
+                        (group "g")
+                        (t "i"))
+                  (propertize it 'face 'completions-annotations)
+                  (propertize
+                   ;; (format "%-4s" it) makes spaces inheriting text props.
+                   " " 'display (concat it (make-string (- 4 (length it)) ? ))))
        ;; Suffix.
        (if doc
            (helm-aand (propertize doc 'face 'completions-annotations)
