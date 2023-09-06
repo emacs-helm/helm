@@ -2210,17 +2210,11 @@ When AFUN, AFIX are nil and CATEGORY is not file return COMPS unmodified."
          ;; completing against a quoted symbol.
          (mapcar (lambda (s)
                    (let ((ann (funcall afun s)))
-                     (if ann
-                         (cons
-                          (concat
-                           s
-                           (propertize
-                            " " 'display
-                            (propertize
-                             ann
-                             'face 'helm-completions-annotations)))
-                          s)
-                       s)))
+                     (or (helm-aand
+                          ann
+                          (propertize ann 'face 'helm-completions-annotations)
+                          (cons (concat s (propertize " " 'display it)) s))
+                         s)))
                  comps))
         (t comps)))
 
