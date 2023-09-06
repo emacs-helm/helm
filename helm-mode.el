@@ -263,6 +263,16 @@ Not guaranteed to work with Emacs < 27."
     '((t :inherit font-lock-property-name-face))
   "Face used to highlight invalid functions."
   :group 'helm-mode)
+
+(defface helm-completions-detailed
+    '((t :inherit font-lock-warning-face))
+  "Face used to highlight completion-detailed informations."
+  :group 'helm-mode)
+
+(defface helm-completions-annotations
+    '((t :inherit font-lock-property-name-face))
+  "Face used to highlight annotations in completion."
+  :group 'helm-mode)
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -1071,11 +1081,11 @@ should be specified as a string and the category as a symbol.")
                              "fm " 'face 'font-lock-comment-face))
                            (fname
                             (propertize
-                             " f " 'face 'font-lock-property-name-face))
+                             " f " 'face 'helm-completions-annotations))
                            (t (propertize "nf " 'face 'font-lock-doc-face))))
              (mode (with-current-buffer comp
                      (propertize
-                      (symbol-name major-mode) 'face 'font-lock-warning-face)))
+                      (symbol-name major-mode) 'face 'helm-completions-detailed)))
              (size (helm-buffer-size buf))
              (max-len helm-buffer-max-length)
              (bname (truncate-string-to-width
@@ -1150,13 +1160,13 @@ is used."
                               symbol-class))
                         (group "g")
                         (t "i"))
-                  (propertize it 'face 'completions-annotations)
+                  (propertize it 'face 'helm-completions-detailed)
                   (propertize
                    ;; (format "%-4s" it) makes spaces inheriting text props.
                    " " 'display (concat it (make-string (- 4 (length it)) ? ))))
        ;; Suffix.
        (if doc
-           (helm-aand (propertize doc 'face 'completions-annotations)
+           (helm-aand (propertize doc 'face 'helm-completions-detailed)
                       (propertize " " 'display (concat sep it)))
          "")))))
 
@@ -1177,9 +1187,9 @@ is used."
              (if status
                  (format "%s " (substring status 0 1))
                "b ")
-              'face 'font-lock-property-name-face)
+              'face 'helm-completions-annotations)
             (or (helm-aand desc
-                           (propertize it 'face 'font-lock-warning-face)
+                           (propertize it 'face 'helm-completions-detailed)
                            (propertize " " 'display (concat sep it)))
                 "")))))
 
@@ -1194,7 +1204,7 @@ is used."
                   (helm--get-theme-doc-1 sym))))
       (list comp
             ""
-            (helm-aand (propertize doc 'face 'font-lock-warning-face)
+            (helm-aand (propertize doc 'face 'helm-completions-detailed)
                        (propertize " " 'display (concat sep it)))))))
 
 (defun helm--get-theme-doc-1 (sym)
@@ -1238,7 +1248,7 @@ is used."
                             ? )))
       (list comp "" (helm-aand (replace-regexp-in-string "^ *" "" doc)
                                (replace-regexp-in-string "[\n]" "" it)
-                               (propertize it 'face 'font-lock-warning-face)
+                               (propertize it 'face 'helm-completions-detailed)
                                (propertize " " 'display (concat sep it)))))))
 
 (defun helm-completion-color-affixation (_comps)
@@ -2208,7 +2218,7 @@ When AFUN, AFIX are nil and CATEGORY is not file return COMPS unmodified."
                             " " 'display
                             (propertize
                              ann
-                             'face 'completions-annotations)))
+                             'face 'helm-completions-annotations)))
                           s)
                        s)))
                  comps))
