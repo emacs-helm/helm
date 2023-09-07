@@ -4640,57 +4640,61 @@ useful when the order of the candidates is meaningful, e.g. with
                                     (or host (and (stringp real) real) display)))))
          (count   0)
          beg-str end-str)
-    (when host (setq pattern (cadr (split-string pattern ":"))))
-    ;; Extract all parts of display keeping original properties.
-    (when (and mp (ignore-errors
-                    ;; Avoid error when candidate is a huge line.
-                    (string-match (regexp-quote mp) display)))
-      (setq beg-str (substring display 0 (match-beginning 0))
-            end-str (substring display (match-end 0) (length display))
-            mp (substring display (match-beginning 0) (match-end 0))))
-    (with-temp-buffer
-      ;; Insert the whole display part and remove non--match-part
-      ;; to keep their original face properties.
-      (insert (propertize (or mp display) 'read-only nil)) ; Fix (bug#1176)
-      (goto-char (point-min))
-      (condition-case nil
-          (progn
-            ;; Try first matching against whole pattern.
-            (unless (string= pattern "")
-              (while (re-search-forward regex nil t)
-                (cl-incf count)
-                (helm-add-face-text-properties
-                 (match-beginning 0) (match-end 0) 'helm-match)))
-            ;; If no matches start matching against multiples or fuzzy matches.
-            (when (zerop count)
-              (cl-loop with multi-match = (string-match-p " " pattern)
-                       with patterns = (if multi-match
-                                           (cl-loop for pat in (helm-mm-split-pattern
-                                                                pattern)
-                                                    collect
-                                                    (helm--maybe-get-migemo-pattern
-                                                     pat diacritics))
-                                         (split-string pattern "" t))
-                       for p in patterns
-                       ;; Multi matches (regexps patterns).
-                       if multi-match do
-                       (progn
-                         (while (re-search-forward p nil t)
+    ;; Happens when matching empty lines (^$), in this case there is nothing to
+    ;; highlight. 
+    (if (string= mpart "")
+        candidate
+      (when host (setq pattern (cadr (split-string pattern ":"))))
+      ;; Extract all parts of display keeping original properties.
+      (when (and mp (ignore-errors
+                      ;; Avoid error when candidate is a huge line.
+                      (string-match (regexp-quote mp) display)))
+        (setq beg-str (substring display 0 (match-beginning 0))
+              end-str (substring display (match-end 0) (length display))
+              mp (substring display (match-beginning 0) (match-end 0))))
+      (with-temp-buffer
+        ;; Insert the whole display part and remove non--match-part
+        ;; to keep their original face properties.
+        (insert (propertize (or mp display) 'read-only nil)) ; Fix (bug#1176)
+        (goto-char (point-min))
+        (condition-case nil
+            (progn
+              ;; Try first matching against whole pattern.
+              (unless (string= pattern "")
+                (while (re-search-forward regex nil t)
+                  (cl-incf count)
+                  (helm-add-face-text-properties
+                   (match-beginning 0) (match-end 0) 'helm-match)))
+              ;; If no matches start matching against multiples or fuzzy matches.
+              (when (zerop count)
+                (cl-loop with multi-match = (string-match-p " " pattern)
+                         with patterns = (if multi-match
+                                             (cl-loop for pat in (helm-mm-split-pattern
+                                                                  pattern)
+                                                      collect
+                                                      (helm--maybe-get-migemo-pattern
+                                                       pat diacritics))
+                                           (split-string pattern "" t))
+                         for p in patterns
+                         ;; Multi matches (regexps patterns).
+                         if multi-match do
+                         (progn
+                           (while (re-search-forward p nil t)
+                             (helm-add-face-text-properties
+                              (match-beginning 0) (match-end 0)
+                              'helm-match))
+                           (goto-char (point-min)))
+                         ;; Fuzzy matches (literal patterns).
+                         else do
+                         (when (search-forward p nil t)
                            (helm-add-face-text-properties
                             (match-beginning 0) (match-end 0)
-                            'helm-match))
-                         (goto-char (point-min)))
-                       ;; Fuzzy matches (literal patterns).
-                       else do
-                       (when (search-forward p nil t)
-                         (helm-add-face-text-properties
-                          (match-beginning 0) (match-end 0)
-                          'helm-match)))))
-        (invalid-regexp nil))
-      ;; Now replace the original match-part with the part
-      ;; with face properties added.
-      (setq display (if mp (concat beg-str (buffer-string) end-str) (buffer-string))))
-    (if real (cons display real) display)))
+                            'helm-match)))))
+          (invalid-regexp nil))
+        ;; Now replace the original match-part with the part
+        ;; with face properties added.
+        (setq display (if mp (concat beg-str (buffer-string) end-str) (buffer-string))))
+      (if real (cons display real) display))))
 
 (cl-defun helm-fuzzy-default-highlight-match (candidate
                                               &optional (pattern helm-pattern) diacritics file-comp)
