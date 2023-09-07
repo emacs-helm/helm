@@ -42,7 +42,7 @@ Don't set it to any value, it will have no effect.")
 (defvar helm-occur--buffer-list nil)
 (defvar helm-occur--buffer-tick nil)
 (defvar helm-occur-history nil)
-(defvar helm-occur--search-buffer-regexp "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'"
+(defvar helm-occur--search-buffer-regexp "\\`\\([0-9]*\\)\\s-\\(.*\\)\\'"
   "The regexp matching candidates in helm-occur candidate buffer.")
 (defvar helm-occur-mode--last-pattern nil)
 (defvar helm-occur--initial-pos 0)
@@ -348,7 +348,7 @@ When GSHORTHANDS is nil use PATTERN unmodified."
                 :diacritics helm-occur-ignore-diacritics
                 :search (lambda (pattern)
                           (when (string-match "\\`\\^\\([^ ]*\\)" pattern)
-                            (setq pattern (concat "^[0-9]* \\{1\\}" (match-string 1 pattern))))
+                            (setq pattern (concat "^[0-9]*\\s-" (match-string 1 pattern))))
                           (condition-case _err
                               (re-search-forward pattern nil t)
                             (invalid-regexp nil)))
