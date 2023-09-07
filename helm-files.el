@@ -1325,9 +1325,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                            (`remain  (nth 3 infos))))
                        (helm-mklist helm-ff-rsync-progress-bar-info)
                        ", "))
-      (setq percent (and (string-match "\\([0-9]+\\)%" progbar)
-                         (setq percent (string-to-number
-                                        (match-string 1 progbar)))))
+      (when (string-match "\\([0-9]+\\)%" progbar)
+        (setq percent (string-to-number
+                       (match-string 1 progbar))))
       (if percent
           (format "%s%s%s%s"
                   (propertize (capitalize (replace-regexp-in-string
