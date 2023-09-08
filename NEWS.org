@@ -2,6 +2,37 @@
 
 * NEWS
 
+** Version 3.9.5
+
+*** Add compatibility with Emacs-28< for helm-packages
+
+Tested with emacs-27.
+
+*** Add new action package-isolate for helm-packages
+
+Allow launching a new Emacs with only package(s).
+
+*** Packages list can be refreshed with C-c C-u
+
+BTW there is no more option to update from actions with prefix arg.
+
+*** Add more affixations fns for completing-read
+
+Themes, colors etc...
+
+*** Add new var helm-compleions-detailed for emacs-27
+
+This allow using completions-detailed in Emacs-27 with various
+describe-* functions.
+
+*** Helm-occur now doesn't hang when trying to match empty lines
+
+With "^$".
+
+*** Highlight matches in M-x highlight only commands
+
+I.e. Items in short documentation are not highlighted.
+
 ** Version 3.9.4
 
 *** Add two new alists to allow extending completions-detailed
