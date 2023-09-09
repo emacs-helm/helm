@@ -148,7 +148,7 @@ you want to keep the recentest order when narrowing candidates."
 Don't use `setq' to set this."
   :type 'boolean
   :set (lambda (var val)
-         (if (featurep 'all-the-icons)
+         (if (require 'all-the-icons nil t)
              (set var val)
            (set var nil))))
 
