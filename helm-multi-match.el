@@ -94,21 +94,17 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
 (defun helm-mm-exact-get-pattern (pattern)
   (unless (equal pattern helm-mm-exact-pattern-str)
     (setq helm-mm-exact-pattern-str pattern
-          helm-mm-exact-pattern-real (concat "\n" pattern "\n")))
+          helm-mm-exact-pattern-real (concat "^" (regexp-quote pattern) "$")))
   helm-mm-exact-pattern-real)
 
 
 (cl-defun helm-mm-exact-match (candidate &optional (pattern helm-pattern))
   (if case-fold-search
-      (progn
-        (setq candidate (downcase candidate)
-              pattern (downcase pattern))
-        (string= candidate pattern))
-      (string= candidate pattern)))
+      (string= (downcase candidate) (downcase pattern))
+    (string= candidate pattern)))
 
 (defun helm-mm-exact-search (pattern &rest _ignore)
-  (and (search-forward (helm-mm-exact-get-pattern pattern) nil t)
-       (forward-line -1)))
+  (re-search-forward (helm-mm-exact-get-pattern pattern) nil t))
 
 
 ;;; Prefix match
