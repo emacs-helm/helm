@@ -266,9 +266,14 @@ i.e (identity (re-search-forward \"foo\" (pos-eol) t)) => t."
                               (funcall pred (condition-case _err
                                                 (funcall searchfn2 regexp eol t)
                                               (invalid-regexp nil)))))
-           do (goto-char eol) and return t
-           else do (goto-char eol)
+           do (helm-mm-3--search-move-forward bol eol) and return t
+           else do (helm-mm-3--search-move-forward bol eol)
            finally return nil))
+
+(defun helm-mm-3--search-move-forward (bol eol)
+  "Move point forward for next search.
+Forward line on empty lines, otherwise goto eol."
+  (if (eql bol eol) (forward-line 1) (goto-char eol)))
 
 (defun helm-mm-3-search (pattern &rest _ignore)
   (helm-mm-3-search-base
