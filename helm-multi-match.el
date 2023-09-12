@@ -88,14 +88,14 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
 ;;
 ;;
 ;; Internal.
-(defvar helm-mm-exact-pattern-str nil)
-(defvar helm-mm-exact-pattern-real nil)
+(defvar helm-mm--exact-pattern-str nil)
+(defvar helm-mm--exact-pattern-real nil)
 
 (defun helm-mm-exact-get-pattern (pattern)
-  (unless (equal pattern helm-mm-exact-pattern-str)
-    (setq helm-mm-exact-pattern-str pattern
-          helm-mm-exact-pattern-real (concat "^" (regexp-quote pattern) "$")))
-  helm-mm-exact-pattern-real)
+  (unless (equal pattern helm-mm--exact-pattern-str)
+    (setq helm-mm--exact-pattern-str pattern
+          helm-mm--exact-pattern-real (concat "^" (regexp-quote pattern) "$")))
+  helm-mm--exact-pattern-real)
 
 
 (cl-defun helm-mm-exact-match (candidate &optional (pattern helm-pattern))
@@ -111,14 +111,14 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
 ;;
 ;;
 ;; Internal
-(defvar helm-mm-prefix-pattern-str nil)
-(defvar helm-mm-prefix-pattern-real nil)
+(defvar helm-mm--prefix-pattern-str nil)
+(defvar helm-mm--prefix-pattern-real nil)
 
 (defun helm-mm-prefix-get-pattern (pattern)
-  (unless (equal pattern helm-mm-prefix-pattern-str)
-    (setq helm-mm-prefix-pattern-str pattern
-          helm-mm-prefix-pattern-real (concat "\n" pattern)))
-  helm-mm-prefix-pattern-real)
+  (unless (equal pattern helm-mm--prefix-pattern-str)
+    (setq helm-mm--prefix-pattern-str pattern
+          helm-mm--prefix-pattern-real (concat "\n" pattern)))
+  helm-mm--prefix-pattern-real)
 
 (defun helm-mm-prefix-match (candidate &optional pattern)
   ;; In filename completion basename and basedir may be
@@ -137,15 +137,15 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
 ;;
 ;;
 ;; Internal
-(defvar helm-mm-1-pattern-str nil)
-(defvar helm-mm-1-pattern-real nil)
+(defvar helm-mm--1-pattern-str nil)
+(defvar helm-mm--1-pattern-real nil)
 
 (defun helm-mm-1-get-pattern (pattern)
-  (unless (equal pattern helm-mm-1-pattern-str)
-    (setq helm-mm-1-pattern-str pattern
-          helm-mm-1-pattern-real
+  (unless (equal pattern helm-mm--1-pattern-str)
+    (setq helm-mm--1-pattern-str pattern
+          helm-mm--1-pattern-real
           (concat "^" (helm-mm-1-make-regexp pattern))))
-  helm-mm-1-pattern-real)
+  helm-mm--1-pattern-real)
 
 (cl-defun helm-mm-1-match (candidate &optional (pattern helm-pattern))
   (string-match (helm-mm-1-get-pattern pattern) candidate))
@@ -158,15 +158,15 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
 ;;
 ;;
 ;; Internal
-(defvar helm-mm-2-pattern-str nil)
-(defvar helm-mm-2-pattern-real nil)
+(defvar helm-mm--2-pattern-str nil)
+(defvar helm-mm--2-pattern-real nil)
 
 (defun helm-mm-2-get-pattern (pattern)
-  (unless (equal pattern helm-mm-2-pattern-str)
-    (setq helm-mm-2-pattern-str pattern
-          helm-mm-2-pattern-real
+  (unless (equal pattern helm-mm--2-pattern-str)
+    (setq helm-mm--2-pattern-str pattern
+          helm-mm--2-pattern-real
           (concat "^.*" (helm-mm-1-make-regexp pattern))))
-  helm-mm-2-pattern-real)
+  helm-mm--2-pattern-real)
 
 (cl-defun helm-mm-2-match (candidate &optional (pattern helm-pattern))
   (string-match (helm-mm-2-get-pattern pattern) candidate))
