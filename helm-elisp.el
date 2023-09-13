@@ -902,13 +902,14 @@ a string, i.e. the `symbol-name' of any existing symbol."
 ;;; Locate elisp library
 ;;
 ;;
+(defvar helm-locate-library-cache nil)
+(defvar helm-locate-library-doc-cache (make-hash-table :test 'equal))
 (defun helm-locate-library-scan-list ()
   (cl-loop for dir in load-path
-           with load-suffixes = '(".el")
+           with load-suffixes = (find-library-suffixes);'(".el")
            when (file-directory-p dir)
-           append (directory-files
-                   dir t (concat (regexp-opt (get-load-suffixes))
-                                 "\\'"))))
+           nconc (directory-files
+                  dir nil (concat (regexp-opt (get-load-suffixes)) "\\'"))))
 
 ;;;###autoload
 (defun helm-locate-library ()
@@ -918,25 +919,49 @@ a string, i.e. the `symbol-name' of any existing symbol."
                    :data #'helm-locate-library-scan-list
                    :fuzzy-match helm-locate-library-fuzzy-match
                    :keymap helm-generic-files-map
-                   :search (unless helm-locate-library-fuzzy-match
-                             (lambda (regexp)
-                               (re-search-forward
-                                (if helm-ff-transformer-show-only-basename
-                                    (replace-regexp-in-string
-                                     "\\`\\^" "" regexp)
-                                    regexp)
-                                nil t)))
-                   :match-part (lambda (candidate)
-                                 (with-helm-buffer
-                                   (if helm-ff-transformer-show-only-basename
-                                       (helm-basename candidate) candidate)))
-                   :filter-one-by-one (lambda (c)
-                                        (with-helm-buffer
-                                          (if helm-ff-transformer-show-only-basename
-                                              (cons (helm-basename c) c) c)))
+                   :filtered-candidate-transformer
+                   (lambda (candidates _source)
+                     (cl-loop with lgst = (helm-in-buffer-get-longest-candidate)
+                              for c in candidates
+                              for sep = (make-string
+                                         (1+ (- lgst
+                                                (length c)))
+                                         ? )
+                              for bn = (helm-basename (helm-basename c t) t)
+                              for path = (or (assoc-default bn helm-locate-library-cache)
+                                             (let ((p (find-library-name bn)))
+                                               (push (cons bn p) helm-locate-library-cache)
+                                               p))
+                              for doc = (or (gethash bn helm-locate-library-doc-cache)
+                                            (puthash bn (helm-locate-lib-get-summary path)
+                                                     helm-locate-library-doc-cache))
+                              for disp = (helm-aand (propertize doc 'face 'font-lock-warning-face)
+                                                    (propertize " " 'display (concat sep it))
+                                                    (concat bn it))
+                              collect (cons disp path)))
                    :action (helm-actions-from-type-file))
-        :ff-transformer-show-only-basename nil
         :buffer "*helm locate library*"))
+
+(defun helm-locate-lib-get-summary (file)
+  (let* ((shell-file-name "sh")
+         (shell-command-switch "-c")
+         (cmd "%s %s | head -n1 | awk 'match($0,\"%s\",a) {print a[2]}'\
+ | awk -F ' -*-' '{print $1}'")
+         (regexp "^;;;(.*) --- (.*)$")
+         (output (replace-regexp-in-string
+                  "\n" ""
+                  (with-temp-buffer
+                    (call-process-shell-command 
+                     (format cmd
+                             (if (string-suffix-p ".gz" file)
+                                 "gzip -c -q -d" "cat")
+                             (shell-quote-argument file)
+                             regexp)
+                     nil t nil)
+                    (buffer-string)))))
+    (if (string= output "")
+        "Not documented"
+      output)))
 
 ;;; Modify variables from Helm
 ;;
