@@ -902,8 +902,8 @@ a string, i.e. the `symbol-name' of any existing symbol."
 ;;; Locate elisp library
 ;;
 ;;
-(defvar helm-locate-library-cache nil)
-(defvar helm-locate-library-doc-cache (make-hash-table :test 'equal))
+(defvar helm--locate-library-cache nil)
+(defvar helm--locate-library-doc-cache (make-hash-table :test 'equal))
 (defun helm-locate-library-scan-list ()
   (cl-loop for dir in load-path
            with load-suffixes = (find-library-suffixes)
@@ -928,13 +928,13 @@ a string, i.e. the `symbol-name' of any existing symbol."
                                                 (length c)))
                                          ? )
                               for bn = (helm-basename (helm-basename c t) t)
-                              for path = (or (assoc-default bn helm-locate-library-cache)
+                              for path = (or (assoc-default bn helm--locate-library-cache)
                                              (let ((p (find-library-name bn)))
-                                               (push (cons bn p) helm-locate-library-cache)
+                                               (push (cons bn p) helm--locate-library-cache)
                                                p))
-                              for doc = (or (gethash bn helm-locate-library-doc-cache)
+                              for doc = (or (gethash bn helm--locate-library-doc-cache)
                                             (puthash bn (helm-locate-lib-get-summary path)
-                                                     helm-locate-library-doc-cache))
+                                                     helm--locate-library-doc-cache))
                               for disp = (helm-aand (propertize doc 'face 'font-lock-warning-face)
                                                     (propertize " " 'display (concat sep it))
                                                     (concat bn it))

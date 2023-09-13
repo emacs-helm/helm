@@ -1281,13 +1281,13 @@ is used."
     (let* ((sep (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
                                     (length comp)))
                              ? ))
-           (path (or (assoc-default comp helm-locate-library-cache)
+           (path (or (assoc-default comp helm--locate-library-cache)
                      (let ((p (find-library-name comp)))
-                       (push (cons comp p) helm-locate-library-cache)
+                       (push (cons comp p) helm--locate-library-cache)
                        p)))
-           (doc (or (gethash comp helm-locate-library-doc-cache)
+           (doc (or (gethash comp helm--locate-library-doc-cache)
                     (puthash comp (helm-locate-lib-get-summary path)
-                             helm-locate-library-doc-cache))))
+                             helm--locate-library-doc-cache))))
       (list comp
             ""
             (helm-aand (propertize doc 'face 'font-lock-warning-face)
