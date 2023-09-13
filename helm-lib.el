@@ -1533,23 +1533,37 @@ candidate as arg."
 (defun helm-basename (fname &optional ext)
   "Print FNAME with any leading directory components removed.
 If specified, also remove filename extension EXT.
-Arg EXT can be specified as a string with or without dot, in this
-case it should match `file-name-extension'.
-It can also be non-nil (t) in this case no checking of
-`file-name-extension' is done and the extension is removed
-unconditionally."
-  (let ((non-essential t))
-    (if (and ext (or (string= (file-name-extension fname) ext)
-                     (string= (file-name-extension fname t) ext)
-                     (eq ext t))
-             (not (file-directory-p fname)))
-        (file-name-sans-extension (file-name-nondirectory fname))
-      (file-name-nondirectory (directory-file-name fname)))))
+If FNAME is a directory EXT arg is ignored.
+
+Arg EXT can be specified as a string, a number or 't`.
+When specified as a string, this string is stripped from end of FNAME.
+e.g. (helm-basename \"tutorial.el.gz\" \".el.gz\") => tutorial.
+When `t' no checking of `file-name-extension' is done and the first
+extension is removed unconditionally with `file-name-sans-extension'.
+e.g. (helm-basename \"tutorial.el.gz\" t) => tutorial.el.
+When a number, remove that many times extensions from FNAME.
+e.g. (helm-basename \"tutorial.el.gz\" 2) => tutorial."
+  (let ((non-essential t)
+        result)
+    (cond ((or (null ext) (file-directory-p fname))
+           (file-name-nondirectory (directory-file-name fname)))
+          ((numberp ext)
+           (cl-dotimes (_ ext)
+             (setq result (file-name-sans-extension
+                           (file-name-nondirectory (or result fname)))))
+           result)
+          ((eq t ext)
+           (file-name-sans-extension (file-name-nondirectory fname)))
+          ((stringp ext)
+           (replace-regexp-in-string (concat (regexp-quote ext) "\\'") ""
+                                     (file-name-nondirectory fname))))))
 
 (defun helm-basedir (fname &optional parent)
-  "Return the base directory of filename ending by a slash.
+  "Return the base directory of FNAME ending by a slash.
 If PARENT is specified and FNAME is a directory return the parent
-directory of FNAME."
+directory of FNAME.
+If PARENT is not specified but FNAME doesn't end by a slash, the returned value
+is same as with PARENT."
   (helm-aif (and fname
                  (or (and (string= fname "~") "~")
                      (file-name-directory
