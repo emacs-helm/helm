@@ -1013,7 +1013,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                       (category . coding-system)))
     (color . (metadata
               (affixation-function . helm-completion-color-affixation)
-              (category . color))))
+              (category . color)))
+    (library . (metadata
+                (affixation-function . helm-completion-library-affixation)
+                (category . library))))
   "Extra metadata for completing-read.
 
 Alist composed of (CATEGORY . METADATA).
@@ -1269,6 +1272,23 @@ is used."
             ""
             (helm-aand (propertize rgb 'face `(:background ,rgb
                                                :distant-foreground "black"))
+                       (propertize " " 'display (concat sep it)))))))
+
+(defun helm-completion-library-affixation (_comps)
+  (lambda (comp)
+    (let* ((sep (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
+                                    (length comp)))
+                             ? ))
+           (path (or (assoc-default comp helm-locate-library-cache)
+                     (let ((p (find-library-name comp)))
+                       (push (cons comp p) helm-locate-library-cache)
+                       p)))
+           (doc (or (gethash comp helm-locate-library-doc-cache)
+                    (puthash comp (helm-locate-lib-get-summary path)
+                             helm-locate-library-doc-cache))))
+      (list comp
+            ""
+            (helm-aand (propertize doc 'face 'font-lock-warning-face)
                        (propertize " " 'display (concat sep it)))))))
 
 ;;; Generic completing read
