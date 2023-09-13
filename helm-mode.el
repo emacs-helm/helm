@@ -1276,6 +1276,7 @@ is used."
                        (propertize " " 'display (concat sep it)))))))
 
 (defun helm-completion-library-affixation (_comps)
+  (require 'helm-elisp)
   (lambda (comp)
     (let* ((sep (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
                                     (length comp)))
