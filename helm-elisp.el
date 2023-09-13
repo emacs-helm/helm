@@ -906,7 +906,7 @@ a string, i.e. the `symbol-name' of any existing symbol."
 (defvar helm-locate-library-doc-cache (make-hash-table :test 'equal))
 (defun helm-locate-library-scan-list ()
   (cl-loop for dir in load-path
-           with load-suffixes = (find-library-suffixes);'(".el")
+           with load-suffixes = (find-library-suffixes)
            when (file-directory-p dir)
            nconc (directory-files
                   dir nil (concat (regexp-opt (get-load-suffixes)) "\\'"))))
@@ -942,26 +942,6 @@ a string, i.e. the `symbol-name' of any existing symbol."
                    :action (helm-actions-from-type-file))
         :buffer "*helm locate library*"))
 
-(defun helm-locate-lib-get-summary (file)
-  (let* ((shell-file-name "sh")
-         (shell-command-switch "-c")
-         (cmd "%s %s | head -n1 | awk 'match($0,\"%s\",a) {print a[2]}'\
- | awk -F ' -*-' '{print $1}'")
-         (regexp "^;;;(.*) --- (.*)$")
-         (output (replace-regexp-in-string
-                  "\n" ""
-                  (with-temp-buffer
-                    (call-process-shell-command 
-                     (format cmd
-                             (if (string-suffix-p ".gz" file)
-                                 "gzip -c -q -d" "cat")
-                             (shell-quote-argument file)
-                             regexp)
-                     nil t nil)
-                    (buffer-string)))))
-    (if (string= output "")
-        "Not documented"
-      output)))
 
 ;;; Modify variables from Helm
 ;;

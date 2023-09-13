@@ -1719,6 +1719,27 @@ Directories expansion is not supported."
     (format ".*\\.\\(%s\\)$"
             (replace-regexp-in-string
              "," "\\\\|" (match-string 2 wc)))))
+
+(defun helm-locate-lib-get-summary (file)
+  (let* ((shell-file-name "sh")
+         (shell-command-switch "-c")
+         (cmd "%s %s | head -n1 | awk 'match($0,\"%s\",a) {print a[2]}'\
+ | awk -F ' -*-' '{print $1}'")
+         (regexp "^;;;(.*) --- (.*)$")
+         (output (replace-regexp-in-string
+                  "\n" ""
+                  (with-temp-buffer
+                    (call-process-shell-command 
+                     (format cmd
+                             (if (string-suffix-p ".gz" file)
+                                 "gzip -c -q -d" "cat")
+                             (shell-quote-argument file)
+                             regexp)
+                     nil t nil)
+                    (buffer-string)))))
+    (if (string= output "")
+        "Not documented"
+      output)))
 
 ;;; helm internals
 ;;
