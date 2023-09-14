@@ -1291,13 +1291,16 @@ differently depending of answer:
 
 (defun helm-describe-class (class)
   "Display documentation of Eieio CLASS, a symbol or a string."
-  (advice-add 'cl--print-table :override #'helm-source--cl--print-table '((depth . 100)))
-  (unwind-protect
-       (if (fboundp 'cl-describe-type)
-           (cl-describe-type (helm-symbolify class))
-         (let ((helm-describe-function-function 'describe-function))
-           (helm-describe-function (helm-symbolify class))))
-    (advice-remove 'cl--print-table #'helm-source--cl--print-table)))
+  (let ((advicep (advice-member-p #'helm-source--cl--print-table 'cl--print-table)))
+    (unless advicep
+      (advice-add 'cl--print-table :override #'helm-source--cl--print-table '((depth . 100))))
+    (unwind-protect
+         (if (fboundp 'cl-describe-type)
+             (cl-describe-type (helm-symbolify class))
+           (let ((helm-describe-function-function 'describe-function))
+             (helm-describe-function (helm-symbolify class))))
+      (unless advicep
+        (advice-remove 'cl--print-table #'helm-source--cl--print-table)))))
 
 (defun helm-describe-function (func)
   "Display documentation of FUNC, a symbol or string."
