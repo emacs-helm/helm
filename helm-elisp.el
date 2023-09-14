@@ -913,7 +913,17 @@ a string, i.e. the `symbol-name' of any existing symbol."
 
 ;;;###autoload
 (defun helm-locate-library ()
-  "Preconfigured helm to locate elisp libraries."
+  "Preconfigured helm to locate elisp libraries.
+
+When `completions-detailed' or `helm-completions-detailed' is non nil, a description
+of libraries is provided. The libraries are partially cached in the variables
+`helm--locate-library-doc-cache' and `helm--locate-library-cache'.
+TIP: You can make these vars persistent for faster start with the psession
+package, using M-x psession-make-persistent-variable.
+NOTE: The caches affect as well `find-libray' and `locate-library' when
+`helm-mode' is enabled and `completions-detailed' is non nil.
+There is no need to refresh the caches, they will be updated automatically if
+some new libraries are found."
   (interactive)
   (message "Please wait, scanning libraries...")
   (helm :sources
