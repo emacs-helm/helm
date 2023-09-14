@@ -1732,7 +1732,7 @@ Directories expansion is not supported."
                   (with-temp-buffer
                     (call-process-shell-command 
                      (format cmd
-                             (if (string-suffix-p ".gz" file)
+                             (if (string-match-p ".gz\\'" file)
                                  "gzip -c -q -d" "cat")
                              (shell-quote-argument file)
                              regexp)
