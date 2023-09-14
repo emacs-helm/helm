@@ -1721,6 +1721,7 @@ Directories expansion is not supported."
              "," "\\\\|" (match-string 2 wc)))))
 
 (defun helm-locate-lib-get-summary (file)
+  "Extract library description from FILE."
   (let* ((shell-file-name "sh")
          (shell-command-switch "-c")
          (cmd "%s %s | head -n1 | awk 'match($0,\"%s\",a) {print a[2]}'\
