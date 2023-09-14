@@ -915,6 +915,9 @@ a string, i.e. the `symbol-name' of any existing symbol."
 (defun helm-locate-library ()
   "Preconfigured helm to locate elisp libraries."
   (interactive)
+  (message "Scanning libraries...")
+  (with-helm-temp-hook 'helm-after-initialize-hook
+    (message "Scanning libraries...Done"))
   (helm :sources
         (helm-build-in-buffer-source  "Elisp libraries (Scan)"
           :data #'helm-locate-library-scan-list
