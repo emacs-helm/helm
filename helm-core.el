@@ -6609,7 +6609,15 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
          #'buffer-substring-no-properties)
      (or (assoc-default 'search src)
          '(helm-candidates-in-buffer-search-default-fn))
-     (helm-candidate-number-limit src)
+     ;; When candidate-transformer is specified in source ALL candidates should
+     ;; be computed with the candidate-transformer function (in contrast with
+     ;; filtered-candidate-transformer).  This to be consistent with what sync
+     ;; sources do. The car of the cons is used for initial fetching of
+     ;; candidates whereas the cdr is used after when searching (in this case
+     ;; the candidate number limit is used).
+     (if (helm-get-attr 'candidate-transformer src)
+         (cons 99999999 (helm-candidate-number-limit src))
+       (helm-candidate-number-limit src))
      (helm-get-attr 'match-part)
      src)))
 
@@ -6631,9 +6639,10 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
         (goto-char start-point)
         (if (string= pattern "")
             (helm-initial-candidates-from-candidate-buffer
-             get-line-fn limit)
+             get-line-fn (if (consp limit) (car limit) limit))
           (helm-search-from-candidate-buffer
-           pattern get-line-fn search-fns limit
+           pattern get-line-fn search-fns
+           (if (consp limit) (cdr limit) limit)
            start-point match-part-fn source))))))
 
 
