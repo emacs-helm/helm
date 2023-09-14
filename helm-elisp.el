@@ -923,8 +923,8 @@ a string, i.e. the `symbol-name' of any existing symbol."
           :data #'helm-locate-library-scan-list
           :fuzzy-match helm-locate-library-fuzzy-match
           :keymap helm-generic-files-map
-          :filtered-candidate-transformer
-          (lambda (candidates _source)
+          :candidate-transformer
+          (lambda (candidates)
             (if (or completions-detailed helm-completions-detailed)
                 (cl-loop with lgst = (helm-in-buffer-get-longest-candidate)
                          for c in candidates
