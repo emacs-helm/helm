@@ -937,7 +937,7 @@ some new libraries are found."
                 (cl-loop with lgst = (helm-in-buffer-get-longest-candidate)
                          for c in candidates
                          for sep = (make-string (1+ (- lgst (length c))) ? )
-                         for bn = (helm-basename (helm-basename c t) t)
+                         for bn = (helm-basename c 2)
                          for path = (or (assoc-default bn helm--locate-library-cache)
                                         (let ((p (find-library-name bn)))
                                           (push (cons bn p) helm--locate-library-cache)
