@@ -931,8 +931,8 @@ some new libraries are found."
           :data #'helm-locate-library-scan-list
           :fuzzy-match helm-locate-library-fuzzy-match
           :keymap helm-generic-files-map
-          :candidate-transformer
-          (lambda (candidates)
+          :filtered-candidate-transformer
+          (lambda (candidates _source)
             (if (or completions-detailed helm-completions-detailed)
                 (cl-loop with lgst = (helm-in-buffer-get-longest-candidate)
                          for c in candidates
