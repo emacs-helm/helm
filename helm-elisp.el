@@ -906,10 +906,9 @@ a string, i.e. the `symbol-name' of any existing symbol."
 (defvar helm--locate-library-doc-cache (make-hash-table :test 'equal))
 (defun helm-locate-library-scan-list ()
   (cl-loop for dir in load-path
-           with load-suffixes = (find-library-suffixes)
            when (file-directory-p dir)
            nconc (directory-files
-                  dir nil (concat (regexp-opt (get-load-suffixes)) "\\'"))))
+                  dir nil (concat (regexp-opt (find-library-suffixes)) "\\'"))))
 
 ;;;###autoload
 (defun helm-locate-library (&optional arg)
