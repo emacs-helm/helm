@@ -1738,15 +1738,15 @@ Directories expansion is not supported."
                         (shell-quote-argument file)
                         regexp)))
          output)
-    (set-process-filter proc nil)
-    (set-process-sentinel proc (lambda (process event)
-                                 (when (string= event "finished\n")
-                                   (setq output
-                                         (with-current-buffer (process-buffer process)
-                                           (replace-regexp-in-string
-                                            "\n" ""
-                                            (buffer-string)))))
-                                 (kill-buffer (process-buffer process))))
+    (set-process-sentinel
+     proc (lambda (process event)
+            (when (string= event "finished\n")
+              (setq output
+                    (with-current-buffer (process-buffer process)
+                      (replace-regexp-in-string
+                       "\n" ""
+                       (buffer-string)))))
+            (kill-buffer (process-buffer process))))
     (while (and proc (eq (process-status proc) 'run))
       (accept-process-output proc))
     (if (string= output "")
