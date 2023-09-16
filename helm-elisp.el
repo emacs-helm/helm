@@ -939,8 +939,8 @@ description change you can reset the caches with a prefix arg."
             (if (or completions-detailed helm-completions-detailed)
                 (cl-loop with lgst = (helm-in-buffer-get-longest-candidate)
                          for c in candidates
-                         for sep = (make-string (1+ (- lgst (length c))) ? )
                          for bn = (helm-basename c 2)
+                         for sep = (make-string (1+ (- lgst (length bn))) ? )
                          for path = (or (assoc-default bn helm--locate-library-cache)
                                         (let ((p (find-library-name bn)))
                                           (push (cons bn p) helm--locate-library-cache)
