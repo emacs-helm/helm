@@ -1729,7 +1729,7 @@ Directories expansion is not supported."
          (shell-command-switch "-c")
          (cmd "%s %s | head -n1 | awk 'match($0,\"%s\",a) {print a[2]}'\
  | awk -F ' -*-' '{print $1}'")
-         (regexp "^;;;(.*) --- (.*)$")
+         (regexp "^;;;(.*) ---? (.*)$")
          (proc (start-process-shell-command
                 "helm-locate-lib-get-summary" "*helm locate lib*"
                 (format cmd
