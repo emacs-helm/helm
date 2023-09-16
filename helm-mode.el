@@ -1278,20 +1278,25 @@ is used."
 (defun helm-completion-library-affixation (_comps)
   (require 'helm-elisp)
   (lambda (comp)
-    (let* ((sep (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
-                                    (length comp)))
-                             ? ))
-           (path (or (assoc-default comp helm--locate-library-cache)
-                     (let ((p (find-library-name comp)))
-                       (push (cons comp p) helm--locate-library-cache)
-                       p)))
-           (doc (or (gethash comp helm--locate-library-doc-cache)
-                    (puthash comp (helm-locate-lib-get-summary path)
-                             helm--locate-library-doc-cache))))
-      (list comp
-            ""
-            (helm-aand (propertize doc 'face 'font-lock-warning-face)
-                       (propertize " " 'display (concat sep it)))))))
+    ;; Because find-library-include-other-files default to t, we have all the
+    ;; unrelated files and directories coming in ... Even if this modify the
+    ;; behavior of find-library-include-other-files remove them for the benefit
+    ;; of everybody.
+    (unless (string-match "\\(\\.elc\\|/\\)\\'" comp)
+      (let* ((sep (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
+                                      (length comp)))
+                               ? ))
+             (path (or (assoc-default comp helm--locate-library-cache)
+                       (let ((p (find-library-name comp)))
+                         (push (cons comp p) helm--locate-library-cache)
+                         p)))
+             (doc (or (gethash comp helm--locate-library-doc-cache)
+                      (puthash comp (helm-locate-lib-get-summary path)
+                               helm--locate-library-doc-cache))))
+        (list comp
+              ""
+              (helm-aand (propertize doc 'face 'font-lock-warning-face)
+                         (propertize " " 'display (concat sep it))))))))
 
 ;;; Generic completing read
 ;;
