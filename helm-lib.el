@@ -1730,17 +1730,25 @@ Directories expansion is not supported."
          (cmd "%s %s | head -n1 | awk 'match($0,\"%s\",a) {print a[2]}'\
  | awk -F ' -*-' '{print $1}'")
          (regexp "^;;;(.*) --- (.*)$")
-         (output (replace-regexp-in-string
-                  "\n" ""
-                  (with-temp-buffer
-                    (call-process-shell-command 
-                     (format cmd
-                             (if (string-match-p "\\.gz\\'" file)
-                                 "gzip -c -q -d" "cat")
-                             (shell-quote-argument file)
-                             regexp)
-                     nil t nil)
-                    (buffer-string)))))
+         (proc (start-process-shell-command
+                "helm-locate-lib-get-summary" "*helm locate lib*"
+                (format cmd
+                        (if (string-match-p "\\.gz\\'" file)
+                            "gzip -c -q -d" "cat")
+                        (shell-quote-argument file)
+                        regexp)))
+         output)
+    (set-process-filter proc nil)
+    (set-process-sentinel proc (lambda (process event)
+                                 (when (string= event "finished\n")
+                                   (setq output
+                                         (with-current-buffer (process-buffer process)
+                                           (replace-regexp-in-string
+                                            "\n" ""
+                                            (buffer-string)))))
+                                 (kill-buffer (process-buffer process))))
+    (while (and proc (eq (process-status proc) 'run))
+      (accept-process-output proc))
     (if (string= output "")
         "Not documented"
       output)))
