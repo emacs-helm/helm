@@ -1144,7 +1144,7 @@ is used."
                          (helm-in-buffer-get-longest-candidate)))
            (sep (if (or (null max-len) (zerop max-len))
                     " --"               ; Default separator.
-                  (make-string (- max-len (length comp)) ? )))
+                  (make-string (1+ (- max-len (length comp))) ? )))
            (doc (ignore-errors
                   (helm-get-first-line-documentation sym)))
            (symbol-class (help--symbol-class sym))
@@ -1167,7 +1167,7 @@ is used."
                   (propertize it 'face 'helm-completions-detailed)
                   (propertize
                    ;; (format "%-4s" it) makes spaces inheriting text props.
-                   " " 'display (concat it (make-string (- 4 (length it)) ? ))))
+                   " " 'display (concat it (make-string (- 5 (length it)) ? ))))
        ;; Suffix.
        (if doc
            (helm-aand (propertize doc 'face 'helm-completions-detailed)
