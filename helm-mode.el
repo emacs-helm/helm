@@ -1051,6 +1051,7 @@ behavior as emacs vanilla.")
     ("trace-function-foreground" . symbol-help)
     ("trace-function-background" . symbol-help)
     ("describe-minor-mode" . symbol-help)
+    ("where-is" . symbol-help)
     ("find-library" . library)
     ("locate-library" . library)
     ("kill-buffer" . buffer)
@@ -1148,7 +1149,8 @@ is used."
            (doc (ignore-errors
                   (helm-get-first-line-documentation sym)))
            (symbol-class (help--symbol-class sym))
-           (group (helm-group-p sym)))
+           (group (helm-group-p sym))
+           (key (helm-completion-get-key sym)))
       (list
        ;; Symbol (comp).
        (if (or (symbol-function sym) (boundp sym)
@@ -1171,8 +1173,16 @@ is used."
        ;; Suffix.
        (if doc
            (helm-aand (propertize doc 'face 'helm-completions-detailed)
-                      (propertize " " 'display (concat sep it)))
+                      (propertize " " 'display (concat sep it key)))
          "")))))
+
+(defun helm-completion-get-key (sym)
+  "Return key description on symbol SYM."
+  (with-helm-current-buffer
+    (let* ((key     (and (commandp sym) (where-is-internal sym nil 'first-only)))
+           (binding (and key (key-description key))))
+      (when binding
+        (propertize (format " (%s)" binding) 'face 'shadow)))))
 
 (defun helm-completion-package-affixation (_completions)
   (lambda (comp)
