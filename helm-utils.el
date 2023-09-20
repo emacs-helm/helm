@@ -1110,14 +1110,19 @@ Run `helm-find-many-files-after-hook' at end."
 
 (defun helm-read-repeat-string (prompt &optional count)
   "Prompt as many time PROMPT is not empty.
-If COUNT is non--nil add a number after each prompt."
-  (cl-loop with elm
-        while (not (string= elm ""))
-        for n from 1
-        do (when count
-             (setq prompt (concat prompt (int-to-string n) ": ")))
-        collect (setq elm (helm-read-string prompt)) into lis
-        finally return (remove "" lis)))
+If COUNT is non--nil add a number after each prompt.
+Return the list of strings entered in each prompt."
+  (cl-loop with prt = prompt
+           with elm
+           while (not (string= elm ""))
+           for n from 1
+           do (when count
+                (setq prt (format "%s (%s): "
+                                  (replace-regexp-in-string
+                                   ": " "" prompt)
+                                  (int-to-string n))))
+           collect (setq elm (helm-read-string prt)) into lis
+           finally return (remove "" lis)))
 
 (defun helm-html-bookmarks-to-alist (file url-regexp bmk-regexp)
   "Parse HTML bookmark FILE and return an alist with (title . url) as elements."
