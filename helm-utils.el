@@ -1071,7 +1071,9 @@ Assume regexp is a pcre based regexp."
                             "xdg-open")
                            ((or (eq system-type 'darwin) ;; Mac OS X
                                 (eq system-type 'macos)) ;; Mac OS 9
-                            "open"))
+                            "open")
+			   ((eq system-type 'cygwin)
+			    "cygstart"))
                      file))))
 
 (defun helm-open-dired (file)
