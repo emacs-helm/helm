@@ -1745,8 +1745,8 @@ Directories expansion is not supported."
                     (with-current-buffer (process-buffer process)
                       (replace-regexp-in-string
                        "\n" ""
-                       (buffer-string)))))
-            (kill-buffer (process-buffer process))))
+                       (buffer-string))))
+              (kill-buffer (process-buffer process)))))
     (while (and proc (eq (process-status proc) 'run))
       (accept-process-output proc))
     (if (string= output "")
