@@ -934,8 +934,8 @@ description change you can reset the caches with a prefix arg."
           :data #'helm-locate-library-scan-list
           :fuzzy-match helm-locate-library-fuzzy-match
           :keymap helm-generic-files-map
-          :filtered-candidate-transformer
-          (lambda (candidates _source)
+          :candidate-transformer
+          (lambda (candidates)
             (cl-loop with lgst = (helm-in-buffer-get-longest-candidate)
                      for c in candidates
                      for bn = (helm-basename c 2)
