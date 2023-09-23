@@ -925,37 +925,43 @@ There is no need to refresh the caches, they will be updated automatically if
 some new libraries are found, however when a library update its headers and the
 description change you can reset the caches with a prefix arg."
   (interactive "P")
-  (when arg
-    (setq helm--locate-library-cache nil)
-    (clrhash helm--locate-library-doc-cache))
-  (message "Please wait, scanning libraries...")
-  (helm :sources
-        (helm-build-in-buffer-source  "Elisp libraries (Scan)"
-          :data #'helm-locate-library-scan-list
-          :fuzzy-match helm-locate-library-fuzzy-match
-          :keymap helm-generic-files-map
-          :candidate-transformer
-          (lambda (candidates)
-            (cl-loop with lgst = (helm-in-buffer-get-longest-candidate)
-                     for c in candidates
-                     for bn = (helm-basename c 2)
-                     for sep = (make-string (1+ (- lgst (length bn))) ? )
-                     for path = (or (assoc-default bn helm--locate-library-cache)
-                                    (let ((p (find-library-name bn)))
-                                      (push (cons bn p) helm--locate-library-cache)
-                                      p))
-                     for doc = (and (or completions-detailed helm-completions-detailed)
-                                    (or (gethash bn helm--locate-library-doc-cache)
-                                        (puthash bn (helm-locate-lib-get-summary path)
-                                                 helm--locate-library-doc-cache)))
-                     for disp = (if (or completions-detailed helm-completions-detailed)
-                                    (helm-aand (propertize doc 'face 'font-lock-warning-face)
-                                               (propertize " " 'display (concat sep it))
-                                               (concat bn it))
-                                  bn)
-                     collect (cons disp path)))
-          :action (helm-actions-from-type-file))
-        :buffer "*helm locate library*"))
+  (let (done)
+    (when arg
+      (setq helm--locate-library-cache nil)
+      (clrhash helm--locate-library-doc-cache))
+    (helm :sources
+          (helm-build-in-buffer-source  "Elisp libraries (Scan)"
+            :data #'helm-locate-library-scan-list
+            :fuzzy-match helm-locate-library-fuzzy-match
+            :keymap helm-generic-files-map
+            :candidate-transformer
+            (lambda (candidates)
+              (cl-loop with reporter = (unless done
+                                         (make-progress-reporter
+                                          "Scanning libraries..." 0 (length candidates)))
+                       with lgst = (helm-in-buffer-get-longest-candidate)
+                       for c in candidates
+                       for count from 0
+                       for bn = (helm-basename c 2)
+                       for sep = (make-string (1+ (- lgst (length bn))) ? )
+                       for path = (or (assoc-default bn helm--locate-library-cache)
+                                      (let ((p (find-library-name bn)))
+                                        (push (cons bn p) helm--locate-library-cache)
+                                        p))
+                       for doc = (and (or completions-detailed helm-completions-detailed)
+                                      (or (gethash bn helm--locate-library-doc-cache)
+                                          (puthash bn (helm-locate-lib-get-summary path)
+                                                   helm--locate-library-doc-cache)))
+                       for disp = (if (or completions-detailed helm-completions-detailed)
+                                      (helm-aand (propertize doc 'face 'font-lock-warning-face)
+                                                 (propertize " " 'display (concat sep it))
+                                                 (concat bn it))
+                                    bn)
+                       collect (cons disp path)
+                       when reporter do (progress-reporter-update reporter count)
+                       finally do (setq done t)))
+            :action (helm-actions-from-type-file))
+          :buffer "*helm locate library*")))
 
 
 ;;; Modify variables from Helm
