@@ -1738,9 +1738,11 @@ Directories expansion is not supported."
                         (shell-quote-argument file)
                         regexp)))
          output)
+    (set-process-filter proc nil)
     (set-process-sentinel
      proc (lambda (process event)
-            (when (string= event "finished\n")
+            (when (and (string= event "finished\n")
+                       (process-buffer process))
               (setq output
                     (with-current-buffer (process-buffer process)
                       (replace-regexp-in-string
