@@ -237,7 +237,7 @@ to avoid errors with outdated packages no more availables."
                       :init (lambda ()
                               (helm-init-candidates-in-buffer 'global upgrades))
                       :filtered-candidate-transformer #'helm-packages-transformer-1
-                      :action '(("Upgrade package(s) (`C-u' refresh package contents)"
+                      :action '(("Upgrade package(s)"
                                  . helm-packages-upgrade)))
                     (helm-make-source "Packages to delete" 'helm-packages-class
                       :init (lambda ()
@@ -250,7 +250,7 @@ to avoid errors with outdated packages no more availables."
                                 (mapcar #'car package-alist)))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
-                                ("Reinstall package(s) (`C-u' refresh package contents)"
+                                ("Reinstall package(s)"
                                  . helm-packages-package-reinstall)
                                 ("Recompile package(s)" . helm-packages-recompile)
                                 ("Uninstall package(s)" . helm-packages-uninstall)
@@ -267,7 +267,7 @@ to avoid errors with outdated packages no more availables."
                                      nconc (list (car p)))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
-                                ("Install packages(s) (`C-u' refresh package contents)"
+                                ("Install packages(s)"
                                  . helm-packages-install)))
                     (helm-make-source "Available built-in packages" 'helm-packages-class
                       :data (cl-loop for p in package--builtins
@@ -279,7 +279,7 @@ to avoid errors with outdated packages no more availables."
                                      collect (car p))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
-                                ("Install packages(s) (`C-u' refresh package contents)"
+                                ("Install packages(s)"
                                  . helm-packages-install))))
           :buffer "*helm packages*")))
 
