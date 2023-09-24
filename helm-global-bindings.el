@@ -50,6 +50,7 @@ Using `setq' to modify this variable will have no effect."
     (define-key map (kbd "a")         'helm-apropos)
     (define-key map (kbd "e")         'helm-etags-select)
     (define-key map (kbd "l")         'helm-locate)
+    (define-key map (kbd "L")         'helm-locate-library)
     (define-key map (kbd "s")         'helm-surfraw)
     (define-key map (kbd "r")         'helm-regexp)
     (define-key map (kbd "m")         'helm-man-woman)
