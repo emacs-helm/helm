@@ -6654,7 +6654,8 @@ VC handled directories.")
 (defvar helm-browse-project-history nil)
 
 ;;;###autoload
-(defun helm-projects-history (arg)
+(defun helm-projects-history (&optional arg)
+  "Jump to project already visisted with `helm-browse-project'."
   (interactive "P")
   (helm :sources
         (helm-build-sync-source "Project history"
