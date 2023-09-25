@@ -620,7 +620,7 @@ If `browse-url-browser-function' is set to something else than
                                   (apply (car it) (cdr it))
                                 (all-the-icons-octicon "file-directory")))
                              ((and isfile isinfo) (all-the-icons-octicon "info"))
-                             (isfile (all-the-icons-icon-for-file isfile))
+                             (isfile (all-the-icons-icon-for-file (helm-basename isfile)))
                              ((or iswoman isman)
                               (all-the-icons-fileicon "man-page"))
                              ((or isgnus ismu4e)

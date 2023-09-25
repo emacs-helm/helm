@@ -4341,7 +4341,7 @@ Arg FILE is the real part of candidate, a filename with no props."
                                                  helm-ff-dotted-symlink-directory))
                                       (file-directory-p file))
                                  (all-the-icons-octicon "file-symlink-directory")
-                               (all-the-icons-icon-for-file file))))))
+                               (all-the-icons-icon-for-file (helm-basename file)))))))
       (when icon (concat icon " ")))))
 
 (defun helm-ff--is-dir-from-disp (disp)
@@ -6458,7 +6458,9 @@ be directories."
                                  (propertize c 'face 'helm-history-deleted))))
            when disp
            collect (cons (if helm-ff-icon-mode
-                             (concat (all-the-icons-icon-for-file c) " " disp)
+                             (concat (all-the-icons-icon-for-file
+                                      (helm-basename elm))
+                                     " " disp)
                            disp)
                          c)))
 
