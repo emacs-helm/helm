@@ -282,6 +282,12 @@ Not guaranteed to work with Emacs < 27."
     map)
   "Keymap for `helm-comp-read'.")
 
+(defvar helm-comp-in-region-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-comp-read-map)
+    map)
+  "Keymap for completion-at-point and friends.")
+
 (defun helm-mode-delete-char-backward-1 ()
   (interactive)
   (condition-case err
@@ -359,8 +365,8 @@ NOT `setq'."
   :set (lambda (var val)
          (set var val)
          (if (memq val '(helm helm-fuzzy))
-             (define-key helm-comp-read-map (kbd "DEL") 'helm-mode-delete-char-backward-maybe)
-           (define-key helm-comp-read-map (kbd "DEL") 'delete-backward-char))))
+             (define-key helm-comp-in-region-map (kbd "DEL") 'helm-mode-delete-char-backward-maybe)
+           (define-key helm-comp-in-region-map (kbd "DEL") 'delete-backward-char))))
 
 (defconst helm-completion--all-styles
   (let ((flex (if (assq 'flex completion-styles-alist)
@@ -2577,6 +2583,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                             :match-dynamic (eq helm-completion-style 'emacs)
                             :fuzzy (eq helm-completion-style 'helm-fuzzy)
                             :exec-when-only-one t
+                            :keymap helm-comp-in-region-map
                             :quit-when-no-cand
                             (lambda ()
                               ;; Delay message to overwrite "Quit".
