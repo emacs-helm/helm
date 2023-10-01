@@ -1538,7 +1538,7 @@ candidate as arg."
 If specified, also remove filename extension EXT.
 If FNAME is a directory EXT arg is ignored.
 
-Arg EXT can be specified as a string, a number or 't`.
+Arg EXT can be specified as a string, a number or `t' .
 When specified as a string, this string is stripped from end of FNAME.
 e.g. (helm-basename \"tutorial.el.gz\" \".el.gz\") => tutorial.
 When `t' no checking of `file-name-extension' is done and the first

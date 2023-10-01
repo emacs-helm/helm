@@ -30,6 +30,8 @@
 (defvar helm-mode)
 (defvar password-cache)
 (defvar package--builtins)
+(defvar helm--locate-library-doc-cache)
+(defvar helm--locate-library-cache)
 
 ;; No warnings in Emacs built --without-x
 (declare-function x-file-dialog "xfns.c")
@@ -46,6 +48,7 @@
 (declare-function package-get-descriptor "package")
 (declare-function print-coding-system-briefly "mul-diag.el")
 (declare-function color-rgb-to-hex "color.el")
+(declare-function find-library-name "find-func.el")
 
 (defgroup helm-mode nil
   "Enable helm completion."

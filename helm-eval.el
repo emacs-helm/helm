@@ -23,7 +23,8 @@
 (require 'edebug)
 
 (declare-function helm-lisp-completion-at-point "helm-elisp.el")
-
+(declare-function helm-elisp-show-doc-modeline "helm-elisp.el")
+(defvar helm-elisp-help-function)
 
 (defgroup helm-eval nil
   "Eval related Applications and libraries for Helm."

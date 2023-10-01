@@ -33,6 +33,8 @@
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-M-x-transformer-no-sort-no-props "helm-command")
 (defvar helm-M-x-show-short-doc)
+(defvar helm-completions-detailed)
+
 
 ;;; Customizable values
 
@@ -914,16 +916,19 @@ a string, i.e. the `symbol-name' of any existing symbol."
 (defun helm-locate-library (&optional arg)
   "Preconfigured helm to locate elisp libraries.
 
-When `completions-detailed' or `helm-completions-detailed' is non nil, a description
-of libraries is provided. The libraries are partially cached in the variables
-`helm--locate-library-doc-cache' and `helm--locate-library-cache'.
-TIP: You can make these vars persistent for faster start with the psession
-package, using M-x psession-make-persistent-variable.
-NOTE: The caches affect as well `find-libray' and `locate-library' when
-`helm-mode' is enabled and `completions-detailed' is non nil.
-There is no need to refresh the caches, they will be updated automatically if
-some new libraries are found, however when a library update its headers and the
-description change you can reset the caches with a prefix arg."
+When `completions-detailed' or `helm-completions-detailed' is non
+nil, a description of libraries is provided. The libraries are
+partially cached in the variables
+`helm--locate-library-doc-cache' and
+`helm--locate-library-cache'.  TIP: You can make these vars
+persistent for faster start with the psession package, using M-x
+psession-make-persistent-variable.  NOTE: The caches affect as
+well `find-libray' and `locate-library' when `helm-mode' is
+enabled and `completions-detailed' is non nil.  There is no need
+to refresh the caches, they will be updated automatically if some
+new libraries are found, however when a library update its
+headers and the description change you can reset the caches with
+a prefix arg."
   (interactive "P")
   (let (done)
     (when arg
