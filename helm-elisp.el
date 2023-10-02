@@ -948,7 +948,7 @@ a prefix arg."
                        for c in candidates
                        for count from 0
                        for bn = (helm-basename c 2)
-                       for sep = (helm-in-buffer-make-separator bn lgst)
+                       for sep = (helm-make-separator bn lgst)
                        for path = (or (assoc-default bn helm--locate-library-cache)
                                       (let ((p (find-library-name bn)))
                                         (push (cons bn p) helm--locate-library-cache)

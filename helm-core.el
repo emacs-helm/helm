@@ -6899,15 +6899,16 @@ It is useful to align extra informations after candidates in `helm-buffer'.")
        (get-buffer it))
     0))
 
-(defun helm-in-buffer-make-separator (cand &optional longest)
-  "Create a separator to align candidates in `helm-source-in-buffer'.
-Longest candidate should have been modified at initialization of
-source, otherwise LONGEST can be used to specify longest candidate."
+(defun helm-make-separator (cand &optional longest)
+  "Create a separator to align candidates.
+Longest candidate should have been calculated at initialization
+of `helm-source-in-buffer' by `helm-init-candidates-in-buffer' , otherwise
+LONGEST can be used to specify longest candidate."
   (let ((lgst (or longest (helm-in-buffer-get-longest-candidate)))
         (len  (length cand)))
     (make-string (1+ (if (> lgst len)
-                         (- lgst (length cand))
-                       0))
+                         (- lgst len)
+                       len))
                  ? )))
 
 (defun helm-init-candidates-in-buffer (buffer-spec data &optional force-longest)
