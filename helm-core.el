@@ -6908,7 +6908,7 @@ LONGEST can be used to specify longest candidate."
         (len  (length cand)))
     (make-string (1+ (if (>= lgst len)
                          (- lgst len)
-                       len))
+                       0))
                  ? )))
 
 (defun helm-init-candidates-in-buffer (buffer-spec data &optional force-longest)
