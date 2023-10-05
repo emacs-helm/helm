@@ -634,7 +634,7 @@ This affects `\\<helm-find-files-map>\\[helm-ff-run-switch-to-shell]' keybinding
   :type '(choice
           (const :tag "Use Eshell" eshell-mode)
           (const :tag "Use Shell" shell-mode)
-          (const :tag "Use Shell" term-mode)))
+          (const :tag "Use Term" term-mode)))
 
 (defcustom helm-rsync-no-mode-line-update nil
   "When non nil don't update mode-line when rsync is running.
