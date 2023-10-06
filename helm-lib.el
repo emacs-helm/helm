@@ -1544,16 +1544,27 @@ e.g. (helm-basename \"tutorial.el.gz\" \".el.gz\") => tutorial.
 When `t' no checking of `file-name-extension' is done and the first
 extension is removed unconditionally with `file-name-sans-extension'.
 e.g. (helm-basename \"tutorial.el.gz\" t) => tutorial.el.
-When a number, remove that many times extensions from FNAME.
-e.g. (helm-basename \"tutorial.el.gz\" 2) => tutorial."
+When a number, remove that many times extensions from FNAME until FNAME ends
+with its real extension which is by default \".el\".
+e.g. (helm-basename \"tutorial.el.gz\" 2) => tutorial
+To specify the extension where to stop use a cons cell where the cdr is a regexp
+matching extension e.g. (2 . \\\\.py$).
+e.g. (helm-basename \"~/ucs-utils-6.0-delta.py.gz\" \\='(2 . \"\\\\.py\\\\\\='\"))
+=>ucs-utils-6.0-delta."
   (let ((non-essential t)
+        (ext-regexp (cond ((consp ext) (cdr ext))
+                          ((numberp ext) "\\.el\\'")
+                          (t ext)))
         result)
     (cond ((or (null ext) (file-directory-p fname))
            (file-name-nondirectory (directory-file-name fname)))
-          ((numberp ext)
-           (cl-dotimes (_ ext)
-             (setq result (file-name-sans-extension
-                           (file-name-nondirectory (or result fname)))))
+          ((or (numberp ext) (consp ext))
+           (cl-dotimes (_ (if (consp ext) (car ext) ext))
+             (let ((bn (file-name-nondirectory (or result fname))))
+               (helm-aif (file-name-sans-extension bn)
+                   (if (string-match-p ext-regexp bn)
+                       (cl-return (setq result (file-name-sans-extension bn)))
+                     (setq result (file-name-sans-extension bn))))))
            result)
           ((eq t ext)
            (file-name-sans-extension (file-name-nondirectory fname)))
