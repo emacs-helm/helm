@@ -535,9 +535,14 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
             :multiline t
             :candidate-transformer
             (lambda (candidates)
-              (cl-loop for c in candidates collect
-                       (propertize (help-key-description (car c) nil)
-                                   'helm-realvalue c)))
+              (cl-loop for c in candidates
+                       for keys = (if (functionp c)
+                                      ;; Emacs-29+ (closure).
+                                      (kmacro--keys c)
+                                    ;; Emacs-28 and below (list).
+                                    (car c))
+                       collect (propertize (help-key-description keys nil)
+                                           'helm-realvalue c)))
             :persistent-action 'ignore
             :persistent-help "Do nothing"
             :help-message 'helm-kmacro-help-message
