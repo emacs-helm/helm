@@ -537,7 +537,7 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
             (lambda (candidates)
               (cl-loop for c in candidates
                        for keys = (if (functionp c)
-                                      ;; Emacs-29+ (closure).
+                                      ;; Emacs-29+ (Oclosure).
                                       (kmacro--keys c)
                                     ;; Emacs-28 and below (list).
                                     (car c))
