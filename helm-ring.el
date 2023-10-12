@@ -528,10 +528,11 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
     (helm :sources
           (helm-build-sync-source "Kmacro"
             :candidates (lambda ()
-                          (helm-fast-remove-dups
-                           (cons (kmacro-ring-head)
-                                 kmacro-ring)
-                           :test 'equal))
+                          (delq nil
+                                (helm-fast-remove-dups
+                                 (cons (kmacro-ring-head)
+                                       kmacro-ring)
+                                 :test 'equal)))
             :multiline t
             :candidate-transformer
             (lambda (candidates)
