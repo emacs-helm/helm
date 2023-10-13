@@ -533,6 +533,7 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
                                  (cons (kmacro-ring-head)
                                        kmacro-ring)
                                  :test 'equal)))
+            
             :multiline t
             :candidate-transformer
             (lambda (candidates)
@@ -613,11 +614,12 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
                        "")))))
 
 (defun helm-kbd-macro-delete-macro (_candidate)
-  (let ((mkd (helm-marked-candidates)))
-    (kmacro-push-ring)
+  (let ((mkd  (helm-marked-candidates))
+        (head (kmacro-ring-head)))
     (cl-loop for km in mkd
              do (setq kmacro-ring (delete km kmacro-ring)))
-    (kmacro-pop-ring1)))
+    (when (member head mkd)
+      (kmacro-delete-ring-head))))
 
 (defun helm-kbd-macro-edit-macro (candidate)
   (kmacro-push-ring)
