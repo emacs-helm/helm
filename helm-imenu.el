@@ -307,6 +307,27 @@ The sexp should be an `all-the-icons' function with its args."
     (helm-aif (and (markerp cand) (marker-buffer cand))
         (switch-to-buffer it))))
 
+(defun helm-imenu--preselect-function (marker)
+  "Move selection to MARKER on Helm Imenu start.
+
+MARKER stores the location of function where the Imenu is invoked."
+  (with-helm-buffer
+    (forward-line 0) ; Avoid scrolling right on long lines.
+    (when (helm-pos-multiline-p)
+      (helm-move--beginning-of-multiline-candidate))
+    (when (helm-pos-header-line-p) (forward-line 1))
+    (when helm-allow-mouse
+      (helm--mouse-reset-selection-help-echo))
+    (if (equal marker (cdr (get-text-property (point) 'helm-realvalue)))
+        ()
+      (catch 'break
+        (while (zerop (forward-line))
+          (when (equal marker (cdr (get-text-property (point) 'helm-realvalue)))
+            (throw 'break nil)))))
+    (helm-mark-current-line)
+    (helm-display-mode-line (helm-get-current-source))
+    (helm-log-run-hook "helm-preselect" 'helm-after-preselection-hook)))
+
 (defun helm-imenu--execute-action-at-once-p ()
   (let ((cur (helm-get-selection))
         (mb (with-helm-current-buffer
@@ -320,7 +341,7 @@ The sexp should be an `all-the-icons' function with its args."
     (if (equal (cdr cur) mb)
         (prog1 nil
           (helm-set-pattern "")
-          (helm-force-update (concat "\\_<" (car cur) "\\_>")))
+          (helm-force-update `(lambda () (helm-imenu--preselect-function ,mb))))
         t)))
 
 (defun helm-imenu-quit-and-find-file-fn (source)
@@ -496,7 +517,13 @@ The icon is found in `helm-imenu-icon-type-alist', if not
     (helm :sources 'helm-source-imenu
           :default (and str (list init-reg str))
           :preselect (helm-aif (which-function)
-                         (concat "\\_<" (regexp-quote it) "\\_>")
+                         `(lambda ()
+                            (helm-imenu--preselect-function
+                             ,(save-excursion
+                                (let ((points (nth 9 (syntax-ppss))))
+                                  (when points
+                                    (goto-char (car points)))
+                                  (point-marker)))))
                        init-reg)
           :buffer "*helm imenu*")))
 
@@ -535,7 +562,13 @@ i.e. `derived-mode-p' or it have an association in
     (helm :sources sources
           :default (and str (list init-reg str))
           :preselect (helm-aif (which-function)
-                         (concat "\\_<" (regexp-quote it) "\\_>")
+                         `(lambda ()
+                            (helm-imenu--preselect-function
+                             ,(save-excursion
+                                (let ((points (nth 9 (syntax-ppss))))
+                                  (when points
+                                    (goto-char (car points)))
+                                  (point-marker)))))
                        init-reg)
           :buffer "*helm imenu all*")))
 
