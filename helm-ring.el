@@ -605,18 +605,15 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
       (kmacro-push-ring)
       (setq last-kbd-macro
             (cl-loop for km in mkd
-                     for keys = (pcase km
-                                  ((pred vectorp) km)
-                                  ((pred functionp) ; Ocl
-                                   (kmacro--keys km))
-                                  (_ (car km)))
-                     if (vectorp keys)
-                     vconcat keys into result
-                     else collect keys into result
-                     finally return
-                     (if (vectorp result)
-                         result
-                       (vconcat (mapcar 'string-to-char result))))))))
+                     for keys = (if (functionp km)
+                                    (kmacro--keys km)
+                                  (pcase (car km)
+                                    ((and vec (pred vectorp)) vec)
+                                    ((and str (pred stringp))
+                                     (vconcat
+                                      (cl-loop for char across str
+                                               collect char)))))
+                     vconcat keys)))))
 
 (defun helm-kbd-macro-delete-macro (_candidate)
   (let ((mkd  (helm-marked-candidates))
