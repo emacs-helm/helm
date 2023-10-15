@@ -603,20 +603,19 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
     (when (cdr mkd)
       (kmacro-push-ring)
       (setq last-kbd-macro
-            (vconcat
-             (cl-loop for km in mkd
-                      for keys = (pcase km
-                                   ((pred vectorp) km)
-                                   ((and closure
-                                         (guard
-                                          (eq (oclosure-type closure)
-                                              'kmacro)))
-                                    (kmacro--keys km))
-                                   (_ (car km)))
-                      if (vectorp keys)
-                      vconcat keys into result
-                      else collect keys into result
-                      finally return result))))))
+            (cl-loop for km in mkd
+                     for keys = (pcase km
+                                  ((pred vectorp) km)
+                                  ((pred functionp) ; Ocl
+                                   (kmacro--keys km))
+                                  (_ (car km)))
+                     if (vectorp keys)
+                     vconcat keys into result
+                     else collect keys into result
+                     finally return
+                     (if (vectorp result)
+                         result
+                       (vconcat (mapcar 'string-to-char result))))))))
 
 (defun helm-kbd-macro-delete-macro (_candidate)
   (let ((mkd  (helm-marked-candidates))
