@@ -24,6 +24,7 @@
 (require 'helm-elisp)
 
 (declare-function undo-tree-restore-state-from-register "ext:undo-tree.el" (register))
+(declare-function kmacro--keys "kmacro.el")
 
 
 (defgroup helm-ring nil
