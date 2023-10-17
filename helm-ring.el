@@ -610,7 +610,7 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
                                   (pcase (car km)
                                     ((and vec (pred vectorp)) vec)
                                     ((and str (pred stringp))
-                                     (read-kbd-macro str t))))
+                                     (kmacro--to-vector str))))
                      vconcat keys)))))
 
 (defun helm-kbd-macro-delete-macro (_candidate)

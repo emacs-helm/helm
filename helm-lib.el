@@ -396,6 +396,20 @@ This is done recursively."
      (and (facep s) "a")
      (and (fboundp 'cl-find-class) (cl-find-class s) "t"))))
 
+;; Inline `kmacro--to-vector' from E29 to fix compatibility of
+;; `helm-kbd-macro-concat-macros' with E29 and E28.
+(unless (fboundp #'kmacro--to-vector)
+  (defun kmacro--to-vector (object)
+  "Normalize an old-style key sequence to the vector form."
+  (if (not (stringp object))
+      object
+    (let ((vec (string-to-vector object)))
+      (unless (multibyte-string-p object)
+	(dotimes (i (length vec))
+	  (let ((k (aref vec i)))
+	    (when (> k 127)
+	      (setf (aref vec i) (+ k ?\M-\C-@ -128))))))
+      vec))))
 
 ;;; Macros helper.
 ;;
