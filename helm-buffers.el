@@ -1110,6 +1110,7 @@ Can be used by any source that list buffers."
   (cl-assert (not helm-buffers-in-project-p)
              nil "You are already browsing this project"))
 
+;;;###autoload
 (defun helm-buffers-quit-and-find-file-fn (source)
   (let* ((sel   (get-buffer (helm-get-selection nil nil source)))
          (bname (and (bufferp sel) (buffer-name sel))))

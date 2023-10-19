@@ -255,6 +255,11 @@ This is mainly needed to prevent \"*Completions*\" buffers to popup.")
 Not guaranteed to work with Emacs < 27."
   :type 'boolean
   :group 'helm-mode)
+
+(defvar helm-mode-find-file-target-alist
+  '(("switch-to-buffer" . helm-buffers-quit-and-find-file-fn))
+  "An alist composed of (SOURCE_NAME . FUNCTION) elements.
+Where FUNCTION is a function suitable for `helm-quit-and-find-file'.")
 
 (defface helm-mode-prefix
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))

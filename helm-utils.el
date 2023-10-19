@@ -596,7 +596,9 @@ from its directory."
 (put 'helm-quit-and-find-file 'helm-only t)
 
 (defun helm--quit-and-find-file-default-file (source)
-  (let ((target-fn (helm-get-attr 'find-file-target source)))
+  (let ((target-fn (or (helm-get-attr 'find-file-target source)
+                       (assoc-default (helm-get-attr 'name source)
+                                      helm-mode-find-file-target-alist))))
     ;; target-fn function may return nil, in this case fallback to default.
     (helm-aif (and target-fn (funcall target-fn source))
         it
