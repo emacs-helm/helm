@@ -1111,18 +1111,16 @@ Can be used by any source that list buffers."
              nil "You are already browsing this project"))
 
 (defun helm-buffers-quit-and-find-file-fn (source)
-  (let* ((sel (helm-get-selection nil nil source))
-         (buf (helm-aand (bufferp sel)
-                         (get-buffer sel)
-                         (buffer-name it))))
-    (when buf
+  (let* ((sel   (get-buffer (helm-get-selection nil nil source)))
+         (bname (and (bufferp sel) (buffer-name sel))))
+    (when bname
       (or (buffer-file-name sel)
-          (car (rassoc buf dired-buffers))
-          (and (with-current-buffer buf
+          (car (rassoc bname dired-buffers))
+          (and (with-current-buffer bname
                  (eq major-mode 'org-agenda-mode))
                org-directory
                (expand-file-name org-directory))
-          (with-current-buffer buf
+          (with-current-buffer bname
             (expand-file-name default-directory))))))
 
 ;;; Candidate Transformers
