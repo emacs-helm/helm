@@ -792,7 +792,7 @@ handle this."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-always-two-windows nil
+(defcustom helm-always-two-windows t
   "When non-nil Helm uses two windows in this frame.
 
 I.e. `helm-buffer' in one window and `helm-current-buffer'
@@ -894,7 +894,7 @@ save or remove source name in this variable."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-allow-mouse nil
+(defcustom helm-allow-mouse t
   "Allow mouse usage during the Helm session when non-nil.
 
 Note that this also allows moving out of minibuffer when clicking
@@ -903,7 +903,7 @@ by clicking back in `helm-buffer' or minibuffer."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-move-to-line-cycle-in-source nil
+(defcustom helm-move-to-line-cycle-in-source t
   "Cycle to the beginning or end of the list after reaching the bottom or top.
 This applies when using `helm-next/previous-line'."
   :group 'helm
@@ -1016,7 +1016,7 @@ Only async sources than use a sentinel calling
   :type 'integer
   :group 'helm)
 
-(defcustom helm-show-action-window-other-window nil
+(defcustom helm-show-action-window-other-window 'left
   "Show action buffer beside `helm-buffer' when non-nil.
 
 If nil don't split and replace helm-buffer by the action buffer
