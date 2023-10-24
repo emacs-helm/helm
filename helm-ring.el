@@ -404,6 +404,11 @@ yanked string."
                          (prin1-to-string (cdr val))
                          ".")
                  'jump-to-register))
+          ((and (consp val) (eq (car val) 'buffer))
+           (list (concat "buffer:"
+                         (prin1-to-string (cdr val))
+                         ".")
+                 'jump-to-register))
           ((and (consp val) (eq (car val) 'file-query))
            (list (concat "file:a file-query reference: file "
                          (car (cdr val))
