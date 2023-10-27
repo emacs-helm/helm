@@ -208,6 +208,9 @@ If `helm-turn-on-show-completion' is nil do nothing."
                'helm-display-function
                (or helm-show-completion-display-function
                    'helm-default-display-buffer))
+              (with-helm-after-update-hook
+                ;; Show immediately first candidate as soon as helm popup.
+                (helm-show-completion))
               (helm-show-completion-init-overlay ,beg ,end)
               ,@body)
           ,@body)
