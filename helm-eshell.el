@@ -290,7 +290,7 @@ at point."
       (delete-char -1) (setq del-dot t)
       (setq helm-ec-target (substring helm-ec-target 0 (1- (length helm-ec-target)))))
     (cond ((eq first ?\()
-           (helm-lisp-completion-or-file-name-at-point))
+           (helm-lisp-completion-at-point))
           ;; In eshell `pcomplete-parse-arguments' is called
           ;; with `pcomplete-parse-arguments-function'
           ;; locally bound to `eshell-complete-parse-arguments'

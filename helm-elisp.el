@@ -462,7 +462,7 @@ documentation when SYM name is the same for function and variable."
   "Preconfigured Helm to complete file name at point."
   (interactive)
   (require 'helm-mode)
-  (let* ((tap (or (thing-at-point 'filename) ""))
+  (let* ((tap (or (thing-at-point 'filename t) ""))
          beg
          (init (and tap
                     (or force
@@ -471,8 +471,7 @@ documentation when SYM name is the same for function and variable."
                           (search-backward tap (pos-bol) t)
                           (setq beg (point))
                           (looking-back "[^'`( ]" (1- (point)))))
-                    (expand-file-name
-                     (substring-no-properties tap))))
+                    (expand-file-name tap)))
          (end  (point))
          (helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
@@ -484,6 +483,7 @@ documentation when SYM name is the same for function and variable."
       (delete-region beg end) (insert (if (string-match "^~" tap)
                                           (abbreviate-file-name completion)
                                         completion)))))
+(make-obsolete 'helm-complete-file-name-at-point 'helm-find-files "3.9.6")
 
 ;;;###autoload
 (defun helm-lisp-indent ()
@@ -494,20 +494,6 @@ documentation when SYM name is the same for function and variable."
   (let ((tab-always-indent (or (eq tab-always-indent 'complete)
                                tab-always-indent)))
     (indent-for-tab-command current-prefix-arg)))
-
-;;;###autoload
-(defun helm-lisp-completion-or-file-name-at-point ()
-  "Preconfigured Helm to complete Lisp symbol or filename at point.
-Filename completion happens if string start after or between a
-double quote."
-  (interactive)
-  (let* ((tap (thing-at-point 'filename)))
-    (if (and tap (save-excursion
-                   (end-of-line)
-                   (search-backward tap (pos-bol) t)
-                   (looking-back "[^'`( ]" (1- (point)))))
-        (helm-complete-file-name-at-point)
-      (helm-lisp-completion-at-point))))
 
 
 ;;; Apropos
