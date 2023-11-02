@@ -229,7 +229,7 @@ executing the first function on the next hit."
   "Define NAME as a multi-key command running FUNS.
 After DELAY seconds, the FUNS list is reinitialized.
 See `helm-define-multi-key'."
-  (declare (indent 2))
+  (declare (indent 2) (doc-string 2))
   (setq docstring (if docstring (concat docstring "\n\n")
                     "This is a helm-ish multi-key command."))
   `(defalias (quote ,name) (helm-make-multi-command ,funs ,delay) ,docstring))
