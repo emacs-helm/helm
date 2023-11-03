@@ -875,10 +875,11 @@ This is a bug in `puthash' which store the printable
 representation of object instead of storing the object itself,
 this to provide at the end a printable representation of
 hashtable itself."
-  (cl-loop with cont = (make-hash-table :test test)
-           for elm in seq
-           unless (gethash elm cont)
-           collect (puthash elm elm cont)))
+  (let ((table (make-hash-table :test test)))
+    (mapcan (lambda (x)
+              (unless (gethash x table)
+                (list (puthash x x table))))
+            seq)))
 
 (defsubst helm--string-join (strings &optional separator)
   "Join all STRINGS using SEPARATOR."
