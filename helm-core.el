@@ -4015,16 +4015,14 @@ Update is reenabled when idle 1s."
   (with-helm-alive-p
     (unless helm--suspend-update-interactive-flag
       (helm-suspend-update 1))
-    (helm-delete-char-backward arg)
+    (delete-char (- arg))
     (run-with-idle-timer
      1 nil
      (lambda ()
        (unless helm--suspend-update-interactive-flag
          (helm-suspend-update -1)
          (helm-check-minibuffer-input)
-         ;; Already done by helm-delete-char-backward.
-         (unless (string= (minibuffer-contents) "")
-           (helm-force-update)))))))
+         (helm-force-update))))))
 (put 'helm-delete-backward-no-update 'helm-only t)
 
 (defun helm-delete-char-backward (arg)
