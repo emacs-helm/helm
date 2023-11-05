@@ -56,7 +56,7 @@ unless `helm-locate-command' is non-nil.
 
 Here are the default values it will use according to your system:
 
-Gnu/linux:     \"locate %s -e -A --regex %s\"
+Gnu/linux:     \"locate %s -e -A -N --regex %s\"
 berkeley-unix: \"locate %s %s\"
 windows-nt:    \"es %s %s\"
 Others:        \"locate %s %s\"
@@ -69,6 +69,10 @@ for this.
 The last option must be the one preceding pattern i.e \"-r\" or
 \"--regex\".
 
+The option \"-N\" may not be available on old locate versions, it is needed on
+latest systems as locate send quoted filenames, it is BTW enabled by default, if
+this option is not recognized on your system, remove it.
+ 
 You will be able to pass other options such as \"-b\" or \"l\"
 during Helm invocation after entering pattern only when multi
 matching, not when fuzzy matching.
@@ -211,7 +215,8 @@ See `helm-locate-with-db' and `helm-locate'."
   (unless helm-locate-command
     (setq helm-locate-command
           (cl-case system-type
-            (gnu/linux "locate %s -e -A --regex %s")
+            ;; Use -N option by default (bug#2625)
+            (gnu/linux "locate %s -e -A -N --regex %s")
             (berkeley-unix "locate %s %s")
             (windows-nt "es %s %s")
             (t "locate %s %s")))))
