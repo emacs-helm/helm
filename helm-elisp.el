@@ -950,7 +950,8 @@ a prefix arg."
                                           (puthash bn (helm-locate-lib-get-summary path)
                                                    helm--locate-library-doc-cache)))
                        for disp = (and path
-                                       (if (or completions-detailed helm-completions-detailed)
+                                       (if (and doc
+                                                (or completions-detailed helm-completions-detailed))
                                            (helm-aand (propertize doc 'face 'font-lock-warning-face)
                                                       (propertize " " 'display (concat sep it))
                                                       (concat bn it))
