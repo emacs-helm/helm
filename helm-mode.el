@@ -1299,7 +1299,8 @@ is used."
     ;; unrelated files and directories coming in ... Even if this modify the
     ;; behavior of find-library-include-other-files remove them for the benefit
     ;; of everybody.
-    (unless (string-match "\\(\\.elc\\|/\\)\\'" comp)
+    (unless (or (string-match "\\(\\.elc\\|/\\)\\'" comp)
+                (string-match "\\`\\.#" comp)) ; (bug#2526)
       (let* ((sep (helm-make-separator comp))
              (path (or (assoc-default comp helm--locate-library-cache)
                        (let ((p (find-library-name comp)))
