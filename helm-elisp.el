@@ -939,7 +939,7 @@ a prefix arg."
                        for bn = (helm-basename c 2)
                        for sep = (helm-make-separator bn lgst)
                        for path = (or (assoc-default bn helm--locate-library-cache)
-                                      ;; An auto-save file in LOAD-PATH (bug#2626).
+                                      ;; A lock file in LOAD-PATH (bug#2626).
                                       (unless (string-match "\\`\\.#" bn)
                                         (let ((p (find-library-name bn)))
                                           (push (cons bn p) helm--locate-library-cache)
