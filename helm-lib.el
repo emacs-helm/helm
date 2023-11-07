@@ -1764,19 +1764,17 @@ Directories expansion is not supported."
                         (shell-quote-argument file)
                         regexp)))
          output)
-    (set-process-filter proc nil)
     (set-process-sentinel
      proc (lambda (process event)
             (when (and (string= event "finished\n")
                        (process-buffer process))
-              (setq output
-                    (with-current-buffer (process-buffer process)
+              (with-current-buffer (process-buffer process)
+                (setq output
                       (replace-regexp-in-string
                        "\n" ""
-                       (buffer-string))))
-              (kill-buffer (process-buffer process)))))
-    (while (and proc (eq (process-status proc) 'run))
-      (accept-process-output proc))
+                       (buffer-string)))
+                (kill-buffer)))))
+    (while (accept-process-output proc 0.5 nil t))
     (if (string= output "")
         "Not documented"
       output)))
