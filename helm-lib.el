@@ -1773,8 +1773,8 @@ Directories expansion is not supported."
                       (replace-regexp-in-string
                        "\n" ""
                        (buffer-string)))
-                (kill-buffer)))))
-    (while (accept-process-output proc 0.5 nil t))
+                (erase-buffer)))))
+    (while (accept-process-output proc))
     (if (string= output "")
         "Not documented"
       output)))
