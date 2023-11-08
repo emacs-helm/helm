@@ -1756,28 +1756,15 @@ Directories expansion is not supported."
          (cmd "%s %s | head -n1 | awk 'match($0,\"%s\",a) {print a[2]}'\
  | awk -F ' -*-' '{print $1}'")
          (regexp "^;;;(.*) ---? (.*)$")
-         (proc (start-process-shell-command
-                "helm-locate-lib-get-summary" "*helm locate lib*"
+         (desc (shell-command-to-string
                 (format cmd
                         (if (string-match-p "\\.gz\\'" file)
                             "gzip -c -q -d" "cat")
                         (shell-quote-argument file)
-                        regexp)))
-         output)
-    (set-process-sentinel
-     proc (lambda (process event)
-            (when (and (string= event "finished\n")
-                       (process-buffer process))
-              (with-current-buffer (process-buffer process)
-                (setq output
-                      (replace-regexp-in-string
-                       "\n" ""
-                       (buffer-string)))
-                (erase-buffer)))))
-    (while (accept-process-output proc))
-    (if (string= output "")
+                        regexp))))
+    (if (string= desc "")
         "Not documented"
-      output)))
+      (replace-regexp-in-string "\n" "" desc))))
 
 ;;; helm internals
 ;;

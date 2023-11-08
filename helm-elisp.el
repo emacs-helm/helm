@@ -893,12 +893,6 @@ a string, i.e. the `symbol-name' of any existing symbol."
 ;;; Locate elisp library
 ;;
 ;;
-;; FIXME: Maybe I make an error of implementation here, building the caches in
-;; the transformer force the usage of an asynchronous function to build the doc
-;; of each library, maybe it would be simpler to make the caches in :init and use
-;; a simple transformer using gethash to fetch doc and path of each candidate. And
-;; `helm-locate-lib-get-summary' could use a synchronous process.
-
 (defvar helm--locate-library-cache nil)
 (defvar helm--locate-library-doc-cache (make-hash-table :test 'equal))
 (defun helm-locate-library-scan-list ()
