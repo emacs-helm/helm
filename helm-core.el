@@ -240,7 +240,7 @@ Run each function in the FUNCTIONS list in turn when called within
 DELAY seconds."
   (declare (indent 1))
   (let ((funs functions)
-        (iter (list nil))
+        (iter (list nil)) ; ref-cell[1].
         (timeout delay))
     (lambda ()
       (interactive)
@@ -251,6 +251,8 @@ DELAY seconds."
               (cl-loop for count from 1 to (length functions)
                        collect count)))
         next)
+    ;; By passing a list containing a single 'nil' element [1] as ITERATOR we
+    ;; avoid using a global var.
     (unless (and (car iterator)
                  ;; Reset iterator when another key is pressed.
                  (eq this-command real-last-command))
