@@ -47,7 +47,7 @@
 (defvar helm-ff-transformer-show-only-basename)
 (defvar helm-popup-tip-mode)
 (defvar helm-ff-last-expanded-candidate-regexp)
-
+(defvar helm-mode-find-file-target-alist)
 
 (defgroup helm-utils nil
   "Utilities routines for Helm."
