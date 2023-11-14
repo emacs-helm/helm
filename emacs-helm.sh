@@ -233,7 +233,7 @@ cat > $CONF_FILE <<EOF
     (setq package-load-list
           (if (equal load-packages '("all"))
               '(all)
-            (append '((helm-core t) (helm t) (async t) (popup t))
+            (append '((helm-core t) (helm t) (async t) (popup t) (wfnames t))
                     (mapcar (lambda (p) (list (intern p) t)) load-packages)))))
 
   (package-initialize))
