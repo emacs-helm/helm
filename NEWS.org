@@ -2,6 +2,16 @@
 
 * NEWS
 
+** Version 3.9.6
+
+*** Fix bug with helm-mm-exact-search (bug#2616)
+*** Improve locate library fns
+*** Fix a old bug with candidate transformer
+candidate-transformer functions should behave the same in in-buffer
+and sync source: transforming all candidates.
+*** Fix kmacro for Emacs-29+
+*** Various minor bug fixes
+
 ** Version 3.9.5
 
 *** Add compatibility with Emacs-28< for helm-packages

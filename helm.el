@@ -11,7 +11,7 @@
 ;;                         Thierry Volpiatto
 
 ;; Author: Thierry Volpiatto <thievol@posteo.net>
-;; Version: 3.9.5
+;; Version: 3.9.6
 ;; URL: https://emacs-helm.github.io/helm/
 ;; Package-Requires: ((helm-core "3.9.4") (wfnames "1.1") (popup "0.5.3"))
 
