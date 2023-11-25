@@ -5115,7 +5115,10 @@ Special commands:
       (progn
         (cl-pushnew helm-ff-default-directory
                     helm-ff--thumbnailed-directories :test 'equal)
-        (cl-loop for (disp . img) in candidates
+        (cl-loop with reporter = (make-progress-reporter
+                                  "Loading thumbnails..." 0 (length candidates))
+                 for (disp . img) in candidates
+                 for count from 0
                  for imgtype = (helm-acase (file-name-extension img)
                                  ("png" 'png)
                                  (("jpg" "jpeg") 'jpeg))
@@ -5138,7 +5141,8 @@ Special commands:
                                                       rear-nonsticky '(display))
                                         disp)
                    (cons disp img))
-                   else collect (cons disp img)))
+                 else collect (cons disp img)
+                 when reporter do (progress-reporter-update reporter count)))
         candidates))
 
 ;; Same as `image-dired-get-thumbnail-image' but use
