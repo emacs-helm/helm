@@ -159,9 +159,9 @@ display."
 ;; Called each time cursor move in helm-buffer.
 (defun helm-show-completion ()
   (with-helm-current-buffer
-    (overlay-put helm-show-completion-overlay
-                 'display (substring-no-properties
-                           (helm-get-selection)))))
+    (helm-aif (helm-get-selection)
+        (overlay-put helm-show-completion-overlay
+                     'display (substring-no-properties it)))))
 
 (defun helm-show-completion-init-overlay (beg end)
   (setq helm-show-completion-overlay (make-overlay beg end))
