@@ -363,6 +363,7 @@ yanked string."
 
 (defun helm-register-candidates ()
   "Collecting register contents and appropriate commands."
+  (require 'frameset)
   (cl-loop for (char . rval) in register-alist
         for key    = (single-key-description char)
         for e27 = (registerv-p rval)
