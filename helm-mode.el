@@ -2236,6 +2236,7 @@ When AFUN, AFIX are nil and CATEGORY is not file return COMPS unmodified."
                 (if (functionp affixations)
                     (cl-loop for comp in comps
                              for cand = (funcall affixations comp)
+                             when cand
                              collect (cons (propertize (concat (nth 1 cand) ;prefix
                                                                (nth 0 cand) ;comp
                                                                (nth 2 cand)) ;suffix
