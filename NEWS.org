@@ -2,6 +2,10 @@
 
 * NEWS
 
+** Version 3.9.7
+
+*** Fix package-requires in helm.el
+
 ** Version 3.9.6
 
 *** Fix bug with helm-mm-exact-search (bug#2616)
