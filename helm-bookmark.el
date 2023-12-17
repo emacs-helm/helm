@@ -250,7 +250,8 @@ will be honored."
 BOOKMARK is a bookmark name or a bookmark record."
   (or (eq (bookmark-get-handler bookmark) 'bmkext-jump-gnus)
       (eq (bookmark-get-handler bookmark) 'gnus-summary-bookmark-jump)
-      (eq (bookmark-get-handler bookmark) 'bookmarkp-jump-gnus)))
+      (eq (bookmark-get-handler bookmark) 'bookmarkp-jump-gnus)
+      (eq (bookmark-get-handler bookmark) 'bmkp-jump-gnus)))
 
 (defun helm-bookmark-mu4e-bookmark-p (bookmark)
   "Return non nil if BOOKMARK is a mu4e bookmark.
@@ -263,21 +264,24 @@ BOOKMARK is a bookmark name or a bookmark record."
 BOOKMARK is a bookmark name or a bookmark record."
   (or (eq (bookmark-get-handler bookmark) 'bmkext-jump-w3m)
       (eq (bookmark-get-handler bookmark) 'bookmark-w3m-bookmark-jump)
-      (eq (bookmark-get-handler bookmark) 'bookmarkp-jump-w3m)))
+      (eq (bookmark-get-handler bookmark) 'bookmarkp-jump-w3m)
+      (eq (bookmark-get-handler bookmark) 'bmkp-jump-w3m)))
 
 (defun helm-bookmark-woman-bookmark-p (bookmark)
   "Return non-nil if BOOKMARK is a Woman bookmark.
 BOOKMARK is a bookmark name or a bookmark record."
   (or (eq (bookmark-get-handler bookmark) 'bmkext-jump-woman)
       (eq (bookmark-get-handler bookmark) 'woman-bookmark-jump)
-      (eq (bookmark-get-handler bookmark) 'bookmarkp-jump-woman)))
+      (eq (bookmark-get-handler bookmark) 'bookmarkp-jump-woman)
+      (eq (bookmark-get-handler bookmark) 'bmkp-jump-woman)))
 
 (defun helm-bookmark-man-bookmark-p (bookmark)
   "Return non-nil if BOOKMARK is a Man bookmark.
 BOOKMARK is a bookmark name or a bookmark record."
   (or (eq (bookmark-get-handler bookmark) 'bmkext-jump-man)
       (eq (bookmark-get-handler bookmark) 'Man-bookmark-jump)
-      (eq (bookmark-get-handler bookmark) 'bookmarkp-jump-man)))
+      (eq (bookmark-get-handler bookmark) 'bookmarkp-jump-man)
+      (eq (bookmark-get-handler bookmark) 'bmkp-jump-man)))
 
 (defun helm-bookmark-woman-man-bookmark-p (bookmark)
   "Return non-nil if BOOKMARK is a Man or Woman bookmark.
@@ -388,6 +392,10 @@ If `browse-url-browser-function' is set to something else than
 (defalias 'bookmarkp-jump-w3m #'helm-bookmark-jump-w3m)
 (defalias 'bookmarkp-jump-woman #'woman-bookmark-jump)
 (defalias 'bookmarkp-jump-man #'Man-bookmark-jump)
+(defalias 'bmkp-jump-gnus #'gnus-summary-bookmark-jump)
+(defalias 'bmkp-jump-w3m #'helm-bookmark-jump-w3m)
+(defalias 'bmkp-jump-woman #'woman-bookmark-jump)
+(defalias 'bmkp-jump-man #'Man-bookmark-jump)
 
 
 ;;;; Filtered bookmark sources
