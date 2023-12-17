@@ -33,6 +33,7 @@
 (declare-function all-the-icons-icon-for-file"ext:all-the-icons.el")
 (declare-function all-the-icons-octicon      "ext:all-the-icons.el")
 (declare-function all-the-icons-match-to-alist "ext:all-the-icons.el")
+(declare-function all-the-icons-faicon "ext:all-the-icons.el")
 
 (defvar all-the-icons-dir-icon-alist)
 
@@ -627,12 +628,13 @@ If `browse-url-browser-function' is set to something else than
                                              all-the-icons-dir-icon-alist))
                                   (apply (car it) (cdr it))
                                 (all-the-icons-octicon "file-directory")))
+                             (isw3m (all-the-icons-faicon "firefox"))
                              ((and isfile isinfo) (all-the-icons-octicon "info"))
-                             (isfile (all-the-icons-icon-for-file (helm-basename isfile)))
                              ((or iswoman isman)
                               (all-the-icons-fileicon "man-page"))
                              ((or isgnus ismu4e)
-                              (all-the-icons-octicon "mail-read"))))
+                              (all-the-icons-octicon "mail-read"))
+                             (isfile (all-the-icons-icon-for-file (helm-basename isfile)))))
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))
           do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
