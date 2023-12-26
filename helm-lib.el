@@ -445,13 +445,13 @@ Like `this-command' but return the real command, and not
   (cl-loop for count from 1 to 50
            for btf = (backtrace-frame count)
            for fn = (cl-second btf)
-           ;; Some commands like `kill-buffer' involve another function
+           ;; Some commands like `kill-buffer' may call another function
            ;; involving a completing-read, in this case we want to stop at this
            ;; function and not go up to the initial interactive call (in this
-           ;; case kill-buffer).
+           ;; case kill-buffer) See Issue#2634.
            if (or (memq fn helm-this-command-functions)
                   (and
-                   ;; In some case we may have in the way an
+                   ;; In some cases we may have in the way an
                    ;; advice compiled resulting in byte-code,
                    ;; ignore it (Bug#691).
                    (symbolp fn)
