@@ -5866,7 +5866,7 @@ Optional arg TRASH-ALIST should be an alist as what
     (let ((trash-files-dir (helm-trash-directory)))
       (cl-loop for (_bn . fn) in (or trash-alist
                                      (helm-ff-trash-list trash-files-dir))
-               thereis (file-equal-p file fn)))))
+               thereis (and (file-equal-p file fn) file)))))
 
 (defun helm-ff-quick-delete (_candidate)
   "Delete file CANDIDATE without quitting.
@@ -6141,9 +6141,7 @@ directories are always deleted with no warnings."
                              (setq result (1+ result))))
                   (error (with-temp-file ,helm-ff-delete-log-file
                            (insert (format-time-string "%x:%H:%M:%S\n"))
-                           (insert (format "%s:%s\n"
-                                           (car err)
-                                           (mapconcat 'identity (cdr err) " ")))))))))
+                           (insert (format "%S\n" err))))))))
          callback)
         (helm-ff--delete-async-modeline-mode 1)))))
 
