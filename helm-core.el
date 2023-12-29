@@ -742,7 +742,9 @@ handle this."
   :type 'symbol)
 
 (defcustom helm-split-window-other-side-when-one-window 'below
-  "The default side to display `helm-buffer' when (1)
+  "Place for `helm-window' when `helm-split-window-default-side' is \\='other.
+
+The default side to display `helm-buffer' when (1)
 `helm-split-window-default-side' is \\='other and (2)
 the current frame only has one window. Possible values
 are acceptable args for `split-window' SIDE, that is `below',
