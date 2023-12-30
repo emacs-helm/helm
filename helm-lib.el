@@ -607,9 +607,12 @@ E.g.: helm.el$
                    ls ""))))
 
 (defsubst helm--collect-pairs-in-string (string)
-  (cl-loop for str on (split-string string "" t) by 'cdr
-           when (cdr str)
-           collect (list (car str) (cadr str))))
+  ;; We want to collect e.g.
+  ;; in "abcd" -> (("a" "b") ("b" "c") ("c" "d"))
+  ;; and not (("a" "b") ("c" "d")) so we use by #'cdr which is the default.
+  ;; If the last pair have no cdr i.e. (s1 nil) ignore it.
+  (cl-loop for (s1 s2) on (split-string string "" t)
+           when s2 collect (list s1 s2)))
 
 ;;; Help routines.
 ;;
