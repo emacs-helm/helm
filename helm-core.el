@@ -3716,10 +3716,14 @@ Argument SAVE-OR-RESTORE is either save or restore."
   (unless (and (or helm-split-window-state
                    helm--window-side-state)
                helm-reuse-last-window-split-state)
+    ;; `helm-split-window-state' should be the contrary of what we currently
+    ;; have to allow toggling windows with C-t.
     (setq helm-split-window-state
-          (if (or (null split-width-threshold)
-                  (and (integerp split-width-threshold)
-                       (>= split-width-threshold (+ (frame-width) 4))))
+          (if (or (null helm-split-window-default-side) ; same as below.
+                  (memq helm-split-window-default-side '(below above))
+                  (null helm-split-width-threshold)
+                  (and (integerp helm-split-width-threshold)
+                       (>= helm-split-width-threshold (+ (frame-width) 4))))
               'vertical 'horizontal))
     (setq helm--window-side-state
           (or helm-split-window-default-side 'below)))
