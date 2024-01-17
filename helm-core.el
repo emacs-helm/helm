@@ -1025,17 +1025,17 @@ Only async sources than use a sentinel calling
 
 If nil don't split and replace helm-buffer by the action buffer
 in same window.
-If left display the action buffer at the left of helm-buffer.
-If right or any other value, split at right.
-
+Possible value are left, right, below and above.
 Note that this may not fit well with some Helm window
 configurations, so it has effect only when
 `helm-always-two-windows' is non-nil."
   :group 'helm
   :type '(choice
           (const :tag "Split at left" left)
-          (const :tag "Don't split" nil)
-          (other :tag "Split at right" right)))
+          (const :tag "Split at right" right)
+          (const :tag "Split below" below)
+          (const :tag "Split above" above)
+          (const :tag "Don't split" nil)))
 
 (defcustom helm-cycle-resume-delay 1.0
   "Delay used before resuming in `helm-run-cycle-resume'."
