@@ -5565,10 +5565,14 @@ Coerce source with coerce function."
     action))
 
 (defun helm--show-action-window-other-window-p ()
-  (and helm-show-action-window-other-window
-       (or helm-always-two-windows
-           helm--buffer-in-new-frame-p)
-       (eq helm-split-window-state 'vertical)))
+  (when (and helm-show-action-window-other-window
+             (or helm-always-two-windows
+                 helm--buffer-in-new-frame-p)
+             (eq helm-split-window-state 'vertical))
+    (if (< (window-width (helm-window))
+           (or split-width-threshold 160))
+        'below
+      helm-show-action-window-other-window)))
 
 (defun helm-select-action ()
   "Select an action for the currently selected candidate.
@@ -5581,13 +5585,16 @@ If action buffer is selected, back to the Helm buffer."
       (with-selected-frame (with-helm-window (selected-frame))
         (prog1
             (helm-acond ((get-buffer-window helm-action-buffer 'visible)
-                         (set-window-buffer it helm-buffer)
-                         (helm--set-action-prompt 'restore)
-                         (when (helm--show-action-window-other-window-p)
-                           (delete-window it))
-                         (kill-buffer helm-action-buffer)
-                         (setq helm-saved-selection nil)
-                         (helm-set-pattern helm-input 'noupdate))
+                         (let ((delta (window-total-height it)))
+                           (set-window-buffer it helm-buffer)
+                           (helm--set-action-prompt 'restore)
+                           (when (helm--show-action-window-other-window-p)
+                             (delete-window it))
+                           (when (memq helm-show-action-window-other-window '(below above))
+                             (window-resize (get-buffer-window helm-buffer) delta))
+                           (kill-buffer helm-action-buffer)
+                           (setq helm-saved-selection nil)
+                           (helm-set-pattern helm-input 'noupdate)))
                         (helm-saved-selection
                          (setq helm-saved-current-source src)
                          (let ((actions (helm-get-actions-from-current-source src))
@@ -5648,9 +5655,8 @@ If action buffer is selected, back to the Helm buffer."
     (erase-buffer)
     (buffer-disable-undo)
     (setq cursor-type nil)
-    (set-window-buffer (if (helm--show-action-window-other-window-p)
-                           (split-window (get-buffer-window helm-buffer)
-                                         nil helm-show-action-window-other-window)
+    (set-window-buffer (helm-aif (helm--show-action-window-other-window-p)
+                           (split-window (get-buffer-window helm-buffer) nil it)
                          (get-buffer-window helm-buffer))
                        helm-action-buffer)
     (set (make-local-variable 'helm-sources)
