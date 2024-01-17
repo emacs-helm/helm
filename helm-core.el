@@ -5594,7 +5594,11 @@ If action buffer is selected, back to the Helm buffer."
                              (window-resize (get-buffer-window helm-buffer) delta))
                            (kill-buffer helm-action-buffer)
                            (setq helm-saved-selection nil)
-                           (helm-set-pattern helm-input 'noupdate)))
+                           (helm-set-pattern helm-input 'noupdate)
+                           ;; Maybe hide minibuffer if helm was showing
+                           ;; minibuffer in header-line and we are just toggling
+                           ;; menu [1].
+                           (helm-hide-minibuffer-maybe)))
                         (helm-saved-selection
                          (setq helm-saved-current-source src)
                          (let ((actions (helm-get-actions-from-current-source src))
@@ -5608,6 +5612,9 @@ If action buffer is selected, back to the Helm buffer."
                              (helm-show-action-buffer actions)
                              ;; Be sure the minibuffer is entirely deleted (bug#907).
                              (helm--delete-minibuffer-contents-from "")
+                             ;; Unhide minibuffer to make visible action prompt [1].
+                             (with-selected-window (minibuffer-window)
+                               (remove-overlays) (setq cursor-type t))
                              (helm--set-action-prompt)
                              (helm-check-minibuffer-input))))
                         (t (message "No Actions available")))
