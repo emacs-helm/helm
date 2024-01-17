@@ -1029,7 +1029,7 @@ If left display the action buffer at the left of helm-buffer.
 If right or any other value, split at right.
 
 Note that this may not fit well with some Helm window
-configurations, so it have only effect when
+configurations, so it has effect only when
 `helm-always-two-windows' is non-nil."
   :group 'helm
   :type '(choice
