@@ -828,8 +828,8 @@ Also when non-nil it overrides the effect of
   "Action functions to pass to `display-buffer'.
 See (info \"(elisp) Buffer Display Action Functions\").
 
-It has no effect when `helm-always-two-windows' is non-nil and
-may override other settings like `helm-split-window-inside-p'."
+It may override others helm window related variables settings like
+`helm-always-two-windows', `helm-split-window-inside-p' etc..."
   :group 'helm
   :type '(repeat symbol))
 
@@ -837,8 +837,9 @@ may override other settings like `helm-split-window-inside-p'."
   "Additional alist to pass to `display-buffer' action.
 See (info \"(elisp) Action Alists for Buffer Display\").
 
-It has no effect when `helm-always-two-windows' is non-nil and
-may override other settings like `helm-split-window-inside-p'.
+It may override others helm window related variables settings like
+`helm-always-two-windows', `helm-split-window-inside-p' etc...
+
 Note that window-height and window-width have to be configured in
 `helm-display-buffer-height' and `helm-display-buffer-width'."
   :group 'helm
