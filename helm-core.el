@@ -47,10 +47,12 @@
 (declare-function custom-unlispify-tag-name "cus-edit.el")
 (declare-function helm-quit-and-find-file "helm-utils.el")
 (declare-function linum-mode "linum.el")
+(declare-function minibuffer-depth-setup "mb-depth.el")
 
 (defvar helm-marked-buffer-name)
 (defvar display-buffer-function)
 (defvar minibuffer-follows-selected-frame)
+(defvar minibuffer-depth-indicate-mode)
 
 
 ;;; Internal Variables
@@ -5665,7 +5667,10 @@ If action buffer is selected, back to the Helm buffer."
                         front-sticky t))
           (prt (if restore helm--prompt helm--action-prompt)))
       (erase-buffer)
-      (insert (apply #'propertize prt props)))))
+      (insert (apply #'propertize prt props))
+      ;; Restore minibuffer depth indicator if the mode is enabled.
+      (when minibuffer-depth-indicate-mode
+        (minibuffer-depth-setup)))))
 
 (defun helm-show-action-buffer (actions)
   (with-current-buffer (get-buffer-create helm-action-buffer)
