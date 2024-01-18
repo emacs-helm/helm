@@ -3717,7 +3717,10 @@ Argument SAVE-OR-RESTORE is either save or restore."
                    helm--window-side-state)
                helm-reuse-last-window-split-state)
     ;; `helm-split-window-state' should be the contrary of what we currently
-    ;; have to allow toggling windows with C-t.
+    ;; have to allow toggling windows with C-t.  This was influencing the
+    ;; behavior of `helm-show-action-window-other-window' but we have now
+    ;; removed this limitation, the action buffer beeing displayed 'below' when
+    ;; helm-window is too narrow (vertical split). See bug#2635.
     (setq helm-split-window-state
           (if (or (null helm-split-window-default-side) ; same as below.
                   (memq helm-split-window-default-side '(below above))
@@ -5565,10 +5568,17 @@ Coerce source with coerce function."
     action))
 
 (defun helm--show-action-window-other-window-p ()
+  "Decide if window layout is suitable for showing action buffer.
+Note that the return value is meaningful only at some point in the code,
+i.e. before displaying action menu."
   (when (and helm-show-action-window-other-window
+             ;; FIXME: now we check the window size, not sure this limitation is
+             ;; still needed (helm-always-two-windows).
              (or helm-always-two-windows
-                 helm--buffer-in-new-frame-p)
-             (eq helm-split-window-state 'vertical))
+                 helm--buffer-in-new-frame-p))
+    ;; We were previously checking helm-split-window-state (eq vertical) to
+    ;; decide to show action window, we now show it inconditionally in such case
+    ;; but 'below'.
     (if (< (window-width (helm-window))
            (or split-width-threshold 160))
         'below
@@ -5588,8 +5598,14 @@ If action buffer is selected, back to the Helm buffer."
                          (let ((delta (window-total-height it)))
                            (set-window-buffer it helm-buffer)
                            (helm--set-action-prompt 'restore)
+                           ;; If `helm-show-action-window-other-window' is non nil
+                           ;; we should have now two windows displaying
+                           ;; helm-buffer, delete the one that was handling
+                           ;; previously action buffer. 
                            (when (helm--show-action-window-other-window-p)
                              (delete-window it))
+                           ;; Resize window on horizontal split, though for some
+                           ;; reasons only 'above' needs to be resized. 
                            (when (memq helm-show-action-window-other-window '(below above))
                              (window-resize (get-buffer-window helm-buffer) delta))
                            (kill-buffer helm-action-buffer)
@@ -5662,6 +5678,8 @@ If action buffer is selected, back to the Helm buffer."
     (erase-buffer)
     (buffer-disable-undo)
     (setq cursor-type nil)
+    ;; Maybe display action buffer 'below' if window isn't large enough
+    ;; (bug#2635).
     (set-window-buffer (helm-aif (helm--show-action-window-other-window-p)
                            (split-window (get-buffer-window helm-buffer) nil it)
                          (get-buffer-window helm-buffer))
