@@ -1026,10 +1026,7 @@ Only async sources than use a sentinel calling
 
 If nil don't split and replace helm-buffer by the action buffer
 in same window.
-Possible value are left, right, below and above.
-Note that this may not fit well with some Helm window
-configurations, so it has effect only when
-`helm-always-two-windows' is non-nil."
+Possible value are left, right, below and above."
   :group 'helm
   :type '(choice
           (const :tag "Split at left" left)
@@ -5572,11 +5569,7 @@ Coerce source with coerce function."
   "Decide if window layout is suitable for showing action buffer.
 Note that the return value is meaningful only at some point in the code,
 i.e. before displaying action menu."
-  (when (and helm-show-action-window-other-window
-             ;; FIXME: now we check the window size, not sure this limitation is
-             ;; still needed (helm-always-two-windows).
-             (or helm-always-two-windows
-                 helm--buffer-in-new-frame-p))
+  (when helm-show-action-window-other-window
     ;; We were previously checking helm-split-window-state (eq vertical) to
     ;; decide to show action window, we now show it inconditionally in such case
     ;; but 'below'.
