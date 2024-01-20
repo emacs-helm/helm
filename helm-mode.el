@@ -641,7 +641,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (name "Helm Completions")
                             header-name
                             candidates-in-buffer
-                            get-line
+                            (get-line #'buffer-substring)
                             diacritics
                             match-part
                             match-dynamic
