@@ -1400,7 +1400,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
           :quit-when-no-cand (eq require-match t)
           :nomark (null helm-comp-read-use-marked)
           :candidates-in-buffer cands-in-buffer
-          :get-line get-line
+          :get-line (or get-line #'buffer-substring)
           :exec-when-only-one exec-when-only-one
           :fuzzy (eq helm-completion-style 'helm-fuzzy)
           :buffer buffer
