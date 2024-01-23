@@ -4637,7 +4637,8 @@ The default function, `helm-fuzzy-matching-default-sort-fn',
 sorts ties by length, shortest first.  This function may be more
 useful when the order of the candidates is meaningful, e.g. with
 `recentf-list'."
-  (helm-fuzzy-matching-default-sort-fn-1 candidates nil nil t))
+  (let ((helm-fuzzy-default-score-fn #'helm-fuzzy-helm-style-score))
+    (helm-fuzzy-matching-default-sort-fn-1 candidates nil nil t)))
 
 (defun helm--maybe-get-migemo-pattern (pattern &optional diacritics)
   (or (and helm-migemo-mode
