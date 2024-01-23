@@ -379,7 +379,7 @@ Note that this variable is buffer-local.")
 
 
 (defun helm-buffers-get-visible-buffers ()
-  "Returns buffers visibles on current frame."
+  "Returns buffers visible on visible frames."
   (let (result)
     (walk-windows
      (lambda (x)
@@ -388,6 +388,7 @@ Note that this variable is buffer-local.")
     result))
 
 (defun helm-buffer-list-1 (&optional visibles)
+  "Return list of all buffers except VISIBLES buffers."
   (cl-loop for b in (buffer-list)
            for bn = (buffer-name b)
            unless (member bn visibles)
