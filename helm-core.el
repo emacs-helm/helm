@@ -4623,6 +4623,11 @@ the candidates."
                      (scr1 (car data1))
                      (scr2 (car data2)))
                 (cond ((= scr1 scr2)
+                       ;; Comparison by length should not be called here most of
+                       ;; the time because we use now flex scoring which does
+                       ;; such test, however we still use helm fuzzy scoring
+                       ;; with preserve-tie-order, so keep testing length here
+                       ;; for it.
                        (unless preserve-tie-order
                          (< len1 len2)))
                       ((> scr1 scr2)))))))))
@@ -4637,6 +4642,9 @@ The default function, `helm-fuzzy-matching-default-sort-fn',
 sorts ties by length, shortest first.  This function may be more
 useful when the order of the candidates is meaningful, e.g. with
 `recentf-list'."
+  ;; Flex scoring is already taking in account length of strings so this
+  ;; function have no effect when flex scoring is in use, force the usage of
+  ;; helm fuzzy scoring to ensure no testing against length is done.
   (let ((helm-fuzzy-default-score-fn #'helm-fuzzy-helm-style-score))
     (helm-fuzzy-matching-default-sort-fn-1 candidates nil nil t)))
 
