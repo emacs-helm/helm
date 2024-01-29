@@ -1030,7 +1030,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
               (category . color)))
     (library . (metadata
                 (affixation-function . helm-completion-library-affixation)
-                (category . library))))
+                (category . library)))
+    (charset . (metadata
+                (affixation-function . helm-completion-charset-affixation)
+                (category . charset))))
   "Extra metadata for completing-read.
 
 Alist composed of (CATEGORY . METADATA).
@@ -1089,7 +1092,8 @@ behavior as emacs vanilla.")
     ("set-next-selection-coding-system" . coding-system)
     ("set-clipboard-coding-system" . coding-system)
     ("universal-coding-system-argument" . coding-system)
-    ("read-color" . color))
+    ("read-color" . color)
+    ("list-charset-chars" . charset))
   "An alist to specify metadata category by command.
 
 Some commands provide a completion-table with no category
@@ -1285,6 +1289,13 @@ is used."
       (list comp "" (helm-aand (replace-regexp-in-string "^ *" "" doc)
                                (replace-regexp-in-string "[\n]" "" it)
                                (propertize it 'face 'helm-completions-detailed)
+                               (propertize " " 'display (concat sep it)))))))
+
+(defun helm-completion-charset-affixation (_comps)
+  (lambda (comp)
+    (let ((doc (charset-description (intern comp)))
+          (sep (helm-make-separator comp)))
+      (list comp "" (helm-aand (propertize doc 'face 'helm-completions-detailed)
                                (propertize " " 'display (concat sep it)))))))
 
 (defun helm-completion-color-affixation (_comps)
