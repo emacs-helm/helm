@@ -1276,6 +1276,7 @@ is used."
       (buffer-substring beg end))))
 
 (defun helm-completion-coding-system-affixation (_comps)
+  (require 'mule-diag)
   (lambda (comp)
     (let ((doc (with-output-to-string
                  (with-current-buffer standard-output
