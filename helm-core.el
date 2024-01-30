@@ -6301,8 +6301,13 @@ message \\='no match'."
               ;; should be either empty or in read-file-name have an
               ;; unknown candidate ([+] prefix), if it's not the case
               ;; fix it in helm-mode but not here.
-              ((and (or empty-buffer-p unknown)
-                    (eq minibuffer-completion-confirm t))
+              ;; When `minibuffer-completion-confirm' is set to 'noexit or
+              ;; 'exit, that's mean MUST-MATCH is a function and we use its
+              ;; return value to set `minibuffer-completion-confirm', this is
+              ;; done in `helm--set-minibuffer-completion-confirm'.
+              ((or (eq minibuffer-completion-confirm 'noexit)
+                   (and (or empty-buffer-p unknown)
+                        (eq minibuffer-completion-confirm t)))
                (minibuffer-message " [No match]"))
               (empty-buffer-p
                ;; This is used when helm-buffer is totally empty,
@@ -6334,8 +6339,8 @@ message \\='no match'."
     (setq minibuffer-completion-confirm
           (pcase (helm-get-attr 'must-match src)
             ((and (pred functionp) fun
-                  (let sel (helm-get-selection nil 'withprop src)))
-             (funcall fun sel))
+                  (let sel (helm-get-selection nil nil src)))
+             (if (funcall fun sel) 'exit 'noexit))
             (val val)))))
 
 (defun helm-read-string (prompt &optional initial-input history
