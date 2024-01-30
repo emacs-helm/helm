@@ -6331,8 +6331,12 @@ message \\='no match'."
 
 (defun helm--set-minibuffer-completion-confirm (src)
   (with-helm-buffer
-    (helm-aif (helm-get-attr 'must-match src)
-        (setq minibuffer-completion-confirm it))))
+    (setq minibuffer-completion-confirm
+          (pcase (helm-get-attr 'must-match src)
+            ((and (pred functionp) fun
+                  (let sel (helm-get-selection nil 'withprop src)))
+             (funcall fun sel))
+            (val val)))))
 
 (defun helm-read-string (prompt &optional initial-input history
                                 default-value inherit-input-method)
