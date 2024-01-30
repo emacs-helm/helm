@@ -810,8 +810,14 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
              nil "Error: History should be specified as a symbol")
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-  (unless (memq must-match '(confirm confirm-after-completion t nil))
-    ;; Fix completing-read's using something else than `t' e.g. 1 or
+  ;; The value of MUST-MATCH is given to
+  ;; `helm--set-minibuffer-completion-confirm' which compute it and propagate it
+  ;; to `minibuffer-completion-confirm' which is then used by
+  ;; `helm-confirm-and-exit-minibuffer'.
+  (unless (or (memq must-match '(confirm confirm-after-completion t nil))
+              (functionp must-match))
+    ;; Fix completing-read's using something else than (confirm
+    ;; confirm-after-completion t nil) or a function e.g. 1 or
     ;; whatever (bug #2527).
     (setq must-match t))
   (let ((action-fn `(("Sole action (Identity)"
