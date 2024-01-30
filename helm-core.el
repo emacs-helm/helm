@@ -6285,11 +6285,11 @@ message \\='no match'."
              (empty-buffer-p (with-current-buffer helm-buffer
                                (eq (point-min) (point-max))))
              (unknown (and (not empty-buffer-p)
-                           (helm-aif (get-text-property
-                                      0 'display
-                                      (helm-get-selection nil 'withprop src))
-                               (when (stringp it)
-                                 (string-match-p "\\`\\[\\?\\]" it))))))
+                           ;; Now such candidates have a helm-new-file or an
+                           ;; unknown text property (we were testing if string
+                           ;; match [?] previously).
+                           (helm-candidate-prefixed-p
+                            (helm-get-selection nil 'withprop src)))))
         (cond ((and (or empty-buffer-p unknown)
                     (memq minibuffer-completion-confirm
                           '(confirm confirm-after-completion)))
