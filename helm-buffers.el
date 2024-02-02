@@ -1003,12 +1003,14 @@ vertically."
 
 (defun helm-buffers-persistent-kill (_buffer)
   (let ((marked (helm-marked-candidates))
-        (sel    (helm-get-selection)))
+        (sel (helm-get-selection))
+        (msg "Buffer `%s' modified, please save it before kill"))
     (unwind-protect
          (cl-loop for b in marked
-                  do (progn
+                  do (if (and (buffer-file-name b) (buffer-modified-p b))
+                         (message msg (buffer-name b))
                        ;; We need to preselect each marked because
-                       ;; helm-buffers-persistent-kill is deleting
+                       ;; helm-buffers-persistent-kill-1 is deleting
                        ;; current selection.
                        (helm-preselect
                         (format "^%s"
