@@ -566,20 +566,25 @@ is usable in next condition."
                 (helm-aand ,@(cdr conditions))))))
 
 (defmacro helm-acase (expr &rest clauses)
-  "A simple anaphoric `cl-case' implementation handling strings.
-EXPR is bound to a temporary variable called `it' which is usable
-in CLAUSES to refer to EXPR.
-NOTE: Duplicate keys in CLAUSES are deliberately not handled.
+  "A simple anaphoric case implementation.
+The car of each clause can be any object that will be compared
+with `equal' or an expression starting with `guard' which should
+return a boolean.  EXPR is bound to a temporary variable called
+`it' which is usable in CLAUSES to refer to EXPR.  The car of
+each CLAUSES doesn't need to be quoted.
 
 \(fn EXPR (KEYLIST BODY...)...)"
   (declare (indent 1) (debug (form &rest (sexp body))))
   (unless (null clauses)
-    (let ((clause1 (car clauses)))
-      `(let ((key ',(car clause1))
-             (it ,expr))
-         (if (or (equal it key)
-                 (and (listp key) (member it key))
-                 (eq key t))
+    (let* ((clause1 (car clauses))
+           (key     (car clause1))
+           (sexp    (and (eq 'guard (car-safe key))
+                         (cadr key))))
+      `(let ((it ,expr))
+         (if (or (equal it ',key)
+                 (and (listp ',key) (member it ',key))
+                 (eq ',key t)
+                 (and (listp ',key) ,sexp))
              (progn ,@(cdr clause1))
            (helm-acase it ,@(cdr clauses)))))))
 
