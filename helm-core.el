@@ -3774,13 +3774,12 @@ See :after-init-hook and :before-init-hook in `helm-source'."
   (cl-loop for s in sources
            for hv = (assoc-default hook s)
            when hv
-           do (pcase hv
-                ((and (pred (functionp))
-                      (guard (not (symbolp hv)))) 
-                 (funcall hv))
-                ((and hook (pred (listp)))
-                 (dolist (h hook) (funcall h)))
-                (_ (helm-log-run-hook "helm--run-init-hooks" hv)))))
+           do (helm-acase hv
+                ((guard (and (functionp it) (not (symbolp it))))
+                 (funcall it))
+                ((guard (listp it))
+                 (dolist (h it) (funcall h)))
+                (t (helm-log-run-hook "helm--run-init-hooks" it)))))
 
 (defun helm-restore-position-on-quit ()
   "Restore position in `helm-current-buffer' when quitting."

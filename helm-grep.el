@@ -533,16 +533,16 @@ Have no effect when grep backend use \"--color=\"."
                           (and rec-com rec-com-ack-p)))))))
 
 (defun helm-grep--pipe-command-for-grep-command (smartcase pipe-switches &optional grep-cmd)
-  (pcase (or grep-cmd (helm-grep-command))
+  (helm-acase (or grep-cmd (helm-grep-command))
     ;; Use grep for GNU regexp based tools.
-    ((or "grep" "zgrep" "git-grep")
+    (("grep" "zgrep" "git-grep")
      (format "grep --color=always%s %s"
              (if smartcase " -i" "")
              pipe-switches))
     ;; Use ack-grep for PCRE based tools.
-    ;; Sometimes ack-grep cmd is ack only.
-    ((and (pred (string-match-p "ack")) ack)
-     (format "%s --smart-case --color %s" ack pipe-switches))))
+    ;; Sometimes ack-grep cmd is ack only so compare by matching ack.
+    ((guard (string-match-p "ack" it))
+     (format "%s --smart-case --color %s" it pipe-switches))))
 
 (defun helm-grep--prepare-cmd-line (only-files &optional include zgrep)
   (let* ((default-directory (or helm-ff-default-directory
