@@ -583,7 +583,7 @@ each CLAUSES doesn't need to be quoted.
       `(let ((it ,expr))
          (if (or (equal it ',key)
                  (and (listp ',key) (member it ',key))
-                 (eq ',key t)
+                 (and (symbolp ',key) (eq ',key t))
                  (and (listp ',key) ,sexp))
              (progn ,@(cdr clause1))
            (helm-acase it ,@(cdr clauses)))))))
