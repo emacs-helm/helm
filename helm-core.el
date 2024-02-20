@@ -6334,13 +6334,17 @@ message \\='no match'."
 (add-hook 'helm-after-update-hook 'helm-confirm-and-exit-hook)
 
 (defun helm--set-minibuffer-completion-confirm (src)
+  "Return the value of a REQUIRE-MATCH arg in a `completing-read'."
+  ;; When `minibuffer-completion-confirm' is set to 'noexit or
+  ;; 'exit, that's mean MUST-MATCH is a function and we use its
+  ;; return value.
   (with-helm-buffer
     (setq minibuffer-completion-confirm
-          (pcase (helm-get-attr 'must-match src)
-            ((and (pred functionp) fun
-                  (let sel (helm-get-selection nil nil src)))
-             (if (funcall fun sel) 'exit 'noexit))
-            (val val)))))
+          (helm-acase (helm-get-attr 'must-match src)
+            ((guard (and (functionp it)
+                         (helm-get-selection nil nil src)))
+             (if (funcall it guard) 'exit 'noexit))
+            (t it)))))
 
 (defun helm-read-string (prompt &optional initial-input history
                                 default-value inherit-input-method)
