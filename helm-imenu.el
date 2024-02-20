@@ -445,8 +445,7 @@ The icon is found in `helm-imenu-icon-type-alist', if not
            for bufname = (buffer-name
                           (pcase v
                             ((pred overlayp) (overlay-buffer v))
-                            ((or (pred markerp) (pred integerp))
-                             (marker-buffer v))))
+                            ((pred markerp) (marker-buffer v))))
            for types = (or (helm-imenu--get-prop k)
                            (list (if (with-current-buffer bufname
                                        (derived-mode-p 'prog-mode))
