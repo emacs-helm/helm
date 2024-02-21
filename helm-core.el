@@ -6335,9 +6335,8 @@ message \\='no match'."
 
 (defun helm--set-minibuffer-completion-confirm (src)
   "Return the value of a REQUIRE-MATCH arg in a `completing-read'."
-  ;; When `minibuffer-completion-confirm' is set to 'noexit or
-  ;; 'exit, that's mean MUST-MATCH is a function and we use its
-  ;; return value.
+  ;; Set `minibuffer-completion-confirm' to 'noexit or
+  ;; 'exit, according to MUST-MATCH value (possibly a function).
   (with-helm-buffer
     (setq minibuffer-completion-confirm
           (helm-acase (helm-get-attr 'must-match src)
