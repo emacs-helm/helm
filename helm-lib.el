@@ -1898,7 +1898,7 @@ flex or helm-flex completion style if present."
       (or
        styles
        (helm-acase (cdr (assq from helm-completion-styles-alist))
-         ((guard (cdr it)) guard))
+         ((guard (and (consp it) (cdr it))) guard))
        ;; We need to have flex always behind helm, otherwise
        ;; when matching against e.g. '(foo foobar foao frogo bar
        ;; baz) with pattern "foo" helm style if before flex will
