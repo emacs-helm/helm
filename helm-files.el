@@ -3193,9 +3193,10 @@ editing absolute fnames in previous Emacs versions."
 
 (defun helm-ff--tramp-cons-or-vector (vector-or-cons)
   "Return VECTOR-OR-CONS as a vector."
-  (pcase vector-or-cons
-    (`(,_l . ,ll) (vconcat ll))
-    ((and vec (pred vectorp)) vec)))
+  (helm-acase vector-or-cons
+    ((guard (and (consp it) (cdr it))) (vconcat guard))
+    ((guard (vectorp it)) it)
+    (t (error "Wrong type argument: %s" it))))
 
 (defun helm-ff--get-tramp-methods ()
   "Return a list of the car of `tramp-methods'."
