@@ -567,13 +567,19 @@ is usable in next condition."
 
 (defmacro helm-acase (expr &rest clauses)
   "A simple anaphoric case implementation.
+
 The car of each clause can be any object that will be compared
 with `equal' or an expression starting with `guard' which is
 evaluated.  Once evaluated `guard' is bound to the returned value
-that can be used in the cdr of clause. EXPR is bound to a
-temporary variable called `it' which is usable in CLAUSES to
-refer to EXPR.  The car of each CLAUSES doesn't need to be
-quoted.
+that can be used in the cdr of clause.
+
+NOTE: `guard' as a temp var is reserved for helm-acase, so if you
+let-bind a local var outside the helm-acase body, it will be
+overriden deliberately by helm-acase.
+
+EXPR is bound to a temporary variable called `it' which is
+usable in CLAUSES to refer to EXPR.  The car of each CLAUSES
+doesn't need to be quoted.
 
 \(fn EXPR (KEYLIST BODY...)...)"
   (declare (indent 1) (debug (form &rest (sexp body))))
