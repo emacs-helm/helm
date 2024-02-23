@@ -761,9 +761,9 @@ displayed in BUFNAME."
 
 (defun helm-help-org-cycle ()
   "Runs `org-cycle' in `helm-help'."
-  (pcase (helm-iter-next helm-help--iter-org-state)
-    ((pred numberp) (org-content))
-    ((and state) (org-cycle state))))
+  (helm-acase (helm-iter-next helm-help--iter-org-state)
+    ((guard (numberp it)) (org-content))
+    (t (org-cycle it))))
 
 (defun helm-help-copy-region-as-kill ()
   "Copy region function for `helm-help'"
