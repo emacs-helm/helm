@@ -763,6 +763,7 @@ displayed in BUFNAME."
   "Runs `org-cycle' in `helm-help'."
   (helm-acase (helm-iter-next helm-help--iter-org-state)
     ((guard (numberp it)) (org-content))
+    ;; See `helm--help-org-prefargs' about `org-cycle' ARG.
     (t (org-cycle it))))
 
 (defun helm-help-copy-region-as-kill ()
@@ -788,13 +789,18 @@ displayed in BUFNAME."
   (ignore-errors
     (org-mark-ring-goto)))
 
+(defvar helm--help-org-prefargs
+  (if (> emacs-major-version 28)
+      '(1 (4) (16)) '(1 (16) (64)))
+  "`org-cycle' ARG have not the same meaning across Emacs versions.")
+
 (defun helm-help-event-loop ()
   "The loop in charge of scanning keybindings in `helm-help'."
   (let ((prompt (propertize
                  helm-help-default-prompt
                  'face 'helm-helper))
         scroll-error-top-bottom
-        (helm-help--iter-org-state (helm-iter-circular '(1 (16) (64)))))
+        (helm-help--iter-org-state (helm-iter-circular helm--help-org-prefargs)))
     (catch 'helm-help-quit
       (helm-awhile (read-key prompt)
         (let ((fun (cl-loop for (k . v) in helm-help-hkmap
