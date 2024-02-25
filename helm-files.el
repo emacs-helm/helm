@@ -5336,9 +5336,9 @@ arg."
              (abbreviate-file-name candidate))
             (t (file-relative-name candidate)))
     (helm-acase prefarg
-      ((4)  (abbreviate-file-name candidate))
-      ((16) (file-relative-name candidate))
-      ((64) (helm-basename candidate))
+      ('(4)  (abbreviate-file-name candidate))
+      ('(16) (file-relative-name candidate))
+      ('(64) (helm-basename candidate))
       (t candidate))))
 
 (cl-defun helm-find-files-history (arg &key (comp-read t))
