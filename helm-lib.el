@@ -578,8 +578,7 @@ let-bind a local var outside the helm-acase body, it will be
 overriden deliberately by helm-acase.
 
 EXPR is bound to a temporary variable called `it' which is
-usable in CLAUSES to refer to EXPR.  The car of each CLAUSES
-doesn't need to be quoted.
+usable in CLAUSES to refer to EXPR.
 
 \(fn EXPR (KEYLIST BODY...)...)"
   (declare (indent 1) (debug (form &rest (sexp body))))
