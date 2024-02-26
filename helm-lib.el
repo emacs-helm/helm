@@ -589,10 +589,10 @@ usable in CLAUSES to refer to EXPR.
                          (cadr key))))
       `(let* ((it ,expr)
               (guard ,sexp))
-         (if (or (equal it ',key)
+         (if (or guard
+                 (equal it ',key)
                  (and (listp ',key) (member it ',key))
-                 (and (symbolp ',key) (eq ',key t))
-                 guard)
+                 (and (symbolp ',key) (eq ',key t)))
              (progn ,@(cdr clause1))
            (helm-acase it ,@(cdr clauses)))))))
 
