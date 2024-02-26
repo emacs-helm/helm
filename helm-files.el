@@ -2281,10 +2281,10 @@ COUNT is used for incrementing new name if needed."
                                       target
                                       (string-to-number
                                        (match-string 1 rep))
-                                      (pcase (match-string 2 rep)
-                                        ((pred (string= ""))
+                                      (helm-acase (match-string 2 rep)
+                                        ((guard (string= it ""))
                                          (length target))
-                                        (res (string-to-number res))))
+                                        (t (string-to-number it))))
                                      t t rep))
                      ;; Search and replace in
                      ;; placeholder. Doesn't

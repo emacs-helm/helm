@@ -617,10 +617,10 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
             (cl-loop for km in mkd
                      for keys = (if (functionp km)
                                     (kmacro--keys km)
-                                  (pcase (car km)
-                                    ((and vec (pred vectorp)) vec)
-                                    ((and str (pred stringp))
-                                     (kmacro--to-vector str))))
+                                  (helm-acase (car km)
+                                    ((guard (vectorp it)) it)
+                                    ((guard (stringp it))
+                                     (kmacro--to-vector it))))
                      vconcat keys)))))
 
 (defun helm-kbd-macro-delete-macro (_candidate)

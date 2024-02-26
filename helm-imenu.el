@@ -406,12 +406,11 @@ The sexp should be an `all-the-icons' function with its args."
                    (and (cdr elm)
                         ;; Semantic uses overlays whereas imenu uses
                         ;; markers (Bug#1706).
-                        (setcdr elm (pcase (cdr elm) ; Same as [1].
-                                      ((and ov (pred overlayp))
-                                       (copy-overlay ov))
-                                      ((and mk (or (pred markerp)
-                                                   (pred integerp)))
-                                       (copy-marker mk))))
+                        (setcdr elm (helm-acase (cdr elm) ; Same as [1].
+                                      ((guard (overlayp it))
+                                       (copy-overlay it))
+                                      ((guard (or (markerp it) (integerp it)))
+                                       (copy-marker it))))
                         (list elm))))))
 
 (defun helm-imenu--get-prop (item)
