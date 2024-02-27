@@ -412,23 +412,22 @@ If SYM is not documented, return \"Not documented\".
 Argument NAME allows specifiying what function to use to display
 documentation when SYM name is the same for function and variable."
   (let ((doc (condition-case _err
-                 (pcase sym
-                   ((pred class-p) (cl--class-docstring (cl--find-class sym)))
-                   ((and (pred fboundp) (pred boundp))
-                    (pcase name
-                      ("describe-function"
-                       (documentation sym t))
-                      ("describe-variable"
-                       (documentation-property sym 'variable-documentation t))
-                      (_ (documentation sym t))))
-                   ((pred custom-theme-p)
-                    (documentation-property sym 'theme-documentation t))
-                   ((pred helm-group-p) (documentation-property
-                                         sym 'group-documentation t))
-                   ((pred fboundp)  (documentation sym t))
-                   ((pred boundp)   (documentation-property
-                                     sym 'variable-documentation t))
-                   ((pred facep)   (face-documentation sym)))
+                 (helm-acase sym
+                   ((guard (class-p it))
+                    (cl--class-docstring (cl--find-class it)))
+                   ((guard (and (fboundp it) (boundp it)))
+                    (if (string= name "describe-variable")
+                        (documentation-property it 'variable-documentation t)
+                      (documentation it t)))
+                   ((guard (custom-theme-p it))
+                    (documentation-property it 'theme-documentation t))
+                   ((guard (helm-group-p it))
+                    (documentation-property it 'group-documentation t))
+                   ((guard (fboundp it))
+                    (documentation it t))
+                   ((guard (boundp it))
+                    (documentation-property it 'variable-documentation t))
+                   ((guard (facep it)) (face-documentation it)))
                (void-function "Void function -- Not documented"))))
     (if (and doc (not (string= doc ""))
              ;; `documentation' return "\n\n(args...)"
