@@ -1302,9 +1302,9 @@ differently depending of answer:
       (dolist (elm list)
         (if dont-ask
             (funcall action elm)
-          (pcase (helm-read-answer
-                  (format (concat prompt "[y,n,!,q]") elm)
-                  '("y" "n" "!" "q"))
+          (helm-acase (helm-read-answer
+                       (format (concat prompt "[y,n,!,q]") elm)
+                       '("y" "n" "!" "q"))
             ("y" (funcall action elm))
             ("n" (ignore))
             ("!" (prog1

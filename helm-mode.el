@@ -1453,7 +1453,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
   (let* ((history (or (car-safe hist) hist))
          (input (helm-acase init
                   ((guard (stringp it)) it)
-                  ((guard (consp it)) (car it)))
+                  ((guard (consp it)) (car it))))
          (completion-flex-nospace t)
          (minibuffer-completion-table collection)
          ;; (completion-styles

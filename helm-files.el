@@ -1318,11 +1318,11 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
         (mapconcat 'identity infos " ")
       (setq info
             (mapconcat (lambda (x)
-                         (pcase x
-                           ('size    (nth 0 infos))
-                           ('percent (nth 1 infos))
-                           ('speed   (nth 2 infos))
-                           ('remain  (nth 3 infos))))
+                         (helm-acase x
+                           (size    (nth 0 infos))
+                           (percent (nth 1 infos))
+                           (speed   (nth 2 infos))
+                           (remain  (nth 3 infos))))
                        (helm-mklist helm-ff-rsync-progress-bar-info)
                        ", "))
       (when (string-match "\\([0-9]+\\)%" progbar)
@@ -6326,11 +6326,11 @@ be directories."
                                    (helm-basename file) dest)))
                for overwrite = (or (null exists)
                                    yes-for-all
-                                   (pcase (helm-read-answer
-                                           (format
-                                            "File `%s' already-exists, overwrite (y,n,!,q) ? "
-                                            dest-file)
-                                           '("y" "n" "!" "q"))
+                                   (helm-acase (helm-read-answer
+                                                (format
+                                                 "File `%s' already-exists, overwrite (y,n,!,q) ? "
+                                                 dest-file)
+                                                '("y" "n" "!" "q"))
                                      ("y" t)
                                      ("n" nil)
                                      ("!" (prog1 t
