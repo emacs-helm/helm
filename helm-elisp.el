@@ -297,13 +297,10 @@ Return a cons (beg . end)."
     (when (and pos (< (point) pos))
       (push-mark pos t t))))
 
-(defvar helm-lisp-completion--cache nil)
-(defvar helm-lgst-len nil)
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
   "Preconfigured Helm for Lisp symbol completion at point."
   (interactive)
-  (setq helm-lgst-len 0)
   (let* ((target     (helm-thing-before-point))
          (beg        (car (helm-bounds-of-thing-before-point)))
          (end        (point))
@@ -316,17 +313,12 @@ Return a cons (beg . end)."
          (helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
          (enable-recursive-minibuffers t))
-    (setq helm-lisp-completion--cache (cl-loop for sym in candidates
-                                            for len = (length sym)
-                                            when (> len helm-lgst-len)
-                                            do (setq helm-lgst-len len)
-                                            collect sym))
     (if candidates
         (with-helm-show-completion beg end
           ;; Overlay is initialized now in helm-current-buffer.
           (helm
            :sources (helm-build-in-buffer-source "Lisp completion"
-                      :data helm-lisp-completion--cache
+                      :data candidates
                       :persistent-action `(helm-lisp-completion-persistent-action .
                                            ,(and (eq helm-elisp-help-function
                                                      'helm-elisp-show-doc-modeline)
@@ -399,17 +391,16 @@ the same time to variable and a function."
 (defun helm-lisp-completion-transformer (candidates _source)
   "Helm candidates transformer for Lisp completion."
   (cl-loop for c in candidates
-        for sym = (intern c)
-        for annot = (pcase sym
-                      ((pred commandp) " (Com)")
-                      ((pred class-p)   " (Class)")
-                      ((pred cl-generic-p) " (Gen)")
-                      ((pred fboundp)  " (Fun)")
-                      ((pred boundp)   " (Var)")
-                      ((pred facep)    " (Face)"))
-        for spaces = (make-string (- helm-lgst-len (length c)) ? )
-        collect (cons (concat c spaces annot) c) into lst
-        finally return (sort lst #'helm-generic-sort-fn)))
+           for sym = (intern c)
+           for annot = (pcase sym
+                         ((pred commandp) " (Com)")
+                         ((pred class-p)   " (Class)")
+                         ((pred cl-generic-p) " (Gen)")
+                         ((pred fboundp)  " (Fun)")
+                         ((pred boundp)   " (Var)")
+                         ((pred facep)    " (Face)"))
+           collect (cons (concat c (helm-make-separator c) annot) c) into lst
+           finally return (sort lst #'helm-generic-sort-fn)))
 
 ;;;###autoload
 (cl-defun helm-get-first-line-documentation (sym &optional
