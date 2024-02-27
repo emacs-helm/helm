@@ -749,23 +749,23 @@ is only used to test DEFAULT."
               ("Info lookup" . helm-info-lookup-symbol))))
 
 (defun helm-info-lookup-fallback-source (candidate)
-  (let ((sym (helm-symbolify candidate))
-        src-name fn)
-    (cond ((class-p sym)
-           (setq fn #'helm-describe-function
-                 src-name "Describe class"))
-          ((cl-generic-p sym)
-           (setq fn #'helm-describe-function
-                 src-name "Describe generic function"))
-          ((fboundp sym)
-           (setq fn #'helm-describe-function
-                 src-name "Describe function"))
-          ((facep sym)
-           (setq fn #'helm-describe-face
-                 src-name "Describe face"))
-          (t
-           (setq fn #'helm-describe-variable
-                 src-name "Describe variable")))
+  (cl-multiple-value-bind (fn src-name)
+      (helm-acase (helm-symbolify candidate)
+        ((guard (class-p it))
+         (list #'helm-describe-function
+               "Describe class"))
+        ((guard (cl-generic-p it))
+         (list #'helm-describe-function
+               "Describe generic function"))
+        ((guard (fboundp it))
+         (list #'helm-describe-function
+               "Describe function"))
+        ((guard (facep it))
+         (list #'helm-describe-face
+               "Describe face"))
+        (t
+         (list #'helm-describe-variable
+               "Describe variable")))
     (helm-build-sync-source src-name
       :candidates (list candidate)
       :persistent-action (lambda (candidate)
