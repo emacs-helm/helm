@@ -1369,10 +1369,9 @@ handling properties, see `helm-comp-read'.
 This handler should be used when candidate list doesn't need to be rebuilt
 dynamically otherwise use `helm-completing-read-default-2'."
   (let* ((history (or (car-safe hist) hist))
-         (initial-input (pcase init
-                          ((pred (stringp)) init)
-                          ;; INIT is a cons cell.
-                          (`(,l . ,_ll) l)))
+         (initial-input (helm-acase init
+                          ((guard (stringp it)) it)
+                          ((guard (consp it)) (car it))))
          (minibuffer-completion-table collection)
          (metadata (or (completion-metadata (or initial-input "") collection test)
                        '(metadata)))
@@ -1452,10 +1451,9 @@ Call `helm-comp-read' with same args as `completing-read'.
 For the meaning of optional args see `helm-completing-read-default-1'.
 This handler uses dynamic matching which allows honouring `completion-styles'."
   (let* ((history (or (car-safe hist) hist))
-         (input (pcase init
-                  ((pred (stringp)) init)
-                  ;; INIT is a cons cell.
-                  (`(,l . ,_ll) l)))
+         (input (helm-acase init
+                  ((guard (stringp it)) it)
+                  ((guard (consp it)) (car it)))
          (completion-flex-nospace t)
          (minibuffer-completion-table collection)
          ;; (completion-styles
