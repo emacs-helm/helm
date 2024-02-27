@@ -2316,10 +2316,8 @@ Actually does nothing."
 
 (defun helm-completion-all-completions (string table pred point)
   "The all completions function for `completing-styles-alist'."
-  ;; FIXME: No need to bind all these value.
-  ;; (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
-  (pcase-let ((`(,all ,_pattern ,prefix ,_suffix ,_carbounds)
-               (helm-completion--multi-all-completions string table pred point)))
+  (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
+      (helm-completion--multi-all-completions string table pred point)
     (when all (nconc all (length prefix)))))
 
 (defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
@@ -2417,8 +2415,8 @@ Actually does nothing."
   ;; It is needed here to make minibuffer-complete work in emacs-26,
   ;; e.g. with regular M-x.
   (unless (string-match-p " " string)
-    (pcase-let ((`(,all ,pattern ,prefix ,suffix ,_carbounds)
-                 (helm-completion--flex-all-completions string table pred point)))
+    (cl-multiple-value-bind (all pattern prefix suffix _carbounds)
+        (helm-completion--flex-all-completions string table pred point)
       (when minibuffer-completing-file-name
         (setq all (completion-pcm--filename-try-filter all)))
       (completion-pcm--merge-try pattern all prefix suffix))))
@@ -2427,10 +2425,10 @@ Actually does nothing."
   "The all completions function for `completing-styles-alist'."
   ;; FIXME: No need to bind all these value.
   (unless (string-match-p " " string)
-    (pcase-let ((`(,all ,pattern ,prefix ,_suffix ,_carbounds)
-                 (helm-completion--flex-all-completions
-                  string table pred point
-                  #'helm-completion--flex-transform-pattern)))
+    (cl-multiple-value-bind (all pattern prefix _suffix _carbounds)
+        (helm-completion--flex-all-completions
+         string table pred point
+         #'helm-completion--flex-transform-pattern)
       (let ((regexp (completion-pcm--pattern->regex pattern 'group)))
         (when all (nconc (helm-flex-add-score-as-prop all regexp)
                          (length prefix)))))))
