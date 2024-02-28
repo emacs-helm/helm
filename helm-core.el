@@ -3771,15 +3771,13 @@ See :after-init-hook and :before-init-hook in `helm-source'."
   ;; values i.e. lambda's or lists not bound to a symbol.  In the future we may
   ;; use `helm-log-run-hook' directly which allow using add-hook, remove-hook
   ;; etc...
-  (cl-loop for s in sources
-           for hv = (assoc-default hook s)
-           when hv
-           do (helm-acase hv
-                ((guard (and (functionp it) (not (symbolp it))))
-                 (funcall it))
-                ((guard (listp it))
-                 (dolist (h it) (funcall h)))
-                (t (helm-log-run-hook "helm--run-init-hooks" it)))))
+  (dolist (s sources)
+    (helm-acase (assoc-default hook s)
+      ((guard (and (functionp it) (not (symbolp it))))
+       (funcall it))
+      ((guard (listp it))
+       (dolist (h it) (funcall h)))
+      (t (helm-log-run-hook "helm--run-init-hooks" it)))))
 
 (defun helm-restore-position-on-quit ()
   "Restore position in `helm-current-buffer' when quitting."
