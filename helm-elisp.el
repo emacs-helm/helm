@@ -357,18 +357,17 @@ other window according to the value of
       (helm-elisp-show-help "Toggle show help for the symbol")))
 
 (defun helm-elisp--show-help-1 (candidate &optional name)
-  (let ((sym (intern-soft candidate)))
-    (helm-acase sym
-      ((guard (and (fboundp it) (boundp it)))
-       (if (member name `(,helm-describe-function-function
-                          ,helm-describe-variable-function))
-           (funcall (intern (format "helm-%s" name)) sym)
-         ;; When there is no way to know what to describe
-         ;; prefer describe-function.
-         (helm-describe-function sym)))
-      ((guard (fboundp it)) (helm-describe-function sym))
-      ((guard (boundp it))  (helm-describe-variable sym))
-      ((guard (facep it))   (helm-describe-face sym)))))
+  (helm-acase (intern-soft candidate)
+    ((guard (and (fboundp it) (boundp it)))
+     (if (member name `(,helm-describe-function-function
+                        ,helm-describe-variable-function))
+         (funcall (intern (format "helm-%s" name)) it)
+       ;; When there is no way to know what to describe
+       ;; prefer describe-function.
+       (helm-describe-function it)))
+    ((guard (fboundp it)) (helm-describe-function it))
+    ((guard (boundp it))  (helm-describe-variable it))
+    ((guard (facep it))   (helm-describe-face it))))
 
 (defun helm-elisp-show-help (candidate &optional name)
   "Show full help for the function CANDIDATE.
