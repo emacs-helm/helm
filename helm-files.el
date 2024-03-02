@@ -5113,33 +5113,35 @@ Special commands:
   (require 'image-dired)
   (if (and helm-ff--show-thumbnails
            (null (file-remote-p helm-ff-default-directory)))
-      (progn
+      (prog1
+          (cl-loop for (disp . img) in candidates
+                   for type = (helm-acase (file-name-extension img)
+                                ((guard (and (member it '("png" "jpg" "jpeg"))
+                                             (memq image-dired-thumbnail-storage
+                                                   '(standard standard-large))))
+                                 'png)
+                                (("jpg" "jpeg") 'jpeg)
+                                ("png" 'png))
+                   if type collect
+                   (let ((thumbnail (plist-get
+                                     (cdr (helm-ff--image-dired-get-thumbnail-image img))
+                                     :file)))
+                     ;; When icons are displayed the leading space handling disp
+                     ;; prop is already here, just replace icon with the thumbnail.
+                     (unless helm-ff-icon-mode (setq disp (concat " " disp)))
+                     (add-text-properties 0 1 `(display (image
+                                                         :type ,type
+                                                         :margin 5
+                                                         :file ,thumbnail)
+                                                        rear-nonsticky '(display))
+                                          disp)
+                     (cons disp img))
+                   else collect (cons disp img))
+        ;; Ensure this is done AFTER previous clause otherwise thumb files will
+        ;; never be created if they don't already exist. 
         (cl-pushnew helm-ff-default-directory
-                    helm-ff--thumbnailed-directories :test 'equal)
-        (cl-loop for (disp . img) in candidates
-                 for type = (helm-acase (file-name-extension img)
-                              ((guard (and (member it '("png" "jpg" "jpeg"))
-                                           (memq image-dired-thumbnail-storage
-                                                 '(standard standard-large))))
-                               'png)
-                              (("jpg" "jpeg") 'jpeg)
-                              ("png" 'png))
-                 if type collect
-                 (let ((thumbnail (plist-get
-                                   (cdr (helm-ff--image-dired-get-thumbnail-image img))
-                                   :file)))
-                   ;; When icons are displayed the leading space handling disp
-                   ;; prop is already here, just replace icon with the thumbnail.
-                   (unless helm-ff-icon-mode (setq disp (concat " " disp)))
-                   (add-text-properties 0 1 `(display (image
-                                                       :type ,type
-                                                       :margin 5
-                                                       :file ,thumbnail)
-                                                      rear-nonsticky '(display))
-                                        disp)
-                   (cons disp img))
-                   else collect (cons disp img)))
-        candidates))
+                    helm-ff--thumbnailed-directories :test 'equal))
+    candidates))
 
 ;; Same as `image-dired-get-thumbnail-image' but use
 ;; `helm-ff--image-dired-thumb-name' which cache thumbnails for further use.
@@ -5148,11 +5150,15 @@ Special commands:
   (unless (string-match-p (image-file-name-regexp) file)
     (error "%s is not a valid image file" file))
   (let* ((thumb-file (helm-ff--image-dired-thumb-name file))
-         (thumb-attr (file-attributes thumb-file)))
-    (when (or (not thumb-attr)
-              (time-less-p (file-attribute-modification-time thumb-attr)
-                           (file-attribute-modification-time
-                            (file-attributes file))))
+         thumb-attr)
+    ;; Don't check status of files with `file-attributes' if it has already been
+    ;; done in this session.
+    (when (and (not (member helm-ff-default-directory
+                            helm-ff--thumbnailed-directories))
+               (or (not (setq thumb-attr (file-attributes thumb-file)))
+                   (time-less-p (file-attribute-modification-time thumb-attr)
+                                (file-attribute-modification-time
+                                 (file-attributes file)))))
       (image-dired-create-thumb file thumb-file))
     (create-image thumb-file)))
 
