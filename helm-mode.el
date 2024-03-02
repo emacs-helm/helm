@@ -390,7 +390,8 @@ NOT `setq'."
 
 (defcustom helm-completion-styles-alist '((gud-mode . helm)
                                           ;; See https://github.com/djcb/mu/issues/2181.
-                                          (mu4e-compose-mode . emacs))
+                                          (mu4e-compose-mode . emacs)
+                                          (wfnames-mode . (emacs helm flex)))
   "Allow configuring `helm-completion-style' per mode or command.
 
 NOTE: Use a mode for a completion that will be used in a buffer
