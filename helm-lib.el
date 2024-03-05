@@ -1129,10 +1129,10 @@ Examples:
 (defun helm-stringify (elm)
   "Return the representation of ELM as a string.
 ELM can be a string, a number or a symbol."
-  (pcase elm
-    ((pred stringp) elm)
-    ((pred numberp) (number-to-string elm))
-    ((pred symbolp) (symbol-name elm))))
+  (helm-acase elm
+    ((guard (stringp it)) it)
+    ((guard (numberp it)) (number-to-string it))
+    ((guard (symbolp it)) (symbol-name it))))
 
 (defun helm-substring (str width)
   "Return the substring of string STR from 0 to WIDTH.
@@ -1267,7 +1267,7 @@ accepted.
 
 Example:
 
-    (pcase (helm-read-answer
+    (helm-acase (helm-read-answer
              \"answer [y,n,!,q]: \"
              \\='(\"y\" \"n\" \"!\" \"q\"))
        (\"y\" \"yes\")

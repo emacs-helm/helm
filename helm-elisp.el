@@ -392,13 +392,13 @@ the same time to variable and a function."
   "Helm candidates transformer for Lisp completion."
   (cl-loop for c in candidates
            for sym = (intern c)
-           for annot = (pcase sym
-                         ((pred commandp) " (Com)")
-                         ((pred class-p)   " (Class)")
-                         ((pred cl-generic-p) " (Gen)")
-                         ((pred fboundp)  " (Fun)")
-                         ((pred boundp)   " (Var)")
-                         ((pred facep)    " (Face)"))
+           for annot = (helm-acase sym
+                         ((guard (commandp it))     " (Com)")
+                         ((guard (class-p it))      " (Class)")
+                         ((guard (cl-generic-p it)) " (Gen)")
+                         ((guard (fboundp it))      " (Fun)")
+                         ((guard (boundp it))       " (Var)")
+                         ((guard (facep it))        " (Face)"))
            collect (cons (concat c (helm-make-separator c) annot) c) into lst
            finally return (sort lst #'helm-generic-sort-fn)))
 
