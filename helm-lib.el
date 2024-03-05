@@ -565,9 +565,6 @@ is usable in next condition."
         (t `(helm-aif ,(car conditions)
                 (helm-aand ,@(cdr conditions))))))
 
-(def-edebug-elem-spec 'helm-acase-GUARD
-  '(&or (symbolp form) sexp))
-
 (defmacro helm-acase (expr &rest clauses)
   "A simple anaphoric case implementation.
 
@@ -584,7 +581,7 @@ EXPR is bound to a temporary variable called `it' which is
 usable in CLAUSES to refer to EXPR.
 
 \(fn EXPR (KEYLIST BODY...)...)"
-  (declare (indent 1) (debug (form &rest (helm-acase-GUARD body))))
+  (declare (indent 1) (debug (form &rest ([&or (symbolp form) sexp] body))))
   (unless (null clauses)
     (let* ((clause1 (car clauses))
            (key     (car clause1))
