@@ -5873,6 +5873,8 @@ mode and header lines."
 
 This is a toggle command."
   (interactive)
+  (cl-assert (not (eq (helm-get-attr 'echo-input-in-header-line) 'never))
+             nil "echo-input-in-header-line not allowed in this source")
   (with-helm-window
     (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
     (setq-local helm-echo-input-in-header-line

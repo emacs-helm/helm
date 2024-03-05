@@ -84,8 +84,13 @@ Should take one arg: the string to display."
     (define-key map (kbd "<left>")     #'backward-char)
     map))
 
+(defclass helm-evaluation-result-class (helm-source-dummy)
+  ((echo-input-in-header-line
+    :initarg :echo-input-in-header-line
+    :initform 'never)))
+
 (defun helm-build-evaluation-result-source ()
-  (helm-build-dummy-source "Evaluation Result"
+  (helm-make-source "Evaluation Result" 'helm-evaluation-result-class
     :multiline t
     :mode-line "C-RET: nl-and-indent, M-tab: reindent, C-tab:complete, C-p/n: next/prec-line."
     :filtered-candidate-transformer
@@ -93,11 +98,11 @@ Should take one arg: the string to display."
       (list
        (condition-case nil
            (with-helm-current-buffer
-            (pp-to-string
-             (if edebug-active
-                 (edebug-eval-expression
-                  (read helm-pattern))
-               (eval (read helm-pattern) t))))
+             (pp-to-string
+              (if edebug-active
+                  (edebug-eval-expression
+                   (read helm-pattern))
+                (eval (read helm-pattern) t))))
          (error "Error"))))
     :nohighlight t
     :keymap helm-eval-expression-map
