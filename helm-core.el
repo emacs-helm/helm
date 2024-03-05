@@ -5891,6 +5891,10 @@ This is a toggle command."
   (when (with-helm-buffer helm-echo-input-in-header-line)
     (helm--set-header-line t)))
 
+;; We were previously let-binding `resize-mini-windows' in
+;; `helm-read-from-minibuffer', this to prevent minibuffer resizing when
+;; inserting multiline string in fake minibuffer (header-line).
+;; I seems it had no effect see bug#2638.
 (defun helm-hide-minibuffer-maybe ()
   "Hide minibuffer contents in a Helm session.
 This function should normally go to `helm-minibuffer-set-up-hook'.
