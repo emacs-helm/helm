@@ -3883,8 +3883,6 @@ For PRESELECT RESUME KEYMAP DEFAULT HISTORY, see `helm'."
                            (assoc-default 'history src)))
            (timer nil)
            blink-matching-paren
-           (resize-mini-windows (and (null helm-echo-input-in-header-line)
-                                     resize-mini-windows))
            (first-src (car helm-sources))
            (source-process-p (or (assq 'candidates-process src)
                                  (assq 'candidates-process first-src)))
