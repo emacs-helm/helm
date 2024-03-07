@@ -524,18 +524,17 @@ is only used to test DEFAULT."
 
 (defun helm-apropos-short-doc-transformer (candidates _source)
   (if helm-apropos-show-short-doc
-      (cl-loop with max-len = (helm-in-buffer-get-longest-candidate)
-               for cand in candidates
+      (cl-loop for cand in candidates
                for doc = (helm-get-first-line-documentation (intern-soft cand))
                collect (cons (format "%s%s%s"
                                      cand
                                      (if doc
-                                         (make-string (+ 1 (if (zerop max-len)
-                                                               max-len
-                                                             (- max-len (string-width cand))))
-                                                      ? )
+                                         (helm-make-separator cand)
                                        "")
-                                     (if doc (propertize doc 'face 'helm-M-x-short-doc) ""))
+                                     (if doc
+                                         (propertize
+                                          doc 'face 'helm-M-x-short-doc)
+                                       ""))
                              cand))
     candidates))
 
