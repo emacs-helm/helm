@@ -136,41 +136,56 @@ algorithm."
   (with-helm-current-buffer
     (cl-loop with local-map = (helm-M-x-current-mode-map-alist)
              for cand in candidates
-             for local-key  = (car (rassq cand local-map))
-             for key        = (substitute-command-keys (format "\\[%s]" cand))
-             for sym        = (intern (if (consp cand) (car cand) cand))
+             for local-key = (car (rassq cand local-map))
+             for key = (substitute-command-keys (format "\\[%s]" cand))
+             for sym = (intern (if (consp cand) (car cand) cand))
              for doc = (when helm-M-x-show-short-doc
-                         (helm-get-first-line-documentation (intern-soft cand)))   
-             for disp       = (if (or (eq sym major-mode)
-                                      (and (memq sym minor-mode-list)
-                                           (boundp sym)
-                                           (buffer-local-value sym helm-current-buffer)))
-                                  (propertize cand 'face 'helm-command-active-mode)
-                                cand)
-             unless (and (null ignore-props) (or (get sym 'helm-only) (get sym 'no-helm-mx)))
+                         (helm-get-first-line-documentation (intern-soft cand)))
+             for disp = (if (or (eq sym major-mode)
+                                (and (memq sym minor-mode-list)
+                                     (boundp sym)
+                                     (buffer-local-value
+                                      sym helm-current-buffer)))
+                            (propertize cand 'face 'helm-command-active-mode)
+                          cand)
+             unless (and (null ignore-props)
+                         (or (get sym 'helm-only) (get sym 'no-helm-mx)))
              collect
              (cons (cond ((and (string-match "^M-x" key) local-key)
-                          (propertize (format "%s%s%s %s"
-                                              disp
-                                              (if doc (helm-make-separator cand) "")
-                                              (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
-                                              (propertize
-                                               " " 'display
-                                               (propertize local-key 'face 'helm-M-x-key)))
-                                      'match-part disp))
-                         ((and (string-match "^M-x" key) (not (string= key "M-x")))
-                          (propertize (format "%s%s%s"
-                                              disp
-                                              (if doc (helm-make-separator cand) "")
-                                              (if doc (propertize doc 'face 'helm-M-x-short-doc) ""))
-                                      'match-part disp))
-                         (t (propertize (format "%s%s%s %s"
-                                                disp
-                                                (if doc (helm-make-separator cand) "")
-                                                (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
-                                                (propertize
-                                                 " " 'display
-                                                 (propertize key 'face 'helm-M-x-key)))
+                          (propertize
+                           (format "%s%s%s %s"
+                                   disp
+                                   (if doc (helm-make-separator cand) "")
+                                   (if doc
+                                       (propertize
+                                        doc 'face 'helm-M-x-short-doc)
+                                     "")
+                                   (propertize
+                                    " " 'display
+                                    (propertize local-key 'face 'helm-M-x-key)))
+                           'match-part disp))
+                         ((and (string-match "^M-x" key)
+                               (not (string= key "M-x")))
+                          (propertize
+                           (format "%s%s%s"
+                                   disp
+                                   (if doc (helm-make-separator cand) "")
+                                   (if doc
+                                       (propertize
+                                        doc 'face 'helm-M-x-short-doc)
+                                     ""))
+                           'match-part disp))
+                         (t (propertize
+                             (format "%s%s%s %s"
+                                     disp
+                                     (if doc (helm-make-separator cand) "")
+                                     (if doc
+                                         (propertize
+                                          doc 'face 'helm-M-x-short-doc)
+                                       "")
+                                     (propertize
+                                      " " 'display
+                                      (propertize key 'face 'helm-M-x-key)))
                                         'match-part disp)))
                    cand)
              into ls
