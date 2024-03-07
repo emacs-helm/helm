@@ -257,7 +257,7 @@ algorithm."
 (defclass helm-M-x-class (helm-source-in-buffer helm-type-command)
   ((requires-pattern :initform 0)
    (must-match :initform t)
-   (filtered-candidate-transformer :initform 'helm-M-x-transformer-no-sort)
+   (filtered-candidate-transformer :initform 'helm-M-x-transformer)
    (persistent-help :initform "Describe this command")
    (help-message :initform 'helm-M-x-help-message)
    (nomark :initform t)
