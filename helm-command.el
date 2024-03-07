@@ -134,14 +134,12 @@ Note that SORT should not be used when fuzzy matching because
 fuzzy matching is running its own sort function with a different
 algorithm."
   (with-helm-current-buffer
-    (cl-loop with max-len = (when helm-M-x-show-short-doc
-                              (helm-in-buffer-get-longest-candidate))
-             with local-map = (helm-M-x-current-mode-map-alist)
+    (cl-loop with local-map = (helm-M-x-current-mode-map-alist)
              for cand in candidates
              for local-key  = (car (rassq cand local-map))
              for key        = (substitute-command-keys (format "\\[%s]" cand))
              for sym        = (intern (if (consp cand) (car cand) cand))
-             for doc = (when max-len
+             for doc = (when helm-M-x-show-short-doc
                          (helm-get-first-line-documentation (intern-soft cand)))   
              for disp       = (if (or (eq sym major-mode)
                                       (and (memq sym minor-mode-list)
@@ -154,7 +152,7 @@ algorithm."
              (cons (cond ((and (string-match "^M-x" key) local-key)
                           (propertize (format "%s%s%s %s"
                                               disp
-                                              (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
+                                              (if doc (helm-make-separator cand) "")
                                               (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
                                               (propertize
                                                " " 'display
@@ -163,12 +161,12 @@ algorithm."
                          ((and (string-match "^M-x" key) (not (string= key "M-x")))
                           (propertize (format "%s%s%s"
                                               disp
-                                              (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
+                                              (if doc (helm-make-separator cand) "")
                                               (if doc (propertize doc 'face 'helm-M-x-short-doc) ""))
                                       'match-part disp))
                          (t (propertize (format "%s%s%s %s"
                                                 disp
-                                                (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
+                                                (if doc (helm-make-separator cand) "")
                                                 (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
                                                 (propertize
                                                  " " 'display
