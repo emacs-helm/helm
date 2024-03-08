@@ -1322,10 +1322,10 @@ differently depending of answer:
 ;;
 (defun helm-symbolify (str-or-sym)
   "Get symbol of STR-OR-SYM."
-  (cond ((symbolp str-or-sym)
-         str-or-sym)
-        ((equal str-or-sym "") nil)
-        (t (intern str-or-sym))))
+  (helm-acase str-or-sym
+    ((guard (symbolp it)) it)
+    ("" nil)
+    (t (intern it))))
 
 (defun helm-symbol-name (obj)
   (if (or (and (consp obj) (functionp obj))
