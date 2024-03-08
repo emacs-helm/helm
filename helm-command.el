@@ -307,16 +307,11 @@ Arg HISTORY default to `extended-command-history'."
                                 ;; [1] Same comment as above.
                                 collection pred nil nil ""))
                        :fuzzy-match helm-M-x-fuzzy-match)))
-         (prompt (concat (cond
-                          ((eq helm-M-x-prefix-argument '-) "- ")
-                          ((and (consp helm-M-x-prefix-argument)
-                                (eq (car helm-M-x-prefix-argument) 4))
-                           "C-u ")
-                          ((and (consp helm-M-x-prefix-argument)
-                                (integerp (car helm-M-x-prefix-argument)))
-                           (format "%d " (car helm-M-x-prefix-argument)))
-                          ((integerp helm-M-x-prefix-argument)
-                           (format "%d " helm-M-x-prefix-argument)))
+         (prompt (concat (helm-acase helm-M-x-prefix-argument
+                           (- "-")
+                           ((guard (and (consp it) (car it)))
+                            (if (eq guard 4) "C-u " (format "%d " guard)))
+                           ((guard (integerp it)) (format "%d " it)))
                          "M-x ")))
     (setq helm-M-x--timer (run-at-time 1 0.1 #'helm-M-x--notify-prefix-arg))
     ;; Fix Bug#2250, add `helm-move-selection-after-hook' which
