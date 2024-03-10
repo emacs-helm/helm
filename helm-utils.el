@@ -1052,13 +1052,10 @@ Assume regexp is a pcre based regexp."
         (helm-w32-shell-execute-open-file file)
       (start-process "helm-open-file-with-default-tool"
                      nil
-                     (cond ((eq system-type 'gnu/linux)
-                            "xdg-open")
-                           ((or (eq system-type 'darwin) ;; Mac OS X
-                                (eq system-type 'macos)) ;; Mac OS 9
-                            "open")
-			   ((eq system-type 'cygwin)
-			    "cygstart"))
+                     (helm-acase system-type
+                       (gnu/linux "xdg-open")
+                       ((darwin macos) "open")
+                       (cygwin "cygstart"))
                      file))))
 
 (defun helm-open-dired (file)
