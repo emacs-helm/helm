@@ -888,40 +888,23 @@ Optional arguments START, END and FACE are only here for debugging purpose."
     ;; Now highlight matches only if we are in helm session, we are
     ;; maybe coming from helm-grep-mode or helm-moccur-mode buffers.
     (when helm-alive-p
-      (cond (;; These 2 clauses have to be the first otherwise
-             ;; `helm-highlight-matches-around-point-max-lines' is
-             ;; compared as a number by other clauses and return an error.
-             (eq helm-highlight-matches-around-point-max-lines 'never)
-             (cl-return-from helm-highlight-current-line))
-            ((consp helm-highlight-matches-around-point-max-lines)
-             (setq start-match
-                   (save-excursion
-                     (forward-line
-                      (- (car helm-highlight-matches-around-point-max-lines)))
-                     (pos-bol))
-                   end-match
-                   (save-excursion
-                     (forward-line
-                      (cdr helm-highlight-matches-around-point-max-lines))
-                     (pos-bol))))
-            ((or (null helm-highlight-matches-around-point-max-lines)
-                 (zerop helm-highlight-matches-around-point-max-lines))
-             (setq start-match start
-                   end-match   end))
-            ((< helm-highlight-matches-around-point-max-lines 0)
-             (setq start-match
-                   (save-excursion
-                     (forward-line
-                      helm-highlight-matches-around-point-max-lines)
-                     (pos-bol))
-                   end-match start))
-            ((> helm-highlight-matches-around-point-max-lines 0)
-             (setq start-match start
-                   end-match
-                   (save-excursion
-                     (forward-line
-                      helm-highlight-matches-around-point-max-lines)
-                     (pos-bol)))))
+      (helm-acase helm-highlight-matches-around-point-max-lines
+        ;; Next 2 clauses must precede others otherwise
+        ;; `helm-highlight-matches-around-point-max-lines' is
+        ;; compared as a number by other clauses and return an error.
+        (never (cl-return-from helm-highlight-current-line))
+        ((guard (consp it))
+         (setq start-match (save-excursion (forward-line (- (car it))) (pos-bol))
+               end-match   (save-excursion (forward-line (cdr it)) (pos-bol))))
+        ((guard (or (null it) (zerop it)))
+         (setq start-match start
+               end-match   end))
+        ((guard (< it 0))
+         (setq start-match (save-excursion (forward-line it) (pos-bol))
+               end-match   start))
+        ((guard (> it 0))
+         (setq start-match start
+               end-match   (save-excursion (forward-line it) (pos-bol)))))
       (catch 'empty-line
         (let* ((regex-list (helm-remove-if-match
                             "\\`!" (helm-mm-split-pattern
