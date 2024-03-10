@@ -7344,7 +7344,8 @@ See `helm-persistent-action-display-window' for how to use SPLIT."
   (prog1
       (select-window
        (setq minibuffer-scroll-window
-             (helm-persistent-action-display-window :split split)))
+             (helm-persistent-action-display-window :split split))
+       'norecord)
     (helm-log "helm-select-persistent-action-window"
               "Selected window is %S" minibuffer-scroll-window)))
 
