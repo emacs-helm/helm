@@ -794,6 +794,7 @@ when moving out of directory when non nil."
    "Relsymlink file(s) `M-Y, C-u to follow'" 'helm-find-files-relsymlink
    "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
    "Compress file(s) to archive" 'helm-find-files-compress-to
+   "Compress or uncompress file(s)" 'helm-ff-compress-marked-files
    "Change mode on file(s) `M-M'" 'helm-ff-chmod
    "Find file other window `C-c o'" 'helm-find-files-other-window
    "Find file other frame `C-c C-o'" 'find-file-other-frame
@@ -1517,6 +1518,20 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
 (defun helm-find-files-compress-to (_candidate)
   "Compress to archive from `helm-find-files'."
   (helm-find-files-do-action 'compress))
+
+(defun helm-ff-compress-marked-files (_candidate)
+  "Compress or uncompress marked files with `dired-compress-file'."
+  (let* ((files (helm-marked-candidates :with-wildcard t))
+         (len 0))
+    (if (not (with-helm-display-marked-candidates
+               helm-marked-buffer-name
+               (mapcar #'abbreviate-file-name files)
+               (y-or-n-p (format "Compress or uncompress *%s File(s)" (length files)))))
+        (message "(No (un)compression performed)")
+      (cl-dolist (i files)
+        (if (dired-compress-file i)
+            (cl-incf len)))
+      (message "%s File(s) (un)compressed" len))))
 
 (defun helm-ff-chmod (_candidate)
   "Set file mode on marked files.
