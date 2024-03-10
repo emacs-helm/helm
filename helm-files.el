@@ -793,6 +793,7 @@ when moving out of directory when non nil."
    "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
    "Relsymlink file(s) `M-Y, C-u to follow'" 'helm-find-files-relsymlink
    "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
+   "Compress file(s) to archive" 'helm-find-files-compress-to
    "Change mode on file(s) `M-M'" 'helm-ff-chmod
    "Find file other window `C-c o'" 'helm-find-files-other-window
    "Find file other frame `C-c C-o'" 'find-file-other-frame
@@ -1236,7 +1237,11 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
          (dest (or target
                    (with-helm-display-marked-candidates
                      helm-marked-buffer-name
-                     (helm-ff--count-and-collect-dups ifiles)
+                     (if (eq action 'compress)
+                         (mapcar
+                          (lambda (f) (file-relative-name f (base-dir ifiles)))
+                          ifiles)
+                       (helm-ff--count-and-collect-dups ifiles))
                      (with-helm-current-buffer
                        (helm-read-file-name
                         prompt
@@ -1259,10 +1264,12 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
         ;; When saying No here with rsync, `helm-rsync-copy-files' will raise an
         ;; error about dest not existing.
         (make-directory dest-dir t)))
-    (if (eq action 'rsync)
-        (helm-rsync-copy-files ifiles dest rsync-switches)
-      (helm-dired-action
-       dest :files ifiles :action action :follow prefarg))))
+    (cond ((eq action 'rsync)
+           (helm-rsync-copy-files ifiles dest rsync-switches))
+          ((eq action 'compress)
+           (helm-do-compress-to ifiles dest))
+          (t (helm-dired-action
+              dest :files ifiles :action action :follow prefarg)))))
 
 ;; Rsync
 ;;
@@ -1506,6 +1513,10 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
 (defun helm-find-files-hardlink (_candidate)
   "Hardlink files from `helm-find-files'."
   (helm-find-files-do-action 'hardlink))
+
+(defun helm-find-files-compress-to (_candidate)
+  "Compress to archive from `helm-find-files'."
+  (helm-find-files-do-action 'compress))
 
 (defun helm-ff-chmod (_candidate)
   "Set file mode on marked files.
@@ -2531,6 +2542,10 @@ Called with a prefix arg open menu unconditionally."
 (helm-make-command-from-action helm-ff-run-hardlink-file
     "Run Hardlink file action from `helm-source-find-files'."
   'helm-find-files-hardlink)
+
+(helm-make-command-from-action helm-ff-run-compress-to
+  "Run Compress to archive action from `helm-source-find-files'."
+  'helm-find-files-compress-to)
 
 (helm-make-command-from-action helm-ff-run-chmod
     "Run chmod action from `helm-source-find-files'."
@@ -5820,6 +5835,51 @@ files to destination."
         (helm-prev-visible-mark)))))
 
 
+;;; Compress/uncompress files
+;;
+;;
+(defun helm-do-compress-to (ifiles ofile)
+  "Compress IFILES files/directories to the OFILE archive.
+Choose the archiving command based on the OFILE extension
+and `dired-compress-files-alist'."
+  (let ((rule (cl-find-if
+               (lambda (x)
+                 (string-match (car x) ofile))
+               dired-compress-files-alist)))
+    (cond ((not rule)
+           (error
+            "No compression rule found for %s, see `dired-compress-files-alist'"
+            ofile))
+          ((and (file-exists-p ofile)
+                (not (y-or-n-p
+                      (format "%s exists, overwrite?"
+                              (abbreviate-file-name ofile)))))
+           (message "Compression aborted"))
+          (t
+           (when (zerop
+                  (with-helm-default-directory (base-dir ifiles)
+                    (dired-shell-command
+                     (format-spec (cdr rule)
+                                  `((?o . ,(shell-quote-argument
+                                            (file-local-name ofile)))
+                                    (?i . ,(mapconcat
+                                            (lambda (in-file)
+                                              (shell-quote-argument
+                                               (file-relative-name in-file)))
+                                            ifiles " ")))))))
+             (message (ngettext "Compressed %d file to %s"
+                                "Compressed %d files to %s"
+                                (length ifiles))
+                      (length ifiles)
+                      (file-name-nondirectory ofile)))))))
+
+(defun base-dir (files)
+  (let* ((dirs (seq-sort-by #'length #'< (mapcar #'file-name-directory files)))
+         (base (pop dirs)))
+    (dolist (subdir dirs base)
+      (cl-assert (string= base (substring subdir 0 (length base)))
+                 nil "%s is not a subdirectory of %s" subdir base))))
+
 ;;; Delete and trash files
 ;;
 ;;
