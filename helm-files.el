@@ -5895,6 +5895,42 @@ and `dired-compress-files-alist'."
       (cl-assert (string= base (substring subdir 0 (length base)))
                  nil "%s is not a subdirectory of %s" subdir base))))
 
+(defun helm-ff-quick-compress (_candidate)
+  "Compress or uncompress file CANDIDATE without quitting."
+  (with-helm-window
+    (let ((cfile))
+      (unwind-protect
+          (cl-loop for c in (helm-marked-candidates) do
+                   (helm-preselect
+                    (format helm-ff-last-expanded-candidate-regexp
+                            (regexp-quote
+                             (if (and helm-ff-transformer-show-only-basename
+                                      (not (helm-ff-dot-file-p c)))
+                                 (helm-basename c) c))))
+                   (when (y-or-n-p
+                          (format "Compress or uncompress file `%s'? "
+                                  (abbreviate-file-name c)))
+                     ;; keep helm buffer
+                     (setq cfile (save-window-excursion (dired-compress-file c)))
+                     (message nil)
+                     (helm--remove-marked-and-update-mode-line c)))
+        (setq helm-marked-candidates nil
+              helm-visible-mark-overlays nil)
+        (helm-force-update
+         ;; select candidate before compress. If it can't, select candidate after compress.
+         (let ((presel (helm-get-selection)))
+           (unless (file-exists-p presel)
+             (setq presel cfile))
+           (when presel
+             (format helm-ff-last-expanded-candidate-regexp
+                     (regexp-quote (if (and helm-ff-transformer-show-only-basename
+                                            (not (helm-ff-dot-file-p presel)))
+                                       (helm-basename presel) presel))))))))))
+
+(helm-make-persistent-command-from-action helm-ff-persistent-compress
+  "Compress or uncompress marked candidates without quitting."
+  'quick-compress 'helm-ff-quick-compress)
+
 ;;; Delete and trash files
 ;;
 ;;
