@@ -1028,7 +1028,7 @@ vertically."
     (if (or (helm-follow-mode-p)
             (eql current (get-buffer helm-current-buffer))
             (not (eql current (get-buffer candidate))))
-        (switch-to-buffer candidate)
+        (display-buffer candidate)
       (if (and helm-persistent-action-display-window
                (window-dedicated-p
                 (next-window helm-persistent-action-display-window 1)))
