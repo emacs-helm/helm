@@ -5889,11 +5889,11 @@ and `dired-compress-files-alist'."
                       (file-name-nondirectory ofile)))))))
 
 (defun base-dir (files)
-  (let* ((dirs (seq-sort-by #'length #'< (mapcar #'file-name-directory files)))
-         (base (pop dirs)))
-    (dolist (subdir dirs base)
-      (cl-assert (string= base (substring subdir 0 (length base)))
-                 nil "%s is not a subdirectory of %s" subdir base))))
+  "Return the longest common directory path of FILES list"
+  (let ((base (pop files)))
+    (cl-loop until (eq files '())
+             do (setq base (fill-common-string-prefix base (pop files)))
+             finally return (file-name-directory base))))
 
 (defun helm-ff-quick-compress (_candidate)
   "Compress or uncompress file CANDIDATE without quitting."
