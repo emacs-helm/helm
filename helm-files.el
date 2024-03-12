@@ -6033,13 +6033,11 @@ When a prefix arg is given, meaning of
     "Notify mode-line that an async process run."
   :group 'dired-async
   :global t
-  ;; FIXME: Handle jobs like in dired-async, needs first to allow
-  ;; naming properly processes in async, they are actually all named
-  ;; emacs and running `async-batch-invoke', so if one copy a file and
-  ;; delete another file at the same time it may clash.
-  :lighter (:eval (propertize (format " %s file(s) async ..."
+  :lighter (:eval (propertize (format " %s file(s) async [%s job]..."
                                       (if helm-ff--trash-flag
-                                          "Trashing" "Deleting"))
+                                          "Trashing" "Deleting")
+                                      (length (dired-async-processes
+                                               'helm-delete-async)))
                               'face 'helm-delete-async-message))
   (unless helm-ff--delete-async-modeline-mode
     (let ((visible-bell t)) (ding))
@@ -6117,29 +6115,31 @@ directories are always deleted with no warnings."
       (helm-ff--count-and-collect-dups files)
       (if (not (y-or-n-p (format "%s *%s File(s)" prmt (length files))))
           (message "(No deletions performed)")
-        (async-start
-         `(lambda ()
-            (require 'cl-lib)
-            ;; `delete-by-moving-to-trash' have to be set globally,
-            ;; using the TRASH argument of delete-file or
-            ;; delete-directory is not enough.
-            (setq delete-by-moving-to-trash ,trash)
-            (let ((result 0))
-              (dolist (file ',files result)
-                (condition-case err
-                    (cond ((and ,trash
-                                (cl-loop for f in ',already-trashed
-                                         thereis (file-equal-p f file)))
-                           (error (format "`%s' is already trashed" file)))
-                          ((eq (nth 0 (file-attributes file)) t)
-                           (delete-directory file 'recursive ,trash)
-                           (setq result (1+ result)))
-                          (t (delete-file file ,trash)
-                             (setq result (1+ result))))
-                  (error (with-temp-file ,helm-ff-delete-log-file
-                           (insert (format-time-string "%x:%H:%M:%S\n"))
-                           (insert (format "%S\n" err))))))))
-         callback)
+        (process-put
+         (async-start
+          `(lambda ()
+             (require 'cl-lib)
+             ;; `delete-by-moving-to-trash' have to be set globally,
+             ;; using the TRASH argument of delete-file or
+             ;; delete-directory is not enough.
+             (setq delete-by-moving-to-trash ,trash)
+             (let ((result 0))
+               (dolist (file ',files result)
+                 (condition-case err
+                     (cond ((and ,trash
+                                 (cl-loop for f in ',already-trashed
+                                          thereis (file-equal-p f file)))
+                            (error (format "`%s' is already trashed" file)))
+                           ((eq (nth 0 (file-attributes file)) t)
+                            (delete-directory file 'recursive ,trash)
+                            (setq result (1+ result)))
+                           (t (delete-file file ,trash)
+                              (setq result (1+ result))))
+                   (error (with-temp-file ,helm-ff-delete-log-file
+                            (insert (format-time-string "%x:%H:%M:%S\n"))
+                            (insert (format "%S\n" err))))))))
+          callback)
+         'helm-delete-async t)
         (helm-ff--delete-async-modeline-mode 1)))))
 
 (defun helm-find-file-or-marked (candidate)
