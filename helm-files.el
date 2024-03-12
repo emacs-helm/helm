@@ -6045,18 +6045,9 @@ When a prefix arg is given, meaning of
     (let ((visible-bell t)) (ding))
     (setq helm-ff--trash-flag nil)))
 
-(defun helm-delete-async-mode-line-message (text face &rest args)
-  "Notify end of async operation in mode-line."
-  (message nil)
-  (let ((mode-line-format (concat
-                           " " (propertize
-                                (if args
-                                    (apply #'format text args)
-                                    text)
-                                'face face))))
-    (force-mode-line-update)
-    (sit-for 3)
-    (force-mode-line-update)))
+(defalias 'helm-delete-async-mode-line-message 'dired-async-mode-line-message)
+(make-obsolete 'helm-delete-async-mode-line-message
+               'dired-async-mode-line-message "3.9.8")
 
 (defun helm-delete-async-kill-process ()
   "Kill async process created by helm delete files async."
@@ -6115,7 +6106,7 @@ directories are always deleted with no warnings."
                      (run-with-timer
                       0.1 nil
                       (lambda ()
-                        (helm-delete-async-mode-line-message
+                        (dired-async-mode-line-message
                          "%s (%s/%s) file(s) async done"
                          'helm-delete-async-message
                          (if trash "Trashing" "Deleting")
