@@ -1550,7 +1550,7 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
               (dired-async-mode-line-message
                "%s %d/%d file(s) done"
                'helm-delete-async-message
-               "Compressing"
+               "(Un)compressing"
                num-files (length ',files)))
             result)))
        'helm-async-compress t)
