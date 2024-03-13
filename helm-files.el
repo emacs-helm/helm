@@ -5964,7 +5964,7 @@ and `dired-compress-files-alist'."
                           (format "Compress or uncompress file `%s'? "
                                   (abbreviate-file-name c)))
                      ;; keep helm buffer
-                     (setq cfile (save-window-excursion
+                     (setq cfile (save-selected-window
                                    (helm-ff--dired-compress-file c)))
                      (message nil)
                      (helm--remove-marked-and-update-mode-line c)))
