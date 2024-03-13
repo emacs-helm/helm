@@ -1556,6 +1556,10 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
        'helm-async-compress t)
       (helm-ff--compress-async-modeline-mode 1))))
 
+(helm-make-command-from-action helm-ff-run-compress-marked-files
+    "Compress or uncompress marked files."
+  'helm-ff-compress-marked-files)
+
 (defun helm-ff-chmod (_candidate)
   "Set file mode on marked files.
 If no mode is specified in prompt, default mode will be the mode of
