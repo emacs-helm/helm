@@ -1533,9 +1533,16 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
                (y-or-n-p (format "Compress or uncompress *%s File(s)" (length files)))))
         (message "(No (un)compression performed)")
       (cl-dolist (i files)
-        (if (dired-compress-file i)
-            (cl-incf len)))
+        (when (helm-ff--dired-compress-file i)
+          (cl-incf len)))
       (message "%s File(s) (un)compressed" len))))
+
+(defun helm-ff--dired-compress-file (file)
+  ;; `dired-compress-file' doesn't take care of binding `default-directory' when
+  ;; uncompressing FILE, as a result FILE is uncompressed in the directory where
+  ;; helm was started i.e. the current value of `default-directory'.
+  (with-helm-default-directory helm-ff-default-directory
+    (dired-compress-file file)))
 
 (defun helm-ff-chmod (_candidate)
   "Set file mode on marked files.
@@ -5957,7 +5964,8 @@ and `dired-compress-files-alist'."
                           (format "Compress or uncompress file `%s'? "
                                   (abbreviate-file-name c)))
                      ;; keep helm buffer
-                     (setq cfile (save-window-excursion (dired-compress-file c)))
+                     (setq cfile (save-window-excursion
+                                   (helm-ff--dired-compress-file c)))
                      (message nil)
                      (helm--remove-marked-and-update-mode-line c)))
         (setq helm-marked-candidates nil
