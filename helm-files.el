@@ -1525,24 +1525,36 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
 
 (defun helm-ff-compress-marked-files (_candidate)
   "Compress or uncompress marked files with `dired-compress-file'."
-  (let* ((files (helm-marked-candidates :with-wildcard t))
-         (len 0))
+  (let* ((files (helm-marked-candidates :with-wildcard t)))
     (if (not (with-helm-display-marked-candidates
                helm-marked-buffer-name
                (mapcar #'abbreviate-file-name files)
                (y-or-n-p (format "Compress or uncompress *%s File(s)" (length files)))))
         (message "(No (un)compression performed)")
-      (cl-dolist (i files)
-        (when (helm-ff--dired-compress-file i)
-          (cl-incf len)))
-      (message "%s File(s) (un)compressed" len))))
-
-(defun helm-ff--dired-compress-file (file)
-  ;; `dired-compress-file' doesn't take care of binding `default-directory' when
-  ;; uncompressing FILE, as a result FILE is uncompressed in the directory where
-  ;; helm was started i.e. the current value of `default-directory'.
-  (with-helm-default-directory helm-ff-default-directory
-    (dired-compress-file file)))
+      (process-put
+       (async-start
+        `(lambda ()
+           (require 'dired-aux)
+           (let ((len 0))
+             (dolist (i ',files)
+               (let ((default-directory (file-name-directory i)))
+                 (when (dired-compress-file i)
+                   (cl-incf len))))
+             len))
+        `(lambda (result)
+           (helm-ff--compress-async-modeline-mode -1)
+           (message "%s File(s) (un)compressed" result)
+           (run-with-timer
+            0.1 nil
+            (lambda (num-files)
+              (dired-async-mode-line-message
+               "%s %d/%d file(s) done"
+               'helm-delete-async-message
+               "Compressing"
+               num-files (length ',files)))
+            result)))
+       'helm-async-compress t)
+      (helm-ff--compress-async-modeline-mode 1))))
 
 (defun helm-ff-chmod (_candidate)
   "Set file mode on marked files.
@@ -5947,6 +5959,13 @@ and `dired-compress-files-alist'."
            for file in files
            do (setq base (fill-common-string-prefix base file))
            finally return (file-name-directory base)))
+
+(defun helm-ff--dired-compress-file (file)
+  ;; `dired-compress-file' doesn't take care of binding `default-directory' when
+  ;; uncompressing FILE, as a result FILE is uncompressed in the directory where
+  ;; helm was started i.e. the current value of `default-directory'.
+  (with-helm-default-directory helm-ff-default-directory
+    (dired-compress-file file)))
 
 (defun helm-ff-quick-compress (_candidate)
   "Compress or uncompress file CANDIDATE without quitting."
