@@ -1258,7 +1258,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                         :initial-input (helm-dwim-target-directory)
                         :default (when (eq action 'compress)
                                    (expand-file-name
-                                    (format "%s.tar.gz" (helm-basename cand))
+                                    (format "%s.tar.gz" (if cand
+                                                            (helm-basename cand)
+                                                          "new_archive"))
                                     helm-ff-default-directory))
                         :history (helm-find-files-history nil :comp-read nil))))))
          (dest-dir-p (file-directory-p dest))
@@ -5903,7 +5905,9 @@ files to destination."
 Choose the archiving command based on the OFILE extension
 and `dired-compress-files-alist'."
   (let ((cmd (cl-loop for (r . c) in dired-compress-files-alist
-                      when (string-match r ofile) return c)))
+                      when (string-match r ofile) return c))
+        (error-file (expand-file-name
+                     "dired-shell-command-output" temporary-file-directory)))
     (cl-assert
      cmd nil
      "No compression rule found for %s, see `dired-compress-files-alist'" ofile)
@@ -5937,7 +5941,7 @@ and `dired-compress-files-alist'."
                               (format-spec ,cmd `((?o . ,local-name) (?i . ,input)))))))
              (let ((error-output (with-current-buffer " *dired-check-process output*"
                                    (buffer-string))))
-               (with-temp-file "/tmp/dired-shell-command-output" ; Don't hard quote this.
+               (with-temp-file ,error-file
                  (insert error-output))))
            process-status))
       `(lambda (result)
@@ -5955,8 +5959,8 @@ and `dired-compress-files-alist'."
                    'helm-delete-async-message
                    "Compressing"
                    (length ',ifiles) (helm-basename ,ofile)))))
-           (when (file-exists-p "/tmp/dired-shell-command-output")
-             (pop-to-buffer (find-file-noselect "/tmp/dired-shell-command-output"))))))
+           (when (file-exists-p ,error-file)
+             (pop-to-buffer (find-file-noselect ,error-file))))))
      'helm-async-compress t)
     (helm-ff--compress-async-modeline-mode 1)))
 
