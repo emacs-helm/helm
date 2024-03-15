@@ -1547,7 +1547,8 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
                    (cl-incf len))))
              len))
         `(lambda (result)
-           (helm-ff--compress-async-modeline-mode -1)
+           (unless (dired-async-processes 'helm-async-compress)
+             (helm-ff--compress-async-modeline-mode -1))
            (message "%s File(s) (un)compressed" result)
            (run-with-timer
             0.1 nil
@@ -5941,7 +5942,8 @@ and `dired-compress-files-alist'."
                  (insert error-output))))
            process-status))
       `(lambda (result)
-         (helm-ff--compress-async-modeline-mode -1)
+         (unless (dired-async-processes 'helm-async-compress)
+           (helm-ff--compress-async-modeline-mode -1))
          (if (zerop result)             ; dired-shell-command succeed.
              (progn
                (message "Compressed %d file(s) to %s"
@@ -6276,7 +6278,8 @@ directories are always deleted with no warnings."
              when trashed
              do (push trashed already-trashed))
     (setq callback (lambda (result)
-                     (helm-ff--delete-async-modeline-mode -1)
+                     (unless (dired-async-processes 'helm-delete-async)
+                       (helm-ff--delete-async-modeline-mode -1))
                      (when (file-exists-p helm-ff-delete-log-file)
                        (display-warning 'helm
                                         (with-temp-buffer
@@ -6551,7 +6554,8 @@ be directories."
                               finally return (list file copies skipped)))
                   (lambda (result)
                     (let ((copied (nth 1 result)))
-                      (dired-async--modeline-mode -1)
+                      (unless (dired-async-processes)
+                        (dired-async--modeline-mode -1))
                       (run-with-idle-timer
                        0.1 nil
                        (lambda ()                    
