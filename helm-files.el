@@ -796,8 +796,8 @@ when moving out of directory when non nil."
    "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
    "Relsymlink file(s) `M-Y, C-u to follow'" 'helm-find-files-relsymlink
    "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
-   "Compress file(s) to archive" 'helm-find-files-compress-to
-   "Compress or uncompress file(s)" 'helm-ff-compress-marked-files
+   "Compress file(s) to archive `M-c'" 'helm-find-files-compress-to
+   "Compress or uncompress file(s) `M-z'" 'helm-ff-compress-marked-files
    "Change mode on file(s) `M-M'" 'helm-ff-chmod
    "Find file other window `C-c o'" 'helm-find-files-other-window
    "Find file other frame `C-c C-o'" 'find-file-other-frame
