@@ -5889,10 +5889,6 @@ files to destination."
     "Notify mode-line that an async process run."
   :group 'dired-async
   :global t
-  ;; FIXME: Handle jobs like in dired-async, needs first to allow
-  ;; naming properly processes in async, they are actually all named
-  ;; emacs and running `async-batch-invoke', so if one copy a file and
-  ;; delete another file at the same time it may clash.
   :lighter (:eval (propertize (format " [%s async job Compressing file(s)]"
                                       (length (dired-async-processes
                                                'helm-async-compress)))
