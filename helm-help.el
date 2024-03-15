@@ -915,6 +915,38 @@ On remote files grep is not well supported by TRAMP unless you suspend updates b
 entering the pattern and re-enable it once your pattern is ready.
 To toggle suspend-update, use `\\<helm-map>\\[helm-toggle-suspend-update]'.
 
+*** Compressing or uncompressing files from helm-find-files
+
+**** Compressing/uncompressing using Helm commands
+
+Helm provide commands like dired (reusing dired code)
+to (un)compress files from `helm-find-files', however these
+commands are asynchronous.
+
+You can use `\\<helm-find-files-map>\\[helm-ff-run-compress-marked-files]' to compress marked files.
+To compress file(s) to an archive use `\\<helm-find-files-map>\\[helm-ff-run-compress-to]'.
+
+To quickly compress/uncompress small files without quitting Helm use `\\<helm-find-files-map>\\[helm-ff-persistent-compress]'.
+NOTE: This persistent action is NOT asynchronous, IOW it will block Helm
+for a while until compression/uncompression finish.
+
+**** Compressing/uncompressing using external commands in Eshell
+
+You can use Eshell aliases to uncompress files,
+see [[Execute Eshell commands on files][Execute Eshell commands on files]] for more infos.
+
+Here some aliases using commands from the excellent =atools= package:
+
+alias pack2zip apack -e -F .zip $* &
+alias pack2gz apack -e -F .tar.gz $* &
+alias pack2bz apack -e -F .tar.bz $* &
+alias pack2xz apack -e -F .tar.xz $* &
+alias unpack aunpack $1 &
+
+Note the \"&\" at end of commands that make eshell aliases asynchronous.
+
+Of course you can use any other commands of your choice as aliases.
+
 *** Execute Eshell commands on files
 
 Setting up aliases in Eshell allows you to set up powerful customized commands.
@@ -1267,7 +1299,10 @@ If `all-the-icons' package is installed, turning on
 |\\[helm-ff-sort-by-size]|Sort by size.
 |\\[helm-ff-toggle-dirs-only]|Show only directories.
 |\\[helm-ff-toggle-files-only]|Show only files.
-|\\[helm-ff-sort-by-ext]|Sort by extensions.")
+|\\[helm-ff-sort-by-ext]|Sort by extensions.
+|\\[helm-ff-run-compress-to]|Compress file(s) to archive.
+|\\[helm-ff-run-compress-marked-files]|Compress file(s).
+|\\[helm-ff-persistent-compress]|Compress file(s) without quitting.")
 
 ;;; Help for file-name-history
 ;;
