@@ -1546,19 +1546,19 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
                  (when (dired-compress-file i)
                    (cl-incf len))))
              len))
-        `(lambda (result)
-           (unless (dired-async-processes 'helm-async-compress)
-             (helm-ff--compress-async-modeline-mode -1))
-           (message "%s File(s) (un)compressed" result)
-           (run-with-timer
-            0.1 nil
-            (lambda (num-files)
-              (dired-async-mode-line-message
-               "%s %d/%d file(s) done"
-               'helm-delete-async-message
-               "(Un)compressing"
-               num-files (length ',files)))
-            result)))
+        (lambda (result)
+          (unless (dired-async-processes 'helm-async-compress)
+            (helm-ff--compress-async-modeline-mode -1))
+          (message "%s File(s) (un)compressed" result)
+          (run-with-timer
+           0.1 nil
+           (lambda (len flist)
+             (dired-async-mode-line-message
+              "%s %d/%d file(s) done"
+              'helm-delete-async-message
+              "(Un)compressing"
+              len (length flist)))
+           result files)))
        'helm-async-compress t)
       (helm-ff--compress-async-modeline-mode 1))))
 
@@ -5941,24 +5941,25 @@ and `dired-compress-files-alist'."
                (with-temp-file ,error-file
                  (insert error-output))))
            process-status))
-      `(lambda (result)
-         (unless (dired-async-processes 'helm-async-compress)
-           (helm-ff--compress-async-modeline-mode -1))
-         (if (zerop result)             ; dired-shell-command succeed.
-             (progn
-               (message "Compressed %d file(s) to %s"
-                        (length ',ifiles)
-                        (file-name-nondirectory ,ofile))
-               (run-with-timer
-                0.1 nil
-                (lambda ()
-                  (dired-async-mode-line-message
-                   "%s %d file(s) to %s done"
-                   'helm-delete-async-message
-                   "Compressing"
-                   (length ',ifiles) (helm-basename ,ofile)))))
-           (when (file-exists-p ,error-file)
-             (pop-to-buffer (find-file-noselect ,error-file))))))
+      (lambda (result)
+        (unless (dired-async-processes 'helm-async-compress)
+          (helm-ff--compress-async-modeline-mode -1))
+        (if (zerop result)              ; dired-shell-command succeed.
+            (progn
+              (message "Compressed %d file(s) to `%s' done"
+                       (length ifiles)
+                       (file-name-nondirectory ofile))
+              (run-with-timer
+               0.1 nil
+               (lambda (flist dest)
+                 (dired-async-mode-line-message
+                  "%s %d file(s) to %s done"
+                  'helm-delete-async-message
+                  "Compressing"
+                  (length flist) (helm-basename dest)))
+               ifiles ofile))
+          (when (file-exists-p error-file)
+            (pop-to-buffer (find-file-noselect error-file))))))
      'helm-async-compress t)
     (helm-ff--compress-async-modeline-mode 1)))
 
