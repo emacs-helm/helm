@@ -5994,15 +5994,17 @@ and `dired-compress-files-alist'."
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil)
         (helm-force-update
-         ;; select candidate before compress. If it can't, select candidate after compress.
+         ;; select candidate before compress. If it can't, select candidate
+         ;; after compress.
          (let ((presel (helm-get-selection)))
            (unless (file-exists-p presel)
              (setq presel cfile))
            (when presel
              (format helm-ff-last-expanded-candidate-regexp
-                     (regexp-quote (if (and helm-ff-transformer-show-only-basename
-                                            (not (helm-ff-dot-file-p presel)))
-                                       (helm-basename presel) presel))))))))))
+                     (regexp-quote
+                      (if (and helm-ff-transformer-show-only-basename
+                               (not (helm-ff-dot-file-p presel)))
+                          (helm-basename presel) presel))))))))))
 
 (helm-make-persistent-command-from-action helm-ff-persistent-compress
   "Compress or uncompress marked candidates without quitting."
