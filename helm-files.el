@@ -5890,7 +5890,7 @@ files to destination."
     "Notify mode-line that an async process run."
   :group 'dired-async
   :global t
-  :lighter (:eval (propertize (format " [%s async job Compressing file(s)]"
+  :lighter (:eval (propertize (format " [%s async job (Un)compressing file(s)]"
                                       (length (dired-async-processes
                                                'helm-async-compress)))
                               'face 'helm-delete-async-message))
