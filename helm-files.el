@@ -5978,7 +5978,7 @@ and `dired-compress-files-alist'."
     (dired-compress-file file)))
 
 (defun helm-ff-quick-compress (_candidate)
-  "Compress or uncompress file CANDIDATE without quitting."
+  "Compress or uncompress marked files without quitting."
   (with-helm-window
     (let (cfile)
       (unwind-protect
