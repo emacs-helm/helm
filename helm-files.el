@@ -5980,23 +5980,17 @@ and `dired-compress-files-alist'."
 (defun helm-ff-quick-compress (_candidate)
   "Compress or uncompress file CANDIDATE without quitting."
   (with-helm-window
-    (let ((cfile))
+    (let (cfile)
       (unwind-protect
-          (cl-loop for c in (helm-marked-candidates) do
-                   (helm-preselect
-                    (format helm-ff-last-expanded-candidate-regexp
-                            (regexp-quote
-                             (if (and helm-ff-transformer-show-only-basename
-                                      (not (helm-ff-dot-file-p c)))
-                                 (helm-basename c) c))))
-                   (when (y-or-n-p
-                          (format "Compress or uncompress file `%s'? "
-                                  (abbreviate-file-name c)))
-                     ;; keep helm buffer
-                     (setq cfile (save-selected-window
-                                   (helm-ff--dired-compress-file c)))
-                     (message nil)
-                     (helm--remove-marked-and-update-mode-line c)))
+           (helm-read-answer-dolist-with-action
+            "Compress or uncompress file `%s'? "
+            (helm-marked-candidates)
+            (lambda (c)
+              (setq cfile (save-selected-window
+                            (helm-ff--dired-compress-file c)))
+              (message nil)
+              (helm--remove-marked-and-update-mode-line c))
+            #'abbreviate-file-name)
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil)
         (helm-force-update
