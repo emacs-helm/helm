@@ -1283,7 +1283,7 @@ Example:
         (message "Please answer by %s" (mapconcat 'identity answer-list ", "))
         (sit-for 1)))))
 
-(defun helm-read-answer-dolist-with-action (prompt list action)
+(defun helm-read-answer-dolist-with-action (prompt list action &optional prompt-formater)
   "Read answer with PROMPT and execute ACTION on each element of LIST.
 
 Argument PROMPT is a format spec string e.g. \"Do this on %s?\"
@@ -1296,14 +1296,20 @@ differently depending of answer:
 - y  Execute ACTION on element.
 - n  Skip element.
 - !  Don't ask anymore and execute ACTION on remaining elements.
-- q  Skip all remaining elements."
+- q  Skip all remaining elements.
+
+PROMPT-FORMATER is a function called with one argument which is
+used to modify each element of LIST to be displayed in PROMPT."
   (let (dont-ask)
     (catch 'break
       (dolist (elm list)
         (if dont-ask
             (funcall action elm)
           (helm-acase (helm-read-answer
-                       (format (concat prompt "[y,n,!,q]") elm)
+                       (format (concat prompt "[y,n,!,q]")
+                               (if prompt-formater
+                                   (funcall prompt-formater elm)
+                                 elm))
                        '("y" "n" "!" "q"))
             ("y" (funcall action elm))
             ("n" (ignore))
