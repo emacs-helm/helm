@@ -1229,6 +1229,8 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                          (length ifiles)
                          (if (memq action '(symlink relsymlink hardlink))
                              "from" "to")))
+         (cdir (and (eq action 'compress)
+                    (helm-common-dir ifiles)))
          helm-ff--move-to-first-real-candidate
          helm-display-source-at-screen-top ; prevent setting window-start.
          helm-ff-auto-update-initial-value
@@ -1239,44 +1241,30 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
          (helm-actions-inherit-frame-settings t)
          helm-use-frame-when-more-than-two-windows
          (dest (or target
-                   (if (eq action 'compress)
-                       (let ((cdir (helm-common-dir ifiles)))
-                         (with-helm-display-marked-candidates
-                           helm-marked-buffer-name
-                           (mapcar
-                            (lambda (f)
-                              (file-relative-name f cdir))
-                            ifiles)
-                           (with-helm-current-buffer
-                             (helm-read-file-name
-                              prompt
-                              :preselect
-                              (when cand
-                                (format helm-ff-last-expanded-candidate-regexp
-                                        (regexp-quote
-                                         (if helm-ff-transformer-show-only-basename
-                                             (helm-basename cand) cand))))
-                              :initial-input cdir
-                              :default (expand-file-name
-                                        (format "%s.tar.gz" (if cand
-                                                                (helm-basename cand)
-                                                              "new_archive"))
-                                        cdir)
-                              :history (helm-find-files-history nil :comp-read nil)))))
-                     (with-helm-display-marked-candidates
-                       helm-marked-buffer-name
-                       (helm-ff--count-and-collect-dups ifiles)
-                       (with-helm-current-buffer
-                         (helm-read-file-name
-                          prompt
-                          :preselect
-                          (when cand
-                            (format helm-ff-last-expanded-candidate-regexp
-                                    (regexp-quote
-                                     (if helm-ff-transformer-show-only-basename
-                                         (helm-basename cand) cand))))
-                          :initial-input (helm-dwim-target-directory)
-                          :history (helm-find-files-history nil :comp-read nil)))))))
+                   (with-helm-display-marked-candidates
+                     helm-marked-buffer-name
+                     (if cdir
+                         (mapcar (lambda (f)
+                                   (file-relative-name f cdir))
+                                 ifiles)
+                       (helm-ff--count-and-collect-dups ifiles))
+                     (with-helm-current-buffer
+                       (helm-read-file-name
+                        prompt
+                        :preselect
+                        (when cand
+                          (format helm-ff-last-expanded-candidate-regexp
+                                  (regexp-quote
+                                   (if helm-ff-transformer-show-only-basename
+                                       (helm-basename cand) cand))))
+                        :default (and cdir
+                                      (expand-file-name
+                                       (format "%s.tar.gz" (if cand
+                                                               (helm-basename cand)
+                                                             "new_archive"))
+                                       cdir))
+                        :initial-input (or cdir (helm-dwim-target-directory))
+                        :history (helm-find-files-history nil :comp-read nil))))))
          (dest-dir-p (file-directory-p dest))
          (dest-dir   (if dest-dir-p dest (helm-basedir dest))))
     ;; We still need to handle directory creation for Emacs version < 27.1 that
