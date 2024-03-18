@@ -1263,6 +1263,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                                                (helm-basename cand)
                                                              "new_archive"))
                                        cdir))
+                        :must-match (and cdir (lambda (f) (not (file-directory-p f))))
                         :initial-input (or cdir (helm-dwim-target-directory))
                         :history (helm-find-files-history nil :comp-read nil))))))
          (dest-dir-p (file-directory-p dest))
