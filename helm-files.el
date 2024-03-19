@@ -5916,7 +5916,6 @@ and `dired-compress-files-alist'."
                      (format "%s exists, overwrite?"
                              (abbreviate-file-name ofile)))))
       (message "Compression aborted"))
-    ;; FIXME: provide mode-line notification like in delete files async.
     (message "Compressing %d file(s) to `%s'..."
              (length ifiles) (helm-basename ofile))
     (process-put
@@ -5997,9 +5996,9 @@ and `dired-compress-files-alist'."
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil)
         (helm-force-update
-         ;; select candidate before compress. If it can't, select candidate
-         ;; after compress.
          (let ((presel (helm-get-selection)))
+           ;; FIXME: Probably this would never happen, I see no cases here where
+           ;; helm-get-selection doesn't exist.
            (unless (file-exists-p presel)
              (setq presel cfile))
            (when presel
