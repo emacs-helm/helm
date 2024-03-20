@@ -2648,16 +2648,16 @@ Can be used for `completion-in-region-function' by advicing it with an
              result start point end base-size))
         ;; Allow running extra property `:exit-function' (Bug#2265,
         ;; Bug#2356). Function is called with 'exact if the return value of
-        ;; `try-completion' is a string (possibly a directory Bug#2274 if the
-        ;; string ends with /), otherwise it is always called with 'finished.
-        ;; However it is still not clear what to use, the documentation on this
-        ;; beeing really bad (bug#2646).
+        ;; `try-completion' is a string ending with / (possibly a directory
+        ;; Bug#2274), otherwise it is always called with 'finished.  However it
+        ;; is still not clear what to use, the documentation on this beeing
+        ;; really bad (see bug#2646).
         (when (and (stringp string) exit-fun)
           (funcall exit-fun string
                    (helm-acase (try-completion initial-input collection predicate)
-                     ;; FIXME: Should I limit 'exact only for strings ending
-                     ;; with / ?
-                     ((guard (stringp it)) 'exact)
+                     ((guard (and (stringp it)
+                                  (string-match "/\\'" it)))
+                      'exact)
                      (t 'finished))))
         (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
