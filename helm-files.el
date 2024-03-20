@@ -1533,6 +1533,7 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
 
 (defun helm-ff-compress-marked-files (_candidate)
   "Compress or uncompress marked files with `dired-compress-file'."
+  (require 'dired-async)
   (let* ((files (helm-marked-candidates :with-wildcard t)))
     (if (not (with-helm-display-marked-candidates
                helm-marked-buffer-name
