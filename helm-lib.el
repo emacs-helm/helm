@@ -566,19 +566,33 @@ is usable in next condition."
                 (helm-aand ,@(cdr conditions))))))
 
 (defmacro helm-acase (expr &rest clauses)
-  "A simple anaphoric case implementation.
+  "Check if EXPR match KEYLIST and then execute BODY.
 
-The car of each clause can be any object that will be compared
-with `equal' or an expression starting with `guard' which is
-evaluated.  Once evaluated `guard' is bound to the returned value
-that can be used in the cdr of clause.
+`helm-acase' is a small macro mixing the features of `cl-case'
+and `cond'.
 
-NOTE: `guard' as a temp var is reserved for helm-acase, so if you
-let-bind a local var outside the helm-acase body, it will be
-overriden deliberately by helm-acase.
+KEYLIST can be any object that will be compared with `equal' or
+an expression starting with `guard' which is then evaluated.
+Once evaluated `guard' is bound to the returned value that can be
+used in the cdr of clause.  When KEYLIST match EXPR, BODY is
+executed and `helm-acase' exited with its value.
+
+If KEYLIST is a non-quoted list, each elements of the list are
+checked with `member' to see if one match EXPR.  To compare a
+whole list with EXPR, you have to quote it.
+
+The last clause can use `t' as KEYLIST to specify a fallback
+clause when previous clause didn't match, if such a clause
+starting with `t' is specified before last clause it will
+override all next clauses, if you want to match an EXPR value
+equal to `t' in any clauses quote `t', i.e. `'t'.
+
+NOTE: `guard' as a temp var is reserved for `helm-acase', so if
+you let-bind a local var outside the `helm-acase' body, it will
+be overriden deliberately by `helm-acase'.
 
 EXPR is bound to a temporary variable called `it' which is
-usable in CLAUSES to refer to EXPR.
+usable in all clauses to refer to EXPR.
 
 \(fn EXPR (KEYLIST BODY...)...)"
   (declare (indent 1) (debug (form &rest ([&or (symbolp form) sexp] body))))
