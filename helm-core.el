@@ -1122,6 +1122,14 @@ You can toggle later `truncate-lines' with
 Set this to an empty string if you don't want prefix in margin when marking."
   :group 'helm
   :type 'string)
+
+(defvar helm-update-edebug nil
+  "Development feature.
+If set to true then all functions invoked after `helm-update' can be
+instrumented by `edebug' for stepping. `helm--maybe-use-while-no-input'
+then doesn't use `while-no-input', because `while-no-input' throws on
+`edebug' command key input.")
+
 
 ;;; Faces
 ;;
@@ -4955,12 +4963,6 @@ Unlike `while-no-input' this macro ensure to not returns `t'."
                   (setq quit-flag nil))
                  (quit-flag nil)
                  (t val)))))))
-
-(defvar helm-update-edebug nil
-  "Development feature.
-If set to true then all functions invoked after `helm-update' can be instrumented by
-`edebug' for stepping. `helm--maybe-use-while-no-input' then doesn't use `while-no-input',
-because `while-no-input' throws on `edebug' command key input.")
 
 (defmacro helm--maybe-use-while-no-input (&rest body)
   "Wrap BODY in `helm-while-no-input' unless initializing a remote connection."
