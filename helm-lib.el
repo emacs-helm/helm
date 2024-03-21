@@ -581,11 +581,12 @@ If KEYLIST is a non-quoted list, each elements of the list are
 checked with `member' to see if one match EXPR.  To compare a
 whole list with EXPR, you have to quote it.
 
-The last clause can use `t' as KEYLIST to specify a fallback
-clause when previous clause didn't match, if such a clause
-starting with `t' is specified before last clause it will
-override all next clauses, if you want to match an EXPR value
-equal to `t' in any clauses quote `t', i.e. `'t'.
+The last clause can use `t' or \\='otherwise as KEYLIST to specify a
+fallback clause when previous clauses didn't match, if such a clause
+starting with `t' or \\='otherwise is specified before last clause it
+will override all next clauses, if you want to match an EXPR value equal
+to `t' in any clauses quote it, i.e. `'t' or use an explicit
+\(guard (eq it t)).
 
 NOTE: `guard' as a temp var is reserved for `helm-acase', so if
 you let-bind a local var outside the `helm-acase' body, it will
@@ -606,7 +607,8 @@ usable in all clauses to refer to EXPR.
          (if (or guard
                  (equal it ',key)
                  (and (listp ',key) (member it ',key))
-                 (and (symbolp ',key) (eq ',key t)))
+                 (and (symbolp ',key)
+                      (or (eq ',key t) (eq ',key 'otherwise))))
              (progn ,@(cdr clause1))
            (helm-acase it ,@(cdr clauses)))))))
 
