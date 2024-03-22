@@ -6762,7 +6762,17 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
                          ;; '(BEG END) instead of an integer like
                          ;; `re-search-forward'.
                          while (and (setq pos-lst (funcall searcher pattern))
-                                    (not (eobp))
+                                    ;; We were previously forwarding line from
+                                    ;; searcher and checking then for eobp, as a
+                                    ;; result the last candidate was always
+                                    ;; skipped. See bug#2650.
+                                    (if (consp pos-lst)
+                                        ;; With negation the searcher is not
+                                        ;; forwarding line, we do it from here.
+                                        ;; If forward-line doesn't return zero,
+                                        ;; we are at eob.
+                                        (zerop (forward-line 1))
+                                      (not (eobp)))
                                     (< count limit))
                          for cand = (apply get-line-fn
                                            (if (and pos-lst (listp pos-lst))

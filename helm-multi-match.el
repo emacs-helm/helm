@@ -249,8 +249,9 @@ i.e (identity (re-search-forward \"foo\" (pos-eol) t)) => t."
                            regex)
            when (eq (caar pat) 'not) return
            ;; Pass the job to `helm-search-match-part'.
-           (prog1 (list (pos-bol) (pos-eol))
-             (forward-line 1))
+           ;; We now forward-line from helm-search-from-candidate-buffer, see
+           ;; comments about bug#2650 there.
+           (list (pos-bol) (pos-eol))
            while (condition-case _err
                      (funcall searchfn1 (or regex1 "") nil t)
                    (invalid-regexp nil))
