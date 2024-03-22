@@ -4709,7 +4709,9 @@ useful when the order of the candidates is meaningful, e.g. with
                                                       collect
                                                       (helm--maybe-get-migemo-pattern
                                                        pat diacritics))
-                                           (split-string pattern "" t))
+                                           (helm-acase (split-string pattern "" t)
+                                             ((guard (string= "!" (car it))) nil)
+                                             (t it)))
                          for p in patterns
                          ;; Multi matches (regexps patterns).
                          if multi-match do
