@@ -6787,6 +6787,10 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
                          for dup = (gethash cand hash)
                          when (and (or (and allow-dups dup (= dup iter))
                                        (null dup))
+                                   ;; Happens with (buffer-substring 1 1) when
+                                   ;; setting cand above (bug#2651) and create a
+                                   ;; ghost candidate on top.
+                                   (not (string= cand ""))
                                    (or
                                     ;; Always collect when cand is matched
                                     ;; by searcher funcs and match-part attr
