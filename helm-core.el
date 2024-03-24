@@ -4658,6 +4658,15 @@ useful when the order of the candidates is meaningful, e.g. with
           (char-fold-to-regexp pattern)
         pattern)))
 
+(defun helm-re-search-forward (regexp &optional bound noerror count)
+  "Same as `re-search-forward' but return nil when point doesn't move.
+This avoid possible infloop when a wrong regexp is entered in minibuffer."
+  ;; See Issue#2652 and Issue#2653.
+  (let ((pos (point)))
+    (helm-acase (re-search-forward regexp bound noerror count)
+      ((guard (eql it pos)) nil)
+      (t it))))
+
 (defun helm-fuzzy-default-highlight-match-1 (candidate &optional pattern diacritics file-comp)
   (let* ((pair    (and (consp candidate) candidate))
          (display (helm-stringify (if pair (car pair) candidate)))
@@ -4696,11 +4705,7 @@ useful when the order of the candidates is meaningful, e.g. with
             (progn
               ;; Try first matching against whole pattern.
               (unless (string= pattern "")
-                (cl-loop
-                 while (re-search-forward regex nil t)
-                 when (eql (match-beginning 0) (match-end 0))
-                 do (cl-return)
-                 do
+                (while (helm-re-search-forward regex nil t)
                  (cl-incf count)
                  (helm-add-face-text-properties
                   (match-beginning 0) (match-end 0) 'helm-match)))
@@ -4720,11 +4725,7 @@ useful when the order of the candidates is meaningful, e.g. with
                          ;; Multi matches (regexps patterns).
                          if multi-match do
                          (progn
-                           (cl-loop
-                            while (re-search-forward p nil t)
-                            when (eql (match-beginning 0) (match-end 0))
-                            do (cl-return)
-                            do
+                           (while (helm-re-search-forward p nil t)
                             (helm-add-face-text-properties
                              (match-beginning 0) (match-end 0) 'helm-match))
                            (goto-char (point-min)))

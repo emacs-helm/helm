@@ -278,7 +278,7 @@ Forward line on empty lines, otherwise goto eol."
 
 (defun helm-mm-3-search (pattern &rest _ignore)
   (helm-mm-3-search-base
-   pattern 're-search-forward 're-search-forward))
+   pattern #'helm-re-search-forward #'helm-re-search-forward))
 
 (defun helm-mm-3-search-on-diacritics (pattern &rest _ignore)
   (let ((helm-mm--match-on-diacritics t))
