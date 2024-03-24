@@ -4720,10 +4720,13 @@ useful when the order of the candidates is meaningful, e.g. with
                          ;; Multi matches (regexps patterns).
                          if multi-match do
                          (progn
-                           (while (re-search-forward p nil t)
-                             (helm-add-face-text-properties
-                              (match-beginning 0) (match-end 0)
-                              'helm-match))
+                           (cl-loop
+                            while (re-search-forward p nil t)
+                            when (eql (match-beginning 0) (match-end 0))
+                            do (cl-return)
+                            do
+                            (helm-add-face-text-properties
+                             (match-beginning 0) (match-end 0) 'helm-match))
                            (goto-char (point-min)))
                          ;; Fuzzy matches (literal patterns).
                          else do
