@@ -5067,6 +5067,14 @@ without recomputing them, it should be a list of lists."
                 (cl-loop for src in helm-sources
                          when (helm-update-source-p src)
                          collect src))
+          ;; When no sources to update erase buffer
+          ;; to avoid duplication of header and candidates
+          ;; when next chunk of update will arrive,
+          ;; otherwise the buffer is erased AFTER [1] the results
+          ;; are computed.
+          ;; FIXME the explanation above is probably obsolete.
+          ;;(unless sources (erase-buffer))
+          
           ;; Compute matches without rendering the sources.
           ;; This prevent the helm-buffer flickering when constantly
           ;; updating.
@@ -5117,12 +5125,8 @@ without recomputing them, it should be a list of lists."
          ;;
          ;; short patterns that are alone not expected to return any results,
          ;; ignore in order to not erase Helm buffer on such patterns.
-         (not
-          (let ((split-string-default-separators "[ \f\t\n\r\v]+")
-                (subpatterns (string-split helm-pattern)))
-            (seq-find
-             (lambda (p) (member p '("!" "!^" "?" "@!")))
-             subpatterns nil))))))
+         (cl-loop for p in (helm-mm-split-pattern helm-pattern)
+                  never (member p '("!" "!^" "?" "@!"))))))
 
 (defun helm--update-move-first-line ()
   "Goto first line of `helm-buffer'."
