@@ -99,9 +99,6 @@ in `helm-initialize'.")
   "The value of point at selection.")
 (defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
-(defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
-                                        "\\<" "\\>" "\\_<" "\\_>" ".*"
-                                        "??" "?*" "*?" "?"))
 (defvar helm--force-updating-p nil
   "[INTERNAL] Don't use this in your programs.")
 (defvar helm-exit-status 0
@@ -5070,12 +5067,6 @@ without recomputing them, it should be a list of lists."
                 (cl-loop for src in helm-sources
                          when (helm-update-source-p src)
                          collect src))
-          ;; When no sources to update erase buffer
-          ;; to avoid duplication of header and candidates
-          ;; when next chunk of update will arrive,
-          ;; otherwise the buffer is erased AFTER [1] the results
-          ;; are computed.
-          (unless sources (erase-buffer))
           ;; Compute matches without rendering the sources.
           ;; This prevent the helm-buffer flickering when constantly
           ;; updating.
@@ -5084,7 +5075,7 @@ without recomputing them, it should be a list of lists."
           ;; If computing matches finished and is not interrupted
           ;; erase the helm-buffer and render results (Fix #1157).
           (when matches ;; nil only when interrupted by while-no-input.
-            (erase-buffer)             ; [1]
+            (erase-buffer)
             (cl-loop for src in sources
                      for mtc in matches
                      do (helm-render-source src mtc))
@@ -5121,16 +5112,17 @@ without recomputing them, it should be a list of lists."
              (member (assoc-default 'name source) helm-source-filter))
          (>= len
              (helm-aif (assq 'requires-pattern source) (or (cdr it) 1) 0))
-         ;; Entering repeatedly these strings (*, ?) takes 100% CPU
-         ;; and hang emacs on MacOs preventing deleting backward those
-         ;; characters (Bug#1802). Update: it seems it is no more true,
-         ;; thus this affect bug#2423, so let's remove this for now.
-         ;; (not (string-match-p "\\`[*]+\\'" helm-pattern))
-         ;; These incomplete regexps hang helm forever
-         ;; so defer update. Maybe replace spaces quoted when using
-         ;; multi-match.
-         (not (member (replace-regexp-in-string "\\s\\ " " " helm-pattern)
-                      helm-update-blacklist-regexps)))))
+         ;; bugs were mentioned here before: Bug#1802, bug#2423
+         ;; must be fixed already by 'helm-re-search-forward'
+         ;;
+         ;; short patterns that are alone not expected to return any results,
+         ;; ignore in order to not erase Helm buffer on such patterns.
+         (not
+          (let ((split-string-default-separators "[ \f\t\n\r\v]+")
+                (subpatterns (string-split helm-pattern)))
+            (seq-find
+             (lambda (p) (member p '("!" "!^" "?" "@!")))
+             subpatterns nil))))))
 
 (defun helm--update-move-first-line ()
   "Goto first line of `helm-buffer'."
