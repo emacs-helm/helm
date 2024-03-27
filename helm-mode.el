@@ -1181,13 +1181,25 @@ is used."
            ;; still available).
            (max-len (and (memq helm-completion-style '(helm helm-fuzzy))
                          (helm-in-buffer-get-longest-candidate)))
-           (sep (if (or (null max-len) (zerop max-len))
-                    " --"               ; Default separator.
-                  (helm-make-separator comp max-len)))
            (doc (ignore-errors
                   (helm-get-first-line-documentation sym)))
            (symbol-class (help--symbol-class sym))
            (group (helm-group-p sym))
+           (prefix (cond ((and symbol-class group)
+                          (concat "g" symbol-class))
+                         ((and (not (string= symbol-class ""))
+                               symbol-class))
+                         (group "g")
+                         (t "i")))
+           (prefix-len (length prefix))
+           (prefix-span 4)
+           (sep (if (or (null max-len) (zerop max-len))
+                    " --"               ; Default separator.
+                  (helm-make-separator comp
+                                       (if (>= prefix-len prefix-span)
+                                           ;; shorten max-len for long prefixes, rare
+                                           (- max-len (1+ (- prefix-len prefix-span)))
+                                         max-len))))
            (key (helm-completion-get-key sym)))
       (list
        ;; Symbol (comp).
@@ -1198,16 +1210,11 @@ is used."
          ;; existing function.
          (propertize comp 'face 'helm-completion-invalid))
        ;; Prefix.
-       (helm-aand (cond ((and symbol-class group)
-                         (concat "g" symbol-class))
-                        ((and (not (string= symbol-class ""))
-                              symbol-class))
-                        (group "g")
-                        (t "i"))
+       (helm-aand prefix
                   (propertize it 'face 'helm-completions-detailed)
                   (propertize
-                   ;; (format "%-4s" it) makes spaces inheriting text props.
-                   " " 'display (concat it (make-string (- 5 (length it)) ? ))))
+                   " " 'display
+                   (concat it (make-string (- (max prefix-span (1+ prefix-len)) prefix-len) ? ))))
        ;; Suffix.
        (if doc
            (helm-aand (propertize doc 'face 'helm-completions-detailed)
