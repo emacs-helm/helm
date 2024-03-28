@@ -104,7 +104,7 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
     (string= candidate pattern)))
 
 (defun helm-mm-exact-search (pattern &rest _ignore)
-  (re-search-forward (helm-mm-exact-get-pattern pattern) nil t))
+  (helm-re-search-forward (helm-mm-exact-get-pattern pattern) nil t))
 
 
 ;;; Prefix match
