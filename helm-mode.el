@@ -1186,7 +1186,7 @@ is used."
                   (helm-make-separator comp max-len)))
            (doc (ignore-errors
                   (helm-get-first-line-documentation sym)))
-           (symbol-class (help--symbol-class sym))
+           (symbol-class (with-helm-current-buffer (help--symbol-class sym)))
            (group (helm-group-p sym))
            (key (helm-completion-get-key sym)))
       (list
@@ -1197,17 +1197,27 @@ is used."
          ;; Not already defined function. To test add an advice on a non
          ;; existing function.
          (propertize comp 'face 'helm-completion-invalid))
-       ;; Prefix.
+       ;; Prefixes.
+       ;; " c " command
+       ;; " - " obsolete, 'byte-obsolete-info
+       ;; " v " var, not a defcustom
+       ;; " ' " local-variable-if-set-p
+       ;; " * " not default value if buffer local
+       ;; " - " 'byte-obsolete-variable
        (helm-aand (cond ((and symbol-class group)
                          (concat "g" symbol-class))
                         ((and (not (string= symbol-class ""))
                               symbol-class))
                         (group "g")
-                        (t "i"))
+                        (t "i")) ; Not already defined function.
                   (propertize it 'face 'helm-completions-detailed)
+                  ;; help--symbol-class currently can return at most 8
+                  ;; characters long symbol class but it is very rare, it is
+                  ;; generally max 4 (bug#2656).
                   (propertize
-                   ;; (format "%-4s" it) makes spaces inheriting text props.
-                   " " 'display (concat it (make-string (- 5 (length it)) ? ))))
+                   ;; (format "%-4s" it) may make spaces inheriting text props
+                   ;; with emacs -nw in emacs<29.
+                   " " 'display (format "%-4s" it)))
        ;; Suffix.
        (if doc
            (helm-aand (propertize doc 'face 'helm-completions-detailed)
