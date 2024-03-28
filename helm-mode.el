@@ -562,7 +562,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-cr-default-transformer (candidates source)
   "Default filter candidate function for `helm-comp-read'."
-  (let ((must-match (helm-get-attr 'must-match source)))
+  (let ((must-match (helm-get-attr 'must-match source))
+        (raw-candidate (helm-get-attr 'raw-candidate source)))
     ;; Annotation and affixation are already handled in completion-in-region and
     ;; in helm-completing-read-default-2 when emacs style is in use.
     ;; For helm-completing-read-default-1 we handle them in an extra FCT; This
@@ -580,7 +581,9 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
              finally return
              ;; Unquote helm-pattern when it is added as candidate
              ;; (Bug#2015).
-             (let ((pat (replace-regexp-in-string "\\s\\" "" helm-pattern)))
+             (let ((pat (if raw-candidate
+                            helm-pattern
+                          (replace-regexp-in-string "\\s\\" "" helm-pattern))))
                (if (or (string= pat "")
                        (eq must-match t)
                        (helm-cr--pattern-in-candidates-p lst pat))
@@ -659,6 +662,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             multiline
                             allow-nest
                             coerce
+                            raw-candidate
                             (group 'helm))
   "Read a string in the minibuffer, with helm completion.
 
@@ -780,6 +784,9 @@ Keys description:
 - MULTILINE: See multiline in `helm-source'.
 
 - COERCE: See coerce in `helm-source'.
+
+- RAW-CANDIDATE: Do not unquote the unknown candidate coming from helm-pattern
+  when non nil. 
 
 - GROUP: See group in `helm-source'.
 
@@ -934,6 +941,9 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
         (setq src-list (cl-loop for src in src-list
                              collect (cons '(nomark) src))))
       (when reverse-history (setq src-list (nreverse src-list)))
+      (when raw-candidate
+        (cl-loop for src in src-list
+                 do (helm-set-attr 'raw-candidate t src)))
       (add-hook 'helm-after-update-hook 'helm-comp-read--move-to-first-real-candidate)
       (unwind-protect
            (setq result (helm

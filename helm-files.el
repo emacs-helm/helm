@@ -1776,7 +1776,10 @@ this working."
                  :raw-history t
                  :reverse-history helm-eshell-on-file-reverse-history
                  :input-history
-                 'helm-eshell-command-on-file-input-history))))
+                 'helm-eshell-command-on-file-input-history
+                 ;; Allow quoting when writing in minibuffer i.e. allow usage of
+                 ;; \@ and \#.
+                 :raw-candidate t))))
            (alias-value (car (assoc-default command eshell-command-aliases-list)))
            cmd-line)
       (if (or (equal helm-current-prefix-arg '(16))
