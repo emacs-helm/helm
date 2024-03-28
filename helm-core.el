@@ -6711,7 +6711,8 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
 (defun helm-candidates-in-buffer-search-default-fn (pattern)
   "Search PATTERN with `re-search-forward' with bound and noerror args."
   (condition-case _err
-      (re-search-forward pattern nil t)
+      ;; Use helm-re-search-forward to avoid infloop (bug#2657).
+      (helm-re-search-forward pattern nil t)
     (invalid-regexp nil)))
 
 (defun helm-candidates-in-buffer-1 (buffer pattern get-line-fn
