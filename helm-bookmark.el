@@ -818,7 +818,63 @@ E.g. prepended with *."
   (dolist (i (helm-marked-candidates))
     (bookmark-delete (helm-bookmark-get-bookmark-from-name i)
                      'batch)))
+
+;;; bookmark annotations
+;;
+(defun helm-bookmark-show-annotation (bookmark-name-or-record)
+  "Display the annotation for BOOKMARK-NAME-OR-RECORD in a buffer."
+  (let ((annotation (bookmark-get-annotation bookmark-name-or-record)))
+    (when (and annotation (not (string-equal annotation "")))
+      (let ((buf (get-buffer-create "*Bookmark Annotation*")))
+        (with-current-buffer buf
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (insert annotation)
+            (goto-char (point-min))
+            (set-buffer-modified-p nil)
+            (helm-bookmark-annotation-mode)
+            (insert (substitute-command-keys
+                     "# Edit this buffer with \\[helm-bookmark-edit-annotation]")
+                    (substitute-command-keys
+                     "\n# Quit this buffer with \\[helm-bookmark-quit-annotation]\n"))
+            (set (make-local-variable 'bookmark-annotation-name)
+                 bookmark-name-or-record)
+            (put 'bookmark-annotation-name 'permanent-local t)))
+        (pop-to-buffer buf)))))
 
+(defun helm-bookmark-edit-annotation ()
+  "Edit bookmark annotation from the show annotation buffer."
+  (interactive)
+  (setq buffer-read-only nil)
+  (bookmark-edit-annotation-mode)
+  (save-excursion
+    (goto-char (point-min))
+    (delete-region
+     (point) (save-excursion (forward-line 2) (point)))
+    (insert (funcall bookmark-edit-annotation-text-func
+                     bookmark-annotation-name))))
+
+(defun helm-bookmark-quit-annotation ()
+  "Quit bookmark annotation buffer."
+  (interactive)
+  (quit-window t))
+
+(defvar helm-bookmark-annotation-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map text-mode-map)
+    (define-key map (kbd "q") #'helm-bookmark-quit-annotation)
+    (define-key map (kbd "e") #'helm-bookmark-edit-annotation)
+    map)
+  "Map used in show annotation bookmark buffer.")
+
+(define-derived-mode helm-bookmark-annotation-mode
+    text-mode "helm-annotation-mode"
+    "Mode to display bookmark annotations.
+
+Special commands:
+\\{helm-bookmark-annotation-mode-map}"
+    :interactive nil
+    (setq-local buffer-read-only t))
 
 ;;;###autoload
 (defun helm-bookmarks ()
@@ -828,7 +884,7 @@ E.g. prepended with *."
                    helm-source-bookmark-set)
         :buffer "*helm bookmarks*"
         :default (buffer-name helm-current-buffer)))
-
+
 ;;;###autoload
 (defun helm-filtered-bookmarks ()
   "Preconfigured `helm' for bookmarks (filtered by category).
