@@ -853,11 +853,13 @@ E.g. prepended with *."
      (point) (save-excursion (forward-line 2) (point)))
     (insert (funcall bookmark-edit-annotation-text-func
                      bookmark-annotation-name))))
+(put 'helm-bookmark-edit-annotation 'no-helm-mx t)
 
 (defun helm-bookmark-quit-annotation ()
   "Quit bookmark annotation buffer."
   (interactive)
   (quit-window t))
+(put 'helm-bookmark-quit-annotation 'no-helm-mx t)
 
 (defvar helm-bookmark-annotation-mode-map
   (let ((map (make-sparse-keymap)))
