@@ -36,6 +36,7 @@
 (defvar dired-buffers)
 (defvar org-directory)
 (defvar helm-ff-default-directory)
+(defvar major-mode-remap-alist)
 
 
 (defgroup helm-buffers nil
@@ -335,6 +336,9 @@ Note that this variable is buffer-local.")
                           when (string-match r candidate)
                           return m)))
         (buffer (get-buffer-create candidate)))
+    (helm-aif (and (boundp 'major-mode-remap-alist)
+                   (cdr (assq mjm major-mode-remap-alist)))
+      (setq mjm it))
     (if mjm
         (with-current-buffer buffer (funcall mjm))
       (set-buffer-major-mode buffer))
