@@ -327,13 +327,13 @@ Note that this variable is buffer-local.")
    (help-message :initform 'helm-buffer-help-message)))
 
 (cl-defun helm-buffers-create-new-buffer-1 (candidate &optional (display-func 'switch-to-buffer))
-  (let ((mjm (or (and helm-current-prefix-arg
-                      (intern-soft (helm-comp-read
-                                    "Major-mode: "
-                                    helm-buffers-favorite-modes)))
-                 (cl-loop for (r . m) in auto-mode-alist
-                          when (string-match r candidate)
-                          return m)))
+  (let ((mjm (major-mode-remap
+              (or (and helm-current-prefix-arg
+                       (intern-soft (helm-comp-read
+                                     "Major-mode: "
+                                     helm-buffers-favorite-modes)))
+                  (alist-get candidate auto-mode-alist nil nil #'string-match)
+                  )))
         (buffer (get-buffer-create candidate)))
     (if mjm
         (with-current-buffer buffer (funcall mjm))
