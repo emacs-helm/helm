@@ -307,7 +307,10 @@ BOOKMARK is a bookmark name or a bookmark record.
 This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
   (let* ((filename   (bookmark-get-filename bookmark))
          (isnonfile  (equal filename helm-bookmark--non-file-filename)))
-    (and filename (not isnonfile) (not (bookmark-get-handler bookmark)))))
+    (and filename
+         (not isnonfile)
+         (not (helm-bookmark-org-file-p bookmark))
+         (not (bookmark-get-handler bookmark)))))
 
 (defun helm-bookmark-org-file-p (bookmark)
   (let* ((filename (bookmark-get-filename bookmark)))
