@@ -783,7 +783,7 @@ consecutive words from the buffer into the new bookmark name."
                             (let ((now-map  (copy-keymap minibuffer-local-map)))
                               (define-key now-map  "\C-w" #'bookmark-yank-word)
                               now-map)
-                            nil 'bookmark-history))))
+                            nil 'bookmark-history old))))
     (bookmark-set-name old newname)
     (setq bookmark-current-bookmark  newname)
     (unless batch (bookmark-bmenu-surreptitiously-rebuild-list))
