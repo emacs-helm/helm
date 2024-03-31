@@ -762,32 +762,42 @@ renamed."
   (setq bookmark-alist-modification-count (1+ bookmark-alist-modification-count))
   (when (bookmark-time-to-save-p) (bookmark-save)))
 
-(defun helm-bookmark-rename (old &optional new batch)
+(defun helm-bookmark-rename (old &optional new _batch)
   "Change bookmark's name from OLD to NEW.
-Interactively:
- If called from the keyboard, then prompt for OLD.
- If called from the menubar, select OLD from a menu.
 If NEW is nil, then prompt for its string value.
 
-If BATCH is non-nil, then do not rebuild the menu list.
+Unused arg _BATCH is kept for backward compatibility.
 
 While the user enters the new name, repeated `C-w' inserts
 consecutive words from the buffer into the new bookmark name."
-  (interactive (list (bookmark-completing-read "Old bookmark name")))
   (bookmark-maybe-historicize-string old)
   (bookmark-maybe-load-default-file)
-  (save-excursion (skip-chars-forward " ") (setq bookmark-yank-point (point)))
+  (save-excursion
+    (skip-chars-forward " ") (setq bookmark-yank-point (point)))
   (setq bookmark-current-buffer (current-buffer))
-  (let ((newname  (or new  (read-from-minibuffer
-                            "New name: " nil
-                            (let ((now-map  (copy-keymap minibuffer-local-map)))
-                              (define-key now-map  "\C-w" #'bookmark-yank-word)
-                              now-map)
-                            nil 'bookmark-history old))))
-    (bookmark-set-name old newname)
-    (setq bookmark-current-bookmark  newname)
-    (unless batch (bookmark-bmenu-surreptitiously-rebuild-list))
-    (helm-bookmark-maybe-save-bookmark) newname))
+  (catch 'skip
+    (let ((newname
+           (or new  (read-from-minibuffer
+                     (format-prompt "New name [%s]" old "C-RET to skip") nil
+                     (let ((now-map  (copy-keymap minibuffer-local-map)))
+                       (define-key now-map "\C-w" #'bookmark-yank-word)
+                       (define-key now-map (kbd "C-<return>")
+                         #'(lambda () (interactive) (throw 'skip 'skip)))
+                       now-map)
+                     nil 'bookmark-history old))))
+      (bookmark-set-name old newname)
+      (setq bookmark-current-bookmark  newname)
+      (helm-bookmark-maybe-save-bookmark) newname)))
+
+(defun helm-bookmark-rename-marked (_candidate)
+  "Rename marked bookmarks."
+  (let* ((bmks (helm-marked-candidates))
+         (count 0)
+         (len (length bmks)))
+    (cl-loop for bmk in bmks
+             unless (eq (helm-bookmark-rename bmk) 'skip)
+             do (cl-incf count))
+    (message "(%s/%s) bookmark(s) renamed" count len)))
 
 (helm-make-command-from-action helm-bookmark-run-edit
   "Run `helm-bookmark-edit-bookmark' from keyboard."
