@@ -3472,7 +3472,10 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
                     (not (window-parameter curwin 'window-side))
                     (delete-other-windows))
                (switch-to-buffer buffer))
-      (when (and (or helm-always-two-windows helm-autoresize-mode)
+      (when (and (or  helm-autoresize-mode
+                      (and helm-always-two-windows
+                           ;; 'other uses existing win, don't delete that win
+                           (not (eq helm-split-window-default-side 'other))))
                  (not (eq helm-split-window-default-side 'same))
                  (not (minibufferp helm-current-buffer))
                  (not helm-split-window-inside-p)
