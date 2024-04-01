@@ -5184,7 +5184,8 @@ Special commands:
   (if (and helm-ff--show-thumbnails
            (null (file-remote-p helm-ff-default-directory)))
       (prog1
-          (cl-loop for (disp . img) in candidates
+          (cl-loop with scale = (image-compute-scaling-factor)
+                   for (disp . img) in candidates
                    for type = (helm-acase (file-name-extension img)
                                 ((guard (and (member it '("png" "jpg" "jpeg"))
                                              (memq image-dired-thumbnail-storage
@@ -5194,7 +5195,8 @@ Special commands:
                                 ("png" 'png))
                    if type collect
                    (let ((thumbnail (plist-get
-                                     (cdr (helm-ff--image-dired-get-thumbnail-image img))
+                                     (cdr (helm-ff--image-dired-get-thumbnail-image
+                                           img type scale))
                                      :file)))
                      ;; When icons are displayed the leading space handling disp
                      ;; prop is already here, just replace icon with the thumbnail.
@@ -5215,7 +5217,7 @@ Special commands:
 
 ;; Same as `image-dired-get-thumbnail-image' but use
 ;; `helm-ff--image-dired-thumb-name' which cache thumbnails for further use.
-(defun helm-ff--image-dired-get-thumbnail-image (file)
+(defun helm-ff--image-dired-get-thumbnail-image (file &optional type scale)
   "Return the image descriptor for a thumbnail of image file FILE."
   (unless (string-match-p (image-file-name-regexp) file)
     (error "%s is not a valid image file" file))
@@ -5230,7 +5232,7 @@ Special commands:
                                 (file-attribute-modification-time
                                  (file-attributes file)))))
       (image-dired-create-thumb file thumb-file))
-    (create-image thumb-file)))
+    (create-image thumb-file type nil :scale scale)))
 
 (defvar helm-ff-image-dired-thumbnails-cache (make-hash-table :test 'equal)
   "Store associations of image_file/thumbnail_file.")
