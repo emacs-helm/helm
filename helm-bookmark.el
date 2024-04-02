@@ -89,6 +89,10 @@ will be honored."
                                    helm-bookmark-default-filtered-sources)
                   for fn = (intern (format "%s-builder" s))
                   do (set s (funcall fn)))))
+
+(defcustom helm-bookmark-annotation-sign "*"
+  "Boomarks with annotation are prefixed with this string."
+  :type 'string)
 
 (defgroup helm-bookmark-faces nil
   "Customize the appearance of helm-bookmark."
@@ -640,7 +644,8 @@ If `browse-url-browser-function' is set to something else than
                              (isfile (all-the-icons-icon-for-file (helm-basename isfile)))))
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))
-          do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
+          do (setq trunc (concat helm-bookmark-annotation-sign
+                                 (if helm-bookmark-show-location trunc i)))
           for sep = (and helm-bookmark-show-location
                          (make-string (- (+ bookmark-bmenu-file-column 2)
                                          (string-width trunc))
