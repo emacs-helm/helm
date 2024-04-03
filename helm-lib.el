@@ -410,6 +410,14 @@ This is done recursively."
 	    (when (> k 127)
 	      (setf (aref vec i) (+ k ?\M-\C-@ -128))))))
       vec))))
+
+(unless (fboundp 'without-remote-files)
+  (defmacro without-remote-files (&rest body)
+  "Deactivate remote file names temporarily and run BODY."
+  (declare (indent 0) (debug ((form body) body)))
+  `(let ((file-name-handler-alist (copy-tree file-name-handler-alist))
+         tramp-mode)
+     (tramp-unload-file-name-handlers) ,@body)))
 
 ;;; Macros helper.
 ;;
