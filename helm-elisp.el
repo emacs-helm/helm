@@ -432,9 +432,15 @@ documentation when SYM name is the same for function and variable."
              ;; `documentation' return "\n\n(args...)"
              ;; for CL-style functions.
              (not (string-match-p "\\`\n\n" doc)))
-        ;; Some commands specify key bindings in their first line.
+        ;; Some commands specify key bindings or keymap in their first line, e.g.:
+        ;; "\<hexl-mode-map>A mode for editing binary [...].  As a result
+        ;; (substitute-command-keys doc) returns a string like
+        ;; "\nUses keymap...\nFirst line docstring.
         (truncate-string-to-width
-         (substitute-command-keys (car (split-string doc "\n")))
+         (helm-acase (split-string (substitute-command-keys doc) "\n")
+           ((guard (and (string= (car it) "") (cdr it)))
+            (cadr guard))
+           (t (car it)))
          end-column nil nil t)
       (if (or (symbol-function sym) (boundp sym) (facep sym) (helm-group-p sym))
           "Not documented"
