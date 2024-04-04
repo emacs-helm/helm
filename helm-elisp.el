@@ -420,7 +420,7 @@ documentation when SYM name is the same for function and variable."
                       (documentation it t)))
                    ((guard (custom-theme-p it))
                     (documentation-property it 'theme-documentation t))
-                   ((guard (helm-group-p it))
+                   ((guard (and (helm-group-p it) (not (fboundp it))))
                     (documentation-property it 'group-documentation t))
                    ((guard (fboundp it))
                     (documentation it t))
