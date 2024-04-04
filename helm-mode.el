@@ -1365,7 +1365,7 @@ is used."
               (helm-aand (propertize doc 'face 'font-lock-warning-face)
                          (propertize " " 'display (concat sep it))))))))
 
-;;; Generic completing read
+;;; Completing read handlers
 ;;
 ;;
 (defun helm-completing-read-default-1
