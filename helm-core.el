@@ -5067,14 +5067,14 @@ without recomputing them, it should be a list of lists."
                 (cl-loop for src in helm-sources
                          when (helm-update-source-p src)
                          collect src))
-          ;; When no sources to update erase buffer
-          ;; to avoid duplication of header and candidates
-          ;; when next chunk of update will arrive,
-          ;; otherwise the buffer is erased AFTER [1] the results
-          ;; are computed.
-          ;; FIXME the explanation above is probably obsolete.
-          ;;(unless sources (erase-buffer))
-          
+          ;; When no sources to update erase buffer to avoid duplication of
+          ;; header and candidates when next chunk of update will arrive,
+          ;; otherwise the buffer is erased AFTER [1] the results are
+          ;; computed. This is also needed when pattern is quickly deleted
+          ;; backward and we reach requires-pattern limit, in this case the helm
+          ;; buffer is not updated and stays with the results of the last
+          ;; matching pattern.
+          (unless sources (erase-buffer))
           ;; Compute matches without rendering the sources.
           ;; This prevent the helm-buffer flickering when constantly
           ;; updating.
