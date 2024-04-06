@@ -538,15 +538,13 @@ Animation is used unless NOANIM is non--nil."
 (defun helm-save-pos-to-register-before-jump ()
   "Save current buffer position to `helm-save-pos-before-jump-register'.
 To use this add it to `helm-goto-line-before-hook'."
-  (unless helm-in-persistent-action
-    (point-to-register helm-save-pos-before-jump-register)))
+  (point-to-register helm-save-pos-before-jump-register))
 
 (defun helm-save-current-pos-to-mark-ring ()
   "Save current buffer position to mark ring.
 To use this add it to `helm-goto-line-before-hook'."
-  (unless helm-in-persistent-action
-    (set-marker (mark-marker) (point))
-    (push-mark (point) 'nomsg)))
+  (set-marker (mark-marker) (point))
+  (push-mark (point) 'nomsg))
 
 (defun helm-displaying-source-names ()
   "Return the list of sources name for this helm session."
