@@ -7238,12 +7238,14 @@ Possible values are \\='left \\='right \\='below or \\='above."
     (helm-maybe-exit-minibuffer)))
 
 (defun helm-get-nth-action (n action)
+  "Return the nth N action from ACTION.
+Argument ACTION can be a symbol or a list of actions."
   (cond ((and (zerop n) (functionp action))
          action)
         ((listp action)
          (or (cdr (elt action n))
              (error "No such action")))
-        ((and (functionp action) (< 0 n))
+        ((and (functionp action) (> n 0))
          (error "Sole action"))
         (t
          (error "Error in `helm-select-nth-action'"))))
