@@ -1825,6 +1825,11 @@ Directories expansion is not supported."
     (if (string= desc "")
         "Not documented"
       (replace-regexp-in-string "\n" "" desc))))
+
+(defun helm-local-directory-files (directory &optional full match nosort count)
+  "Run `directory-files' without tramp file name handlers."
+  (without-remote-files
+    (directory-files directory full match nosort count)))
 
 ;;; helm internals
 ;;

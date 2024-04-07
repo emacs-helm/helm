@@ -3624,22 +3624,17 @@ SEL argument is only here for debugging purpose, it default to
            (ignore-errors
              (funcall helm-list-directory-function directory sort-method)))
           ((memq helm-ff-initial-sort-method '(newest size))
-           (sort (helm-ff--local-directory-files
+           (sort (helm-local-directory-files
                   directory t directory-files-no-dot-files-regexp)
                  sort-method))
           ((eq helm-ff-initial-sort-method 'ext)
            (funcall sort-method
-                    (helm-ff--local-directory-files
+                    (helm-local-directory-files
                      directory t directory-files-no-dot-files-regexp)
                     #'file-name-extension
                     (or sel (helm-get-selection) "")))
-          (t (helm-ff--local-directory-files
+          (t (helm-local-directory-files
               directory t directory-files-no-dot-files-regexp)))))
-
-(defun helm-ff--local-directory-files (directory &optional full match nosort count)
-  "Run `directory-files' without tramp file name handlers."
-  (without-remote-files
-    (directory-files directory full match nosort count)))
 
 (defsubst helm-ff-file-larger-that-file-p (f1 f2)
   (let ((attr1 (file-attributes f1))
