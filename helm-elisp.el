@@ -432,10 +432,11 @@ documentation when SYM name is the same for function and variable."
              ;; `documentation' return "\n\n(args...)"
              ;; for CL-style functions.
              (not (string-match-p "\\`\n\n" doc)))
-        ;; Some commands specify key bindings or keymap in their first line, e.g.:
-        ;; "\<hexl-mode-map>A mode for editing binary [...].  As a result
-        ;; (substitute-command-keys doc) returns a string like
-        ;; "\nUses keymap...\nFirst line docstring.
+        ;; Some commands specify key bindings or keymap in their first line,
+        ;; e.g.: "\<hexl-mode-map>A mode for editing binary [...].  As a result
+        ;; (substitute-command-keys doc) returns a string like "\nUses
+        ;; keymap...\nFirst line docstring.  See
+        ;; <https://debbugs.gnu.org/70163>.
         (truncate-string-to-width
          (helm-acase (split-string (substitute-command-keys doc) "\n")
            ((guard (and (string= (car it) "") (cdr it)))
