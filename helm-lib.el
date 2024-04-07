@@ -410,15 +410,6 @@ This is done recursively."
 	    (when (> k 127)
 	      (setf (aref vec i) (+ k ?\M-\C-@ -128))))))
       vec))))
-
-(eval-and-compile
-  (unless (fboundp 'without-remote-files)
-    (defmacro without-remote-files (&rest body)
-      "Deactivate remote file names temporarily and run BODY."
-      (declare (indent 0) (debug ((form body) body)))
-      `(let ((file-name-handler-alist (copy-tree file-name-handler-alist))
-             tramp-mode)
-         (tramp-unload-file-name-handlers) ,@body))))
 
 ;;; Macros helper.
 ;;
@@ -1829,7 +1820,10 @@ Directories expansion is not supported."
 
 (defun helm-local-directory-files (directory &optional full match nosort count)
   "Run `directory-files' without tramp file name handlers."
-  (without-remote-files
+  (require 'tramp)
+  (let ((file-name-handler-alist (copy-tree file-name-handler-alist))
+       tramp-mode)
+    (tramp-unload-file-name-handlers)
     (directory-files directory full match nosort count)))
 
 ;;; helm internals
