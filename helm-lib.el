@@ -1820,7 +1820,6 @@ Directories expansion is not supported."
 
 (defun helm-local-directory-files (directory &rest args)
   "Run `directory-files' without tramp file name handlers.
-
 Take same args as `directory-files'."
   (require 'tramp)
   (let ((file-name-handler-alist
@@ -1829,6 +1828,8 @@ Take same args as `directory-files'."
                               (string-prefix-p "tramp-" (symbol-name sym)))
                   collect `(,re . ,sym)))
        tramp-mode)
+    ;; Avoid error with 5nth arg COUNT which is not available in previous Emacs,
+    ;; at least 27.1, see bug#2662.
     (apply #'directory-files directory args)))
 
 ;;; helm internals
