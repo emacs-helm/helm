@@ -1823,9 +1823,12 @@ Directories expansion is not supported."
 
 Take same args as `directory-files'."
   (require 'tramp)
-  (let ((file-name-handler-alist (copy-tree file-name-handler-alist))
+  (let ((file-name-handler-alist
+         (cl-loop for (re . sym) in file-name-handler-alist
+                  unless (and (symbolp sym)
+                              (string-prefix-p "tramp-" (symbol-name sym)))
+                  collect `(,re . ,sym)))
        tramp-mode)
-    (tramp-unload-file-name-handlers)
     (apply #'directory-files directory args)))
 
 ;;; helm internals
