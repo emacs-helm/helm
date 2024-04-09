@@ -5184,7 +5184,7 @@ Special commands:
   (if (and helm-ff--show-thumbnails
            (null (file-remote-p helm-ff-default-directory)))
       (prog1
-          (cl-loop with scale = (image-compute-scaling-factor)
+          (cl-loop with scale = (image-compute-scaling-factor nil)
                    for (disp . img) in candidates
                    for type = (helm-acase (file-name-extension img)
                                 ((guard (and (member it '("png" "jpg" "jpeg"))
