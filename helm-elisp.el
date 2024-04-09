@@ -33,6 +33,7 @@
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-M-x-transformer-no-sort-no-props "helm-command")
 (defvar helm-M-x-show-short-doc)
+(defvar completions-detailed)
 (defvar helm-completions-detailed)
 
 
