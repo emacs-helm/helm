@@ -1818,13 +1818,15 @@ Directories expansion is not supported."
         "Not documented"
       (replace-regexp-in-string "\n" "" desc))))
 
-(defun helm-local-directory-files (directory &optional full match nosort count)
-  "Run `directory-files' without tramp file name handlers."
+(defun helm-local-directory-files (directory &rest args)
+  "Run `directory-files' without tramp file name handlers.
+
+Take same args as `directory-files'."
   (require 'tramp)
   (let ((file-name-handler-alist (copy-tree file-name-handler-alist))
        tramp-mode)
     (tramp-unload-file-name-handlers)
-    (directory-files directory full match nosort count)))
+    (apply #'directory-files directory args)))
 
 ;;; helm internals
 ;;
