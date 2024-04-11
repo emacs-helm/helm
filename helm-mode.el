@@ -1529,7 +1529,9 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                      (append (and default
                                   (memq helm-completion-style '(helm helm-fuzzy))
                                   (list default))
-                             all))))
+                             (if (and sort-fn (> (length str) 0))
+                                 (funcall sort-fn all)
+                               all)))))
          (data (if (memq helm-completion-style '(helm helm-fuzzy))
                    (funcall compfn (or input "") nil nil)
                  compfn))
