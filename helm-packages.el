@@ -21,6 +21,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'package)
+(require 'finder)
 (require 'helm-utils) ; For with-helm-display-marked-candidates.
 
 
@@ -218,6 +219,13 @@ Arg PACKAGES is a list of strings."
   (unless helm-packages--updated (package-refresh-contents))
   (helm-set-local-variable 'helm-packages--updated t))
 
+(defun helm-finder--list-matches (key)
+  (let* ((id (intern key))
+	 (packages (gethash id finder-keywords-hash)))
+    (unless packages
+      (error "No packages matching key `%s'" key))
+    packages))
+
 
 ;;;###autoload
 (defun helm-packages (&optional arg)
@@ -282,6 +290,35 @@ to avoid errors with outdated packages no more availables."
                                 ("Install packages(s)"
                                  . helm-packages-install))))
           :buffer "*helm packages*")))
+
+;;;###autoload
+(defun helm-finder ()
+  "Helm interface to find packages by keywords with `finder'."
+  (interactive)
+  (helm :sources
+        (helm-build-in-buffer-source "helm finder"
+          :data (mapcar #'car finder-known-keywords)
+          :filtered-candidate-transformer
+          (lambda (candidates _source)
+            (cl-loop for cand in candidates
+                     for desc = (assoc-default (intern-soft cand) finder-known-keywords)
+                     for sep = (helm-make-separator cand)
+                     for disp = (helm-aand (propertize desc 'face 'font-lock-warning-face)
+                                           (propertize " " 'display (concat sep it))
+                                           (concat cand it))
+                     collect (cons disp cand)))
+          :action (lambda (c)
+                    (if (string-match "\\.el$" c)
+                        (finder-commentary c)
+                      (helm :sources
+                            (helm-make-source "packages" 'helm-packages-class
+                              :init (lambda ()
+                                      (helm-init-candidates-in-buffer
+                                          'global (helm-finder--list-matches c)))
+                              :filtered-candidate-transformer #'helm-packages-transformer-1
+                              :action '(("Describe package" . helm-packages-describe)))
+                            :buffer "*helm finder results*"))))
+        :buffer "*helm finder*"))
 
 (provide 'helm-packages)
 
