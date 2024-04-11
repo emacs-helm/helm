@@ -1,6 +1,26 @@
 #+STARTUP:showall
 
 * NEWS
+** Version 3.9.8
+
+*** New helm-finder command
+*** Make `completions-detailed` working with 'emacs' helm-completion-style
+It was already working but was really slow and was not supporting
+`helm-completing-read-command-categories` mechanism which provide
+`completions-detailed` in much more places than Emacs vanilla.
+*** Helm-goto-line save position even when using persistent actions
+*** helm-info is now colorized
+*** Displaying thumnails is now slighly faster
+*** Add a new mode to edit bookmark annotations
+When viewing an annotation you had to kill the buffer, restart
+helm-bookmarks, and run the edit annotation action, now you can edit
+directly from the view buffer.
+*** It is now possible to rename marked bookmarks
+*** New compress/uncompress/compress-to action in helm-find-files
+All actions are asynchronous except the persistent ones.
+*** Allow toggling while-no-input for easier edebugging
+Use the new `helm-update-edebug` variable to enable this.
+*** And various bug fixes as always
 
 ** Version 3.9.7
 
