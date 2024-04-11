@@ -32,6 +32,7 @@
 (defvar package--builtins)
 (defvar helm--locate-library-doc-cache)
 (defvar helm--locate-library-cache)
+(defvar completion-lazy-hilit) ; Emacs-30 only.
 
 ;; No warnings in Emacs built --without-x
 (declare-function x-file-dialog "xfns.c")
@@ -1471,7 +1472,8 @@ dynamically otherwise use `helm-completing-read-default-2'."
 Call `helm-comp-read' with same args as `completing-read'.
 For the meaning of optional args see `helm-completing-read-default-1'.
 This handler uses dynamic matching which allows honouring `completion-styles'."
-  (let* ((history (or (car-safe hist) hist))
+  (let* ((completion-lazy-hilit t)
+         (history (or (car-safe hist) hist))
          (input (helm-acase init
                   ((guard (stringp it)) it)
                   ((guard (consp it)) (car it))))
@@ -1527,16 +1529,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                      (append (and default
                                   (memq helm-completion-style '(helm helm-fuzzy))
                                   (list default))
-                             (helm-completion--initial-filter
-                              (let ((lst (if (and sort-fn (> (length str) 0))
-                                             (funcall sort-fn all)
-                                           all)))
-                                (if (and default afix)
-                                    (prog1 (append (list default)
-                                                   (delete default lst))
-                                      (setq default nil))
-                                  lst))
-                              afun afix category)))))
+                             all))))
          (data (if (memq helm-completion-style '(helm helm-fuzzy))
                    (funcall compfn (or input "") nil nil)
                  compfn))
@@ -1561,10 +1554,13 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          ;; candidates.
          :default (and (eq helm-completion-style 'emacs) (null afix) default)
          :fc-transformer
-         ;; Ensure sort fn is at the end.
-         (append '(helm-cr-default-transformer)
-                 (and helm-completion-in-region-default-sort-fn
-                      (list helm-completion-in-region-default-sort-fn)))
+         (append (and (or afix afun (memq category '(file library)))
+                      (list (lambda (candidates source)
+                              (helm-completion--initial-filter
+                               (funcall helm-completion-in-region-default-sort-fn
+                                        candidates source)
+                               afun afix category))))
+                 '(helm-cr-default-transformer))
          :match-dynamic (eq helm-completion-style 'emacs)
          :diacritics helm-mode-ignore-diacritics
          :fuzzy (eq helm-completion-style 'helm-fuzzy)
@@ -2563,7 +2559,8 @@ Can be used for `completion-in-region-function' by advicing it with an
                  ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
                  base-size
                  (compfn (lambda (str _predicate _action)
-                           (let* ((completion-ignore-case (helm-set-case-fold-search))
+                           (let* ((completion-lazy-hilit t)
+                                  (completion-ignore-case (helm-set-case-fold-search))
                                   (comps
                                    (completion-all-completions
                                     str ; This is helm-pattern
