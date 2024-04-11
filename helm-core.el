@@ -6994,10 +6994,12 @@ of `helm-source-in-buffer' by `helm-init-candidates-in-buffer' , otherwise
 LONGEST can be used to specify longest candidate."
   (let ((lgst (or longest (helm-in-buffer-get-longest-candidate)))
         (len  (length cand)))
-    (make-string (1+ (if (>= lgst len)
-                         (- lgst len)
-                       0))
-                 ? )))
+    (if (zerop lgst)
+        " -- "
+      (make-string (1+ (if (>= lgst len)
+                             (- lgst len)
+                           0))
+                     ? ))))
 
 (defun helm-init-candidates-in-buffer (buffer-spec data &optional force-longest)
   "Register BUFFER-SPEC with DATA for a helm candidates-in-buffer session.

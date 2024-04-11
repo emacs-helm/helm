@@ -1193,7 +1193,7 @@ is used."
            (max-len (and (memq helm-completion-style '(helm helm-fuzzy))
                          (helm-in-buffer-get-longest-candidate)))
            (sep (if (or (null max-len) (zerop max-len))
-                    " --"               ; Default separator.
+                    " -- "               ; Default separator.
                   (helm-make-separator comp max-len)))
            (doc (ignore-errors
                   (helm-get-first-line-documentation sym)))
@@ -1538,7 +1538,20 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
             (if (or helm-completion--sorting-done
                     (string= helm-pattern ""))
                 candidates
-              (sort candidates 'helm-generic-sort-fn)))))
+              (sort candidates 'helm-generic-sort-fn))))
+         flags)
+    (helm-aif (and (null category)
+                   (assoc-default name helm-completing-read-command-categories))
+        (setq metadata `(metadata (category . ,it))
+              category it))
+    (helm-aif (and (or (and (boundp 'completions-detailed) completions-detailed)
+                       helm-completions-detailed)
+                   (assoc-default category helm-completing-read-extra-metadata))
+        (progn
+          (setq metadata it)
+          (setq afun (completion-metadata-get metadata 'annotation-function)
+                afix (completion-metadata-get metadata 'affixation-function)
+                flags (completion-metadata-get metadata 'flags))))
     (unwind-protect
         (helm-comp-read
          ;; Completion-at-point and friends have no prompt.
@@ -1567,7 +1580,8 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          :exec-when-only-one exec-when-only-one
          :quit-when-no-cand (eq require-match t)
          :must-match require-match)
-      (setq helm-completion--sorting-done nil))))
+      (setq helm-completion--sorting-done nil)
+      (dolist (f flags) (set f nil)))))
 
 (defun helm-mode-all-the-icons-handler (prompt collection test require-match
                                         init hist default inherit-input-method
