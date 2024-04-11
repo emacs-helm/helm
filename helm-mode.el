@@ -1065,9 +1065,7 @@ like this:
 FLAGS is a list of variables to renitialize to nil when exiting or quitting.
 
 It is used to add `affixation-function' or `annotation-function' if original
-metadata doesn't have some and `completions-detailed' is non nil.
-When using emacs as `helm-completion-style', this has no effect, keeping same
-behavior as emacs vanilla.")
+metadata doesn't have some and `completions-detailed' is non nil.")
 
 (defvar helm-completing-read-command-categories
   '(("customize-variable" . symbol-help)
