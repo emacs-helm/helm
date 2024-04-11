@@ -2621,11 +2621,9 @@ Can be used for `completion-in-region-function' by advicing it with an
                              (unless base-size (setq base-size bs))
                              (setq helm-completion--sorting-done (and sort-fn t))
                              (setq all (copy-sequence comps))
-                             (helm-completion--initial-filter
-                              (if (and sort-fn (> (length str) 0))
-                                  (funcall sort-fn all)
-                                all)
-                              afun afix category))))
+                             (if (and sort-fn (> (length str) 0))
+                                 (funcall sort-fn all)
+                               all))))
                  (data (if (memq helm-completion-style '(helm helm-fuzzy))
                            (funcall compfn input nil nil)
                          compfn))
@@ -2655,10 +2653,13 @@ Can be used for `completion-in-region-function' by advicing it with an
                                              init-space-suffix)))
                             :buffer buf-name
                             :fc-transformer
-                            ;; Ensure sort fn is at the end.
-                            (append '(helm-cr-default-transformer)
-                                    (and helm-completion-in-region-default-sort-fn
-                                         (list helm-completion-in-region-default-sort-fn)))
+                            (append (and (or afix afun (memq category '(file library)))
+                                         (list (lambda (candidates source)
+                                                 (helm-completion--initial-filter
+                                                  (funcall helm-completion-in-region-default-sort-fn
+                                                           candidates source)
+                                                  afun afix category))))
+                                    '(helm-cr-default-transformer))
                             :match-dynamic (eq helm-completion-style 'emacs)
                             :fuzzy (eq helm-completion-style 'helm-fuzzy)
                             :exec-when-only-one t
