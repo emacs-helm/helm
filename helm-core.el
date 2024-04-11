@@ -6995,7 +6995,7 @@ LONGEST can be used to specify longest candidate."
   (let ((lgst (or longest (helm-in-buffer-get-longest-candidate)))
         (len  (length cand)))
     (if (zerop lgst)
-        " -- "
+        " -- " ; For emacs style.
       (make-string (1+ (if (>= lgst len)
                              (- lgst len)
                            0))
