@@ -1563,9 +1563,13 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          :history history
          :nomark (null helm-comp-read-use-marked)
          :reverse-history helm-mode-reverse-history
-         ;; In helm h-c-styles default is passed directly in
-         ;; candidates.
-         :default (and (eq helm-completion-style 'emacs) (null afix) default)
+         ;; If DEF is not provided, fallback to empty string
+         ;; to avoid `thing-at-point' to be appended on top of list.
+         ;; FIXME: default is added first in the collection fn, and then it is
+         ;; added here and appended to candidates with the get candidates fn of
+         ;; helm-comp-read, later when sorting default may move somewhere
+         ;; whereas it has to stay on top.
+         :default (or default "")
          :fc-transformer
          (append (and (or afix afun (memq category '(file library)))
                       (list (lambda (candidates source)
