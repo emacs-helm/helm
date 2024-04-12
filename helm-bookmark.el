@@ -783,7 +783,8 @@ consecutive words from the buffer into the new bookmark name."
   (catch 'skip
     (let ((newname
            (or new  (read-from-minibuffer
-                     (format "(C-RET to skip) New name [%s]: " old) nil
+                     ;; `format-prompt' is not available in old Emacs.
+                     (format "New name [C-RET to skip] (default %s): " old) nil
                      (let ((now-map  (copy-keymap minibuffer-local-map)))
                        (define-key now-map "\C-w" #'bookmark-yank-word)
                        (define-key now-map (kbd "C-<return>")
