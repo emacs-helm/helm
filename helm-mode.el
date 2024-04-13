@@ -1143,7 +1143,7 @@ should be specified as a string and the category as a symbol.")
              (bname (truncate-string-to-width
                      comp helm-buffer-max-length nil nil
                      helm-buffers-end-truncated-string))
-             (suffix (format "%s%s%s%s%s(in %s)"
+             (suffix (format "%s%s%s%s%s `%s'"
                              (make-string (1+ (- max-len (length bname))) ? )
                              (propertize size
                                          'face 'helm-buffer-size)

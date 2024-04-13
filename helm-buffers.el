@@ -457,7 +457,7 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
                    (format "(%s %s in `%s')"
                            (process-name proc)
                            (process-status proc) dir)
-                 (format "(in `%s')" dir))
+                 (format "`%s'" dir))
                'face face2)))))
 
 (defun helm-buffer--format-mode-name (buf)
