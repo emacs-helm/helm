@@ -1206,7 +1206,8 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
   (require 'dired-async)
   (when (eq action 'rsync)
     (cl-assert (executable-find "rsync") nil "No command named rsync"))
-  (let* ((rsync-switches
+  (let* (dired-create-destination-dirs ; We handle dirs creation ourself.
+         (rsync-switches
           (when (and (eq action 'rsync)
                      helm-current-prefix-arg)
             (cdr (split-string
@@ -1268,12 +1269,10 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                         :history (helm-find-files-history nil :comp-read nil))))))
          (dest-dir-p (file-directory-p dest))
          (dest-dir   (if dest-dir-p dest (helm-basedir dest))))
-    ;; We still need to handle directory creation for Emacs version < 27.1 that
-    ;; doesn't have `dired-create-destination-dirs' and for rsync as well.
-    (unless (or (and (boundp 'dired-create-destination-dirs)
-                     (null (eq action 'rsync)))
-                dest-dir-p
-                (file-directory-p dest-dir))
+    ;; Ignore `dired-create-destination-dirs' and handle directory creation from
+    ;; here like we were doing before. Dired is failing to create directories
+    ;; when e.g. symlinking some files to a not yet existing directory.
+    (unless (or dest-dir-p (file-directory-p dest-dir))
       (when (y-or-n-p (format "Create directory `%s'? " dest-dir))
         ;; When saying No here with rsync, `helm-rsync-copy-files' will raise an
         ;; error about dest not existing.
