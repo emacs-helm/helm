@@ -292,12 +292,14 @@ yanked string."
     (helm-aif (marker-buffer candidate)
         (progn
           (switch-to-buffer it)
-          (helm-log-run-hook "helm-mark-ring-default-action" 'helm-goto-line-before-hook)
-          (helm-match-line-cleanup)
-          (with-helm-current-buffer
-            (unless helm-yank-point (setq helm-yank-point (point))))
-          (helm-goto-char target)
-          (helm-highlight-current-line))
+          (with-selected-window (get-buffer-window it)
+            (unless helm-in-persistent-action
+              (helm-log-run-hook
+               "helm-mark-ring-default-action" 'helm-goto-line-before-hook))
+            (helm-match-line-cleanup)
+            (unless helm-yank-point (setq helm-yank-point (point)))
+            (helm-goto-char target)
+            (helm-highlight-current-line)))
       ;; marker points to no buffer, no need to dereference it, just
       ;; delete it.
       (setq mark-ring (delete target mark-ring))
