@@ -125,10 +125,11 @@ supports only numeric entities."
 (defvar helm-goto-line-before-hook '(helm-save-current-pos-to-mark-ring)
   "Run before jumping to line.
 This hook runs when jumping from `helm-goto-line', `helm-etags-default-action',
-and `helm-imenu-default-action'.
+`helm-imenu-default-action' and `helm-mark-ring-default-action' itself.
 This allows you to retrieve a previous position after using the different helm
-tools for searching (etags, grep, gid, (m)occur etc...).
+tools for searching or retrieving a position (etags, grep, gid, (m)occur etc...).
 By default positions are added to `mark-ring'.
+
 You can also add to register by using (or adding)
 `helm-save-pos-to-register-before-jump' instead. In this case
 last position is added to the register `helm-save-pos-before-jump-register'.
