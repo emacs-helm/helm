@@ -92,6 +92,8 @@
 (declare-function all-the-icons-material "ext:all-the-icons.el")
 (declare-function helm-adaptive-sort "ext:helm-adaptive.el")
 (declare-function wfnames-setup-buffer "ext:wfnames.el")
+(declare-function svg-lib-progress-bar "ext:svg-lib")
+(declare-function svg-lib-tag "ext:svg-lib")
 
 (defvar all-the-icons-dir-icon-alist)
 (defvar term-char-mode-point-at-process-mark)
@@ -686,8 +688,17 @@ bar, it is useful to display it to distinguish the different processes running
 e.g. rsync1 rsync2 etc...
 PERCENT is the current percentage of data sent to the progress bar.
 INFO is what is displayed after the progress bar according to
-`helm-ff-rsync-progress-bar-info'."
-  :type 'function)
+`helm-ff-rsync-progress-bar-info'.
+Currently Helm provides two functions to draw the progress bar:
+- The default progress bar which use the whole height of mode-line and print
+colored spaces to mimic a progress bar.
+- The SVG based progress bar which use the external library svg-lib (you will
+have to install to use this function)."
+  :type '(choice
+          (function :tag "Default progress bar"
+                    helm-rsync-default-progress-bar)
+          (function :tag "SVG progress bar"
+                    helm-rsync-svg-progress-bar)))
 
 (defcustom helm-trash-default-directory nil
   "The default trash directory.
@@ -1061,7 +1072,11 @@ want to use it, helm is still providing
   "Face used for rsync progress bar background."
   :group 'helm-files-faces)
 
-
+(defface helm-ff-rsync-progress-svg
+    `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+         :background "black" :foreground "Deepskyblue4"))
+  "Face used for rsync svg progress bar."
+  :group 'helm-files-faces)
 
 ;;; Helm-find-files
 ;;
@@ -1376,6 +1391,19 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
           (propertize info
                       'display '(height 0.9)
                       'face 'helm-ff-rsync-progress-1)))
+
+(defun helm-rsync-svg-progress-bar (proc percent info)
+  (require 'svg-lib)
+  (format "%s%s%s"
+          (propertize " " 'display (svg-lib-tag
+                                    (process-name proc)
+                                    'helm-ff-rsync-progress-svg))
+          (propertize " " 'display (svg-lib-progress-bar
+                                    (/ (1+ percent) 100.0)
+                                    'helm-ff-rsync-progress-svg
+                                    :width 10 :margin 1 :stroke 2 :padding 2))
+          (propertize " " 'display (svg-lib-tag
+                                    info 'helm-ff-rsync-progress-svg))))
 
 (defun helm-rsync-mode-line (proc)
   "Add Rsync progress to the mode line."
