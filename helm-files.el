@@ -678,6 +678,17 @@ This Has no effect when `helm-ff-rsync-progress-bar-style' is text."
           (const :tag "Show the current speed of transfer" speed)
           (const :tag "Show the time remaining" remain)))
 
+(defcustom helm-rsync-progress-bar-function #'helm-rsync-default-progress-bar
+  "Function used to draw a rsync progress bar in mode-line.
+Function is called with three args: PROCESS, PERCENT, INFO.
+PROCESS is the rsync process in use, it's name is displayed before the progress
+bar, it is useful to display it to distinguish the different processes running
+e.g. rsync1 rsync2 etc...
+PERCENT is the current percentage of data sent to the progress bar.
+INFO is what is displayed after the progress bar according to
+`helm-ff-rsync-progress-bar-info'."
+  :type 'function)
+
 (defcustom helm-trash-default-directory nil
   "The default trash directory.
 You probably don't need to set this when using a Linux system using
@@ -1348,20 +1359,23 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
         (setq percent (string-to-number
                        (match-string 1 progbar))))
       (if percent
-          (format "%s%s%s%s"
-                  (propertize (capitalize (replace-regexp-in-string
-                                           "<\\([0-9]+\\)>" "(\\1)"
-                                           (process-name proc)))
-                              'display '(height 0.9)
-                              'face 'helm-ff-rsync-progress-1)
-                  (propertize " " 'display `(space :width ,(list percent))
-                              'face 'helm-ff-rsync-progress-2)
-                  (propertize " " 'display `(space :width ,(list (- 100 percent)))
-                              'face 'helm-ff-rsync-progress-3)
-                  (propertize info
-                              'display '(height 0.9)
-                              'face 'helm-ff-rsync-progress-1))
+          (funcall helm-rsync-progress-bar-function proc percent info)
         ""))))
+
+(defun helm-rsync-default-progress-bar (proc percent info)
+  (format "%s%s%s%s"
+          (propertize (capitalize (replace-regexp-in-string
+                                   "<\\([0-9]+\\)>" "(\\1)"
+                                   (process-name proc)))
+                      'display '(height 0.9)
+                      'face 'helm-ff-rsync-progress-1)
+          (propertize " " 'display `(space :width ,(list percent))
+                      'face 'helm-ff-rsync-progress-2)
+          (propertize " " 'display `(space :width ,(list (- 100 percent)))
+                      'face 'helm-ff-rsync-progress-3)
+          (propertize info
+                      'display '(height 0.9)
+                      'face 'helm-ff-rsync-progress-1)))
 
 (defun helm-rsync-mode-line (proc)
   "Add Rsync progress to the mode line."
