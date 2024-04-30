@@ -21,7 +21,7 @@
 ;;; Commentary:
 
 ;; Interface to create helm sources easily.
-;; Actually the eieo objects are transformed in alist for compatibility.
+;; Currently the eieo objects are transformed in alist for compatibility.
 ;; In the future this package should allow creating source as eieo objects
 ;; without conversion to alist, teaching helm to read such a structure.
 ;; The compatibility with alists would be kept.
@@ -322,7 +322,7 @@
   even if this transformation is done every time the pattern is
   changed.  For example, if a candidate set is very large then
   `candidate-transformer' transforms every candidate while only
-  some of them will actually be displayed due to the limit
+  some of them will currently be displayed due to the limit
   imposed by `helm-candidate-number-limit'.
 
   Note that `candidates' and `candidate-transformer' is run

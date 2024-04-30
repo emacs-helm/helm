@@ -54,7 +54,7 @@ Helm buffer."
 (defcustom helm-dabbrev-related-buffer-fn #'helm-dabbrev--same-major-mode-p
   "A function that decide if a buffer to search in its related to `current-buffer'.
 
-This is actually determined by comparing `major-mode' of the
+This is currently determined by comparing `major-mode' of the
 buffer to search and the `current-buffer'.
 
 The function take one arg, the buffer which is current, look at

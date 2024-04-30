@@ -7280,7 +7280,7 @@ When `helm-full-frame' is non-nil, and `helm-buffer' is displayed
 in only one window, the helm window is split to display
 `helm-select-persistent-action-window' in other window to
 maintain visibility.  The argument SPLIT can be used to force
-splitting inconditionally, it is unused actually."
+splitting inconditionally, it is unused currently."
   (interactive)
   (with-helm-alive-p
     (let ((source (helm-get-current-source)))
@@ -7318,7 +7318,7 @@ splitting inconditionally, it is unused actually."
           (when source
             (with-helm-window
               (save-selected-window
-                ;; FIXME: Simplify SPLIT behavior, it is a mess actually. 
+                ;; FIXME: Simplify SPLIT behavior, it is a mess currently. 
                 (if no-split
                     (helm-select-persistent-action-window :split 'never)
                   (helm-select-persistent-action-window

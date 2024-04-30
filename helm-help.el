@@ -807,7 +807,7 @@ instead its scp method if you want to avoid out of memory
 problems and crash Emacs or the whole system.  Moreover when using
 scp method, you will hit a bug when copying more than 3 files at
 the time, see [[https://github.com/emacs-helm/helm/issues/1945][bug#1945]].
-The best way actually is using Rsync to copy files from or to
+The best way currently is using Rsync to copy files from or to
 remote, see [[Use Rsync to copy files][Use Rsync to copy files]].
 Also if you often work on remote you may consider using SSHFS
 instead of relying on tramp.
@@ -873,7 +873,7 @@ rsync command line with a prefix arg (see above).
 
 Since Android doesn't provide anymore mass storage for USB, it is
 not simple to access files on Android, the best way to do this
-actually seems to use Adb, here some hints to set this up, read
+currently seems to use Adb, here some hints to set this up, read
 in addition the Tramp documentation.
 
 1) Install Adb, most distribution provide it.

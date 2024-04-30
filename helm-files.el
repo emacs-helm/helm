@@ -582,7 +582,7 @@ On Ubuntu-based distributions it is \\='trash-cli'."
     (t #'helm-list-dir-lisp))
   "The function used in `helm-find-files' to list remote directories.
 
-Actually Helm provides two functions to do this:
+Currently Helm provides two functions to do this:
 `helm-list-dir-lisp' and `helm-list-dir-external'.
 
 Using `helm-list-dir-external' will provide a similar display to
@@ -4678,7 +4678,7 @@ specifying the trash directory with TRASH-DIR arg."
     ;; ~/.local/share/Trash.
     (cl-loop for f in (directory-files
                        (expand-file-name
-                        ;; helm-ff-default-directory is actually the
+                        ;; helm-ff-default-directory is currently the
                         ;; trash directory.
                         "info" (helm-basedir (directory-file-name
                                               (or trash-dir helm-ff-default-directory))))

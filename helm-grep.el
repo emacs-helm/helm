@@ -1196,7 +1196,7 @@ of grep."
             :initform nil
             :documentation
             "  The grep backend that will be used.
-  It is actually used only as an internal flag
+  It is currently used only as an internal flag
   and doesn't set the backend by itself.
   You probably don't want to modify this.")
    (candidate-number-limit :initform 9999)
@@ -1243,7 +1243,7 @@ Argument DEFAULT-INPUT is use as `default' arg of `helm' and
 INPUT is used as `input' arg of `helm'.  See `helm' docstring.
 
 Arg BACKEND when non-nil specifies which backend to use.
-It is used actually to specify \\='zgrep' or \\='git'.
+It is used currently to specify \\='zgrep' or \\='git'.
 When BACKEND \\='zgrep' is used don't prompt for a choice in
 recurse, and ignore EXTS, search being made recursively on files
 matching `helm-zgrep-file-extension-regexp' only."

@@ -1176,7 +1176,7 @@ the speed avoiding one useless loop on complete list of candidates.
 
 Returns a function and not a list of completions.
 
-It affects actually describe-variable/function/command/symbol functions.
+It affects currently describe-variable/function/command/symbol functions.
 It uses `helm-get-first-line-documentation' which allow providing documentation
 for `describe-variable' symbols and align properly documentation when helm style
 is used."
@@ -2337,7 +2337,7 @@ When AFUN, AFIX are nil and CATEGORY is not file return COMPS unmodified."
 
 (defun helm-completion-try-completion (string table pred point)
   "The try completion function for `completing-styles-alist'.
-Actually does nothing."
+Currently does nothing."
   ;; AFAIU the try-completions style functions
   ;; are here to check if what is at point is suitable for TABLE but
   ;; there is no way to pass a multiple pattern from what is at point
@@ -2418,7 +2418,7 @@ Actually does nothing."
          (suffix (substring afterpoint (cdr bounds)))
          (all (helm-completion--multi-all-completions-1
                ;; Using `regexp-quote' on STRING fixes bug#2355 but
-               ;; breaks regexp matching in multi match, actually with
+               ;; breaks regexp matching in multi match, currently with
                ;; Helm-3.7.1 and emacs-27+ it seems using plain STRING
                ;; works for both so use it.
                ;;(regexp-quote string)
