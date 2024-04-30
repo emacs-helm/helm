@@ -1399,7 +1399,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                     (process-name proc)
                                     'helm-ff-rsync-progress-svg))
           (propertize " " 'display (svg-lib-progress-bar
-                                    (/ (1+ percent) 100.0)
+                                    (/ (+ percent 7) 107.0)
                                     'helm-ff-rsync-progress-svg
                                     :width 10 :margin 1 :stroke 2 :padding 2))
           (propertize " " 'display (svg-lib-tag
