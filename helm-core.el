@@ -3105,9 +3105,9 @@ buffers (sessions).  When calling from Lisp, specify a
                    'default-directory (get-buffer buffer)))
     (setq helm-saved-selection nil
           helm-saved-action nil)
-    (unless (buffer-live-p helm-current-buffer)
-      ;; `helm-current-buffer' may have been killed.
-      (setq helm-current-buffer (current-buffer)))
+    ;; Always resume from current-buffer, if a source needs to resume from a
+    ;; specific buffer it should be specified from this source, not here.
+    (setq helm-current-buffer (current-buffer))
     (helm-aif (with-current-buffer buffer
                 helm--current-buffer-narrowed)
         (progn
