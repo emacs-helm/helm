@@ -1074,7 +1074,7 @@ want to use it, helm is still providing
 
 (defface helm-ff-rsync-progress-svg
     `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-         :background "black" :foreground "Deepskyblue4"))
+         :background "black" :foreground "white"))
   "Face used for rsync svg progress bar."
   :group 'helm-files-faces)
 
