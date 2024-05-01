@@ -1402,8 +1402,10 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                     (/ (+ percent 7) 105.0)
                                     'helm-ff-rsync-progress-svg
                                     :width 10 :margin 1 :stroke 2 :padding 2))
-          (propertize " " 'display (svg-lib-tag
-                                    info 'helm-ff-rsync-progress-svg))))
+          (if (string= info "")
+              ""
+            (propertize " " 'display (svg-lib-tag
+                                      info 'helm-ff-rsync-progress-svg)))))
 
 (defun helm-rsync-mode-line (proc)
   "Add Rsync progress to the mode line."
