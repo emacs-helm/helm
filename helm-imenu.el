@@ -320,7 +320,8 @@ The sexp should be an `all-the-icons' function with its args."
     (if (equal (cdr cur) mb)
         (prog1 nil
           (helm-set-pattern "")
-          (helm-force-update (concat "\\_<" (car cur) "\\_>")))
+          (helm-force-update
+           (concat "\\_<" (regexp-quote (car cur)) "\\_>")))
         t)))
 
 (defun helm-imenu-quit-and-find-file-fn (source)
