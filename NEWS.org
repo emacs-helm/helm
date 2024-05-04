@@ -1,6 +1,16 @@
 #+STARTUP:showall
 
 * NEWS
+** Version 3.9.9-pre
+
+*** Allow toggling auto update in helm-top with a prefix arg
+*** Do not use `dired-create-destination-dirs` mechanism for directory creation
+as it is not working in some cases (e.g. symlinks).
+*** Fix persistent action in helm mark-ring when follow mode is on
+*** Fix Imenu preselection when point is on a name with special chars
+*** Provide a new progress bar for rsync with a svg widget 
+Needs svg-lib package but it is not mandatory.
+
 ** Version 3.9.8
 
 *** New helm-finder command

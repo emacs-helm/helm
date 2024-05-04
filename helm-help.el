@@ -2286,6 +2286,15 @@ See [[Moving in `helm-buffer'][Moving in `helm-buffer']].
 (defvar helm-top-help-message
   "* Helm Top
 
+** Tips
+
+*** Auto update
+
+You can enable auto updating in `helm-top' by turning on
+`helm-top-poll-mode' either interactively or in your init file
+with (helm-top-poll-mode 1).
+Calling `helm-top' with a prefix arg also toggle auto updating.
+
 ** Commands
 \\<helm-top-map>
 |Keys|Description

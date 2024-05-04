@@ -440,9 +440,11 @@ Show actions only on line starting by a PID."
 
 
 ;;;###autoload
-(defun helm-top ()
-  "Preconfigured `helm' for top command."
-  (interactive)
+(defun helm-top (&optional arg)
+  "Preconfigured `helm' for top command.
+When prefix arg ARG is non nil toggle auto updating mode `helm-top-poll-mode'."
+  (interactive "P")
+  (when arg (helm-top-poll-mode 'toggle))
   (add-hook 'helm-after-update-hook 'helm-top--skip-top-line)
   (unwind-protect
        (helm :sources 'helm-source-top
