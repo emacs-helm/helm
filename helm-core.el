@@ -2492,12 +2492,12 @@ i.e. functions called with RET."
   (let ((actions (helm-get-actions-from-current-source)))
     (when actions
       (cl-assert (or (eq action actions)
+                     ;; Lambdas
+                     (functionp action)
                      ;; Compiled lambdas
                      (byte-code-function-p action)
                      ;; Natively compiled (libgccjit)
                      (helm-subr-native-elisp-p action)
-                     ;; Lambdas
-                     (and (listp action) (functionp action))
                      ;; One of current actions.
                      (rassq action actions))
                  nil "No such action `%s' for this source" action)))
