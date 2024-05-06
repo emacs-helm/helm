@@ -5722,6 +5722,9 @@ source is `helm-source-find-files'."
                                   (ffap-url-at-point)
                                   (ffap-fixup-url it)
                                   (and (string-match ffap-url-regexp it) it))
+                       (and helm-ff-guess-ffap-urls ffap-url-regexp
+                            (fboundp 'ffap-fixup-email) ; Emacs-30
+                            (ffap-fixup-email (thing-at-point 'email)))
                        (ffap-file-at-point))))
         ;; Workaround emacs bugs:
         ;; When the region is active and a file is detected
