@@ -2491,15 +2491,18 @@ i.e. functions called with RET."
   (helm-log "helm-exit-and-execute-action" "Start executing action")
   (let ((actions (helm-get-actions-from-current-source)))
     (when actions
-      (cl-assert (or (eq action actions)
-                     ;; Compiled lambdas
-                     (byte-code-function-p action)
-                     ;; Natively compiled (libgccjit)
-                     (helm-subr-native-elisp-p action)
-                     ;; Lambdas
-                     (and (listp action) (functionp action))
-                     ;; One of current actions.
-                     (rassq action actions))
+      (cl-assert (or
+                  ;; Single actions defined as symbol.
+                  (eq action actions)
+                  ;; Compiled lambdas
+                  (byte-code-function-p action)
+                  ;; Natively compiled (libgccjit)
+                  (helm-subr-native-elisp-p action)
+                  ;; Lambdas (lambdas are no more represented as list in
+                  ;; Emacs-29+) Bug#2666.
+                  (and (not (symbolp action)) (functionp action))
+                  ;; One of current actions.
+                  (rassq action actions))
                  nil "No such action `%s' for this source" action)))
   (setq helm-saved-action action)
   (setq helm-saved-selection (or (helm-get-selection) ""))
@@ -5636,7 +5639,9 @@ If action buffer is selected, back to the Helm buffer."
                                helm-onewindow-p)
                            (if (functionp actions)
                                (message "Sole action: %s"
-                                        (if (or (consp actions)
+                                        ;; lambdas are no more represented as list in
+                                        ;; Emacs-29+ Bug#2666.
+                                        (if (or (not (symbolp actions))
                                                 (byte-code-function-p actions)
                                                 (helm-subr-native-elisp-p actions))
                                             "Anonymous" actions))
@@ -5664,7 +5669,9 @@ If action buffer is selected, back to the Helm buffer."
             (setq helm-saved-current-source src)
             (if (functionp it)
                 (message "Sole action: %s"
-                         (if (or (consp it)
+                         ;; lambdas are no more represented as list in
+                         ;; Emacs-29+ Bug#2666.
+                         (if (or (not (symbolp it))
                                  (byte-code-function-p it)
                                  (helm-subr-native-elisp-p it))
                              "Anonymous" it))

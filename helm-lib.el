@@ -1350,11 +1350,15 @@ used to modify each element of LIST to be displayed in PROMPT."
     (t (intern it))))
 
 (defun helm-symbol-name (obj)
-  (if (or (and (consp obj) (functionp obj))
+  "Return name of OBJ.
+If object is a lambda, return \"Anonymous\"."
+  ;; lambdas are no more represented as list in
+  ;; Emacs-29+ Bug#2666.
+  (if (or (and (not (symbolp obj)) (functionp obj))
           (byte-code-function-p obj)
           (helm-subr-native-elisp-p obj))
       "Anonymous"
-      (symbol-name obj)))
+    (symbol-name obj)))
 
 (defun helm-describe-class (class)
   "Display documentation of Eieio CLASS, a symbol or a string."
