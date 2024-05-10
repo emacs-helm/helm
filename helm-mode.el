@@ -33,6 +33,7 @@
 (defvar helm--locate-library-doc-cache)
 (defvar helm--locate-library-cache)
 (defvar completion-lazy-hilit) ; Emacs-30 only.
+(defvar eww-bookmarks)
 
 ;; No warnings in Emacs built --without-x
 (declare-function x-file-dialog "xfns.c")
@@ -1035,6 +1036,9 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
     (symbol-help . (metadata
                     (affixation-function . helm-symbol-completion-table-affixation)
                     (category . symbol-help)))
+    (eww-help . (metadata ;; Emacs-30 only
+                    (affixation-function . helm-completion-eww-affixation)
+                    (category . eww-help)))
     (package . (metadata
                 (affixation-function . helm-completion-package-affixation)
                 (category . package)))
@@ -1110,7 +1114,9 @@ metadata doesn't have some and `completions-detailed' is non nil.")
     ("set-clipboard-coding-system" . coding-system)
     ("universal-coding-system-argument" . coding-system)
     ("read-color" . color)
-    ("list-charset-chars" . charset))
+    ("list-charset-chars" . charset)
+    ;; Emacs-30 only
+    ("eww" . eww-help))
   "An alist to specify metadata category by command.
 
 Some commands provide a completion-table with no category
@@ -1364,6 +1370,21 @@ is used."
               ""
               (helm-aand (propertize doc 'face 'font-lock-warning-face)
                          (propertize " " 'display (concat sep it))))))))
+
+(defun helm-completion-eww-affixation (_completions)
+  (lambda (comp)
+    (let* ((title (or (cl-loop for bmk in eww-bookmarks
+                               for title = (plist-get bmk :title)
+                               for url = (plist-get bmk :url)
+                               thereis (and (string= comp url) title))
+                      "Unknown title"))
+           (sep (helm-make-separator title 72)))
+      (list (propertize comp 'display
+                        (truncate-string-to-width comp 72 nil nil t))
+            (helm-aand (propertize (truncate-string-to-width title 72)
+                                   'face 'helm-completions-detailed)
+                       (propertize " " 'display (concat it sep)))
+            ""))))
 
 ;;; Completing read handlers
 ;;
