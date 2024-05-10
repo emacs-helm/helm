@@ -290,7 +290,7 @@
   when the completion list from the source is built. The argument
   is the list of candidates retrieved from the source. The
   function should return a transformed list of candidates which
-  will be used for the actual completion.  If it is a list of
+  will be used for the current completion.  If it is a list of
   functions, it calls each function sequentially.
 
   This can be used to transform or remove items from the list of
