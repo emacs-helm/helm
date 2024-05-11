@@ -2714,11 +2714,10 @@ Can be used for `completion-in-region-function' by advicing it with an
         ;; really bad (see bug#2646).
         (when (and (stringp string) exit-fun)
           (funcall exit-fun string
-                   (helm-acase (try-completion initial-input collection predicate)
-                     ((guard (and (stringp it)
-                                  (string-match "/\\'" it)))
-                      'exact)
-                     (t 'finished))))
+                   (if (string-match "/\\'" string)
+                   'exact
+                   'finished)
+                   ))
         (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
         (setq helm-completion--sorting-done nil)
