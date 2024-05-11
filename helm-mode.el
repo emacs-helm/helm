@@ -2716,7 +2716,9 @@ Can be used for `completion-in-region-function' by advicing it with an
           (funcall exit-fun string
                    (helm-acase (try-completion initial-input collection predicate)
                      ((guard (and (stringp it)
-                                  (string-match "/\\'" it)))
+                                  (or (string-match "/\\'" it)
+                                      ;; Fix bug#2669.
+                                      (string-match "/\\'" string))))
                       'exact)
                      (t 'finished))))
         (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
