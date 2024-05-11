@@ -850,13 +850,23 @@ directories belonging to each visible windows."
                  nil)))
 
 (defcustom helm-ff-use-notify t
-  "Watch directories visited with `helm-find-files' when non nil.
+  "Control watching and caching directories visited with `helm-find-files'.
+
+When `t' watch and cache directories.
+When `nil' stop watching directories but continue caching directories.
+Any other value disable watching directories and disable caching as well.
+
 If your system have no file notification package available turn this
-to nil to avoid error messages when using `helm-find-files'."
-  :type 'boolean
+to nil to avoid error messages when using `helm-find-files'.
+
+Warning: Do not use `setq' to set this variable."
+  :type '(radio
+          (const :tag "Enable watching and caching directories" t)
+          (const :tag "Disable watching only" nil)
+          (const :tag "Disable watching and caching" 0))
   :set (lambda (var val)
 	 (set-default var val)
-	 (unless (symbol-value var)
+	 (unless (eq (symbol-value var) t)
            (cl-loop for dir being the hash-keys of helm-ff--file-notify-watchers
                     do (remhash dir helm-ff--list-directory-cache)))))
 
@@ -3788,6 +3798,10 @@ later in the transformer."
 ;; watcher ring on the truename remove the symlinked directory from cache.  
 (defvar helm-ff--list-directory-links nil)
 
+(defvar helm-ff-incompatible-notify-methods
+  '("docker" "toolbox" "podman" "kubernetes")
+  "Tramp methods incompatible with (i)notify.")
+
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -3798,13 +3812,17 @@ When FORCE-UPDATE is non nil recompute candidates even if DIRECTORY is
 in cache."
   (let* ((method (file-remote-p directory 'method))
          (dfn (directory-file-name directory))
-         (truename (and (file-symlink-p dfn) (file-truename dfn))))
+         (truename (and (file-symlink-p dfn) (file-truename dfn)))
+         (tramp-compatible (not (member (file-remote-p directory 'method)
+                                        helm-ff-incompatible-notify-methods))))
     (setq directory (file-name-as-directory
                      (expand-file-name directory)))
     (when truename
       (cl-pushnew (cons truename directory)
                   helm-ff--list-directory-links :test 'equal))
     (or (and (not force-update)
+             (booleanp helm-ff-use-notify)
+             tramp-compatible
              (gethash directory helm-ff--list-directory-cache))
         (let* (file-error
                (ls   (condition-case err
@@ -3836,6 +3854,7 @@ in cache."
                        helm-ff--list-directory-cache)
             ;; Put an inotify watcher to check directory modifications.
             (unless (or (null helm-ff-use-notify)
+                        (not tramp-compatible)
                         (member method helm-ff-inotify-unsupported-methods)
                         (helm-aand (setq watcher (gethash
                                                   directory
