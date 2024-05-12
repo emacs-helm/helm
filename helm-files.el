@@ -3860,6 +3860,7 @@ in cache."
                   lst))
             ;; Put an inotify watcher to check directory modifications.
             (unless (or (null helm-ff-use-notify)
+                        (not (booleanp helm-ff-use-notify))
                         (not tramp-compatible)
                         (member method helm-ff-inotify-unsupported-methods)
                         (helm-aand (setq watcher (gethash
