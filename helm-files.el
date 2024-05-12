@@ -3798,9 +3798,10 @@ later in the transformer."
 ;; watcher ring on the truename remove the symlinked directory from cache.  
 (defvar helm-ff--list-directory-links nil)
 
-(defvar helm-ff-incompatible-notify-methods
-  '("docker" "toolbox" "podman" "kubernetes")
-  "Tramp methods incompatible with (i)notify.")
+(defvar helm-ff-incompatible-notify-methods nil
+  "Tramp methods incompatible with (i)notify.
+When `helm-find-files' visit a directory with one of those methods, it stops
+using the cache and setting a watcher in this directory.")
 
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
