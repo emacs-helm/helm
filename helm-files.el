@@ -110,6 +110,7 @@
 (defvar password-cache)
 (defvar helm-fd-executable)
 (defvar wfnames-buffer)
+(defvar Info-current-file)
 
 ;;; Internal vars
 ;;
@@ -7033,7 +7034,9 @@ files."
                                         (and input-as-presel input)
                                         (buffer-file-name (current-buffer))
                                         (and (eq major-mode 'dired-mode)
-                                             smart-input))
+                                             smart-input)
+                                        (and (eq major-mode 'Info-mode)
+                                             Info-current-file))
                               (if (and helm-ff-transformer-show-only-basename
                                        (null hist)
                                        (not (string-match-p "[.]\\{1,2\\}\\'" it)))
