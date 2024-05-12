@@ -316,13 +316,14 @@ Info files are made available."
   ;; Symbol at point is used as default as long as one of the sources
   ;; in `helm-info-default-sources' is member of
   ;; `helm-sources-using-default-as-input'.
-  (let ((helm-info-default-sources
-         (helm-aif (and Info-current-file
-                        (intern-soft
-                         (concat "helm-source-info-"
-                                 (helm-basename Info-current-file))))
-             (cons it helm-info-default-sources)
-           helm-info-default-sources)))
+  (let* ((current (and Info-current-file
+                       (intern-soft
+                        (concat "helm-source-info-"
+                                (helm-basename Info-current-file)))))
+         (helm-info-default-sources
+          (if (and current (not (memq current helm-info-default-sources)))
+              (cons current helm-info-default-sources)
+            helm-info-default-sources)))
     (cl-loop for src in helm-info-default-sources
              for name = (if (symbolp src)
                             (assoc 'name (symbol-value src))
