@@ -857,7 +857,11 @@ When `nil' stop watching directories but continue caching directories.
 Any other value disable watching directories and disable caching as well.
 
 If your system have no file notification package available turn this
-to nil to avoid error messages when using `helm-find-files'.
+to nil or 0 to avoid error messages when using `helm-find-files'.
+
+You can also disable watching and caching in specific tramp methods by settings
+`helm-ff-incompatible-notify-methods', in this case no need to modify default
+setting of `helm-ff-use-notify'.
 
 Warning: Do not use `setq' to set this variable."
   :type '(radio
