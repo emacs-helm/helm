@@ -3847,11 +3847,12 @@ in cache."
                watcher)
           (puthash directory (+ (length ls) 2) helm-ff--directory-files-length)
           (prog1
-              (puthash directory
-                       (cl-loop for f in candidates
-                                when (helm-ff-filter-candidate-one-by-one f)
-                                collect it)
-                       helm-ff--list-directory-cache)
+              (let ((lst (cl-loop for f in candidates
+                                  when (helm-ff-filter-candidate-one-by-one f)
+                                  collect it)))
+                (if tramp-compatible
+                    (puthash directory lst helm-ff--list-directory-cache)
+                  lst))
             ;; Put an inotify watcher to check directory modifications.
             (unless (or (null helm-ff-use-notify)
                         (not tramp-compatible)
