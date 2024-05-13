@@ -3806,6 +3806,7 @@ in cache."
       (cl-pushnew (cons truename directory)
                   helm-ff--list-directory-links :test 'equal))
     (or (and (not force-update)
+             (not (member method helm-ff-inotify-unsupported-methods))
              (gethash directory helm-ff--list-directory-cache))
         (let* (file-error
                (ls   (condition-case err
