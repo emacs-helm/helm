@@ -5151,7 +5151,7 @@ Special commands:
 
 (defun helm-ff-slideshow-state ()
   (format "(%s/%s) "
-          (1+ (cl-position
+          (1+ (helm-position
                (buffer-file-name) helm-ff--slideshow-sequence
                :test 'equal))
           (length helm-ff--slideshow-sequence)))

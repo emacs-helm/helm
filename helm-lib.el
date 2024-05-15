@@ -1137,7 +1137,7 @@ Examples:
   (let* ((new-seq  (if reverse
                        (reverse sequence)
                      sequence))
-         (pos      (1+ (cl-position elm new-seq :test 'equal))))
+         (pos      (1+ (helm-position elm new-seq :test 'equal))))
     (append (nthcdr pos new-seq) (helm-take new-seq pos))))
 
 ;;; Strings processing.
