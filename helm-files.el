@@ -5079,28 +5079,29 @@ file."
              finally do (setq helm-ff--image-cache nil))))
 
 (defun helm-ff--display-image-native (candidate)
-  (when (buffer-live-p (get-buffer helm-ff-image-native-buffer))
-    (kill-buffer helm-ff-image-native-buffer))
-  ;; Avoid hight memory consumption see
-  ;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2021-11/msg00879.html.
-  (when (> (length helm-ff--image-cache)
-           (* helm-ff-image-cache-max-len 2))
-    ;; Only keep the last `helm-ff-image-cache-max-len' images in cache.
-    (cl-loop for img in (butlast helm-ff--image-cache
-                                 (1+ helm-ff-image-cache-max-len))
-             do (clear-image-cache img)
-             (setq helm-ff--image-cache
-                   (delete img helm-ff--image-cache))))
-  (cl-letf* (((symbol-function 'message) #'ignore)
-             (buf (find-file-noselect candidate t)))
-    ;; When going back reuse the cached images.
-    (unless (member candidate helm-ff--image-cache)
-      (setq helm-ff--image-cache
-            (append helm-ff--image-cache
-                    (list (expand-file-name candidate)))))
-    (with-current-buffer buf
-      (rename-buffer helm-ff-image-native-buffer))
-    (display-buffer buf)))
+  (when (string-match-p (image-file-name-regexp) candidate)
+    (when (buffer-live-p (get-buffer helm-ff-image-native-buffer))
+      (kill-buffer helm-ff-image-native-buffer))
+    ;; Avoid hight memory consumption see
+    ;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2021-11/msg00879.html.
+    (when (> (length helm-ff--image-cache)
+             (* helm-ff-image-cache-max-len 2))
+      ;; Only keep the last `helm-ff-image-cache-max-len' images in cache.
+      (cl-loop for img in (butlast helm-ff--image-cache
+                                   (1+ helm-ff-image-cache-max-len))
+               do (clear-image-cache img)
+               (setq helm-ff--image-cache
+                     (delete img helm-ff--image-cache))))
+    (cl-letf* (((symbol-function 'message) #'ignore)
+               (buf (find-file-noselect candidate t)))
+      ;; When going back reuse the cached images.
+      (unless (member candidate helm-ff--image-cache)
+        (setq helm-ff--image-cache
+              (append helm-ff--image-cache
+                      (list (expand-file-name candidate)))))
+      (with-current-buffer buf
+        (rename-buffer helm-ff-image-native-buffer))
+      (display-buffer buf))))
 
 ;;; Slideshow action
 ;;
@@ -5137,7 +5138,9 @@ Special commands:
 
 (defun helm-ff-start-slideshow-on-marked (_candidate)
   "Start a slideshow on marked files."
-  (let ((marked (helm-marked-candidates :with-wildcard t)))
+  (let ((marked (helm-remove-if-not-match
+                 (image-file-name-regexp)
+                 (helm-marked-candidates :with-wildcard t))))
     (cl-assert (cdr marked) nil "Can't start a slideshow on a single file")
     (setq helm-ff--slideshow-sequence marked)
     (setq helm-ff--slideshow-iterator (helm-iter-circular marked))
