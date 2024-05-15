@@ -4658,15 +4658,6 @@ useful when the order of the candidates is meaningful, e.g. with
           (char-fold-to-regexp pattern)
         pattern)))
 
-(defun helm-re-search-forward (regexp &optional bound noerror count)
-  "Same as `re-search-forward' but return nil when point doesn't move.
-This avoid possible infloop when a wrong regexp is entered in minibuffer."
-  ;; See Issue#2652 and Issue#2653.
-  (let ((pos (point)))
-    (helm-acase (re-search-forward regexp bound noerror count)
-      ((guard (eql it pos)) nil)
-      (t it))))
-
 (defun helm-fuzzy-default-highlight-match-1 (candidate &optional pattern diacritics file-comp)
   (let* ((pair    (and (consp candidate) candidate))
          (display (helm-stringify (if pair (car pair) candidate)))
