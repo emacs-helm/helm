@@ -18,6 +18,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'mule-util)
 (require 'helm)
 (require 'helm-types)
 (require 'helm-utils)
@@ -101,7 +102,7 @@ When adding a source here it is up to you to ensure the library
 of this source is accessible and properly loaded."
   :type '(repeat (choice symbol)))
 
-(defcustom helm-buffers-end-truncated-string "..."
+(defcustom helm-buffers-end-truncated-string (truncate-string-ellipsis)
   "The string to display at end of truncated buffer names."
   :type 'string)
 
