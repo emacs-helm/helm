@@ -2011,7 +2011,7 @@ Keys description:
            ;; Non existing file or dir source.
            (unless (eq must-match t)
              (helm-build-dummy-source "New file or dir"
-               :keymap 'helm-read-file-dummy-map
+               :keymap 'helm-read-file-map
                :must-match must-match
                :filtered-candidate-transformer
                (lambda (_candidates _source)
