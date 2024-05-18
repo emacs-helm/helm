@@ -580,22 +580,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                       (string-match "\n" elm))
                                  (cons (replace-regexp-in-string "\n" "->" elm) c))
                                 (t c)))
-             collect cand into lst
-             finally return
-             ;; Unquote helm-pattern when it is added as candidate
-             ;; (Bug#2015).
-             (let ((pat (if raw-candidate
-                            helm-pattern
-                          (replace-regexp-in-string "\\s\\" "" helm-pattern))))
-               (if (or (string= pat "")
-                       (eq must-match t)
-                       (helm-cr--pattern-in-candidates-p lst pat))
-                   lst
-                 (append (list (cons (helm-aand (propertize "[?]" 'face 'helm-ff-prefix)
-                                                (propertize " " 'display it 'unknown t)
-                                                (concat it pat))
-                                     pat))
-                         lst))))))
+             collect cand)))
 
 (defun helm-comp-read--move-to-first-real-candidate ()
   (helm-aif (helm-get-selection nil 'withprop)
@@ -887,6 +872,19 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                        :mode-line mode-line
                        :help-message help-message
                        :action action-fn))
+           (dummy-src (helm-build-dummy-source "Not matching candidate"
+                        :must-match must-match
+                        :keymap keymap
+                        :filtered-candidate-transformer
+                        (lambda (_candidates _source)
+                          (let ((pat (if raw-candidate
+                                         helm-pattern
+                                       (replace-regexp-in-string "\\s\\" "" helm-pattern))))
+                            (unless (string= pat "")
+                              (list (cons (helm-aand (propertize "[?]" 'face 'helm-ff-prefix)
+                                                     (propertize " " 'display it 'unknown t)
+                                                     (concat it pat))
+                                          pat)))))))
            (src (helm-build-sync-source name
                   :candidates get-candidates
                   :match-part match-part
@@ -935,6 +933,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                     :help-message help-message
                     :action action-fn))
            (src-list (list src-hist
+                           (unless (eq must-match t) dummy-src)
                            (if candidates-in-buffer
                                src-1 src)))
            (helm-execute-action-at-once-if-one exec-when-only-one)
