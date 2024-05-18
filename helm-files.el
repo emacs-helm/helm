@@ -723,11 +723,20 @@ will have no effect, use customize instead."
                (define-key helm-find-files-map (kbd "<right>")  'helm-execute-persistent-action)
                (define-key helm-find-files-map (kbd "<left>")   'helm-find-files-up-one-level)
                (define-key helm-read-file-map (kbd "<right>")  'helm-execute-persistent-action)
-               (define-key helm-read-file-map (kbd "<left>")   'helm-find-files-up-one-level))
+               (define-key helm-read-file-map (kbd "<left>")   'helm-find-files-up-one-level)
+               ;; Dummy map.
+               (define-key helm-find-files-dummy-map (kbd "<right>")  'helm-execute-persistent-action)
+               (define-key helm-find-files-dummy-map (kbd "<left>")   'helm-find-files-up-one-level)
+               (define-key helm-read-file-dummy-map (kbd "<right>")  'helm-execute-persistent-action)
+               (define-key helm-read-file-dummy-map (kbd "<left>")   'helm-find-files-up-one-level))
            (define-key helm-find-files-map (kbd "<right>") nil)
            (define-key helm-find-files-map (kbd "<left>")  nil)
+           (define-key helm-find-files-dummy-map (kbd "<right>") nil)
+           (define-key helm-find-files-dummy-map (kbd "<left>")  nil)
            (define-key helm-read-file-map (kbd "<right>") nil)
-           (define-key helm-read-file-map (kbd "<left>")  nil))))
+           (define-key helm-read-file-map (kbd "<left>")  nil)
+           (define-key helm-read-file-dummy-map (kbd "<right>") nil)
+           (define-key helm-read-file-dummy-map (kbd "<left>")  nil))))
 
 (defcustom helm-ff-DEL-up-one-level-maybe nil
   "Use DEL to maybe go up one level when non nil.

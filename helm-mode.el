@@ -1891,6 +1891,12 @@ See documentation of `completing-read' and `all-completions' for details."
 ;;; Generic read-file-name
 ;;
 ;;
+(defvar helm-read-file-dummy-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-l") 'helm-find-files-up-one-level)
+    map))
+
 ;;;###autoload
 (cl-defun helm-read-file-name
     (prompt
@@ -2011,6 +2017,7 @@ Keys description:
            ;; Non existing file or dir source.
            (unless must-match
              (helm-build-dummy-source "New file or dir"
+               :keymap 'helm-read-file-dummy-map
                :filtered-candidate-transformer
                (lambda (_candidates _source)
                  (unless (file-exists-p helm-pattern)
