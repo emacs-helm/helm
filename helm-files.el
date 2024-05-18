@@ -3516,7 +3516,7 @@ debugging purpose."
           ;; Return PATTERN unchanged.
           (t pattern))))
 
-(defun helm-find-files-get-candidates (&optional require-match)
+(defun helm-find-files-get-candidates ()
   "Create candidate list for `helm-source-find-files'."
   (let* ((path          (helm-ff-set-pattern helm-pattern))
          (dir-p         (file-accessible-directory-p path))
@@ -5595,7 +5595,7 @@ Use it for non-interactive calls of `helm-find-files'."
 (defvar helm-find-files-dummy-source
   (helm-build-dummy-source "New file or dir"
     :filtered-candidate-transformer
-    (lambda (candidates _source)
+    (lambda (_candidates _source)
       (unless (file-exists-p helm-pattern)
         (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))
     :action #'helm-find-file-or-marked))

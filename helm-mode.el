@@ -2009,7 +2009,14 @@ Keys description:
              :must-match must-match
              :nomark nomark
              :action action-fn)
-           ;; Other source.
+           ;; Non existing file or dir source.
+           (unless must-match
+             (helm-build-dummy-source "New file or dir"
+               :filtered-candidate-transformer
+               (lambda (_candidates _source)
+                 (unless (file-exists-p helm-pattern)
+                   (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))))
+           ;; List files source.
            (helm-build-sync-source name
              :header-name (lambda (name)
                             (concat name (substitute-command-keys
@@ -2033,12 +2040,11 @@ Keys description:
                            (cl-loop with hn = (helm-ff--tramp-hostnames)
                                     ;; helm-find-files-get-candidates is
                                     ;; returning a list of cons cells.
-                                    for (d . r) in (helm-find-files-get-candidates
-                                                    must-match)
+                                    for (d . r) in (helm-find-files-get-candidates)
                                     when (or (member r hn) ; A tramp host
                                              (funcall test r)) ; Test ok
                                     collect (cons d r)))
-                 (helm-find-files-get-candidates must-match)))
+                 (helm-find-files-get-candidates)))
              :update (lambda ()
                        (remhash helm-ff-default-directory
                                 helm-ff--list-directory-cache))
