@@ -797,6 +797,10 @@ is only used to test DEFAULT."
                          (helm-get-current-source)))))
 
 (defun helm-apropos-get-default ()
+  "Return the default symbol name at point.
+In Org derived modes, strip the tilde (`~') or equal (`=') characters
+before returning the symbol name. Otherwise, return the symbol name as
+it is. Return the symbol name as a string, or nil if no symbol is found."
   (with-syntax-table emacs-lisp-mode-syntax-table
     (let* ((symbol (thing-at-point 'symbol t))
            (symbol-string (and symbol (substring-no-properties symbol)))
