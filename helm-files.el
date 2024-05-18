@@ -5576,7 +5576,7 @@ Use it for non-interactive calls of `helm-find-files'."
       (setq helm-ff-default-directory nil))))
 
 (defvar helm-find-files-dummy-source
-  (helm-build-dummy-source "New file or dir"
+  (helm-build-dummy-source "New file or directory"
     :filtered-candidate-transformer
     (lambda (_candidates _source)
       (unless (file-exists-p helm-pattern)

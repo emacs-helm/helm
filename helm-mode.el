@@ -2010,7 +2010,7 @@ Keys description:
              :action action-fn)
            ;; Non existing file or dir source.
            (unless (eq must-match t)
-             (helm-build-dummy-source "New file or dir"
+             (helm-build-dummy-source "New file or directory"
                :keymap 'helm-read-file-map
                :must-match must-match
                :filtered-candidate-transformer
