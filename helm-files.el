@@ -304,6 +304,13 @@ It is the source handling new file or directory in `helm-find-files'.")
                                   nil 'helm-ff-delete-char-backward--exit-fn)
     map)
   "Keymap for `helm-read-file-name'.")
+
+(defvar helm-read-file-dummy-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-l") 'helm-find-files-up-one-level)
+    map)
+  "Keymap for `helm-read-file-name' dummy source.")
 
 ;;; User variables
 ;;

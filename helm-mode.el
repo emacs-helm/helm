@@ -1891,12 +1891,6 @@ See documentation of `completing-read' and `all-completions' for details."
 ;;; Generic read-file-name
 ;;
 ;;
-(defvar helm-read-file-dummy-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-l") 'helm-find-files-up-one-level)
-    map))
-
 ;;;###autoload
 (cl-defun helm-read-file-name
     (prompt
