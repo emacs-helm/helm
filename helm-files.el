@@ -3588,7 +3588,8 @@ debugging purpose."
     (when (and (string-match ":\\'" path)
                (file-remote-p basedir nil t))
       (setq helm-pattern basedir))
-    (cond ((string-match helm-ff-tramp-method-regexp path) ; Tramp methods
+    (cond (invalid-basedir nil)
+          ((string-match helm-ff-tramp-method-regexp path) ; Tramp methods
            (mapcar (lambda (method)
                      (helm-ff-filter-candidate-one-by-one
                       (concat "/" ":" method)))
@@ -3599,8 +3600,6 @@ debugging purpose."
                     (eq last-repeatable-command 'helm-execute-persistent-action))
                ;; `ffap-url-regexp' don't match until url is complete.
                (string-match helm-ff-url-regexp path)
-               invalid-basedir
-               (and (not (file-exists-p path)) (string-match "/$" path))
                (and helm--url-regexp (string-match helm--url-regexp path)))
            ;; Do NOT filter boring files here (Bug#2330).
            (list (helm-ff-filter-candidate-one-by-one path nil t)))
@@ -3615,30 +3614,7 @@ debugging purpose."
           ;; is enabled.
           ((and dir-p helm-ff-auto-update-flag)
            (helm-ff-directory-files path))
-          (t (append (unless (or (eq require-match t)
-                                 ;; Check here if path is an existing
-                                 ;; file before adding it to
-                                 ;; candidates, it was previously done
-                                 ;; in the sort function but this
-                                 ;; create a bug with remote files
-                                 ;; when path is at the same time a
-                                 ;; pattern matching a candidate and a
-                                 ;; real candidate e.g. ack and
-                                 ;; ack-grep in /usr/bin. This is due
-                                 ;; presumably to a latency more
-                                 ;; important with remote files which
-                                 ;; lead to a confusion with the
-                                 ;; pattern matching one candidate and
-                                 ;; the real candidate which is same
-                                 ;; as pattern.
-                                 (file-exists-p path)
-                                 ;; When `helm-ff-auto-update-flag' has been
-                                 ;; disabled, whe don't want PATH to be added on top
-                                 ;; if it is a directory.
-                                 dir-p)
-                       ;; Do NOT filter boring files here (Bug#2330).
-                       (list (helm-ff-filter-candidate-one-by-one path nil t)))
-                     (helm-ff-directory-files basedir))))))
+          (t (helm-ff-directory-files basedir)))))
 
 (defun helm-list-directory (directory &optional sel)
   "List directory DIRECTORY.
@@ -5604,7 +5580,7 @@ Use it for non-interactive calls of `helm-find-files'."
     (helm-ff-setup-update-hook)
     (add-hook 'helm-resume-after-hook 'helm-ff--update-resume-after-hook)
     (unwind-protect
-         (helm :sources 'helm-source-find-files
+         (helm :sources '(helm-source-find-files helm-find-files-dummy-source)
                :input fname
                :case-fold-search helm-file-name-case-fold-search
                :preselect preselect
@@ -5615,6 +5591,14 @@ Use it for non-interactive calls of `helm-find-files'."
                :buffer "*helm find files*")
       (helm-ff--update-resume-after-hook nil t)
       (setq helm-ff-default-directory nil))))
+
+(defvar helm-find-files-dummy-source
+  (helm-build-dummy-source "New file or dir"
+    :filtered-candidate-transformer
+    (lambda (candidates _source)
+      (unless (file-exists-p helm-pattern)
+        (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))
+    :action #'helm-find-file-or-marked))
 
 (defun helm-ff--update-resume-after-hook (sources &optional nohook)
   "Meant to be used in `helm-resume-after-hook'.
