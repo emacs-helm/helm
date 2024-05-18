@@ -2998,29 +2998,6 @@ hitting C-j on \"..\"."
           (helm-mark-current-line)))
       (setq helm-ff-last-expanded nil))))
 
-(defun helm-ff-move-to-first-real-candidate ()
-  "When candidate is an incomplete file name move to first real candidate."
-  (let* ((src (helm-get-current-source))
-         (name (assoc-default 'name src))
-         ;; Ensure `helm-file-completion-source-p' returns nil on
-         ;; `helm-read-file-name' history.
-         minibuffer-completing-file-name)
-    (helm-aif (and (helm-file-completion-source-p src)
-                   (not (helm-empty-source-p))
-                   ;; Prevent dired commands moving to first real
-                   ;; (Bug#910).
-                   (or (memq (intern-soft name)
-                             helm-ff-goto-first-real-dired-exceptions)
-                       (not (string-match "\\`[Dd]ired-" name)))
-                   helm-ff--move-to-first-real-candidate
-                   (helm-get-selection nil nil src))
-        (unless (or (not (stringp it))
-                    (and (string-match helm-tramp-file-name-regexp it)
-                         (not (file-remote-p it nil t)))
-                    (string-match helm-ff-tramp-method-regexp it)
-                    (file-exists-p it))
-          (helm-next-line)))))
-
 (defun helm-ff-undo ()
   "Undo minibuffer in `helm-find-files'.
 Ensure disabling `helm-ff-auto-update-flag' before undoing."
@@ -3066,18 +3043,7 @@ when `helm-pattern' is equal to \"~/\"."
                (candnum (helm-get-candidate-number))
                (lt2-p   (and (<= candnum 2)
                              (>= (string-width (helm-basename helm-pattern)) 2)))
-               (cur-cand (prog2
-                             (unless (or completed-p
-                                         (file-exists-p pat)
-                                         history-p (null lt2-p))
-                               ;; Only one non--existing candidate
-                               ;; and one directory candidate, move to it,
-                               ;; but not when renaming, copying etc...,
-                               ;; so for this use
-                               ;; `helm-ff-move-to-first-real-candidate'
-                               ;; instead of `helm-next-line' (Bug#910).
-                               (helm-ff-move-to-first-real-candidate))
-                             (helm-get-selection nil nil src)))
+               (cur-cand (helm-get-selection nil nil src))
                expand-to)
           (when (and (or (and helm-ff-auto-update-flag
                               (null helm-ff--deleting-char-backward)
@@ -5622,7 +5588,6 @@ source is `helm-source-find-files'."
 
 (defun helm-ff-setup-update-hook ()
   (dolist (hook '(helm-ff-clean-initial-input ; Add to be called first.
-                  helm-ff-move-to-first-real-candidate
                   helm-ff-update-when-only-one-matched
                   helm-ff-auto-expand-to-home-or-root))
     (add-hook 'helm-after-update-hook hook)))
@@ -5632,7 +5597,6 @@ source is `helm-source-find-files'."
           (remove-hook 'helm-after-update-hook hook))
         '(helm-ff-auto-expand-to-home-or-root
           helm-ff-update-when-only-one-matched
-          helm-ff-move-to-first-real-candidate
           helm-ff-clean-initial-input))
   (maphash (lambda (k _v)
              (when (member k helm-ff--thumbnailed-directories)

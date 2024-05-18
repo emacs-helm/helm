@@ -1963,8 +1963,7 @@ Keys description:
     (kill-buffer helm-action-buffer))
   (mapc (lambda (hook)
           (add-hook 'helm-after-update-hook hook))
-        '(helm-ff-move-to-first-real-candidate
-          helm-ff-update-when-only-one-matched
+        '(helm-ff-update-when-only-one-matched
           helm-ff-auto-expand-to-home-or-root))
   (let* ((action-fn `(("Sole action (Identity)"
                        . (lambda (candidate)
