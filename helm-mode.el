@@ -2009,9 +2009,10 @@ Keys description:
              :nomark nomark
              :action action-fn)
            ;; Non existing file or dir source.
-           (unless must-match
+           (unless (eq must-match t)
              (helm-build-dummy-source "New file or dir"
                :keymap 'helm-read-file-dummy-map
+               :must-match must-match
                :filtered-candidate-transformer
                (lambda (_candidates _source)
                  (unless (file-exists-p helm-pattern)
