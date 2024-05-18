@@ -5558,13 +5558,26 @@ Use it for non-interactive calls of `helm-find-files'."
       (helm-ff--update-resume-after-hook nil t)
       (setq helm-ff-default-directory nil))))
 
+(defvar helm-find-files-dummy-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-T") 'helm-ff-run-touch-files)
+    (define-key map (kbd "C-c r") 'helm-ff-run-find-file-as-root)
+    map)
+  "The map used for `helm-find-files-dummy-source'.
+It is the source handling new file or directory in `helm-find-files'.")
+
 (defvar helm-find-files-dummy-source
   (helm-build-dummy-source "New file or dir"
     :filtered-candidate-transformer
     (lambda (_candidates _source)
       (unless (file-exists-p helm-pattern)
         (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))
-    :action #'helm-find-file-or-marked))
+    :keymap 'helm-find-files-dummy-map
+    :action (helm-make-actions
+             "Find File" 'helm-find-file-or-marked
+             "Find file as root `C-c r'" 'helm-find-file-as-root
+             "Touch File(s) `M-T'" 'helm-ff-touch-files)))
 
 (defun helm-ff--update-resume-after-hook (sources &optional nohook)
   "Meant to be used in `helm-resume-after-hook'.
