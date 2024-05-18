@@ -268,6 +268,16 @@ Should not be used among other sources.")
     map)
   "Keymap for `helm-find-files'.")
 
+(defvar helm-find-files-dummy-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-T") 'helm-ff-run-touch-files)
+    (define-key map (kbd "C-c r") 'helm-ff-run-find-file-as-root)
+    (define-key map (kbd "C-l") 'helm-find-files-up-one-level)
+    map)
+  "The map used for `helm-find-files-dummy-source'.
+It is the source handling new file or directory in `helm-find-files'.")
+
 (defvar helm-read-file-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -5566,16 +5576,6 @@ Use it for non-interactive calls of `helm-find-files'."
                :buffer "*helm find files*")
       (helm-ff--update-resume-after-hook nil t)
       (setq helm-ff-default-directory nil))))
-
-(defvar helm-find-files-dummy-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-T") 'helm-ff-run-touch-files)
-    (define-key map (kbd "C-c r") 'helm-ff-run-find-file-as-root)
-    (define-key map (kbd "C-l") 'helm-find-files-up-one-level)
-    map)
-  "The map used for `helm-find-files-dummy-source'.
-It is the source handling new file or directory in `helm-find-files'.")
 
 (defvar helm-find-files-dummy-source
   (helm-build-dummy-source "New file or dir"
