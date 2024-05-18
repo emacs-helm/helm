@@ -5563,6 +5563,7 @@ Use it for non-interactive calls of `helm-find-files'."
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-T") 'helm-ff-run-touch-files)
     (define-key map (kbd "C-c r") 'helm-ff-run-find-file-as-root)
+    (define-key map (kbd "C-l") 'helm-find-files-up-one-level)
     map)
   "The map used for `helm-find-files-dummy-source'.
 It is the source handling new file or directory in `helm-find-files'.")
