@@ -580,12 +580,6 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                               (t c)))
            collect cand))
 
-(defun helm-comp-read--move-to-first-real-candidate ()
-  (helm-aif (helm-get-selection nil 'withprop)
-      ;; Avoid error with candidates with an image as display (Bug#2296).
-      (when (helm-candidate-prefixed-p it)
-        (helm-next-line))))
-
 (defun helm-cr-default (default cands)
   (delq nil
         (cond ((and (consp default) (string= helm-pattern ""))
@@ -945,22 +939,19 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
       (when raw-candidate
         (cl-loop for src in src-list
                  do (helm-set-attr 'raw-candidate t src)))
-      (add-hook 'helm-after-update-hook 'helm-comp-read--move-to-first-real-candidate)
-      (unwind-protect
-           (setq result (helm
-                         :sources src-list
-                         :input initial-input
-                         :default default
-                         :preselect preselect
-                         :prompt prompt
-                         :resume 'noresume
-                         :keymap keymap ;; Needed with empty collection.
-                         :allow-nest allow-nest
-                         :candidate-number-limit candidate-number-limit
-                         :case-fold-search case-fold
-                         :history (and (symbolp input-history) input-history)
-                         :buffer buffer))
-        (remove-hook 'helm-after-update-hook 'helm-comp-read--move-to-first-real-candidate))
+      (setq result (helm
+                    :sources src-list
+                    :input initial-input
+                    :default default
+                    :preselect preselect
+                    :prompt prompt
+                    :resume 'noresume
+                    :keymap keymap ;; Needed with empty collection.
+                    :allow-nest allow-nest
+                    :candidate-number-limit candidate-number-limit
+                    :case-fold-search case-fold
+                    :history (and (symbolp input-history) input-history)
+                    :buffer buffer))
       ;; If `history' is a symbol save it, except when it is t.
       (when (and result history (symbolp history) (not (eq history t)))
         (set history
