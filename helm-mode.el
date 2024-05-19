@@ -1991,6 +1991,17 @@ Keys description:
           (replace-regexp-in-string "helm-maybe-exit-minibuffer"
                                     "helm-confirm-and-exit-minibuffer"
                                     helm-read-file-name-mode-line-string))
+         (dummy-src
+          (unless (eq must-match t)
+            ;; Non existing file or dir source.
+            (helm-build-dummy-source "New file or directory"
+              :keymap 'helm-read-file-map
+              :must-match must-match
+              :filtered-candidate-transformer
+              (lambda (_candidates _source)
+                (unless (file-exists-p helm-pattern)
+                  (list (helm-ff-filter-candidate-one-by-one
+                         helm-pattern nil t)))))))
          (src-list
           (list
            ;; History source.
@@ -2008,15 +2019,6 @@ Keys description:
              :must-match must-match
              :nomark nomark
              :action action-fn)
-           ;; Non existing file or dir source.
-           (unless (eq must-match t)
-             (helm-build-dummy-source "New file or directory"
-               :keymap 'helm-read-file-map
-               :must-match must-match
-               :filtered-candidate-transformer
-               (lambda (_candidates _source)
-                 (unless (file-exists-p helm-pattern)
-                   (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))))
            ;; List files source.
            (helm-build-sync-source name
              :header-name (lambda (name)
@@ -2063,8 +2065,9 @@ Keys description:
              :action action-fn)))
          ;; Helm result.
          (result (helm
-                  :sources (if helm-mode-reverse-history
-                               (reverse src-list) src-list)
+                  :sources (append (if helm-mode-reverse-history
+                                       (reverse src-list) src-list)
+                                   (list dummy-src))
                   :input (if (string-match helm-ff-url-regexp initial-input)
                              initial-input
                            (expand-file-name initial-input))
