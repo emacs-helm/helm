@@ -3,6 +3,13 @@
 * NEWS
 ** Version 3.9.9-pre
 
+*** Now new file and dir have a dummy source in HFF, same for completing-read's
+and read-file-name.
+*** helm-info-at-point shows index of current page in addition of default
+
+So it can safely be used as a replacement of "i" in Info.
+
+*** Add affixation function for eww (emacs-30 only)
 *** Allow toggling auto update in helm-top with a prefix arg
 *** Do not use `dired-create-destination-dirs` mechanism for directory creation
 as it is not working in some cases (e.g. symlinks).
