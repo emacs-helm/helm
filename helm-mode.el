@@ -2597,10 +2597,6 @@ Can be used for `completion-in-region-function' by advicing it with an
                  ;; completion-in-region, try anyway never know.
                  (afix (or (plist-get completion-extra-properties :affixation-function)
                            (completion-metadata-get metadata 'affixation-function)))
-                 (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
-                                                (string-suffix-p " " input)
-                                                (string= input ""))
-                                      " "))
                  (category (or (eq (completion-metadata-get metadata 'category) 'file)
                                (eq (plist-get completion-extra-properties :category) 'file)))
                  (file-comp-p (or (eq category 'file)
@@ -2673,18 +2669,16 @@ Can be used for `completion-in-region-function' by advicing it with an
                             :initial-input
                             (cond ((and file-comp-p
                                         (not (string-match "/\\'" initial-input)))
-                                   (concat (helm-mode--completion-in-region-initial-input
-                                            (if (memq helm-completion-style '(helm helm-fuzzy))
-                                                (helm-basename initial-input)
-                                              initial-input))
-                                           init-space-suffix))
+                                   (helm-mode--completion-in-region-initial-input
+                                    (if (memq helm-completion-style '(helm helm-fuzzy))
+                                        (helm-basename initial-input)
+                                      initial-input)))
                                   ((string-match "/\\'" initial-input)
                                    (and (eq helm-completion-style 'emacs) initial-input))
                                   ((or (null require-match)
                                        (stringp require-match))
                                    (helm-mode--completion-in-region-initial-input initial-input))
-                                  (t (concat (helm-mode--completion-in-region-initial-input initial-input)
-                                             init-space-suffix)))
+                                  (t (helm-mode--completion-in-region-initial-input initial-input)))
                             :buffer buf-name
                             :fc-transformer
                             (append (and (or afix afun (memq category '(file library)))
