@@ -798,7 +798,10 @@ is only used to test DEFAULT."
 
 (defun helm-apropos-get-default ()
   (with-syntax-table emacs-lisp-mode-syntax-table
-    (symbol-name (intern-soft (thing-at-point 'symbol)))))
+    (symbol-name (intern-soft
+                  (helm-aand (thing-at-point 'symbol t)
+                             (replace-regexp-in-string "\\`[~=]" "" it)
+                             (replace-regexp-in-string "[~=]\\'" "" it))))))
 
 ;;;###autoload
 (defun helm-apropos (default)
