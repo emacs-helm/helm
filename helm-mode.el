@@ -563,24 +563,22 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
       (member (downcase pattern) candidates)
       (member (upcase pattern) candidates)))
 
-(defun helm-cr-default-transformer (candidates source)
+(defun helm-cr-default-transformer (candidates _source)
   "Default filter candidate function for `helm-comp-read'."
-  (let ((must-match (helm-get-attr 'must-match source))
-        (raw-candidate (helm-get-attr 'raw-candidate source)))
-    ;; Annotation and affixation are already handled in completion-in-region and
-    ;; in helm-completing-read-default-2 when emacs style is in use.
-    ;; For helm-completing-read-default-1 we handle them in an extra FCT; This
-    ;; allows extracting annotation and affixation from metadata which is not
-    ;; accessible from here.
-    (cl-loop for c in candidates
-             for cand = (let ((elm (if (stringp c)
-                                       (replace-regexp-in-string "\\s\\" "" c)
-                                     c)))
-                          (cond ((and (stringp elm)
-                                      (string-match "\n" elm))
-                                 (cons (replace-regexp-in-string "\n" "->" elm) c))
-                                (t c)))
-             collect cand)))
+  ;; Annotation and affixation are already handled in completion-in-region and
+  ;; in helm-completing-read-default-2 when emacs style is in use.
+  ;; For helm-completing-read-default-1 we handle them in an extra FCT; This
+  ;; allows extracting annotation and affixation from metadata which is not
+  ;; accessible from here.
+  (cl-loop for c in candidates
+           for cand = (let ((elm (if (stringp c)
+                                     (replace-regexp-in-string "\\s\\" "" c)
+                                   c)))
+                        (cond ((and (stringp elm)
+                                    (string-match "\n" elm))
+                               (cons (replace-regexp-in-string "\n" "->" elm) c))
+                              (t c)))
+           collect cand))
 
 (defun helm-comp-read--move-to-first-real-candidate ()
   (helm-aif (helm-get-selection nil 'withprop)
