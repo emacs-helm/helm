@@ -2576,13 +2576,13 @@ Can be used for `completion-in-region-function' by advicing it with an
                  (crm (eq current-command 'crm-complete))
                  (str-command (helm-symbol-name current-command))
                  (buf-name (format "*helm-mode-%s*" str-command))
-                 (require-match (or (and (boundp 'require-match) require-match)
-                                    minibuffer-completion-confirm
-                                    ;; If prompt have not been propagated here, that's
-                                    ;; probably mean we have no prompt and we are in
-                                    ;; completion-at-point or friend, so use a non--nil
-                                    ;; value for require-match.
-                                    (not (boundp 'prompt))))
+                 (require-match (cond ((boundp 'require-match) require-match)
+                                      (minibuffer-completion-confirm)
+                                      ;; If prompt have not been propagated here, that's
+                                      ;; probably mean we have no prompt and we are in
+                                      ;; completion-at-point or friend, so use a non--nil
+                                      ;; value for require-match.
+                                      ((not (boundp 'prompt)))))
                  (metadata (completion-metadata input collection predicate))
                  ;; `completion-extra-properties' is let-bounded in `completion-at-point'.
                  ;; `afun' is a closure to call against each string in `data'.
