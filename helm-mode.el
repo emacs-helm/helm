@@ -933,7 +933,6 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                     :help-message help-message
                     :action action-fn))
            (src-list (list src-hist
-                           (unless (eq must-match t) dummy-src)
                            (if candidates-in-buffer
                                src-1 src)))
            (helm-execute-action-at-once-if-one exec-when-only-one)
@@ -943,6 +942,8 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
         (setq src-list (cl-loop for src in src-list
                              collect (cons '(nomark) src))))
       (when reverse-history (setq src-list (nreverse src-list)))
+      (unless (eq must-match t)
+        (setq src-list (append src-list (list dummy-src))))
       (when raw-candidate
         (cl-loop for src in src-list
                  do (helm-set-attr 'raw-candidate t src)))
