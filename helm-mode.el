@@ -864,7 +864,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                        :mode-line mode-line
                        :help-message help-message
                        :action action-fn))
-           (dummy-src (helm-build-dummy-source "Not matching candidate"
+           (dummy-src (helm-build-dummy-source "Unknown candidate"
                         :must-match must-match
                         :keymap keymap
                         :filtered-candidate-transformer
