@@ -5583,11 +5583,8 @@ Use it for non-interactive calls of `helm-find-files'."
     (lambda (_candidates _source)
       (unless (file-exists-p helm-pattern)
         (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))
-    :keymap 'helm-find-files-dummy-map
-    :action (helm-make-actions
-             "Find File" 'helm-find-file-or-marked
-             "Find file as root `C-c r'" 'helm-find-file-as-root
-             "Touch File(s) `M-T'" 'helm-ff-touch-files)))
+    :keymap 'helm-find-files-map
+    :action 'helm-find-files-actions))
 
 (defun helm-ff--update-resume-after-hook (sources &optional nohook)
   "Meant to be used in `helm-resume-after-hook'.
