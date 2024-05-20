@@ -874,8 +874,8 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                                        (replace-regexp-in-string "\\s\\" "" helm-pattern))))
                             (unless (string= pat "")
                               (list (cons (helm-aand (propertize "[?]" 'face 'helm-ff-prefix)
-                                                     (propertize " " 'display it 'unknown t)
-                                                     (concat it pat))
+                                                     (propertize
+                                                      pat 'display (concat it pat) 'unknown t))
                                           pat)))))))
            (src (helm-build-sync-source name
                   :candidates get-candidates
