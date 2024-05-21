@@ -588,10 +588,10 @@ On completion (\\[helm-ff-run-complete-fn-at-point]):
 
 Use of wildcard is supported to run an action over a set of files.
 
-Example: You can copy all the files with \".el\" extension by using \"*.el\" and
+Example: You can copy all the files with \".el\" extension by using \"​*.el\" and
 then run copy action.
 
-Similarly, \"**.el\" (note the two stars) will recursively select all \".el\"
+Similarly, \"​*​*.el\" (note the two stars) will recursively select all \".el\"
 files under the current directory.
 
 Note that when recursively copying files, you may have files with same name
@@ -606,7 +606,7 @@ to backup files in current directory.
 This command is available only when `dired-async-mode' is active.
 
 When using an action that involves an external backend (e.g. grep), using \"**\"
-is not recommended (even thought it works fine) because it will be slower to
+is not recommended (even though it works fine) because it will be slower to
 select all the files.  You are better off leaving the backend to do it, it will
 be faster.  However, if you know you have not many files it is reasonable to use
 this, also using not recursive wildcard (e.g. \"*.el\") is perfectly fine for
@@ -614,14 +614,14 @@ this.
 
 The \"**\" feature is active by default in the option `helm-file-globstar'.  It
 is different from the Bash \"shopt globstar\" feature in that to list files with
-a named extension recursively you would write \"**.el\" whereas in Bash it would
-be \"**/*.el\".  Directory selection with \"**/\" like Bash \"shopt globstar\"
+a named extension recursively you would write \"​*​*.el\" whereas in Bash it would
+be \"​*​*/​*.el\".  Directory selection with \"​*​*/\" like Bash \"shopt globstar\"
 option is not supported yet.
 
 Helm supports different styles of wildcards:
 
 - `sh' style, the ones supported by `file-expand-wildcards'.
-e.g. \"*.el\", \"*.[ch]\" which match respectively all \".el\"
+e.g. \"​*.el\", \"​*.[ch]\" which match respectively all \".el\"
 files or all \".c\" and \".h\" files.
 
 - `bash' style (partially) In addition to what allowed in `sh'
