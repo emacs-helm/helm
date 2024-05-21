@@ -1637,7 +1637,7 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
   "Set file mode on marked files.
 If no mode is specified in prompt, default mode will be the mode of
 the car of marked files i.e. the first marked file."
-  (let* ((mkd        (helm-marked-candidates))
+  (let* ((mkd        (helm-marked-candidates :with-wildcard t))
          (model      (car mkd))
          (default    (helm-file-attributes model :octal t))
          (mode       (read-file-modes nil model))
