@@ -1683,23 +1683,14 @@ Use either `helm-completing-read-default-1' or `helm-completing-read-default-2'
 according to `helm-completion-style'."
   (let* (;; Standard will be used as CANDS-IN-BUFFER arg.
          (standard (and (memq helm-completion-style '(helm helm-fuzzy)) t))
-         (def (or default (helm-mode--find-default-in-prompt prompt)))
          (fn (if standard
                  #'helm-completing-read-default-1
                #'helm-completing-read-default-2)))
     (funcall fn
              prompt collection test require-match
-             init hist def inherit-input-method name buffer
+             init hist default inherit-input-method name buffer
              ;; CANDS-IN-BUFFER
              standard)))
-
-(defun helm-mode--find-default-in-prompt (prompt)
-  ;; Some completing-read's are providing DEFAULT in prompt but the DEFAULT
-  ;; argument of completing-read is not provided, try here to extract DEFAULT
-  ;; from PROMPT which is typically a prompt builded with format-prompt.
-  ;; See `describe-language-environment' as example.
-  (when (string-match "\\`.*\\([(]default \\(.*\\)[)]\\):" prompt)
-    (match-string 2 prompt)))
 
 (defun helm-mode--read-buffer-to-switch (prompt)
   "[INTERNAL] This is used to advice `read-buffer-to-switch'.
