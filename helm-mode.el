@@ -2055,6 +2055,7 @@ Keys description:
                            (expand-file-name initial-input))
                   :prompt prompt
                   :candidate-number-limit candidate-number-limit
+                  :dim-prompt-on-update t
                   :resume 'noresume
                   :case-fold-search case-fold
                   :default default

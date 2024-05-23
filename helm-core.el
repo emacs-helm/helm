@@ -1992,6 +1992,12 @@ The hook should takes one arg SOURCES.")
 
 (defvar helm-last-query ""
   "The value of `helm-pattern' is stored here exit or quit.")
+
+(defvar helm-dim-prompt-on-update nil
+  "Dim prompt when updating.
+Do not set this globaly.  Do not use this in async sources or in
+commands using an async source in their sources.
+Use this either let-bounded of helm buffer local.")
 
 ;; Utility: logging
 (defun helm-log (from format-string &rest args)
@@ -5054,53 +5060,64 @@ without recomputing them, it should be a list of lists."
     (with-helm-window (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
-    (unwind-protect
-        (let (sources matches)
-          ;; Collect sources ready to be updated.
-          (setq sources
-                (cl-loop for src in helm-sources
-                         when (helm-update-source-p src)
-                         collect src))
-          ;; When no sources to update erase buffer to avoid duplication of
-          ;; header and candidates when next chunk of update will arrive,
-          ;; otherwise the buffer is erased AFTER [1] the results are
-          ;; computed. This is also needed when pattern is quickly deleted
-          ;; backward and we reach requires-pattern limit, in this case the helm
-          ;; buffer is not updated and stays with the results of the last
-          ;; matching pattern.
-          (unless sources (erase-buffer))
-          ;; Compute matches without rendering the sources.
-          ;; This prevent the helm-buffer flickering when constantly
-          ;; updating.
-          (helm-log "helm-update" "Matches: %S"
-                    (setq matches (or candidates (helm--collect-matches sources))))
-          ;; If computing matches finished and is not interrupted
-          ;; erase the helm-buffer and render results (Fix #1157).
-          (when matches ;; nil only when interrupted by while-no-input.
-            (erase-buffer)
-            (cl-loop for src in sources
-                     for mtc in matches
-                     do (helm-render-source src mtc))
-            ;; Move to first line only when there is matches
-            ;; to avoid cursor moving upside down (Bug#1703).
-            (helm--update-move-first-line)))
-      ;; When there is only one async source, update mode-line and run
-      ;; `helm-after-update-hook' in `helm-output-filter--post-process',
-      ;; when there is more than one source, update mode-line and run
-      ;; `helm-after-update-hook' now even if an async source is
-      ;; present and running in BG.
-      (let ((src (or source (helm-get-current-source))))
-        (unless (assq 'candidates-process src)
-          (helm-display-mode-line src 'force)
-          (helm-log-run-hook "helm-update" 'helm-after-update-hook)))
-      (when preselect
-        (helm-log "helm-update" "Update preselect candidate %s" preselect)
-        (if (helm-window)
-            (with-helm-window (helm-preselect preselect source))
-          (helm-preselect preselect source)))
-      (setq helm--force-updating-p nil)
-      (helm--reset-update-flag))
-    (helm-log "helm-update" "end update")))
+    (let ((ov '(nil)))
+      (unwind-protect
+           (let (sources matches)
+             ;; Collect sources ready to be updated.
+             (setq sources
+                   (cl-loop for src in helm-sources
+                            when (helm-update-source-p src)
+                            collect src))
+             ;; When no sources to update erase buffer to avoid duplication of
+             ;; header and candidates when next chunk of update will arrive,
+             ;; otherwise the buffer is erased AFTER [1] the results are
+             ;; computed. This is also needed when pattern is quickly deleted
+             ;; backward and we reach requires-pattern limit, in this case the helm
+             ;; buffer is not updated and stays with the results of the last
+             ;; matching pattern.
+             (unless sources (erase-buffer))
+             (helm-maybe-dim-prompt-on-update ov)
+             ;; Compute matches without rendering the sources.
+             ;; This prevent the helm-buffer flickering when constantly
+             ;; updating.
+             (helm-log "helm-update" "Matches: %S"
+                       (setq matches (or candidates (helm--collect-matches sources))))
+             ;; If computing matches finished and is not interrupted
+             ;; erase the helm-buffer and render results (Fix #1157).
+             (when matches ;; nil only when interrupted by while-no-input.
+               (erase-buffer)
+               (cl-loop for src in sources
+                        for mtc in matches
+                        do (helm-render-source src mtc))
+               ;; Move to first line only when there is matches
+               ;; to avoid cursor moving upside down (Bug#1703).
+               (helm--update-move-first-line)))
+        ;; When there is only one async source, update mode-line and run
+        ;; `helm-after-update-hook' in `helm-output-filter--post-process',
+        ;; when there is more than one source, update mode-line and run
+        ;; `helm-after-update-hook' now even if an async source is
+        ;; present and running in BG.
+        (let ((src (or source (helm-get-current-source))))
+          (unless (assq 'candidates-process src)
+            (helm-display-mode-line src 'force)
+            (and (car ov) (delete-overlay (car ov)))
+            (helm-log-run-hook "helm-update" 'helm-after-update-hook)))
+        (when preselect
+          (helm-log "helm-update" "Update preselect candidate %s" preselect)
+          (if (helm-window)
+              (with-helm-window (helm-preselect preselect source))
+            (helm-preselect preselect source)))
+        (setq helm--force-updating-p nil)
+        (helm--reset-update-flag))
+      (helm-log "helm-update" "end update"))))
+
+(defun helm-maybe-dim-prompt-on-update (overlay)
+  "Make minibuffer foreground gray while updating."
+  (when (and helm-dim-prompt-on-update (not (helm-empty-buffer-p)))
+    (with-selected-window (minibuffer-window)
+      (setcar overlay (make-overlay (minibuffer-prompt-end) (point-max)))
+      (overlay-put (car overlay) 'face `(:foreground "DimGray"))
+      (redisplay))))
 
 (defun helm-update-source-p (source)
   "Whether SOURCE needs updating or not."

@@ -938,6 +938,10 @@ want to use it, helm is still providing
 (defcustom helm-ff-ignore-following-on-directory nil
   "In follow mode ignore silently directories when non nil."
   :type 'boolean)
+
+(defcustom helm-ff-dim-prompt-on-update t
+  "When non nil dim prompt while updating."
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -5571,6 +5575,7 @@ Use it for non-interactive calls of `helm-find-files'."
                :preselect preselect
                :ff-transformer-show-only-basename
                helm-ff-transformer-show-only-basename
+               :dim-prompt-on-update helm-ff-dim-prompt-on-update
                :default def
                :prompt "Find files or url: "
                :buffer "*helm find files*")
