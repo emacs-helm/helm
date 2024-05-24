@@ -397,18 +397,17 @@ NOT `setq'."
                                           (wfnames-mode . (emacs helm flex)))
   "Allow configuring `helm-completion-style' per mode or command.
 
-NOTE: Use a mode for a completion that will be used in a buffer
-i.e. completion-in-region, whereas you have to specify instead a
-command to affect the completing-read trigerred by this
-command. Commands specified in `helm-completing-read-handlers-alist' take
-precedence on commands you put here.
+NOTE: Commands involving `completing-read' specified in
+`helm-completing-read-handlers-alist' take precedence on commands
+you put here.
 
-Each entry is a cons cell like (mode . style) where style must be
-a suitable value for `helm-completion-style'.  When specifying
-emacs as style for a mode or a command, `completion-styles' can
-be specified by using a cons cell specifying completion-styles to
-use with helm emacs style, e.g. (foo-mode . (emacs helm flex))
-will set `completion-styles' to \\='(helm flex) for foo-mode."
+Each entry is a cons cell like (mode_or_command . style) where
+style must be a suitable value for `helm-completion-style'.  When
+specifying emacs as style for a mode or a command,
+`completion-styles' can be specified by using a cons cell
+specifying completion-styles to use with helm emacs style,
+e.g. (foo-mode . (emacs helm flex)) will set `completion-styles'
+to \\='(helm flex) for foo-mode."
   :group 'helm-mode
   :type
   `(alist :key-type (symbol :tag "Major Mode")
@@ -2534,8 +2533,19 @@ Can be used for `completion-in-region-function' by advicing it with an
           ;; relaying on crap old completion-styles emacs22 which
           ;; add suffix after prefix. e.g. def|else.
           (initial-input (buffer-substring-no-properties start (point)))
+          (current-command (or (helm-this-command)
+                               this-command
+                               ;; Some backends are async and
+                               ;; use a callback, in those
+                               ;; cases, we can't retrieve from
+                               ;; frames the last interactive
+                               ;; command, so fallback to
+                               ;; `last-command' which may be
+                               ;; the one that called the callback.
+                               last-command))
           string)
-      (helm-aif (cdr (assq major-mode helm-completion-styles-alist))
+      (helm-aif (cdr (or (assq major-mode helm-completion-styles-alist)
+                         (assq current-command helm-completion-styles-alist)))
           (customize-set-variable 'helm-completion-style
                                   (if (cdr-safe it) (car it) it)))
       ;; This hook force usage of the display part of candidate with
@@ -2550,16 +2560,6 @@ Can be used for `completion-in-region-function' by advicing it with an
                  (input (buffer-substring-no-properties start end))
                  (prefix (and (eq helm-completion-style 'emacs) initial-input))
                  (point (point))
-                 (current-command (or (helm-this-command)
-                                      this-command
-                                      ;; Some backends are async and
-                                      ;; use a callback, in those
-                                      ;; cases, we can't retrieve from
-                                      ;; frames the last interactive
-                                      ;; command, so fallback to
-                                      ;; `last-command' which may be
-                                      ;; the one that called the callback.
-                                      last-command))
                  (crm (eq current-command 'crm-complete))
                  (str-command (helm-symbol-name current-command))
                  (buf-name (format "*helm-mode-%s*" str-command))
