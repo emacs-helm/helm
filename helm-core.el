@@ -5116,7 +5116,7 @@ without recomputing them, it should be a list of lists."
   (when (and helm-dim-prompt-on-update (not (helm-empty-buffer-p)))
     (with-selected-window (minibuffer-window)
       (setcar overlay (make-overlay (minibuffer-prompt-end) (point-max)))
-      (overlay-put (car overlay) 'face `(:foreground "DimGray"))
+      (overlay-put (car overlay) 'face '(:foreground "DimGray"))
       (redisplay))))
 
 (defun helm-update-source-p (source)
