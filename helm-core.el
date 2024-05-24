@@ -5112,7 +5112,8 @@ without recomputing them, it should be a list of lists."
       (helm-log "helm-update" "end update"))))
 
 (defun helm-maybe-dim-prompt-on-update (overlay)
-  "Make minibuffer foreground gray while updating."
+  "Make minibuffer foreground gray while updating.
+Argument OVERLAY is a ref-cell."
   (when (and helm-dim-prompt-on-update (not (helm-empty-buffer-p)))
     (with-selected-window (minibuffer-window)
       (setcar overlay (make-overlay (minibuffer-prompt-end) (point-max)))

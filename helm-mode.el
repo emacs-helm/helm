@@ -399,7 +399,9 @@ NOT `setq'."
 
 NOTE: Commands involving `completing-read' specified in
 `helm-completing-read-handlers-alist' take precedence on commands
-you put here.
+you put here.  Specifying a mode instead of a command affect only
+completion-in-region and not the completing-read's called in this mode, use
+`helm-completing-read-handlers-alist' for this.
 
 Each entry is a cons cell like (mode_or_command . style) where
 style must be a suitable value for `helm-completion-style'.  When
