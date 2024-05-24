@@ -1340,7 +1340,7 @@ used to modify each element of LIST to be displayed in PROMPT."
   (or (cl-loop for c across str always (char-equal c ?0))
       (not (zerop (string-to-number str)))))
 
-(defun helm-re-search-forward (regexp &optional bound noerror count)
+(defsubst helm-re-search-forward (regexp &optional bound noerror count)
   "Same as `re-search-forward' but return nil when point doesn't move.
 This avoid possible infloop when a wrong regexp is entered in minibuffer."
   ;; See Issue#2652 and Issue#2653.
