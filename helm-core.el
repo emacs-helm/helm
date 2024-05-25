@@ -5114,7 +5114,9 @@ without recomputing them, it should be a list of lists."
 (defun helm-maybe-dim-prompt-on-update (overlay)
   "Make minibuffer foreground gray while updating.
 Argument OVERLAY is a ref-cell."
-  (when (and helm-dim-prompt-on-update (not (helm-empty-buffer-p)))
+  (when (and helm-dim-prompt-on-update
+             ;; Avoid an empty window when coming from bookmarks.
+             (not (helm-empty-buffer-p)))
     (with-selected-window (minibuffer-window)
       (setcar overlay (make-overlay (minibuffer-prompt-end) (point-max)))
       (overlay-put (car overlay) 'face '(:foreground "DimGray"))
