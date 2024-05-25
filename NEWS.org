@@ -3,8 +3,13 @@
 * NEWS
 ** Version 3.9.9-pre
 
+*** helm-completion-styles-alist accepts commands for completion-in-region
+*** Minibuffer-contents change color in HFF when updating
+This is controlled by =helm-ff-dim-prompt-on-update= user variable.
+
 *** Now new file and dir have a dummy source in HFF, same for completing-read's
 and read-file-name.
+
 *** helm-info-at-point shows index of current page in addition of default
 
 So it can safely be used as a replacement of "i" in Info.
