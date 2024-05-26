@@ -1040,7 +1040,7 @@ Assume regexp is a pcre based regexp."
              (member (assoc-default 'name (helm-get-current-source))
                      helm-sources-using-help-echo-popup))
     (setq helm--show-help-echo-timer
-          (run-with-timer
+          (run-with-idle-timer
            1 nil
            (lambda ()
              (save-selected-window
