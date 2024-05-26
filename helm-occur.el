@@ -272,6 +272,7 @@ engine beeing completely different and also much faster."
   "Return CANDIDATES prefixed with line number."
   (cl-loop with buf = (helm-get-attr 'buffer-name source)
            for c in candidates
+           for bfname = (buffer-file-name (get-buffer buf))
            for disp-linum = (when (string-match helm-occur--search-buffer-regexp c)
                               (let ((linum (match-string 1 c))
                                     (disp (match-string 2 c)))
@@ -279,9 +280,10 @@ engine beeing completely different and also much faster."
                                  linum
                                  (format "%s:%s"
                                          (propertize
-                                          linum 'face 'helm-grep-lineno
-                                          'help-echo (buffer-file-name
-                                                      (get-buffer buf)))
+                                          linum
+                                          'face 'helm-grep-lineno
+                                          'help-echo bfname
+                                          'helm-grep-fname bfname)
                                          disp))))
            for linum = (car disp-linum)
            for disp = (cadr disp-linum)
@@ -734,12 +736,13 @@ numbered.  The property \\='buffer-name is added to the whole string."
   (let* ((split  (helm-grep-split-line candidate))
          (buf    (car split))
          (lineno (nth 1 split))
-         (str    (nth 2 split)))
+         (str    (nth 2 split))
+         (bfname (buffer-file-name (get-buffer buf))))
     (cons (concat (propertize
                    buf
                    'face 'helm-moccur-buffer
-                   'help-echo (buffer-file-name
-                               (get-buffer buf))
+                   'help-echo bfname
+                   'helm-grep-fname bfname
                    'buffer-name buf)
                   ":"
                   (propertize lineno 'face 'helm-grep-lineno)
