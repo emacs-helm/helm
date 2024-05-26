@@ -23,7 +23,6 @@
 
 (declare-function helm-find-files-1 "helm-files" (fname &optional preselect))
 (declare-function helm-grep-split-line "helm-grep" (line))
-(declare-function popup-tip "ext:popup")
 (declare-function markdown-show-entry "ext:markdown-mode.el")
 (declare-function outline-show-subtree "outline")
 (declare-function org-reveal "org")
@@ -1005,16 +1004,37 @@ Assume regexp is a pcre based regexp."
 ;;; Popup buffer-name or filename in grep/moccur/imenu-all.
 ;;
 (defvar helm--show-help-echo-timer nil)
+(defvar helm--maybe-show-help-echo-overlay nil)
+(defface helm-tooltip
+  `((t :background "Goldenrod"
+       :foreground "black"))
+  "Face used by `helm-tooltip-show'."
+  :group 'helm-grep-faces)
 
 (defun helm-cancel-help-echo-timer ()
   (when helm--show-help-echo-timer
     (cancel-timer helm--show-help-echo-timer)
-    (setq helm--show-help-echo-timer nil)))
+    (setq helm--show-help-echo-timer nil))
+  (when helm--maybe-show-help-echo-overlay
+    (delete-overlay helm--maybe-show-help-echo-overlay)
+    (setq helm--maybe-show-help-echo-overlay nil)))
+
+(defun helm-tooltip-show (text pos)
+  "Display TEXT at POS in an overlay."
+  (setq helm--maybe-show-help-echo-overlay
+        (make-overlay pos (1+ pos)))
+  (overlay-put helm--maybe-show-help-echo-overlay
+               'display
+               (propertize
+                (concat text "\n")
+                'face 'helm-tooltip)))
 
 (defun helm-maybe-show-help-echo ()
   (when helm--show-help-echo-timer
     (cancel-timer helm--show-help-echo-timer)
     (setq helm--show-help-echo-timer nil))
+  (when helm--maybe-show-help-echo-overlay
+    (delete-overlay helm--maybe-show-help-echo-overlay))
   (when (and helm-alive-p
              helm-popup-tip-mode
              (member (assoc-default 'name (helm-get-current-source))
@@ -1026,11 +1046,11 @@ Assume regexp is a pcre based regexp."
              (save-selected-window
                (with-helm-window
                  (helm-aif (get-text-property (pos-bol) 'help-echo)
-                     (popup-tip (concat " " (abbreviate-file-name
-                                             (replace-regexp-in-string "\n.*" "" it)))
-                                :around nil
-                                :point (save-excursion
-                                         (end-of-visual-line) (point)))))))))))
+                     (helm-tooltip-show
+                      (concat " " (abbreviate-file-name
+                                   (replace-regexp-in-string "\n.*" "" it)))
+                      (save-excursion
+                        (end-of-visual-line) (point)))))))))))
 
 ;;;###autoload
 (define-minor-mode helm-popup-tip-mode
