@@ -1058,7 +1058,6 @@ Assume regexp is a pcre based regexp."
 (define-minor-mode helm-popup-tip-mode
     "Show help-echo informations in a popup tip at end of line."
   :global t
-  (require 'popup)
   (if helm-popup-tip-mode
       (progn
         (add-hook 'helm-move-selection-after-hook 'helm-maybe-show-help-echo)
