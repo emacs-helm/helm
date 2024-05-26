@@ -1049,8 +1049,7 @@ Assume regexp is a pcre based regexp."
                  ;; maybe used by mouse overlay after resume.
                  (helm-aif (get-text-property (pos-bol) 'helm-grep-fname)
                      (helm-tooltip-show
-                      (concat " " (abbreviate-file-name
-                                   (replace-regexp-in-string "\n.*" "" it)))
+                      (concat " " (abbreviate-file-name it))
                       (save-excursion
                         (end-of-visual-line) (point)))))))))))
 
