@@ -1045,7 +1045,9 @@ Assume regexp is a pcre based regexp."
            (lambda ()
              (save-selected-window
                (with-helm-window
-                 (helm-aif (get-text-property (pos-bol) 'help-echo)
+                 ;; Use helm-grep-fname prop instead of help-echo as help-echo
+                 ;; maybe used by mouse overlay after resume.
+                 (helm-aif (get-text-property (pos-bol) 'helm-grep-fname)
                      (helm-tooltip-show
                       (concat " " (abbreviate-file-name
                                    (replace-regexp-in-string "\n.*" "" it)))
