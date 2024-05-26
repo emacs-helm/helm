@@ -3,6 +3,7 @@
 * NEWS
 ** Version 3.9.9-pre
 
+*** Get rid of popup.el dependency
 *** helm-completion-styles-alist accepts commands for completion-in-region
 *** Minibuffer-contents change color in HFF when updating
 This is controlled by =helm-ff-dim-prompt-on-update= user variable.
