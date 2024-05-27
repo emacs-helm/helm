@@ -2351,11 +2351,11 @@ If NO-UPDATE is non-nil, skip executing `helm-update'."
   (unless no-update (helm-update)))
 
 (defun helm-show-all-candidates-in-source (arg)
-  "Toggle all or only candidate-number-limit cands in current source.
-With a numeric prefix arg show only the ARG number of candidates.
-The prefix arg has no effect when toggling to only
-candidate-number-limit."
-  (interactive "p")
+  "Toggle all sources or only current source visibility.
+With a prefix arg show all candidates in current source
+disregarding candidate-number-limit and with a numeric prefix arg
+show ARG number of candidates."
+  (interactive "P")
   (with-helm-alive-p
     (with-helm-buffer
       (if helm-source-filter
@@ -2364,7 +2364,11 @@ candidate-number-limit."
                         (default-value 'helm-candidate-number-limit))
             (helm-set-source-filter nil))
         (with-helm-default-directory (helm-default-directory)
-          (setq-local helm-candidate-number-limit (and (> arg 1) arg))
+          (setq-local helm-candidate-number-limit
+                      (helm-acase arg
+                        ((guard (consp arg)) nil)
+                        ((guard (numberp arg)) it)
+                        (t (default-value 'helm-candidate-number-limit))))
           (helm-set-source-filter
            (list (helm-get-current-source))))))))
 (put 'helm-show-all-candidates-in-source 'helm-only t)

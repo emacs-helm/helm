@@ -2,7 +2,10 @@
 
 * NEWS
 ** Version 3.9.9-pre
-
+*** Change prefix arg behavior of helm-show-all-candidates-in-source
+With a prefix arg show all candidates, with a numeric prefix arg show
+ARG number of candidates, and with no prefix arg show only
+helm-candidate-number-limit of candidates.
 *** Get rid of popup.el dependency
 *** helm-completion-styles-alist accepts commands for completion-in-region
 *** Minibuffer-contents change color in HFF when updating
