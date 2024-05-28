@@ -6681,7 +6681,7 @@ be directories."
                                       (helm-basename elm))
                                      " " disp)
                            disp)
-                         c)))
+                         elm)))
 
 (defun helm-ff-file-name-history-ff (candidate)
   (helm-set-pattern
