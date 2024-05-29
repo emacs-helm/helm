@@ -6302,7 +6302,7 @@ marking candidates."
                (point-max)))
        (1+ (pos-eol))))
     (setq helm-selection-point (overlay-start helm-selection-overlay))
-    (when (and helm-allow-mouse (null nomouse))
+    (when (and helm-allow-mouse (null nomouse) (not resumep))
       (helm--bind-mouse-for-selection helm-selection-point))))
 
 (defun helm-confirm-and-exit-minibuffer ()
