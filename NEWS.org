@@ -1,7 +1,7 @@
 #+STARTUP:showall
 
 * NEWS
-** Version 3.9.9-pre
+** Version 3.9.9
 *** Change prefix arg behavior of helm-show-all-candidates-in-source
 With a prefix arg show all candidates, with a numeric prefix arg show
 ARG number of candidates, and with no prefix arg show only

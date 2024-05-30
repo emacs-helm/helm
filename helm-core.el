@@ -4,8 +4,8 @@
 
 ;; Author: Thierry Volpiatto <thievol@posteo.net>
 ;; URL: https://emacs-helm.github.io/helm/
-;; Version: 3.9.8
-;; Package-Requires: ((emacs "25.1") (async "1.9.7"))
+;; Version: 3.9.9
+;; Package-Requires: ((emacs "25.1") (async "1.9.8"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
