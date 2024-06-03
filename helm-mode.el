@@ -67,6 +67,8 @@
     (dired-do-symlink . helm-read-file-name-handler-1)
     (dired-do-relsymlink . helm-read-file-name-handler-1)
     (dired-do-hardlink . helm-read-file-name-handler-1)
+    ;; Next two are using completing-read where not needed.
+    (read-multiple-choice--long-answers . nil)
     (dired-do-touch . nil)
     (basic-save-buffer . helm-read-file-name-handler-1)
     (write-file . (default helm-read-file-name-handler-1))
