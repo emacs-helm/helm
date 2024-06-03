@@ -1272,7 +1272,7 @@ behaviour of this function is really needed."
       (goto-char (point-min)))
     (decode-coding-string (buffer-string) 'utf-8)))
 
-(defun helm-read-answer (prompt answer-list)
+(defun helm-read-answer (prompt answer-list &optional help)
   "Prompt user for an answer.
 Arg PROMPT is the prompt to present user the different possible
 answers, ANSWER-LIST is a list of strings.
@@ -1280,24 +1280,43 @@ If user enters an answer which is one of ANSWER-LIST return this
 answer, otherwise keep prompting for a valid answer.
 Note that answer should be a single char, only short answer are
 accepted.
+When HELP is provided, it is a string which will be displayed in a buffer when
+\"h\" is pressed (don't forget to add \"h\" in prompt).
 
 Example:
 
-    (helm-acase (helm-read-answer
-             \"answer [y,n,!,q]: \"
-             \\='(\"y\" \"n\" \"!\" \"q\"))
-       (\"y\" \"yes\")
-       (\"n\" \"no\")
-       (\"!\" \"all\")
-       (\"q\" \"quit\"))
+     (helm-acase (helm/read-answer
+                 \"answer [y,n,!,q,h]: \"
+                 \\='(\"y\" \"n\" \"!\" \"q\")
+                 \"(y)es:  do this
+\(n)o:   skip
+\(!)all: do this for all
+\(q)uit: quit skipping remaining candidates\")
+      (\"y\" \"yes\")
+      (\"n\" \"no\")
+      (\"!\" \"all\")
+      (\"q\" \"quit\"))
 
 "
-  (helm-awhile (read-key (propertize prompt 'face 'minibuffer-prompt))
-    (let ((str (and (characterp it) (string it))))
-      (if (and str (member str answer-list))
-          (cl-return str)
-        (message "Please answer by %s" (mapconcat 'identity answer-list ", "))
-        (sit-for 1)))))
+  (unwind-protect
+       (helm-awhile (read-key (propertize
+                               prompt 'face 'minibuffer-prompt))
+         (let ((str (and (characterp it) (string it)))
+               (choices (remove "h" answer-list)))
+           (cond ((and str (member str choices))
+                  (cl-return str))
+                 ((and help (string= str "h"))
+                  (helm-aif (get-buffer-window "*choices help*" 'visible)
+                      (quit-window t it)
+                    (with-current-buffer-window "*choices help*"
+                        '(display-buffer-at-bottom
+                         (window-height . fit-window-to-buffer)
+	                 (preserve-size . (nil . t)))
+                        nil (insert help))))
+                 (t (message "Please answer by %s"
+                             (mapconcat 'identity choices ", "))
+                    (sit-for 1)))))
+    (helm-aand help (get-buffer-window "*choices help*") (quit-window t it))))
 
 (defun helm-read-answer-dolist-with-action (prompt list action &optional prompt-formater)
   "Read answer with PROMPT and execute ACTION on each element of LIST.
