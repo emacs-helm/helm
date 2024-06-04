@@ -1341,11 +1341,12 @@ used to modify each element of LIST to be displayed in PROMPT."
         (if dont-ask
             (funcall action elm)
           (helm-acase (helm-read-answer
-                       (format (concat prompt "[y,n,!,q]")
+                       (format (concat prompt "[y,n,!,q,h]")
                                (if prompt-formater
                                    (funcall prompt-formater elm)
                                  elm))
-                       '("y" "n" "!" "q"))
+                       '("y" "n" "!" "q")
+                       "y: yes\nn: no\n!: yes for all\nq: quit\nh: toggle this help")
             ("y" (funcall action elm))
             ("n" (ignore))
             ("!" (prog1
