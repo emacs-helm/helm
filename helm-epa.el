@@ -108,13 +108,23 @@
                 (replace-regexp-in-string "\\.[\t ]*\\'" "" (cadr split)))
       (format "%s: " (replace-regexp-in-string "\\.[\t ]*\\'" "" (car split))))))
 
+(defun helm-epa--read-signature-type-help ()
+  (with-temp-buffer
+    (save-excursion
+      (insert
+       "n: Create a normal signature)\n"
+       "c: Create a cleartext signature)\n"
+       "d: Create a detached signature)"))
+    (while (re-search-forward "^\\(.\\):" nil t)
+      (helm-add-face-text-properties (match-beginning 1) (match-end 1)
+                                     'font-lock-variable-name-face))
+    (buffer-string)))
+
 (defun helm-epa--read-signature-type ()
   "A helm replacement for `epa--read-signature-type'."
-  (let ((answer (helm-read-answer "Signature type:
-(n - Create a normal signature)
-(c - Create a cleartext signature)
-(d - Create a detached signature)"
-                                  '("n" "c" "d"))))
+  (let ((answer (helm-read-answer "Signature type? [n,c,d,h]"
+                                  '("n" "c" "d")
+                                  #'helm-epa--read-signature-type-help)))
     (helm-acase answer
       ("n" 'normal)
       ("c" 'clear)

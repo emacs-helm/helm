@@ -2339,10 +2339,11 @@ This doesn't replace inside the files, only modify filenames."
                                         (file-name-extension new t))))
                     (unless (string= query "!")
                       (setq query (helm-read-answer (format
-                                                     "Replace `%s' by `%s' [!,y,n,q]"
+                                                     "Replace `%s' by `%s' [!,y,n,q,h]"
                                                      (helm-basename old)
                                                      (helm-basename new))
-                                                    '("y" "n" "!" "q"))))
+                                                    '("y" "n" "!" "q")
+                                                    #'helm-read-answer-default-help-fn)))
                     (when (string= query "q")
                       (cl-return (message "Operation aborted")))
                     (unless (string= query "n")
@@ -6194,9 +6195,11 @@ is nil."
                ;; is a bug).
                (if (or helm-ff-allow-recursive-deletes trash)
                    (delete-directory file 'recursive trash)
-                 (helm-acase (helm-read-answer (format "Recursive delete of `%s'? [y,n,!,q]"
-                                                      (abbreviate-file-name file))
-                                              '("y" "n" "!" "q"))
+                 (helm-acase (helm-read-answer
+                              (format "Recursive delete of `%s'? [y,n,!,q,h]"
+                                      (abbreviate-file-name file))
+                              '("y" "n" "!" "q")
+                              #'helm-read-answer-default-help-fn)
                    ("y" (delete-directory file 'recursive trash))
                    ("!" (setq helm-ff-allow-recursive-deletes t)
                          (delete-directory file 'recursive trash))
