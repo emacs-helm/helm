@@ -1280,8 +1280,9 @@ If user enters an answer which is one of ANSWER-LIST return this
 answer, otherwise keep prompting for a valid answer.
 Note that answer should be a single char, only short answer are
 accepted.
-When HELP is provided, it is a string which will be displayed in a buffer when
-\"h\" is pressed (don't forget to add \"h\" in prompt).
+When HELP is provided, it is a string or a function that returns a string
+which will be displayed in a buffer when \"h\"
+is pressed (don't forget to add \"h\" in prompt).
 
 Example:
 
@@ -1310,15 +1311,35 @@ Example:
                       (quit-window t it)
                     (with-current-buffer-window "*choices help*"
                         '(display-buffer-at-bottom
-                         (window-height . fit-window-to-buffer)
-	                 (preserve-size . (nil . t)))
-                        nil (insert help))))
+                          (window-height . fit-window-to-buffer)
+                          (preserve-size . (nil . t)))
+                        nil (progn
+                              (insert (if (functionp help)
+                                          (funcall help) help))
+                              (setq-local cursor-type nil)))))
                  (t (message "Please answer by %s"
                              (mapconcat 'identity choices ", "))
                     (sit-for 1)))))
     (helm-aand help (get-buffer-window "*choices help*") (quit-window t it))))
 
-(defun helm-read-answer-dolist-with-action (prompt list action &optional prompt-formater)
+(defun helm-read-answer-default-help-fn ()
+  "Return a string suitable for `helm-read-answer' help."
+  (with-temp-buffer
+    (save-excursion
+      (insert "y: yes\n"
+              "n: no\n"
+              "!: yes for all\n"
+              "q: quit\n"
+              "h: toggle this help"))
+    (while (re-search-forward "^\\(.\\):" nil t)
+      (helm-add-face-text-properties (match-beginning 1) (match-end 1)
+                                     'font-lock-variable-name-face))
+    (buffer-string)))
+
+(defun helm-read-answer-dolist-with-action (prompt list action
+                                            &optional
+                                              prompt-formater
+                                              help-function)
   "Read answer with PROMPT and execute ACTION on each element of LIST.
 
 Argument PROMPT is a format spec string e.g. \"Do this on %s?\"
@@ -1346,7 +1367,7 @@ used to modify each element of LIST to be displayed in PROMPT."
                                    (funcall prompt-formater elm)
                                  elm))
                        '("y" "n" "!" "q")
-                       "y: yes\nn: no\n!: yes for all\nq: quit\nh: toggle this help")
+                       (or help-function #'helm-read-answer-default-help-fn))
             ("y" (funcall action elm))
             ("n" (ignore))
             ("!" (prog1
