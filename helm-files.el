@@ -445,8 +445,8 @@ very large directories."
   :type 'boolean)
 
 (defcustom helm-files-save-history-extra-sources
-  '("Find" "Locate" "Recentf"
-    "Files from Current Directory" "File Cache")
+  '("Find" "Fd" "Locate" "Recentf"
+    "Files from Current Directory" "File Cache" "Etags")
   "Extras source that save candidate to `file-name-history'."
   :type '(repeat (choice string)))
 
