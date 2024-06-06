@@ -6621,31 +6621,34 @@ Used generally to modify current selection."
   `(helm--edit-current-selection-internal
     (lambda () ,@forms)))
 
-(defun helm--delete-minibuffer-contents-from (from-str)
+(defun helm--delete-minibuffer-contents-from (from-str &optional presel)
   ;; Giving an empty string value to FROM-STR delete all.
   (let ((input (minibuffer-contents)))
     (helm-reset-yank-point)
     (if (> (length input) 0)
         ;; minibuffer is not empty, delete contents from end
         ;; of FROM-STR and update.
-        (helm-set-pattern from-str)
+        (progn (helm-set-pattern from-str t) (helm-update presel))
       ;; minibuffer is already empty, force update.
-      (helm-force-update))))
+      (helm-force-update presel))))
 
 (defun helm-delete-minibuffer-contents (&optional arg)
   "Delete minibuffer contents.
-When `helm-delete-minibuffer-contents-from-point' is non-nil,
-delete minibuffer contents from point instead of deleting all.
-With a prefix arg reverse this behaviour.  When at the end of
-minibuffer, delete all."
+When `helm-delete-minibuffer-contents-from-point' is non-nil, delete
+minibuffer contents from point instead of deleting all.  With a prefix
+ARG reverse this behaviour.  When at the end of minibuffer, delete all
+but if a prefix ARG were given preselect current selection when
+updating if possible."
   (interactive "P")
   (with-helm-alive-p
     (let ((str (if helm-delete-minibuffer-contents-from-point
                    (if (or arg (eobp))
                        "" (helm-minibuffer-completion-contents))
                  (if (and arg (not (eobp)))
-                     (helm-minibuffer-completion-contents) ""))))
-      (helm--delete-minibuffer-contents-from str))))
+                     (helm-minibuffer-completion-contents) "")))
+          (presel (and arg (eobp)
+                       (with-helm-buffer (helm-get-selection nil t)))))
+      (helm--delete-minibuffer-contents-from str presel))))
 (put 'helm-delete-minibuffer-contents 'no-helm-mx t)
 
 
