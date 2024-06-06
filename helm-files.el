@@ -6635,7 +6635,8 @@ be directories."
                  ;; other parts of Emacs seems to,
                  ;; and we don't want to introduce duplicates.
                  (add-to-history 'file-name-history
-                                 (abbreviate-file-name sel)))))))
+                                 (abbreviate-file-name
+                                  (expand-file-name sel))))))))
 (add-hook 'helm-exit-minibuffer-hook 'helm-files-save-file-name-history)
 
 (defvar helm-source-file-name-history
