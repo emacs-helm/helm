@@ -6650,8 +6650,7 @@ updating if possible."
                        "" (helm-minibuffer-completion-contents))
                  (if (and arg (not (eobp)))
                      (helm-minibuffer-completion-contents) "")))
-          (presel (and arg (eobp)
-                       (with-helm-buffer (helm-get-selection nil t)))))
+          (presel (and arg (eobp) (helm-get-selection nil t))))
       (helm--delete-minibuffer-contents-from str presel))))
 (put 'helm-delete-minibuffer-contents 'no-helm-mx t)
 
