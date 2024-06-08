@@ -6521,7 +6521,7 @@ This is the default function for `helm-debug-function'."
 ;; Misc
 
 (defun helm-preselect (candidate-or-regexp &optional source)
-  "Move selection to CANDIDATE-OR-REGEXP on Helm start.
+  "Move selection to CANDIDATE-OR-REGEXP.
 
 CANDIDATE-OR-REGEXP can be a:
 
@@ -6530,10 +6530,11 @@ CANDIDATE-OR-REGEXP can be a:
 - Nullary function, which moves to a candidate
 
 When CANDIDATE-OR-REGEXP is a cons cell, tries moving to first
-element of the cons cell, then the second, and so on.  This allows
-selection of duplicate candidates after the first.
+element of the cons cell, then the second, and so on.  This
+allows selection of duplicate candidates after the first.
 
-Optional argument SOURCE is a Helm source object."
+When SOURCE is specified, move to it and search
+CANDIDATE-OR-REGEXP from there."
   (with-helm-buffer
     (when candidate-or-regexp
       (if source
