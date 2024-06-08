@@ -6560,7 +6560,7 @@ CANDIDATE-OR-REGEXP from there."
       (helm--mouse-reset-selection-help-echo))
     (helm-mark-current-line)
     ;; helm-force-update is already recentering.
-    (unless helm--force-updating-p (recenter))
+    (unless (or helm--force-updating-p (not (helm-window))) (recenter))
     (helm-display-mode-line (or source (helm-get-current-source)))
     (helm-log-run-hook "helm-preselect" 'helm-after-preselection-hook)))
 
