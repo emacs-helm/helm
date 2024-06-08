@@ -6538,7 +6538,7 @@ CANDIDATE-OR-REGEXP from there."
   (with-helm-buffer
     (when candidate-or-regexp
       (if source
-          (helm-goto-source source)
+          (progn (helm-goto-source source) (forward-line 1))
         (goto-char (point-min))
         (forward-line 1))
       (if (functionp candidate-or-regexp)
@@ -6559,6 +6559,8 @@ CANDIDATE-OR-REGEXP from there."
     (when helm-allow-mouse
       (helm--mouse-reset-selection-help-echo))
     (helm-mark-current-line)
+    ;; helm-force-update is already recentering.
+    (unless helm--force-updating-p (recenter))
     (helm-display-mode-line (or source (helm-get-current-source)))
     (helm-log-run-hook "helm-preselect" 'helm-after-preselection-hook)))
 
@@ -6629,13 +6631,15 @@ Used generally to modify current selection."
 
 (defun helm--delete-minibuffer-contents-from (from-str &optional presel)
   ;; Giving an empty string value to FROM-STR delete all.
-  (let ((input (minibuffer-contents)))
+  (let ((input (minibuffer-contents))
+        (src (and presel (helm-get-current-source)))
+        helm-move-to-line-cycle-in-source)
     (helm-reset-yank-point)
     (unless (zerop (length input))
       ;; minibuffer is not empty, delete contents from end
       ;; of FROM-STR and update.
       (helm-set-pattern from-str t)
-      (helm-update presel))))
+      (helm-update presel src))))
 
 (defun helm-delete-minibuffer-contents (&optional arg)
   "Delete minibuffer contents.
@@ -6643,7 +6647,7 @@ When `helm-delete-minibuffer-contents-from-point' is non-nil, delete
 minibuffer contents from point instead of deleting all.  With a prefix
 ARG reverse this behaviour.  When at the end of minibuffer, delete all
 but if a prefix ARG were given also preselect current selection when
-updating if possible."
+updating if possible (selection may be beyond candidate-number-limit)."
   (interactive "P")
   (with-helm-alive-p
     (let ((str (if helm-delete-minibuffer-contents-from-point
@@ -6651,7 +6655,8 @@ updating if possible."
                        "" (helm-minibuffer-completion-contents))
                  (if (and arg (not (eobp)))
                      (helm-minibuffer-completion-contents) "")))
-          (presel (and arg (eobp) (helm-get-selection nil t))))
+          (presel (and arg (eobp)
+                       (concat "^" (regexp-quote (helm-get-selection nil t)) "$"))))
       (helm--delete-minibuffer-contents-from str presel))))
 (put 'helm-delete-minibuffer-contents 'no-helm-mx t)
 
