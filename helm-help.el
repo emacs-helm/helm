@@ -944,6 +944,8 @@ alias pack2xz apack -e -F .tar.xz $* &
 alias unpack aunpack $1 &
 
 Note the \"&\" at end of commands that make eshell aliases asynchronous.
+NOTE: Using the ampersand at end of command to make it asynchronous is broken
+in all emacs versions before emacs-28 (see emacs bug#50209).
 
 Of course you can use any other commands of your choice as aliases.
 

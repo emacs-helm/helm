@@ -1477,6 +1477,20 @@ and not a fuzzy pattern.  When using multi match patterns, each
 pattern starting with \"!\" is interpreted as a negation i.e.
 match everything but this.
 
+** Moving selection to a specific candidate
+
+Once you found the candidate you were searching by narrowing candidates,
+you may want to keep the selection on this candidate after deleting
+minibuffer contents and showing the whole list of candidates, this is
+useful for example when examining and searching git log or similar.  To
+achieve this, ensure all candidates are shown at startup or at least
+enough candidates to be sure your candidate is not beyond candidate-number-limit,
+you can use \\<helm-map>\\[helm-show-all-candidates-in-source] for this with a prefix arg or a numeric prefix arg.
+Once this is done narrow down your list by typing in minibuffer, once the
+selection is on the candidate you want to keep, hit C-u \\<helm-map>\\[helm-delete-minibuffer-contents].
+Another way to achieve this is to mark the candidate, then delete minibuffer
+contents with \\<helm-map>\\[helm-delete-minibuffer-contents] and reach back the mark with \\<helm-map>\\[helm-next-visible-mark].
+
 *** Completion-styles
 
 UPDATE: At version 3.8.0 Helm default is now to NOT use
@@ -1725,7 +1739,12 @@ and are by the way not compatible with Helm.
 \[1] Behavior may change depending context in some source e.g. `helm-find-files'.
 
 \[2] Delete from point to end or all depending on the value of
-`helm-delete-minibuffer-contents-from-point'.
+`helm-delete-minibuffer-contents-from-point'.  When the cursor is at end
+of minibuffer and a prefix arg is given, delete the whole contents of
+minibuffer and keep selection as well when possible (depends of
+candidate-number-limit) when helm update to the whole list of
+candidates.  This depends also of requires-pattern i.e. you may have a
+source that display nothing when there is an input < to requires-pattern.
 
 NOTE: Any of these bindings are from `helm-map' and may be
 overriten by the map specific to the current source in use (each
