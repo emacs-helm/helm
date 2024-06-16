@@ -594,7 +594,10 @@ command on remote (and/or locally if you want to trash as root).
 On Ubuntu-based distributions it is \\='trash-cli'."
   :type 'boolean)
 
-(defcustom helm-list-directory-function
+(defvaralias 'helm-list-directory-function 'helm-list-remote-directory-fn)
+(make-obsolete-variable 'helm-list-directory-function 'helm-list-remote-directory-fn "4.0")
+
+(defcustom helm-list-remote-directory-fn
   (cl-case system-type
     (gnu/linux #'helm-list-dir-external)
     (berkeley-unix #'helm-list-dir-lisp)
@@ -3609,19 +3612,19 @@ debugging purpose."
 (defun helm-list-directory (directory &optional sel)
   "List directory DIRECTORY.
 
-If DIRECTORY is remote use `helm-list-directory-function',
+If DIRECTORY is remote use `helm-list-remote-directory-fn',
 otherwise use `directory-files'.
 SEL argument is only here for debugging purpose, it default to
 `helm-get-selection'."
   (let* ((remote (file-remote-p directory 'method))
-         (helm-list-directory-function
+         (helm-list-remote-directory-fn
           (helm-acase remote
             ("ftp" #'helm-list-dir-lisp)
             ("adb" #'helm-list-dir-adb)
-            (t helm-list-directory-function)))
+            (t helm-list-remote-directory-fn)))
          (use-ext-remote-fn
           (and remote
-               (eq helm-list-directory-function 'helm-list-dir-external)))
+               (eq helm-list-remote-directory-fn 'helm-list-dir-external)))
          (sort-method (helm-acase helm-ff-initial-sort-method
                         (newest (if use-ext-remote-fn
                                     "-t" #'file-newer-than-file-p))
@@ -3632,7 +3635,7 @@ SEL argument is only here for debugging purpose, it default to
                                #'helm-group-candidates-by)))))
     (if remote
         (ignore-errors
-          (funcall helm-list-directory-function directory sort-method))
+          (funcall helm-list-remote-directory-fn directory sort-method))
       (helm-acase helm-ff-initial-sort-method
         ((newest size)
          (sort (helm-local-directory-files

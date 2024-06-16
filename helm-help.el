@@ -1040,9 +1040,9 @@ Starting at helm version 2.9.7 it is somewhat possible to
 colorize fnames by listing files without loosing performances with
 external commands (ls and awk) if your system is compatible.
 For this you can use `helm-list-dir-external' as value
-for `helm-list-directory-function'.
+for `helm-list-remote-directory-fn'.
 
-See `helm-list-directory-function' documentation for more infos.
+See `helm-list-remote-directory-fn' documentation for more infos.
 
 **** Completing host
 
