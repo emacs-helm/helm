@@ -3615,36 +3615,36 @@ SEL argument is only here for debugging purpose, it default to
 `helm-get-selection'."
   (let* ((remote (file-remote-p directory 'method))
          (helm-list-directory-function
-          (cond ((and remote (string= remote "ftp"))
-                 #'helm-list-dir-lisp)
-                ((and remote (string= remote "adb"))
-                 #'helm-list-dir-adb)
-                (t helm-list-directory-function)))
-         (remote-fn-p (eq helm-list-directory-function
-                          'helm-list-dir-external))
-         (sort-method (cl-case helm-ff-initial-sort-method
-                        (newest (if (and remote remote-fn-p)
+          (helm-acase remote
+            ("ftp" #'helm-list-dir-lisp)
+            ("adb" #'helm-list-dir-adb)
+            (t helm-list-directory-function)))
+         (use-ext-remote-fn
+          (and remote
+               (eq helm-list-directory-function 'helm-list-dir-external)))
+         (sort-method (helm-acase helm-ff-initial-sort-method
+                        (newest (if use-ext-remote-fn
                                     "-t" #'file-newer-than-file-p))
-                        (size (if (and remote remote-fn-p)
+                        (size (if use-ext-remote-fn
                                   "-S" #'helm-ff-file-larger-that-file-p))
-                        (ext (unless (and remote remote-fn-p)
-                               #'helm-group-candidates-by))
-                        (t nil))))
-    (cond (remote
-           (ignore-errors
-             (funcall helm-list-directory-function directory sort-method)))
-          ((memq helm-ff-initial-sort-method '(newest size))
-           (sort (helm-local-directory-files
-                  directory t directory-files-no-dot-files-regexp)
-                 sort-method))
-          ((eq helm-ff-initial-sort-method 'ext)
-           (funcall sort-method
-                    (helm-local-directory-files
-                     directory t directory-files-no-dot-files-regexp)
-                    #'file-name-extension
-                    (or sel (helm-get-selection) "")))
-          (t (helm-local-directory-files
-              directory t directory-files-no-dot-files-regexp)))))
+                        (ext (if use-ext-remote-fn
+                                 #'identity
+                               #'helm-group-candidates-by)))))
+    (if remote
+        (ignore-errors
+          (funcall helm-list-directory-function directory sort-method))
+      (helm-acase helm-ff-initial-sort-method
+        ((newest size)
+         (sort (helm-local-directory-files
+                directory t directory-files-no-dot-files-regexp)
+               sort-method))
+        (ext (funcall sort-method
+                      (helm-local-directory-files
+                       directory t directory-files-no-dot-files-regexp)
+                      #'file-name-extension
+                      (or sel (helm-get-selection) "")))
+        (t (helm-local-directory-files
+            directory t directory-files-no-dot-files-regexp))))))
 
 (defsubst helm-ff-file-larger-that-file-p (f1 f2)
   (let ((attr1 (file-attributes f1))
