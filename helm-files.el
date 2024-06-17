@@ -1797,7 +1797,7 @@ this working."
   (require 'helm-adaptive)
   (require 'em-alias) (eshell-read-aliases-list)
   (unless (> emacs-major-version 27)
-    ;; This advice have been merged in emacs-28.
+    ;; This advice has been merged in emacs-28.
     (advice-add 'eshell-eval-command :override #'helm--advice-eshell-eval-command))
   (when (or eshell-command-aliases-list
             (y-or-n-p "No eshell aliases found, run eshell-command without alias anyway? "))
