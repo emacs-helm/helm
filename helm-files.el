@@ -6111,29 +6111,31 @@ When a prefix arg is given, meaning of
            (helm-ff--trashed-files
             (and trash (helm-ff-trash-list (helm-trash-directory)))))
       (unwind-protect
-           (cl-loop for c in marked do
-                    (progn (helm-preselect
-                            (format helm-ff-last-expanded-candidate-regexp
-                                    (regexp-quote
-                                     (if (and helm-ff-transformer-show-only-basename
-                                              (not (helm-ff-dot-file-p c)))
-                                         (helm-basename c) c))))
-                           (when (y-or-n-p
-                                  (format "Really %s file `%s'? "
-                                          (if trash "Trash" "Delete")
-                                          (abbreviate-file-name c)))
-                             (helm-acase (helm-delete-file
-                                          c helm-ff-signal-error-on-dot-files 'synchro trash)
-                               (skip
-                                ;; This happens only when trying to
-                                ;; trash a file already trashed.
-                                (helm-delete-visible-mark (helm-this-visible-mark))
-                                (if (helm-end-of-source-p)
-                                    (helm-previous-line)
-                                  (helm-next-line)))
-                               (t (helm-delete-current-selection)))
-                             (message nil)
-                             (helm--remove-marked-and-update-mode-line c))))
+           (helm-read-answer-dolist-with-action
+            (concat (format "Really %s file"
+                            (if trash "Trash" "Delete"))
+                    " `%s'")
+            marked
+            (lambda (c)
+              (helm-preselect
+               (format helm-ff-last-expanded-candidate-regexp
+                       (regexp-quote
+                        (if (and helm-ff-transformer-show-only-basename
+                                 (not (helm-ff-dot-file-p c)))
+                            (helm-basename c) c))))
+              (helm-acase (helm-delete-file
+                           c helm-ff-signal-error-on-dot-files 'synchro trash)
+                (skip
+                 ;; This happens only when trying to
+                 ;; trash a file already trashed.
+                 (helm-delete-visible-mark (helm-this-visible-mark))
+                 (if (helm-end-of-source-p)
+                     (helm-previous-line)
+                   (helm-next-line)))
+                (t (helm-delete-current-selection)))
+              (message nil)
+              (helm--remove-marked-and-update-mode-line c))
+            #'abbreviate-file-name)
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil)
         (helm-force-update
