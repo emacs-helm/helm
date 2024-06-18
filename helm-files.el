@@ -6114,25 +6114,7 @@ When a prefix arg is given, meaning of
            (helm-read-answer-dolist-with-action
             "Really %s file `%s'"
             marked
-            (lambda (c)
-              (helm-preselect
-               (format helm-ff-last-expanded-candidate-regexp
-                       (regexp-quote
-                        (if (and helm-ff-transformer-show-only-basename
-                                 (not (helm-ff-dot-file-p c)))
-                            (helm-basename c) c))))
-              (helm-acase (helm-delete-file
-                           c helm-ff-signal-error-on-dot-files 'synchro trash)
-                (skip
-                 ;; This happens only when trying to
-                 ;; trash a file already trashed.
-                 (helm-delete-visible-mark (helm-this-visible-mark))
-                 (if (helm-end-of-source-p)
-                     (helm-previous-line)
-                   (helm-next-line)))
-                (t (helm-delete-current-selection)))
-              (message nil)
-              (helm--remove-marked-and-update-mode-line c))
+            (lambda (file) (helm-ff--quick-delete-action file trash))
             (list (if trash "Trash" "Delete") #'abbreviate-file-name))
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil)
@@ -6143,6 +6125,27 @@ When a prefix arg is given, meaning of
                      (regexp-quote (if (and helm-ff-transformer-show-only-basename
                                             (not (helm-ff-dot-file-p presel)))
                                        (helm-basename presel) presel))))))))))
+
+(defun helm-ff--quick-delete-action (candidate trash)
+  "Delete or trash CANDIDATE and remove it from display."
+  (helm-preselect
+   (format helm-ff-last-expanded-candidate-regexp
+           (regexp-quote
+            (if (and helm-ff-transformer-show-only-basename
+                     (not (helm-ff-dot-file-p candidate)))
+                (helm-basename candidate) candidate))))
+  (helm-acase (helm-delete-file
+               candidate helm-ff-signal-error-on-dot-files 'synchro trash)
+    (skip
+     ;; This happens only when trying to
+     ;; trash a file already trashed.
+     (helm-delete-visible-mark (helm-this-visible-mark))
+     (if (helm-end-of-source-p)
+         (helm-previous-line)
+       (helm-next-line)))
+    (t (helm-delete-current-selection)))
+  (message nil)
+  (helm--remove-marked-and-update-mode-line candidate))
 
 (defun helm-delete-file (file &optional error-if-dot-file-p synchro trash)
   "Delete FILE after querying the user.
