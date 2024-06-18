@@ -6112,9 +6112,7 @@ When a prefix arg is given, meaning of
             (and trash (helm-ff-trash-list (helm-trash-directory)))))
       (unwind-protect
            (helm-read-answer-dolist-with-action
-            (concat (format "Really %s file"
-                            (if trash "Trash" "Delete"))
-                    " `%s'")
+            "Really %s file `%s'"
             marked
             (lambda (c)
               (helm-preselect
@@ -6135,7 +6133,7 @@ When a prefix arg is given, meaning of
                 (t (helm-delete-current-selection)))
               (message nil)
               (helm--remove-marked-and-update-mode-line c))
-            #'abbreviate-file-name)
+            (list (if trash "Trash" "Delete") #'abbreviate-file-name))
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil)
         (helm-force-update

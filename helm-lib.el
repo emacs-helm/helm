@@ -1354,18 +1354,27 @@ differently depending of answer:
 - !  Don't ask anymore and execute ACTION on remaining elements.
 - q  Skip all remaining elements.
 
-PROMPT-FORMATER is a function called with one argument which is
-used to modify each element of LIST to be displayed in PROMPT."
+PROMPT-FORMATER may be a function or a list containing strings and
+functions.  Functions either in list or alone are called on each element
+in LIST to be displayed in PROMPT."
   (let (dont-ask)
     (catch 'break
       (dolist (elm list)
         (if dont-ask
             (funcall action elm)
           (helm-acase (helm-read-answer
-                       (format (concat prompt "[y,n,!,q,h]")
-                               (if prompt-formater
-                                   (funcall prompt-formater elm)
-                                 elm))
+                       (apply #'format
+                              (concat prompt "[y,n,!,q,h]")
+                              (helm-acase prompt-formater
+                                ((guard (listp it))
+                                 (mapcar (lambda (x)
+                                           (if (functionp x)
+                                               (funcall x elm)
+                                             x))
+                                         it))
+                                ((guard (functionp it))
+                                 (list (funcall it elm)))
+                                (t it)))
                        '("y" "n" "!" "q")
                        (or help-function #'helm-read-answer-default-help-fn))
             ("y" (funcall action elm))
