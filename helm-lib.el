@@ -1366,14 +1366,15 @@ in LIST to be displayed in PROMPT."
                        (apply #'format
                               (concat prompt "[y,n,!,q,h]")
                               (helm-acase prompt-formater
-                                ((guard (listp it))
+                                ((guard (consp it))
                                  (mapcar (lambda (x)
                                            (if (functionp x)
                                                (funcall x elm)
                                              x))
                                          it))
                                 ((guard (functionp it))
-                                 (list (funcall it elm)))))
+                                 (list (funcall it elm)))
+                                (t (list elm))))
                        '("y" "n" "!" "q")
                        (or help-function #'helm-read-answer-default-help-fn))
             ("y" (funcall action elm))
