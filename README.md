@@ -51,3 +51,6 @@
     alt="Donate monthly using Patreon"
     style="height: 50px; width: auto;"
     src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
+
+
+[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/emacs-helm)
