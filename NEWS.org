@@ -2,6 +2,9 @@
 
 * NEWS
 ** Version 4.0-pre
+*** Helm-find-files presistent delete uses now a read-answer prompt
+It is now possible to answer "!" (yes for all) when using marked
+candidates.
 *** Allow saving selection when deleting minibuffer contents
 This is now possible with a prefix arg given when position is at eol
 in minibuffer.  This allow for example showing all candidates keeping
