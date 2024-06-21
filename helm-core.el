@@ -3167,18 +3167,22 @@ buffers (sessions).  When calling from Lisp, specify a
   (interactive)
   (with-helm-alive-p
     (let ((arg (if (null (member helm-buffer helm-buffers)) 0 1)))
-      (if (> (length helm-buffers) arg)
-          (helm-run-after-exit (lambda () (helm-resume (nth arg helm-buffers))))
-        (message "No previous helm sessions available for resuming!")))))
+      (cond ((> (minibuffer-depth) 1)
+             (message "Can't resume from recursive minibuffers"))
+            ((> (length helm-buffers) arg)
+             (helm-run-after-exit (lambda () (helm-resume (nth arg helm-buffers)))))
+            (t (message "No previous helm sessions available for resuming"))))))
 (put 'helm-resume-previous-session-after-quit 'helm-only t)
 
 (defun helm-resume-list-buffers-after-quit ()
   "List Helm buffers that can be resumed within a running Helm."
   (interactive)
   (with-helm-alive-p
-    (if (> (length helm-buffers) 0)
-        (helm-run-after-exit (lambda () (helm-resume t)))
-      (message "No previous helm sessions available for resuming!"))))
+    (cond ((> (minibuffer-depth) 1)
+           (message "Can't resume from recursive minibuffers"))
+          ((> (length helm-buffers) 0)
+           (helm-run-after-exit (lambda () (helm-resume t))))
+          (t (message "No previous helm sessions available for resuming")))))
 (put 'helm-resume-list-buffers-after-quit 'helm-only t)
 
 (defun helm-resume-p (resume)
