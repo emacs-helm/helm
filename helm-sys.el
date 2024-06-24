@@ -117,7 +117,8 @@ This affects also sorting functions in the same way."
     (cancel-timer helm-top--poll-timer))
   (condition-case nil
       (progn
-        (when (and (helm--alive-p) (null no-update))
+        (when (and (helm--alive-p) (null no-update)
+                   (null helm-suspend-update-flag))
           ;; Fix quitting while process is running
           ;; by binding `with-local-quit' in init function
           ;; Bug#1521.
