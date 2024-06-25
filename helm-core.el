@@ -5132,7 +5132,7 @@ without recomputing them, it should be a list of lists."
         (when preselect
           (helm-log "helm-update" "Update preselect candidate %s" preselect)
           (if (helm-window)
-              (with-helm-window (helm-preselect preselect source 'recenter))
+              (with-helm-window (helm-preselect preselect source))
             (helm-preselect preselect source)))
         (setq helm--force-updating-p nil)
         (helm--reset-update-flag))
@@ -6543,7 +6543,7 @@ This is the default function for `helm-debug-function'."
 
 ;; Misc
 
-(defun helm-preselect (candidate-or-regexp &optional source recenter)
+(defun helm-preselect (candidate-or-regexp &optional source)
   "Move selection to CANDIDATE-OR-REGEXP.
 
 CANDIDATE-OR-REGEXP can be a:
@@ -6582,7 +6582,7 @@ CANDIDATE-OR-REGEXP from there."
     (when helm-allow-mouse
       (helm--mouse-reset-selection-help-echo))
     (helm-mark-current-line)
-    (when recenter (recenter))
+    (when helm--deleting-minibuffer-contents-from (recenter))
     (helm-display-mode-line (or source (helm-get-current-source)))
     (helm-log-run-hook "helm-preselect" 'helm-after-preselection-hook)))
 
@@ -6651,10 +6651,14 @@ Used generally to modify current selection."
   `(helm--edit-current-selection-internal
     (lambda () ,@forms)))
 
+(defvar helm--deleting-minibuffer-contents-from nil
+  "[INTERNAL] Recenter when deleting minibuffer-contents and preselecting.
+This is a flag used internally.")
 (defun helm--delete-minibuffer-contents-from (from-str &optional presel)
   ;; Giving an empty string value to FROM-STR delete all.
   (let ((input (minibuffer-contents))
         (src (and presel (helm-get-current-source)))
+        (helm--deleting-minibuffer-contents-from presel)
         helm-move-to-line-cycle-in-source)
     (helm-reset-yank-point)
     (unless (zerop (length input))
