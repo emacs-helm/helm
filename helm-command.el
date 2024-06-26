@@ -149,7 +149,8 @@ algorithm."
                             (propertize cand 'face 'helm-command-active-mode)
                           cand)
              unless (and (null ignore-props)
-                         (or (get sym 'helm-only) (get sym 'no-helm-mx)))
+                         (or (get sym 'helm-only) (get sym 'no-helm-mx)
+                             (eq sym 'helm-M-x)))
              collect
              (cons (cond ((and (string-match "^M-x" key) local-key)
                           (propertize
