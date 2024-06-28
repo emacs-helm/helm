@@ -24,7 +24,13 @@
 (require 'finder)
 (require 'helm-utils) ; For with-helm-display-marked-candidates.
 
+(declare-function dired-async-mode-line-message "ext:dired-async.el")
+
 
+(defgroup helm-packages nil
+  "Helm interface for package.el."
+  :group 'helm)
+
 (defclass helm-packages-class (helm-source-in-buffer)
   ((coerce :initform #'helm-symbolify)
    (find-file-target :initform #'helm-packages-quit-an-find-file)
@@ -35,18 +41,91 @@
         (sort candidates #'helm-generic-sort-fn))))
    (update :initform #'helm-packages--refresh-contents))
   "A class to define `helm-packages' sources.")
+
+(defcustom helm-packages-async nil
+  "Install packages async when non nil."
+  :type 'boolean)
+
+
+;;; Async support
+;;
+(define-minor-mode helm-packages--async-modeline-mode
+    "Notify mode-line that an async process run."
+  :group 'dired-async
+  :global t
+  :lighter (:eval (propertize (format " [%s async job Installing package(s)]"
+                                      (length (dired-async-processes
+                                               'helm-async-pkg-install)))
+                              'face 'helm-delete-async-message))
+  (unless helm-packages--async-modeline-mode
+    (let ((visible-bell t)) (ding))))
+
+;; TODO: log compilation buffer.
+(defun helm-packages-do-async (action packages error-file)
+  "Execute ACTION asynchronously on PACKAGES.
+Argument ACTION can be one of \\='install, \\='upgrade, \\='reinstall.
+Argument PACKAGES is a list of packages (symbols).
+Argument ERROR-FILE is the file where errors are logged, if some."
+  (let ((fn (helm-acase action
+              (install 'package-install)
+              (upgrade 'package-upgrade)
+              (reinstall 'package-reinstall)))
+        (action-string (helm-acase action
+                         (install "Installing")
+                         (upgrade "Upgrading")
+                         (reinstall "Reinstalling"))))
+    (message "%s %s package(s)..." action-string (length packages))
+    (process-put
+     (async-start
+      `(lambda ()
+         (setq package-archives ',package-archives)
+         (package-initialize)
+         (condition-case err
+             (mapc ',fn ',packages)
+           (error
+            (with-temp-file ,error-file
+              (insert
+               (format
+                "%S:\n Please refresh package list before %s"
+                err action-string))))))
+      (lambda (result)
+        (if (file-exists-p error-file)
+            (progn (pop-to-buffer (find-file-noselect error-file))
+                   (delete-file error-file))
+          (when result
+            (setq package-selected-packages
+                  (append result package-selected-packages))
+            (helm-packages--async-modeline-mode -1)
+            (message "%s %s packages done" action-string (length packages))
+            (run-with-timer
+             0.1 nil
+             (lambda (lst)
+               (dired-async-mode-line-message
+                "%s %d package(s) done"
+                'helm-delete-async-message
+                action-string
+                (length lst)))
+             packages)))))
+     'helm-async-pkg-install t)
+    (helm-packages--async-modeline-mode 1)))
+
 
 ;;; Actions
 ;;
 ;;
 (defun helm-packages-upgrade (_candidate)
   "Helm action for upgrading marked packages."
-  (let ((mkd (helm-marked-candidates)))
+  (let ((mkd (helm-marked-candidates))
+        (error-file (expand-file-name
+                     "helm-packages-upgrade-error.txt"
+                     temporary-file-directory)))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (mapcar #'symbol-name mkd)
       (when (y-or-n-p (format "Upgrade %s packages? " (length mkd)))
-        (mapc #'package-upgrade mkd)))))
+        (if helm-packages-async
+            (helm-packages-do-async 'install mkd error-file)
+        (mapc #'package-upgrade mkd))))))
 
 (defun helm-packages-describe (candidate)
   "Helm action for describing package CANDIDATE."
@@ -66,12 +145,17 @@
 
 (defun helm-packages-package-reinstall (_candidate)
   "Helm action for reinstalling marked packages."
-  (let ((mkd (helm-marked-candidates)))
+  (let ((mkd (helm-marked-candidates))
+        (error-file (expand-file-name
+                     "helm-packages-reinstall-error.txt"
+                     temporary-file-directory)))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (mapcar #'symbol-name mkd)
       (when (y-or-n-p (format "Reinstall %s packages? " (length mkd)))
-        (mapc #'package-reinstall mkd)))))
+        (if helm-packages-async
+            (helm-packages-do-async 'reinstall mkd error-file)
+          (mapc #'package-reinstall mkd))))))
 
 (defun helm-packages-delete-1 (packages &optional force)
   "Run `package-delete' on PACKAGES.
@@ -111,16 +195,24 @@ as dependencies."
       (when (y-or-n-p (format "Recompile %s packages? " (length mkd)))
         (mapc #'package-recompile mkd)))))
 
+(defun helm-packages-install--sync (packages)
+  (condition-case err
+      (mapc #'package-install packages)
+    (error "%S:\n Please refresh package list before installing" err)))
+
 (defun helm-packages-install (_candidate)
   "Helm action for installing marked packages."
-  (let ((mkd (helm-marked-candidates)))
+  (let ((mkd (helm-marked-candidates))
+        (error-file (expand-file-name
+                     "helm-packages-install-error.txt"
+                     temporary-file-directory)))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (mapcar #'symbol-name mkd)
       (when (y-or-n-p (format "Install %s packages? " (length mkd)))
-        (condition-case err
-            (mapc #'package-install mkd)
-          (error "%S:\n Please refresh package list before installing" err))))))
+        (if helm-packages-async
+            (helm-packages-do-async 'install mkd error-file)
+          (helm-packages-install--sync mkd))))))
 
 (defun helm-packages-isolate-1 (packages)
     "Start an Emacs with only PACKAGES loaded.
