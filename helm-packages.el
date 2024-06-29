@@ -60,12 +60,12 @@
   (unless helm-packages--async-modeline-mode
     (let ((visible-bell t)) (ding))))
 
-;; TODO: log compilation buffer.
 (defun helm-packages-do-async (action packages error-file)
   "Execute ACTION asynchronously on PACKAGES.
 Argument ACTION can be one of \\='install, \\='upgrade, \\='reinstall.
 Argument PACKAGES is a list of packages (symbols).
 Argument ERROR-FILE is the file where errors are logged, if some."
+  (require 'async-bytecomp)
   (let ((fn (helm-acase action
               (install 'package-install)
               (upgrade 'package-upgrade)
@@ -78,16 +78,26 @@ Argument ERROR-FILE is the file where errors are logged, if some."
     (process-put
      (async-start
       `(lambda ()
+         (require 'bytecomp)
          (setq package-archives ',package-archives)
          (package-initialize)
-         (condition-case err
-             (mapc ',fn ',packages)
-           (error
-            (with-temp-file ,error-file
-              (insert
-               (format
-                "%S:\n Please refresh package list before %s"
-                err action-string))))))
+         (prog1
+             (condition-case err
+                 (mapc ',fn ',packages)
+               (error
+                (with-temp-file ,error-file
+                  (insert
+                   (format
+                    "%S:\n Please refresh package list before %s"
+                    err action-string)))))
+           (when (get-buffer byte-compile-log-buffer)
+             (setq error-data (with-current-buffer byte-compile-log-buffer
+                                (buffer-substring-no-properties
+                                 (point-min) (point-max))))
+             (unless (string= error-data "")
+               (with-temp-file ,async-byte-compile-log-file
+                 (erase-buffer)
+                 (insert error-data))))))
       (lambda (result)
         (if (file-exists-p error-file)
             (progn (pop-to-buffer (find-file-noselect error-file))
@@ -95,6 +105,7 @@ Argument ERROR-FILE is the file where errors are logged, if some."
           (when result
             (setq package-selected-packages
                   (append result package-selected-packages))
+            (package-initialize) ; load packages.
             (helm-packages--async-modeline-mode -1)
             (message "%s %s packages done" action-string (length packages))
             (run-with-timer
@@ -105,7 +116,16 @@ Argument ERROR-FILE is the file where errors are logged, if some."
                 'helm-delete-async-message
                 action-string
                 (length lst)))
-             packages)))))
+             packages)
+            (when (file-exists-p async-byte-compile-log-file)
+              (let ((buf (get-buffer-create byte-compile-log-buffer)))
+                (with-current-buffer buf
+                  (goto-char (point-max))
+                  (let ((inhibit-read-only t))
+                    (insert-file-contents async-byte-compile-log-file)
+                    (compilation-mode))
+                  (display-buffer buf)
+                  (delete-file async-byte-compile-log-file))))))))
      'helm-async-pkg-install t)
     (helm-packages--async-modeline-mode 1)))
 
