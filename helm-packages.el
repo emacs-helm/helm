@@ -145,7 +145,7 @@ Argument ERROR-FILE is the file where errors are logged, if some."
       (when (y-or-n-p (format "Upgrade %s packages? " (length mkd)))
         (if helm-packages-async
             (helm-packages-do-async 'install mkd error-file)
-        (mapc #'package-upgrade mkd))))))
+          (mapc #'package-upgrade mkd))))))
 
 (defun helm-packages-describe (candidate)
   "Helm action for describing package CANDIDATE."
