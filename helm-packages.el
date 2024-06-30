@@ -89,19 +89,21 @@ Argument ERROR-FILE is the file where errors are logged, if some."
                   (insert
                    (format
                     "%S:\n Please refresh package list before %s"
-                    err action-string)))))
-           (when (get-buffer byte-compile-log-buffer)
-             (setq error-data (with-current-buffer byte-compile-log-buffer
-                                (buffer-substring-no-properties
-                                 (point-min) (point-max))))
-             (unless (string= error-data "")
-               (with-temp-file ,async-byte-compile-log-file
-                 (erase-buffer)
-                 (insert error-data))))))
+                    err ,action-string)))))
+           (let (error-data)
+             (when (get-buffer byte-compile-log-buffer)
+               (setq error-data (with-current-buffer byte-compile-log-buffer
+                                  (buffer-substring-no-properties
+                                   (point-min) (point-max))))
+               (unless (string= error-data "")
+                 (with-temp-file ,async-byte-compile-log-file
+                   (erase-buffer)
+                   (insert error-data)))))))
       (lambda (result)
         (if (file-exists-p error-file)
             (progn (pop-to-buffer (find-file-noselect error-file))
-                   (delete-file error-file))
+                   (delete-file error-file)
+                   (helm-packages--async-modeline-mode -1))
           (when result
             (setq package-selected-packages
                   (append result package-selected-packages))
@@ -110,13 +112,12 @@ Argument ERROR-FILE is the file where errors are logged, if some."
             (message "%s %s packages done" action-string (length packages))
             (run-with-timer
              0.1 nil
-             (lambda (lst)
+             (lambda (lst str)
                (dired-async-mode-line-message
                 "%s %d package(s) done"
                 'helm-delete-async-message
-                action-string
-                (length lst)))
-             packages)
+                str (length lst)))
+             packages action-string)
             (when (file-exists-p async-byte-compile-log-file)
               (let ((buf (get-buffer-create byte-compile-log-buffer)))
                 (with-current-buffer buf
