@@ -101,9 +101,12 @@ Argument ERROR-FILE is the file where errors are logged, if some."
                    (insert error-data)))))))
       (lambda (result)
         (if (file-exists-p error-file)
-            (progn (pop-to-buffer (find-file-noselect error-file))
-                   (delete-file error-file)
-                   (helm-packages--async-modeline-mode -1))
+            (let ((buf (find-file-noselect error-file)))
+              (pop-to-buffer
+               buf '(nil . ((window-height . fit-window-to-buffer))))
+              (special-mode)
+              (delete-file error-file)
+              (helm-packages--async-modeline-mode -1))
           (when result
             (setq package-selected-packages
                   (append result package-selected-packages))
