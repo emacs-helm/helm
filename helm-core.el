@@ -194,6 +194,9 @@ window handling a buffer, it is this one we store.")
 (defvar helm--tramp-archive-maybe-loaded nil)
 (defvar helm--original-dedicated-windows-alist nil
   "[INTERNAL] Store all dedicated windows with their dedicated state on startup")
+(defvar helm--deleting-minibuffer-contents-from nil
+  "[INTERNAL] Recenter when deleting minibuffer-contents and preselecting.
+This is a flag used internally.")
 
 ;;; Multi keys
 ;;
@@ -6651,9 +6654,6 @@ Used generally to modify current selection."
   `(helm--edit-current-selection-internal
     (lambda () ,@forms)))
 
-(defvar helm--deleting-minibuffer-contents-from nil
-  "[INTERNAL] Recenter when deleting minibuffer-contents and preselecting.
-This is a flag used internally.")
 (defun helm--delete-minibuffer-contents-from (from-str &optional presel)
   ;; Giving an empty string value to FROM-STR delete all.
   (let ((input (minibuffer-contents))
