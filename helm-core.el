@@ -3462,10 +3462,10 @@ The function used to display `helm-buffer' by calling
         (helm-split-window-default-side
          (if (and (not helm-full-frame)
                   helm-reuse-last-window-split-state)
-             (cond ((eq helm-split-window-default-side 'same) 'same)
-                   ((eq helm-split-window-default-side 'other) 'other)
-                   (helm--window-side-state)
-                   (t helm-split-window-default-side))
+             (helm-acase helm-split-window-default-side
+               ((same other) it) ; take precedence on *-window-side-state.
+               ((guard helm--window-side-state) guard)
+               (t it))
            helm-split-window-default-side))
         (disp-fn (with-current-buffer buffer
                    (helm-resolve-display-function
