@@ -23,6 +23,7 @@
 (require 'package)
 (require 'finder)
 (require 'helm-utils) ; For with-helm-display-marked-candidates.
+(require 'async-package)
 
 (declare-function dired-async-mode-line-message "ext:dired-async.el")
 
@@ -47,93 +48,6 @@
   :type 'boolean)
 
 
-;;; Async support
-;;
-(define-minor-mode helm-packages--async-modeline-mode
-    "Notify mode-line that an async process run."
-  :group 'dired-async
-  :global t
-  :lighter (:eval (propertize (format " [%s async job Installing package(s)]"
-                                      (length (dired-async-processes
-                                               'helm-async-pkg-install)))
-                              'face 'helm-delete-async-message))
-  (unless helm-packages--async-modeline-mode
-    (let ((visible-bell t)) (ding))))
-
-(defun helm-packages-do-async (action packages error-file)
-  "Execute ACTION asynchronously on PACKAGES.
-Argument ACTION can be one of \\='install, \\='upgrade, \\='reinstall.
-Argument PACKAGES is a list of packages (symbols).
-Argument ERROR-FILE is the file where errors are logged, if some."
-  (require 'async-bytecomp)
-  (let ((fn (helm-acase action
-              (install 'package-install)
-              (upgrade 'package-upgrade)
-              (reinstall 'package-reinstall)))
-        (action-string (helm-acase action
-                         (install "Installing")
-                         (upgrade "Upgrading")
-                         (reinstall "Reinstalling"))))
-    (message "%s %s package(s)..." action-string (length packages))
-    (process-put
-     (async-start
-      `(lambda ()
-         (require 'bytecomp)
-         (setq package-archives ',package-archives)
-         (package-initialize)
-         (prog1
-             (condition-case err
-                 (mapc ',fn ',packages)
-               (error
-                (with-temp-file ,error-file
-                  (insert
-                   (format
-                    "%S:\n Please refresh package list before %s"
-                    err ,action-string)))))
-           (let (error-data)
-             (when (get-buffer byte-compile-log-buffer)
-               (setq error-data (with-current-buffer byte-compile-log-buffer
-                                  (buffer-substring-no-properties
-                                   (point-min) (point-max))))
-               (unless (string= error-data "")
-                 (with-temp-file ,async-byte-compile-log-file
-                   (erase-buffer)
-                   (insert error-data)))))))
-      (lambda (result)
-        (if (file-exists-p error-file)
-            (let ((buf (find-file-noselect error-file)))
-              (pop-to-buffer
-               buf '(nil . ((window-height . fit-window-to-buffer))))
-              (special-mode)
-              (delete-file error-file)
-              (helm-packages--async-modeline-mode -1))
-          (when result
-            (setq package-selected-packages
-                  (append result package-selected-packages))
-            (package-initialize) ; load packages.
-            (helm-packages--async-modeline-mode -1)
-            (message "%s %s packages done" action-string (length packages))
-            (run-with-timer
-             0.1 nil
-             (lambda (lst str)
-               (dired-async-mode-line-message
-                "%s %d package(s) done"
-                'helm-delete-async-message
-                str (length lst)))
-             packages action-string)
-            (when (file-exists-p async-byte-compile-log-file)
-              (let ((buf (get-buffer-create byte-compile-log-buffer)))
-                (with-current-buffer buf
-                  (goto-char (point-max))
-                  (let ((inhibit-read-only t))
-                    (insert-file-contents async-byte-compile-log-file)
-                    (compilation-mode))
-                  (display-buffer buf)
-                  (delete-file async-byte-compile-log-file))))))))
-     'helm-async-pkg-install t)
-    (helm-packages--async-modeline-mode 1)))
-
-
 ;;; Actions
 ;;
 ;;
@@ -148,7 +62,7 @@ Argument ERROR-FILE is the file where errors are logged, if some."
       (mapcar #'symbol-name mkd)
       (when (y-or-n-p (format "Upgrade %s packages? " (length mkd)))
         (if helm-packages-async
-            (helm-packages-do-async 'install mkd error-file)
+            (async-package-do-action 'install mkd error-file)
           (mapc #'package-upgrade mkd))))))
 
 (defun helm-packages-describe (candidate)
@@ -178,7 +92,7 @@ Argument ERROR-FILE is the file where errors are logged, if some."
       (mapcar #'symbol-name mkd)
       (when (y-or-n-p (format "Reinstall %s packages? " (length mkd)))
         (if helm-packages-async
-            (helm-packages-do-async 'reinstall mkd error-file)
+            (async-package-do-action 'reinstall mkd error-file)
           (mapc #'package-reinstall mkd))))))
 
 (defun helm-packages-delete-1 (packages &optional force)
@@ -235,7 +149,7 @@ as dependencies."
       (mapcar #'symbol-name mkd)
       (when (y-or-n-p (format "Install %s packages? " (length mkd)))
         (if helm-packages-async
-            (helm-packages-do-async 'install mkd error-file)
+            (async-package-do-action 'install mkd error-file)
           (helm-packages-install--sync mkd))))))
 
 (defun helm-packages-isolate-1 (packages)
