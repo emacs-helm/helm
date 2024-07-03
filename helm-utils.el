@@ -356,10 +356,13 @@ If a prefix arg is given split windows vertically."
 
 (defun helm-window-decide-split-fn (candidates &optional other-window-fn)
   "Try to find the best split window fn according to the number of CANDIDATES."
-  (let ((fn (cond ((>= (length candidates) 3)
+  (let ((fn (cond (;; 4 or more.
+                   (>= (length candidates) 4)
                    #'helm-window-mosaic-fn)
-                  ((>= (length candidates) 2)
+                  ;; 3 only.
+                  ((= (length candidates) 3)
                    #'helm-window-alternate-split-fn)
+                  ;; 2 or less.
                   (t #'helm-window-default-split-fn))))
     (funcall fn candidates other-window-fn)))
 
