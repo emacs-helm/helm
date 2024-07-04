@@ -4361,12 +4361,13 @@ Cache the candidates if there is no cached value yet."
        (let ((real (if (consp ,candidate)
                        (cdr ,candidate)
                      ,candidate)))
-         (if (and (listp it)
-                  (not (functionp it))) ;; Don't treat lambda's as list.
-             (cl-loop for f in it
-                      do (setq ,candidate (funcall f real))
-                      finally return ,candidate)
-           (setq ,candidate (funcall it real))))
+         (when real
+           (if (and (listp it)
+                    (not (functionp it))) ;; Don't treat lambda's as list.
+               (cl-loop for f in it
+                        do (setq ,candidate (funcall f real))
+                        finally return ,candidate)
+             (setq ,candidate (funcall it real)))))
      ,candidate))
 
 (defun helm--initialize-one-by-one-candidates (candidates source)
