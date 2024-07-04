@@ -4079,7 +4079,14 @@ Update is reenabled when idle 1s."
   "Delete char backward and update when reaching prompt."
   (interactive "p")
   (condition-case _err
-      (delete-backward-char arg)
+      (cond ((and (use-region-p)
+                  delete-active-region
+                  (= arg 1))
+             ;; If a region is active, kill or delete it.
+             (if (eq delete-active-region 'kill)
+                 (kill-region (region-beginning) (region-end) 'region)
+               (delete-region (region-beginning) (region-end))))
+            (t (delete-char (- arg))))
     (buffer-read-only
      (progn
        (helm-update)
