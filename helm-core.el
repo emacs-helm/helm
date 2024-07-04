@@ -4079,7 +4079,7 @@ Update is reenabled when idle 1s."
   "Delete char backward and update when reaching prompt."
   (interactive "p")
   (condition-case _err
-      (delete-char (- arg))
+      (delete-backward-char arg)
     (buffer-read-only
      (progn
        (helm-update)
