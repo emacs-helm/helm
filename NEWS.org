@@ -4,7 +4,7 @@
 ** Version 4.0-pre
 *** Packages can now be installed/upgraded asynchronously from helm-packages
 It is still synchronous by default, to enable async customize =helm-packages-async=.
-*** Helm-find-files presistent delete uses now a read-answer prompt
+*** Helm-find-files persistent delete uses now a read-answer prompt
 It is now possible to answer "!" (yes for all) when using marked
 candidates.
 *** Allow saving selection when deleting minibuffer contents
