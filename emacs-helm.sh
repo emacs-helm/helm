@@ -156,27 +156,37 @@ fi
 
 
 cat > $CONF_FILE <<EOF
-(setq initial-scratch-message (concat initial-scratch-message
-";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\n\
+(setq initial-scratch-message
+";; This buffer is for text that is not saved, and for Lisp evaluation.\\n\
+;; You can hit \`C-j' at end of a lisp expression to eval it.\\n\\n\
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\n\
 ;; This Emacs is Powered by \`HELM' using\\n\
 ;; emacs program \"$EMACS\".\\n\
 ;; This is a minimal \`helm' configuration to discover \`helm' or debug it.\\n\
 ;; You can retrieve this minimal configuration in \"$CONF_FILE\".\\n\
-;;
+
 ;; Some original Emacs commands are replaced by their \`helm' counterparts:\\n\\n\
 ;; - \`find-file'(C-x C-f)            =>\`helm-find-files'\\n\
 ;; - \`occur'(M-s o)                  =>\`helm-occur'\\n\
 ;; - \`list-buffers'(C-x C-b)         =>\`helm-buffers-list'\\n\
-;; - \`completion-at-point'(M-tab)    =>\`helm-lisp-completion-at-point'[1]\\n\
 ;; - \`apropos-command'(C-h a)        =>\`helm-apropos'\\n\
 ;; - \`dabbrev-expand'(M-/)           =>\`helm-dabbrev'\\n\
 ;; - \`execute-extended-command'(M-x) =>\`helm-M-x'\\n\\n
-;; Some other Emacs commands are \"helmized\" by \`helm-mode'.\\n\
-;; [1] Coming with emacs-24.4, \`completion-at-point' is \"helmized\" by \`helm-mode'\\n\
+;; \`helm-mode' is enabled which mean that most Emacs commands using completion\\n\
+;; will use helm.\\n\
 
-;; which provides Helm completion in many places like \`shell-mode'.\\n\
-;; Find context help for most Helm commands with \`C-h m'.\\n\
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\n\\n"))
+;; To start editing a file or to create a new file, visit it with \`C-x C-f'\\n\
+;; and enter text in its buffer, to save your changes hit \`C-x C-s'.
+
+;; Find context help for most Helm commands with \`C-h m' while helm is running.\\n\
+;; You can also retrieve the whole user documentation with \`C-x c h h'.\\n\
+;; For online documentation see \`https://github.com/emacs-helm/helm/wiki'.\\n\
+;; \(Put cursor on url, hit \`C-x C-f' and then RETurn).\\n\
+
+;; To quit this Emacs, hit \'C-x C-c'.\\n\
+
+;; Note about keybindings in Emacs: \`C-' means \'Control-' and \`M-' \'Alt-'.\\n\
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\n\\n")
 
 (setq load-path (quote $LOAD_PATH))
 
@@ -256,9 +266,6 @@ cat > $CONF_FILE <<EOF
 (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
 (define-key global-map [remap execute-extended-command] 'helm-M-x)
 (define-key global-map [remap apropos-command] 'helm-apropos)
-(unless (boundp 'completion-in-region-function)
-  (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
-  (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point))
 (add-hook 'kill-emacs-hook #'(lambda () (and (file-exists-p "$CONF_FILE") (delete-file "$CONF_FILE"))))
 EOF
 
