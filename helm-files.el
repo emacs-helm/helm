@@ -716,7 +716,8 @@ Currently Helm provides two functions to draw the progress bar:
 - The default progress bar which use the whole height of mode-line and print
 colored spaces to mimic a progress bar.
 - The SVG based progress bar which use the external library svg-lib (you will
-have to install to use this function)."
+have to install it to use this function) and needs emacs to be compiled with svg
+support."
   :type '(choice
           (function :tag "Default progress bar"
                     helm-rsync-default-progress-bar)
@@ -1420,6 +1421,8 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                       'face 'helm-ff-rsync-progress-1)))
 
 (defun helm-rsync-svg-progress-bar (proc percent info)
+  (cl-assert (image-type-available-p 'svg) nil
+             "svg-lib requires Emacs to be compiled with svg support")
   (require 'svg-lib)
   (format "%s%s%s"
           (propertize " " 'display (svg-lib-tag
