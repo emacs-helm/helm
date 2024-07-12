@@ -5154,7 +5154,8 @@ without recomputing them, it should be a list of lists."
 Argument OVERLAY is a ref-cell."
   (when (and helm-dim-prompt-on-update
              ;; Avoid an empty window when coming from bookmarks.
-             (not (helm-empty-buffer-p)))
+             (not (helm-empty-buffer-p))
+             (consp overlay)) ;; Ensure OVERLAY is a ref-cell.
     (with-selected-window (minibuffer-window)
       (setcar overlay (make-overlay (minibuffer-prompt-end) (point-max)))
       (overlay-put (car overlay) 'face '(:foreground "DimGray"))
