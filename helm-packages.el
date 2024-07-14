@@ -209,9 +209,11 @@ Arg PACKAGES is a list of strings."
                               ;; Package name.
                               (propertize
                                c
-                               'face (if (equal status "dependency")
-                                         font-lock-type-face
-                                       'font-lock-keyword-face)
+                               'face
+                               (helm-acase status
+                                 ("dependency" 'font-lock-type-face)
+                                 ("disabled" 'default)
+                                 (t 'font-lock-keyword-face))
                                'match-part c)
                               ;; Separator.
                               (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
@@ -220,9 +222,10 @@ Arg PACKAGES is a list of strings."
                               ;; Package status.
                               (propertize
                                (or status "")
-                               'face (if (equal status "dependency")
-                                         'bold-italic
-                                       'default))
+                               'face (helm-acase status
+                                       ("dependency" 'bold-italic)
+                                       ("disabled" 'font-lock-property-name-face)
+                                       (t 'default)))
                               ;; Separator.
                               (make-string (1+ (- 10 (length status))) ? )
                               ;; Package provider.
