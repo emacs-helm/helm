@@ -62,7 +62,7 @@
       (mapcar #'symbol-name mkd)
       (when (y-or-n-p (format "Upgrade %s packages? " (length mkd)))
         (if helm-packages-async
-            (async-package-do-action 'install mkd error-file)
+            (async-package-do-action 'upgrade mkd error-file)
           (mapc #'package-upgrade mkd))))))
 
 (defun helm-packages-describe (candidate)
