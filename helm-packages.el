@@ -271,7 +271,10 @@ to avoid errors with outdated packages no more availables."
   (interactive "P")
   (package-initialize)
   (when arg (helm-packages--refresh-contents))
-  (let ((upgrades (package--upgradeable-packages))
+  (let ((upgrades (cl-loop for p in (package--upgradeable-packages)
+                           unless (helm-aand (assq p package-load-list)
+                                             (or (null it) (stringp it)))
+                           collect p))
         (removables (package--removable-packages)))
     (helm :sources (list
                     (helm-make-source "Availables for upgrade" 'helm-packages-class
