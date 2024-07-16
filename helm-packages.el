@@ -43,7 +43,7 @@
    (update :initform #'helm-packages--refresh-contents))
   "A class to define `helm-packages' sources.")
 
-(defcustom helm-packages-async nil
+(defcustom helm-packages-async t
   "Install packages async when non nil."
   :type 'boolean)
 
