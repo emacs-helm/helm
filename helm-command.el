@@ -55,6 +55,12 @@ This value can be toggled with
 \\<helm-M-x-map>\\[helm-M-x-toggle-short-doc] while in helm-M-x session."
   :type 'boolean)
 
+(defcustom helm-M-x-filtered-candidate-transformer
+  #'helm-M-x-transformer
+  "The function to transform filtered candidates."
+  :group 'helm-command
+  :type 'function)
+
 
 ;;; Faces
 ;;
@@ -258,7 +264,7 @@ algorithm."
 (defclass helm-M-x-class (helm-source-in-buffer helm-type-command)
   ((requires-pattern :initform 0)
    (must-match :initform t)
-   (filtered-candidate-transformer :initform 'helm-M-x-transformer)
+   (filtered-candidate-transformer :initform (lambda (candidates _source) (funcall helm-M-x-filtered-candidate-transformer candidates _source)))
    (persistent-help :initform "Describe this command")
    (help-message :initform 'helm-M-x-help-message)
    (nomark :initform t)
