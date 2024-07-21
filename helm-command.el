@@ -55,6 +55,10 @@ This value can be toggled with
 \\<helm-M-x-map>\\[helm-M-x-toggle-short-doc] while in helm-M-x session."
   :type 'boolean)
 
+(defcustom helm-M-x-history-transformer-sort t
+  "When nil, do not sort helm-M-x's commands history."
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -258,7 +262,7 @@ algorithm."
 (defclass helm-M-x-class (helm-source-in-buffer helm-type-command)
   ((requires-pattern :initform 0)
    (must-match :initform t)
-   (filtered-candidate-transformer :initform 'helm-M-x-transformer)
+   (filtered-candidate-transformer :initform #'helm-M-x-transformer)
    (persistent-help :initform "Describe this command")
    (help-message :initform 'helm-M-x-help-message)
    (nomark :initform t)
@@ -287,9 +291,11 @@ Arg HISTORY default to `extended-command-history'."
   (setq helm--mode-line-display-prefarg t)
   (let* ((pred (or predicate #'commandp))
          (helm-fuzzy-sort-fn (lambda (candidates _source)
-                               ;; Sort on real candidate otherwise
-                               ;; "symbol (<binding>)" is used when sorting.
-                               (helm-fuzzy-matching-default-sort-fn-1 candidates t)))
+                               (if helm-M-x-history-transformer-sort
+                                   ;; Sort on real candidate otherwise
+                                   ;; "symbol (<binding>)" is used when sorting.
+                                   (helm-fuzzy-matching-default-sort-fn-1 candidates t)
+                                 candidates)))
          (sources `(,(helm-make-source "Emacs Commands history" 'helm-M-x-class
                        :data (lambda ()
                                (helm-comp-read-get-candidates
@@ -301,6 +307,10 @@ Arg HISTORY default to `extended-command-history'."
                                 ;; Ensure using empty string to
                                 ;; not defeat helm matching fns [1]
                                 pred nil nil ""))
+                       :filtered-candidate-transformer
+                       (if helm-M-x-history-transformer-sort
+                           #'helm-M-x-transformer
+                         #'helm-M-x-transformer-no-sort)
                        :fuzzy-match helm-M-x-fuzzy-match)
                     ,(helm-make-source "Emacs Commands" 'helm-M-x-class
                        :data (lambda ()
