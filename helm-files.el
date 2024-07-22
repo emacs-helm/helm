@@ -6002,13 +6002,6 @@ and `dired-compress-files-alist'."
      'helm-async-compress t)
     (helm-ff--compress-async-modeline-mode 1)))
 
-(defun helm-common-dir (files)
-  "Return the longest common directory path of FILES list"
-  (cl-loop with base = (car files)
-           for file in files
-           do (setq base (fill-common-string-prefix base file))
-           finally return (file-name-directory base)))
-
 (defun helm-ff--dired-compress-file (file)
   ;; `dired-compress-file' doesn't take care of binding `default-directory' when
   ;; uncompressing FILE, as a result FILE is uncompressed in the directory where

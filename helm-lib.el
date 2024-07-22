@@ -1894,6 +1894,13 @@ Take same args as `directory-files'."
     ;; Avoid error with 5nth arg COUNT which is not available in previous Emacs,
     ;; at least 27.1, see bug#2662.
     (apply #'directory-files directory args)))
+
+(defun helm-common-dir (files)
+  "Return the longest common directory path of FILES list"
+  (cl-loop with base = (car files)
+           for file in files
+           do (setq base (fill-common-string-prefix base file))
+           finally return (file-name-directory base)))
 
 ;;; helm internals
 ;;
