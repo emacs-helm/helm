@@ -1288,7 +1288,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                 (eq action 'compress)
                 (helm-common-dir ifiles)
                 (if (stringp it)
-                    it
+                    (file-name-as-directory it)
                   (error "Try to compress files not belonging to same drive"))))
          helm-ff--move-to-first-real-candidate
          helm-display-source-at-screen-top ; prevent setting window-start.
