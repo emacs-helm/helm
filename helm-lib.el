@@ -1897,17 +1897,19 @@ Take same args as `directory-files'."
 
 (defun helm-common-dir-1 (files)
   "Find the common directories of FILES."
-  (cl-loop with base = (car files)
-           with others = nil
-           for file in files
-           for cpart = (fill-common-string-prefix base file)
-           if cpart
-           do (setq base cpart)
-           else do (push file others)
-           finally return (if (and others base)
-                              (append (list (directory-file-name base))
-                                      (helm-common-dir-1 others))
-                            (list (and base (directory-file-name base))))))
+  (if (cdr files)
+      (cl-loop with base = (car files)
+               with others = nil
+               for file in files
+               for cpart = (fill-common-string-prefix base file)
+               if cpart
+               do (setq base cpart)
+               else do (push file others)
+               finally return (if (and others base)
+                                  (nconc (list (directory-file-name base))
+                                         (helm-common-dir-1 others))
+                                (list (and base (directory-file-name base)))))
+    (and files (list (file-name-directory (car files))))))
 
 (defun helm-common-dir (files)
   "Return the longest common directory path of FILES list.
