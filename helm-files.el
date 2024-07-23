@@ -1284,8 +1284,12 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                          (length ifiles)
                          (if (memq action '(symlink relsymlink hardlink))
                              "from" "to")))
-         (cdir (and (eq action 'compress)
-                    (helm-common-dir ifiles)))
+         (cdir (helm-aand
+                (eq action 'compress)
+                (helm-common-dir ifiles)
+                (if (stringp it)
+                    it
+                  (error "Try to compress files not belonging to same drive"))))
          helm-ff--move-to-first-real-candidate
          helm-display-source-at-screen-top ; prevent setting window-start.
          helm-ff-auto-update-initial-value

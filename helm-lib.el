@@ -1895,12 +1895,30 @@ Take same args as `directory-files'."
     ;; at least 27.1, see bug#2662.
     (apply #'directory-files directory args)))
 
-(defun helm-common-dir (files)
-  "Return the longest common directory path of FILES list"
+(defun helm-common-dir-1 (files)
+  "Find the common directories of FILES."
   (cl-loop with base = (car files)
+           with others = nil
            for file in files
-           do (setq base (fill-common-string-prefix base file))
-           finally return (file-name-directory base)))
+           for cpart = (fill-common-string-prefix base file)
+           if cpart
+           do (setq base cpart)
+           else do (push file others)
+           finally return (if (and others base)
+                              (append (list (directory-file-name base))
+                                      (let ((res (helm-common-dir-1 others)))
+                                        (if (listp res)
+                                            res
+                                          (list res))))
+                            (list (and base (directory-file-name base))))))
+
+(defun helm-common-dir (files)
+  "Return the longest common directory path of FILES list.
+If FILES are not all common to the same drive (Windows) a list of
+common directory is returned."
+  (let ((result (helm-common-dir-1 files)))
+    (if (cdr result) result (car result))))
+
 
 ;;; helm internals
 ;;
