@@ -1906,10 +1906,7 @@ Take same args as `directory-files'."
            else do (push file others)
            finally return (if (and others base)
                               (append (list (directory-file-name base))
-                                      (let ((res (helm-common-dir-1 others)))
-                                        (if (listp res)
-                                            res
-                                          (list res))))
+                                      (helm-common-dir-1 others))
                             (list (and base (directory-file-name base))))))
 
 (defun helm-common-dir (files)
@@ -1918,6 +1915,19 @@ If FILES are not all common to the same drive (Windows) a list of
 common directory is returned."
   (let ((result (helm-common-dir-1 files)))
     (if (cdr result) result (car result))))
+
+;; Tests:
+;; (helm-common-dir '("c:/foo" "c:/foo/bar/baz"
+;;                    "f:/foo" "e:/foo" "f:/foo/bar"
+;;                    "d:/foo" "d:/foo/bar/baz"
+;;                    "e:/foo/bar/baz"))
+;; ("c:/foo" "e:/foo" "f:/foo" "d:/foo")
+
+
+;; (helm-common-dir '("/home/you/download/foo/"
+;;                    "/home/you/download/foo/bar/baz"
+;;                    "/home/you/tmp/foo"))
+;; "/home/you"
 
 
 ;;; helm internals
