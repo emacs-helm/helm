@@ -1709,6 +1709,9 @@ returns if available with current AG version."
    (persistent-action :initform 'helm-grep-persistent-action)
    (persistent-help :initform "Jump to line (`C-u' Record in mark ring)")
    (candidate-number-limit :initform 99999)
+   (directory :initarg :directory :initform nil
+              :documentation
+              "  Directory currently searched.")
    (requires-pattern :initform 2)
    (nomark :initform t)
    (action :initform 'helm-grep-actions)
@@ -1732,6 +1735,7 @@ If INPUT is provided, use it as the search string."
           :header-name (lambda (name)
                          (format "%s [%s]"
                                  name (abbreviate-file-name directory)))
+          :directory directory
           :candidates-process
           (lambda () (helm-grep-ag-init directory type))))
   (helm-set-local-variable 'helm-input-idle-delay helm-grep-input-idle-delay)
