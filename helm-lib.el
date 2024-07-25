@@ -1909,7 +1909,8 @@ Take same args as `directory-files'."
                                   (nconc (list (directory-file-name base))
                                          (helm-common-dir-1 others))
                                 (list (and base (directory-file-name base)))))
-    (and files (list (file-name-directory (car files))))))
+    (and files (list (directory-file-name
+                      (file-name-directory (car files)))))))
 
 (defun helm-common-dir (files)
   "Return the longest common directory path of FILES list.
