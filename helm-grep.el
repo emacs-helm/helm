@@ -1697,12 +1697,18 @@ returns if available with current AG version."
                      proc-name
                      (replace-regexp-in-string "\n" "" event))))))))))
 
+(defvar helm-grep-ag-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-grep-map)
+    (define-key map (kbd "C-s") 'helm-grep-run-ag-grep-parent-directory)
+    map))
+
 (defclass helm-grep-ag-class (helm-source-async)
   ((nohighlight :initform t)
    (pcre :initarg :pcre :initform t
          :documentation
          "  Backend is using pcre regexp engine when non--nil.")
-   (keymap :initform 'helm-grep-map)
+   (keymap :initform 'helm-grep-ag-map)
    (history :initform 'helm-grep-ag-history)
    (help-message :initform 'helm-grep-help-message)
    (filtered-candidate-transformer :initform #'helm-grep-fc-transformer)
@@ -1736,15 +1742,28 @@ If INPUT is provided, use it as the search string."
                          (format "%s [%s]"
                                  name (abbreviate-file-name directory)))
           :directory directory
+          :action (append helm-grep-actions
+                          `((,(format "%s grep parent directory"
+                                      (upcase (helm-grep--ag-command)))
+                              . helm-grep-ag-grep-parent-directory)))
           :candidates-process
           (lambda () (helm-grep-ag-init directory type))))
   (helm-set-local-variable 'helm-input-idle-delay helm-grep-input-idle-delay)
   (helm :sources 'helm-source-grep-ag
-        :keymap helm-grep-map
         :history 'helm-grep-ag-history
         :input input
         :truncate-lines helm-grep-truncate-lines
         :buffer (format "*helm %s*" (helm-grep--ag-command))))
+
+(defun helm-grep-ag-grep-parent-directory (_candidate)
+  "Restart helm-grep-ag in the parent of the currently searched directory."
+  (let* ((src (with-helm-buffer (car helm-sources)))
+         (directory (helm-basedir (helm-get-attr 'directory src) t))
+         (input helm-pattern))
+    (helm-grep-ag-1 directory nil input)))
+
+(helm-make-command-from-action helm-grep-run-ag-grep-parent-directory
+    "Ag grep parent directory." 'helm-grep-ag-grep-parent-directory)
 
 (defun helm-grep-ag (directory with-types)
   "Start grep AG in DIRECTORY.
