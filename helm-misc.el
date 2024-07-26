@@ -409,7 +409,7 @@ Default action change TZ environment variable locally to emacs."
                                 and collect
                                 (cons (buffer-substring beg end) beg)))))
                  :action (lambda (pos)
-                           (goto-char pos)
+                           (helm-goto-char pos)
                            (helm-highlight-current-line)))
         :preselect (save-excursion
                      (when (condition-case _err
