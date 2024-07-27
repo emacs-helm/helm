@@ -6110,13 +6110,20 @@ When a prefix arg is given, meaning of
            (trash (helm-ff--delete-by-moving-to-trash (car marked)))
            (helm-ff--trashed-files
             (and trash (helm-ff-trash-list (helm-trash-directory))))
-           (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
+           (old--allow-recursive-deletes helm-ff-allow-recursive-deletes)
+           (buffers (cl-loop for f in marked
+                             append (helm-file-buffers f))))
       (unwind-protect
-           (helm-read-answer-dolist-with-action
-            "Really %s file `%s'"
-            marked
-            (lambda (file) (helm-ff--quick-delete-action file trash))
-            (list (if trash "Trash" "Delete") #'abbreviate-file-name))
+           (progn
+             (helm-read-answer-dolist-with-action
+              "Really %s file `%s'"
+              marked
+              (lambda (file) (helm-ff--quick-delete-action file trash))
+              (list (if trash "Trash" "Delete") #'abbreviate-file-name))
+             (when buffers
+               (helm-read-answer-dolist-with-action
+                "Kill buffer `%s', too? "
+                buffers #'kill-buffer)))
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil)
         (helm-force-update
@@ -6137,7 +6144,8 @@ When a prefix arg is given, meaning of
                      (not (helm-ff-dot-file-p candidate)))
                 (helm-basename candidate) candidate))))
   (helm-acase (helm-delete-file
-               candidate helm-ff-signal-error-on-dot-files trash)
+               candidate helm-ff-signal-error-on-dot-files
+               trash)
     (skip
      ;; This happens only when trying to
      ;; trash a file already trashed.
@@ -6172,8 +6180,7 @@ is nil."
     (when (and error-if-dot-file-p
                (helm-ff-dot-file-p file))
       (error "Error: Cannot operate on `.' or `..'"))
-    (let ((buffers (helm-file-buffers file))
-          (helm--reading-passwd-or-string t)
+    (let ((helm--reading-passwd-or-string t)
           (file-attrs (file-attributes file))
           (trash (or trash (helm-ff--delete-by-moving-to-trash file)))
           (delete-by-moving-to-trash trash)
@@ -6186,7 +6193,7 @@ is nil."
              (message "User error: `%s' is already trashed" file)
              (sit-for 1.5)
              (cl-return 'skip))
-            ((and (eq (nth 0 file-attrs) t) ; a directory.
+            ((and (eq (nth 0 file-attrs) t) ; a not empty directory.
                   (directory-files file t directory-files-no-dot-files-regexp))
              (if (or helm-ff-allow-recursive-deletes trash)
                  (delete-directory file 'recursive trash)
@@ -6202,13 +6209,9 @@ is nil."
                  ("q" (throw 'helm-abort-delete-file
                         (progn
                           (message "Abort file deletion") (sleep-for 1)))))))
-            ((eq (nth 0 file-attrs) t)
+            ((eq (nth 0 file-attrs) t) ; a directory.
              (delete-directory file nil trash))
-            (t (delete-file file trash)))
-      (when buffers
-        (dolist (buf buffers)
-          (when (y-or-n-p (format "Kill buffer %s, too? " buf))
-            (kill-buffer buf)))))))
+            (t (delete-file file trash))))))
 
 (defun helm-delete-marked-files (_ignore)
   "Delete marked files with `helm-delete-file'.
@@ -6221,7 +6224,9 @@ When a prefix arg is given, meaning of
          (helm-ff--trashed-files
           (and trash (helm-ff-trash-list (helm-trash-directory))))
          (prmt (if trash "Trash" "Delete"))
-         (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
+         (old--allow-recursive-deletes helm-ff-allow-recursive-deletes)
+         (buffers (cl-loop for f in files
+                           append (helm-file-buffers f))))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (helm-ff--count-and-collect-dups files)
@@ -6229,14 +6234,19 @@ When a prefix arg is given, meaning of
           (message "(No deletions performed)")
         (catch 'helm-abort-delete-file
           (unwind-protect
-               (dolist (i files)
-                 (set-text-properties 0 (length i) nil i)
-                 (let ((res (helm-delete-file
-                             i helm-ff-signal-error-on-dot-files trash)))
-                   (if (eq res 'skip)
-                       (progn (message "Directory is not empty, skipping")
-                              (sleep-for 1))
-                     (cl-incf len))))
+               (progn
+                 (dolist (i files)
+                   (set-text-properties 0 (length i) nil i)
+                   (let ((res (helm-delete-file
+                               i helm-ff-signal-error-on-dot-files trash)))
+                     (if (eq res 'skip)
+                         (progn (message "Directory is not empty, skipping")
+                                (sleep-for 1))
+                       (cl-incf len))))
+                 (when buffers
+                   (helm-read-answer-dolist-with-action
+                    "Kill buffer `%s', too? "
+                    buffers #'kill-buffer)))
             (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes)))
         (message "%s File(s) %s" len (if trash "trashed" "deleted"))))))
 
