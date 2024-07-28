@@ -403,8 +403,7 @@ Default action change TZ environment variable locally to emacs."
                                 for beg = (match-beginning 0)
                                 for end = (progn
                                             (outline-end-of-heading) (point))
-                                do (jit-lock-fontify-now beg end)
-                                and collect
+                                collect
                                 (cons (buffer-substring beg end) beg)))))
                  :action (lambda (pos)
                            (helm-goto-char pos)
