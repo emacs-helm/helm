@@ -1552,7 +1552,7 @@ DEST must be a directory.  SWITCHES when unspecified default to
                 (push (cons proc ml-str) helm-rsync-progress-str-alist)))))
     ;; Finally update mode-line.
     (unless helm-rsync-no-mode-line-update
-      (force-mode-line-update t))))
+      (force-mode-line-update))))
 
 (defun helm-ff-kill-rsync-process (process)
   "Kill rsync process PROCESS.
