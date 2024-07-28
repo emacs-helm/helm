@@ -393,15 +393,13 @@ Default action change TZ environment variable locally to emacs."
 (defun helm-outline ()
   "Basic helm navigation tool for outline buffers."
   (interactive)
-  (cl-assert (buffer-local-value 'outline-minor-mode (current-buffer))
-             nil "Not an outline enabled buffer")
   (helm :sources (helm-build-sync-source "helm outline"
                  :candidates
                  (lambda ()
                    (with-helm-current-buffer
                      (save-excursion
                        (goto-char (point-min))
-                       (cl-loop while (re-search-forward "^[*]+" nil t)
+                       (cl-loop while (re-search-forward outline-regexp nil t)
                                 for beg = (match-beginning 0)
                                 for end = (progn
                                             (outline-end-of-heading) (point))
