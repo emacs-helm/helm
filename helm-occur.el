@@ -322,6 +322,7 @@ When GSHORTHANDS is nil use PATTERN unmodified."
 
 (defun helm-occur-build-sources (buffers &optional source-name)
   "Build sources for `helm-occur' for each buffer in BUFFERS list."
+  (require 'helm-grep)
   (setq helm-occur--gshorthands nil)
   (and helm-occur-match-shorthands
        (setq helm-occur--gshorthands
@@ -381,9 +382,12 @@ When GSHORTHANDS is nil use PATTERN unmodified."
                 :history 'helm-occur-history
                 :candidate-number-limit helm-occur-candidate-number-limit
                 :action (append helm-occur-actions
-                          `((,(format "%s grep buffer directory"
-                                      (upcase (helm-grep--ag-command)))
-                              . helm-occur-grep-ag-buffer-directory)))
+                                (helm-make-actions
+                                 (lambda ()
+                                   (when helm-grep-ag-command
+                                     (format "%s grep buffer directory"
+                                             (upcase (helm-grep--ag-command)))))
+                                 'helm-occur-grep-ag-buffer-directory))
                 :requires-pattern 2
                 :follow 1
                 :group 'helm-occur

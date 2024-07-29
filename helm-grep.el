@@ -1584,8 +1584,9 @@ non-file buffers."
 ;;  https://github.com/BurntSushi/ripgrep
 
 (defun helm-grep--ag-command ()
-  (car (helm-remove-if-match
-        "\\`[A-Z]*=" (split-string helm-grep-ag-command))))
+  (and helm-grep-ag-command
+       (car (helm-remove-if-match
+             "\\`[A-Z]*=" (split-string helm-grep-ag-command)))))
 
 (defun helm-grep-ag-get-types ()
   "Returns a list of AG types if available with AG version.
