@@ -29,6 +29,8 @@
 (declare-function helm-comp-read "helm-mode")
 (declare-function outline-back-to-heading "outline.el")
 (declare-function outline-end-of-heading  "outline.el")
+(declare-function helm-goto-char "helm-utils")
+(declare-function helm-highlight-current-line "helm-utils")
 
 
 (defgroup helm-misc nil

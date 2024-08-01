@@ -27,6 +27,8 @@
 (declare-function helm-buffer-list "helm-buffers")
 (declare-function helm-grep-split-line "helm-grep")
 (declare-function helm-grep-highlight-match "helm-grep")
+(declare-function helm-grep-ag-1 "helm-grep")
+(declare-function helm-grep--ag-command "helm-grep")
 (declare-function helm-comp-read "helm-mode")
 
 (defvar helm-current-error)
