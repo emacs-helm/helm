@@ -285,7 +285,7 @@ Arg PACKAGES is a list of strings."
                                     (version-list-<
                                      cversion
                                      (package-desc-version (cadr available))))))
-                      (package-vc-p desc))
+                      (and (fboundp 'package-vc-p) (package-vc-p desc)))
              collect sym)))
 
 ;;;###autoload
