@@ -315,23 +315,7 @@ the leading `-' char."
         (unless package--initialized (package-initialize 'no-activate))
         (or (cadr (assq pkg-name package-alist))
             (cadr (assq pkg-name package-archive-contents))))
-  
-      (defun package--upgradeable-packages ()
-        ;; Initialize the package system to get the list of package
-        ;; symbols for completion.
-        (package--archives-initialize)
-        (mapcar
-         #'car
-         (seq-filter
-          (lambda (elt)
-            (or (let ((available
-                       (assq (car elt) package-archive-contents)))
-                  (and available
-                       (version-list-<
-                        (package-desc-version (cadr elt))
-                        (package-desc-version (cadr available)))))))
-          package-alist)))
-
+      
       (defun package-upgrade (name)
         "Upgrade package NAME if a newer version exists."
         (let* ((package (if (symbolp name)

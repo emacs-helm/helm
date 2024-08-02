@@ -47,6 +47,10 @@
   "Install packages async when non nil."
   :type 'boolean)
 
+(defcustom helm-package-install-upgrade-built-in
+  (bound-and-true-p package-install-upgrade-built-in)
+  "Allow upgrading builtin packages when non nil."
+  :type 'boolean)
 
 ;;; Actions
 ;;
@@ -259,6 +263,30 @@ Arg PACKAGES is a list of strings."
       (error "No packages matching key `%s'" key))
     packages))
 
+(defun helm-package--upgradeable-packages (&optional include-builtins)
+  ;; Initialize the package system to get the list of package
+  ;; symbols for completion.
+  (package--archives-initialize)
+  (let ((pkgs (if include-builtins
+                  (append package-alist
+                          (cl-loop for (sym . vec) in package--builtins
+                                   when (not (assq sym package-alist))
+                                   nconc (list (list sym (package--from-builtin
+                                                          (cons sym vec))))))
+                package-alist))) 
+    (cl-loop for (sym desc) in pkgs
+             for available = (helm-aif (assq sym package-archive-contents)
+                                 (and (not (package-disabled-p sym cversion))
+                                      it))
+             for cversion = (and available (package-desc-version desc))
+             when (or (and available
+                           (or (and include-builtins (not cversion))
+                               (and cversion
+                                    (version-list-<
+                                     cversion
+                                     (package-desc-version (cadr available))))))
+                      (package-vc-p desc))
+             collect sym)))
 
 ;;;###autoload
 (defun helm-packages (&optional arg)
@@ -271,10 +299,8 @@ to avoid errors with outdated packages no more availables."
   (interactive "P")
   (package-initialize)
   (when arg (helm-packages--refresh-contents))
-  (let ((upgrades (cl-loop for p in (package--upgradeable-packages)
-                           unless (helm-aand (assq p package-load-list)
-                                             (or (null (cadr it)) (stringp (cadr it))))
-                           collect p))
+  (let ((upgrades (helm-package--upgradeable-packages
+                   helm-package-install-upgrade-built-in))
         (removables (package--removable-packages)))
     (helm :sources (list
                     (helm-make-source "Availables for upgrade" 'helm-packages-class
