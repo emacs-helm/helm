@@ -1866,6 +1866,23 @@ Add (helm-popup-tip-mode 1) in your init file or enable it
 interactively with M-x helm-popup-tip-mode, however it is
 generally enough to just put your mouse cursor over candidate.
 
+*** Stop grepping with AG or RG and search in the current results
+
+Once you have found your results with helm grep ag you can search
+in these results (helm search, no grep).  This allows narrowing
+the results to a specific file for example or to a specific
+pattern without launching grep ag/rg.  The command is \\<helm-grep-ag-map>\\[helm-grep-ag-run-search-results].
+If you want to continue grepping, switch to the previous helm session
+which is helm-grep-ag session with \\<helm-map>\\[helm-resume-previous-session-after-quit].
+
+_NOTE_: This is available only in AG/RG, not grep.
+
+*** Grep AG/RG on parent directory
+
+The command
+\\<helm-grep-ag-map>\\[helm-grep-run-ag-grep-parent-directory] allow to grep the parent directory
+of the currently searched directory.
+
 *** Open file in other window
 
 The command \\<helm-grep-map>\\[helm-grep-run-other-window-action] allow you to open file
