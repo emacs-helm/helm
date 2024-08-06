@@ -1698,10 +1698,39 @@ returns if available with current AG version."
                      proc-name
                      (replace-regexp-in-string "\n" "" event))))))))))
 
+(defun helm-grep-ag-search-results (_candidate)
+  "Launch a new helm session on the current results.
+Allow narrowing the grep ag results to a specific file or pattern without
+continuing calling grep ag."
+  (with-helm-buffer
+    (let* ((src        (helm-get-current-source))
+           (candidates (nthcdr 1 (split-string
+                                  (buffer-substring-no-properties
+                                   (point-min) (point-max))
+                                  "\n")))
+           (transfo    (helm-get-attr 'filtered-candidate-transformer src))
+           (actions    (helm-get-attr 'action src))
+           (name       (helm-get-attr 'name src))
+           (directory  (helm-get-attr 'directory src)))
+      (helm :sources (helm-build-sync-source (format "Search in %s" name)
+                       :candidates candidates
+                       :keymap 'helm-grep-map
+                       :candidate-transformer
+                       (lambda (candidates)
+                         (let ((helm-grep-default-directory-fn
+                                (lambda () directory)))
+                           (funcall transfo candidates nil)))
+                       :action actions)
+            :buffer "*helm search ag*"))))
+
+(helm-make-command-from-action helm-grep-ag-run-search-results
+    "Run `helm-grep-ag-search-results' action." 'helm-grep-ag-search-results)
+
 (defvar helm-grep-ag-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-grep-map)
     (define-key map (kbd "C-s") 'helm-grep-run-ag-grep-parent-directory)
+    (define-key map (kbd "C-c s") 'helm-grep-ag-run-search-results)
     map))
 
 (defclass helm-grep-ag-class (helm-source-async)
@@ -1746,7 +1775,10 @@ If INPUT is provided, use it as the search string."
           :action (append helm-grep-actions
                           `((,(format "%s grep parent directory"
                                       (upcase (helm-grep--ag-command)))
-                              . helm-grep-ag-grep-parent-directory)))
+                              . helm-grep-ag-grep-parent-directory)
+                            (,(format "Search results in grep %s buffer"
+                                      (upcase (helm-grep--ag-command)))
+                             . helm-grep-ag-search-results)))
           :candidates-process
           (lambda () (helm-grep-ag-init directory type))))
   (helm-set-local-variable 'helm-input-idle-delay helm-grep-input-idle-delay)
