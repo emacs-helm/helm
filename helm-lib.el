@@ -558,8 +558,9 @@ and `cond'.
 KEYLIST can be any object that will be compared with `equal' or
 an expression starting with `guard' which is then evaluated.
 Once evaluated `guard' is bound to the returned value that can be
-used in the cdr of clause.  When KEYLIST match EXPR, BODY is
-executed and `helm-acase' exited with its value.
+used in the cdr of clause.  When KEYLIST match EXPR or `guard'
+evaluation is non-nil, BODY is executed and `helm-acase' exits
+with its value.
 
 If KEYLIST is a non-quoted list, each elements of the list are
 checked with `member' to see if one match EXPR.  To compare a
