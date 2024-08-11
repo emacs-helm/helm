@@ -51,6 +51,13 @@
   (bound-and-true-p package-install-upgrade-built-in)
   "Allow upgrading builtin packages when non nil."
   :type 'boolean)
+
+(defcustom helm-packages-isolate-fn (if (fboundp 'package-isolate)
+                                        #'package-isolate
+                                      #'helm-packages-isolate-1)
+  "The function to isolate package.
+`package-isolate' is available only in emacs-30+."
+  :type 'function)
 
 ;;; Actions
 ;;
@@ -178,15 +185,12 @@ Arg PACKAGES is a list of strings."
 (defun helm-packages-isolate (_candidate)
   "Start a new Emacs with only marked packages loaded."
   (let* ((mkd (helm-marked-candidates))
-         (pkg-names (mapcar #'symbol-name mkd))
-         (isolate (if (fboundp 'package-isolate)
-                      #'package-isolate
-                    #'helm-packages-isolate-1)))
+         (pkg-names (mapcar #'symbol-name mkd)))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       pkg-names
       (when (y-or-n-p "Start a new Emacs with only package(s)? ")
-        (funcall isolate pkg-names helm-current-prefix-arg)))))
+        (funcall helm-packages-isolate-fn pkg-names helm-current-prefix-arg)))))
 
 (defun helm-packages-quit-an-find-file (source)
   "`find-file-target' function for `helm-packages'."
