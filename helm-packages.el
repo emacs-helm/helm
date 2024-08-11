@@ -156,7 +156,7 @@ as dependencies."
             (async-package-do-action 'install mkd error-file)
           (helm-packages-install--sync mkd))))))
 
-(defun helm-packages-isolate-1 (packages)
+(defun helm-packages-isolate-1 (packages &optional _ignore)
     "Start an Emacs with only PACKAGES loaded.
 Arg PACKAGES is a list of strings."
     (let* ((name (concat "package-isolate-" (mapconcat #'identity packages "_")))
@@ -186,7 +186,7 @@ Arg PACKAGES is a list of strings."
       helm-marked-buffer-name
       pkg-names
       (when (y-or-n-p "Start a new Emacs with only package(s)? ")
-        (funcall isolate pkg-names)))))
+        (funcall isolate pkg-names helm-current-prefix-arg)))))
 
 (defun helm-packages-quit-an-find-file (source)
   "`find-file-target' function for `helm-packages'."
