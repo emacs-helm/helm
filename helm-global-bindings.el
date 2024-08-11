@@ -55,6 +55,7 @@ Using `setq' to modify this variable will have no effect."
     (define-key map (kbd "r")         'helm-regexp)
     (define-key map (kbd "m")         'helm-man-woman)
     (define-key map (kbd "t")         'helm-top)
+    (define-key map (kbd "o")         'helm-outline)
     (define-key map (kbd "/")         'helm-find)
     (define-key map (kbd "i")         'helm-imenu)
     (define-key map (kbd "I")         'helm-imenu-in-all-buffers)
