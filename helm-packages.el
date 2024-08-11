@@ -179,7 +179,9 @@ Arg PACKAGES is a list of strings."
                               (setq package-load-list
                                     ',(append (mapcar (lambda (p) (list (intern p) t))
                                                       packages)
-                                              (mapcar (lambda (p) (list p t)) deps)))
+                                              (mapcar (lambda (p) (list p t)) deps))
+                                    package-user-dir ,package-user-dir
+                                    package-directory-list ',package-directory-list)
                               (package-initialize)))))))
 
 (defun helm-packages-isolate (_candidate)
