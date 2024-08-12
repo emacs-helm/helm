@@ -281,10 +281,9 @@ Arg PACKAGES is a list of strings."
                                                           (cons sym vec))))))
                 package-alist))) 
     (cl-loop for (sym desc) in pkgs
-             for available = (helm-aif (assq sym package-archive-contents)
-                                 (and (not (package-disabled-p sym cversion))
-                                      it))
-             for cversion = (and available (package-desc-version desc))
+             for pkg = (assq sym package-archive-contents)
+             for cversion = (and pkg (package-desc-version desc))
+             for available = (and pkg (not (package-disabled-p sym cversion)) pkg)
              when (or (and available
                            (or (and include-builtins (not cversion))
                                (and cversion
