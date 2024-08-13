@@ -7352,70 +7352,72 @@ in only one window, the helm window is split to display
 maintain visibility.  The argument SPLIT can be used to force
 splitting inconditionally, it is unused currently."
   (interactive)
-  (with-helm-alive-p
-    (let ((source (helm-get-current-source)))
-      (unless attr
-        (setq attr (or (car (assq 'persistent-action source))
-                       (car (assq 'persistent-action-if source)))))
-      (helm-log "helm-execute-persistent-action" "executing persistent-action")
-      (let* ((selection (and source (helm-get-selection nil nil source)))
-             (attr-val (if (eq attr 'persistent-action-if)
-                           (funcall (assoc-default attr source) selection)
-                         (assoc-default attr source)))
-             ;; If attr value is a cons, use its car as persistent function.
-             (fn       (if (and (consp attr-val)
-                                ;; maybe a lambda.
-                                (not (functionp attr-val)))
-                           (car attr-val) attr-val))
-             ;; And its cdr to decide if helm window should be splitted.
-             (no-split (and (consp attr-val)
-                            (not (functionp attr-val))
-                            (cdr attr-val)))
-             ;; Is next-window (from helm-window) a suitable window for PA?
-             (no-suitable-win
-              (helm-aand (not helm--buffer-in-new-frame-p)
-                         (get-buffer-window helm-current-buffer)
-                         (or (window-dedicated-p it)
-                             (window-parameter it 'window-side))))
-             (cursor-in-echo-area t)
-             mode-line-in-non-selected-windows)
-        (progn
-          (when (and helm-onewindow-p (null no-split)
-                     (null helm--buffer-in-new-frame-p))
-            (helm-toggle-full-frame))
-          (when (eq fn 'ignore)
-            (cl-return-from helm-execute-persistent-action nil))
-          (when source
-            (with-helm-window
-              (save-selected-window
-                ;; FIXME: Simplify SPLIT behavior, it is a mess currently. 
-                (if no-split
-                    (helm-select-persistent-action-window :split 'never)
-                  (helm-select-persistent-action-window
-                   :split (or split helm-onewindow-p no-suitable-win)))
-                (helm-log "helm-execute-persistent-action"
-                          "current-buffer = %S" (current-buffer))
-                (let ((helm-in-persistent-action t)
-                      (display-buffer-alist '((".*" (display-buffer-same-window))))
-                      display-buffer-function pop-up-windows pop-up-frames
-                      special-display-regexps special-display-buffer-names)
-                  (helm-execute-selection-action-1
-                   selection (or fn (helm-get-actions-from-current-source source)) t)
-                  (unless (helm-action-window)
-                    (helm-log-run-hook "helm-execute-persistent-action"
-                                       'helm-after-persistent-action-hook)))
-                ;; A typical case is when a persistent action delete
-                ;; the buffer already displayed in
-                ;; `helm-persistent-action-display-window' and `helm-full-frame'
-                ;; is enabled, we end up with the `helm-buffer'
-                ;; displayed in two windows.
-                (when (and helm-onewindow-p
-                           (> (length (window-list)) 1)
-                           (equal (buffer-name
-                                   (window-buffer
-                                    helm-persistent-action-display-window))
-                                  (helm-buffer-get)))
-                  (delete-other-windows))))))))))
+  (with-suppressed-warnings ((obsolete special-display-regexps)
+                             (obsolete special-display-buffer-names))
+    (with-helm-alive-p
+      (let ((source (helm-get-current-source)))
+        (unless attr
+          (setq attr (or (car (assq 'persistent-action source))
+                         (car (assq 'persistent-action-if source)))))
+        (helm-log "helm-execute-persistent-action" "executing persistent-action")
+        (let* ((selection (and source (helm-get-selection nil nil source)))
+               (attr-val (if (eq attr 'persistent-action-if)
+                             (funcall (assoc-default attr source) selection)
+                           (assoc-default attr source)))
+               ;; If attr value is a cons, use its car as persistent function.
+               (fn       (if (and (consp attr-val)
+                                  ;; maybe a lambda.
+                                  (not (functionp attr-val)))
+                             (car attr-val) attr-val))
+               ;; And its cdr to decide if helm window should be splitted.
+               (no-split (and (consp attr-val)
+                              (not (functionp attr-val))
+                              (cdr attr-val)))
+               ;; Is next-window (from helm-window) a suitable window for PA?
+               (no-suitable-win
+                (helm-aand (not helm--buffer-in-new-frame-p)
+                           (get-buffer-window helm-current-buffer)
+                           (or (window-dedicated-p it)
+                               (window-parameter it 'window-side))))
+               (cursor-in-echo-area t)
+               mode-line-in-non-selected-windows)
+          (progn
+            (when (and helm-onewindow-p (null no-split)
+                       (null helm--buffer-in-new-frame-p))
+              (helm-toggle-full-frame))
+            (when (eq fn 'ignore)
+              (cl-return-from helm-execute-persistent-action nil))
+            (when source
+              (with-helm-window
+                (save-selected-window
+                  ;; FIXME: Simplify SPLIT behavior, it is a mess currently.
+                  (if no-split
+                      (helm-select-persistent-action-window :split 'never)
+                    (helm-select-persistent-action-window
+                     :split (or split helm-onewindow-p no-suitable-win)))
+                  (helm-log "helm-execute-persistent-action"
+                            "current-buffer = %S" (current-buffer))
+                  (let ((helm-in-persistent-action t)
+                        (display-buffer-alist '((".*" (display-buffer-same-window))))
+                        display-buffer-function pop-up-windows pop-up-frames
+                        special-display-regexps special-display-buffer-names)
+                    (helm-execute-selection-action-1
+                     selection (or fn (helm-get-actions-from-current-source source)) t)
+                    (unless (helm-action-window)
+                      (helm-log-run-hook "helm-execute-persistent-action"
+                                         'helm-after-persistent-action-hook)))
+                  ;; A typical case is when a persistent action delete
+                  ;; the buffer already displayed in
+                  ;; `helm-persistent-action-display-window' and `helm-full-frame'
+                  ;; is enabled, we end up with the `helm-buffer'
+                  ;; displayed in two windows.
+                  (when (and helm-onewindow-p
+                             (> (length (window-list)) 1)
+                             (equal (buffer-name
+                                     (window-buffer
+                                      helm-persistent-action-display-window))
+                                    (helm-buffer-get)))
+                    (delete-other-windows)))))))))))
 (put 'helm-execute-persistent-action 'helm-only t)
 
 (cl-defun helm-persistent-action-display-window (&key split)
