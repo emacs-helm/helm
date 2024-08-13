@@ -6791,8 +6791,9 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
-      (let ((inhibit-point-motion-hooks t)
-            (start-point (1- (point-min))))
+      (let ((start-point (1- (point-min))))
+        ;; Replace `inhibit-point-motion-hooks'.
+        (cursor-sensor-mode 1)
         (goto-char start-point)
         (if (string= pattern "")
             (helm-initial-candidates-from-candidate-buffer
