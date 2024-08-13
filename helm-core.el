@@ -6788,20 +6788,20 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
                                            search-fns limit
                                            match-part-fn source)
   "Return the list of candidates inserted in BUFFER matching PATTERN."
-  ;; buffer == nil when candidates buffer does not exist.
-  (when buffer
-    (with-current-buffer buffer
-      (let ((start-point (1- (point-min))))
-        ;; Replace `inhibit-point-motion-hooks'.
-        (cursor-sensor-mode 1)
-        (goto-char start-point)
-        (if (string= pattern "")
-            (helm-initial-candidates-from-candidate-buffer
-             get-line-fn (if (consp limit) (car limit) limit))
-          (helm-search-from-candidate-buffer
-           pattern get-line-fn search-fns
-           (if (consp limit) (cdr limit) limit)
-           start-point match-part-fn source))))))
+  (with-suppressed-warnings ((obsolete inhibit-point-motion-hooks))
+    ;; buffer == nil when candidates buffer does not exist.
+    (when buffer
+      (with-current-buffer buffer
+        (let ((inhibit-point-motion-hooks t)
+              (start-point (1- (point-min))))
+          (goto-char start-point)
+          (if (string= pattern "")
+              (helm-initial-candidates-from-candidate-buffer
+               get-line-fn (if (consp limit) (car limit) limit))
+            (helm-search-from-candidate-buffer
+             pattern get-line-fn search-fns
+             (if (consp limit) (cdr limit) limit)
+             start-point match-part-fn source)))))))
 
 
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
