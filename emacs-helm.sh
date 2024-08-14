@@ -163,7 +163,8 @@ cat > $CONF_FILE <<EOF
 ;; This Emacs is Powered by \`HELM' using\\n\
 ;; emacs program \"$EMACS\".\\n\
 ;; This is a minimal \`helm' configuration to discover \`helm' or debug it.\\n\
-;; You can retrieve this minimal configuration in \"$CONF_FILE\".\\n\
+;; You can retrieve this minimal configuration in \"$CONF_FILE\",\\n\
+;; to do this move cursor on the filename above and hit \`C-x C-f' and then RETurn.\\n\
 
 ;; Some original Emacs commands are replaced by their \`helm' counterparts:\\n\\n\
 ;; - \`find-file'(C-x C-f)            =>\`helm-find-files'\\n\
@@ -171,7 +172,8 @@ cat > $CONF_FILE <<EOF
 ;; - \`list-buffers'(C-x C-b)         =>\`helm-buffers-list'\\n\
 ;; - \`apropos-command'(C-h a)        =>\`helm-apropos'\\n\
 ;; - \`dabbrev-expand'(M-/)           =>\`helm-dabbrev'\\n\
-;; - \`execute-extended-command'(M-x) =>\`helm-M-x'\\n\\n
+;; - \`execute-extended-command'(M-x) =>\`helm-M-x'\\n\
+;; - \`yank-pop'(M-y)                 =>\`helm-show-kill-ring'\\n\\n
 ;; \`helm-mode' is enabled which mean that most Emacs commands using completion\\n\
 ;; will use helm.\\n\
 
@@ -266,6 +268,7 @@ cat > $CONF_FILE <<EOF
 (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
 (define-key global-map [remap execute-extended-command] 'helm-M-x)
 (define-key global-map [remap apropos-command] 'helm-apropos)
+(define-key global-map [remap yank-pop] 'helm-show-kill-ring)
 (add-hook 'kill-emacs-hook #'(lambda () (and (file-exists-p "$CONF_FILE") (delete-file "$CONF_FILE"))))
 EOF
 
