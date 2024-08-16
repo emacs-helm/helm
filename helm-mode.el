@@ -1050,20 +1050,25 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
     (charset . (metadata
                 (affixation-function . helm-completion-charset-affixation)
                 (category . charset))))
-  "Extra metadata for completing-read.
+  "Extra metadatas for completing-read.
 
-Alist composed of (CATEGORY . METADATA).
-CATEGORY is extracted from original metadata and METADATA is a list composed
-like this:
+It is used to add `affixation-function' or `annotation-function' if original
+metadata doesn't have some or to override existing metadata according to the
+category extracted from current metadata.
+
+It is an alist composed of (CATEGORY . METADATA) elements.
+CATEGORY is a symbol specifying the category according
+to the command in use and METADATA is a list composed like this:
+
     (metadata (affixation-function . fun)
               (annotation-function . fun)
               (category . category)
               (flags . flags))
 
-FLAGS is a list of variables to renitialize to nil when exiting or quitting.
+Categories for a specific commands are stored in
+`helm-completing-read-command-categories'.
 
-It is used to add `affixation-function' or `annotation-function' if original
-metadata doesn't have some and `completions-detailed' is non nil.")
+FLAGS is a list of variables to renitialize to nil when exiting or quitting.")
 
 (defvar helm-completing-read-command-categories
   '(("customize-variable" . symbol-help)
