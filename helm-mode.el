@@ -1030,8 +1030,8 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                     (affixation-function . helm-symbol-completion-table-affixation)
                     (category . symbol-help)))
     (eww-help . (metadata ;; Emacs-30 only
-                    (affixation-function . helm-completion-eww-affixation)
-                    (category . eww-help)))
+                 (affixation-function . helm-completion-eww-affixation)
+                 (category . eww-help)))
     (package . (metadata
                 (affixation-function . helm-completion-package-affixation)
                 (category . package)))
