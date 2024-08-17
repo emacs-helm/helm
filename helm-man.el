@@ -58,6 +58,8 @@ Arguments are passed to `manual-entry' with `format.'"
 Will be calculated the first time you invoke Helm with this
 source.")
 
+(defvar helm-source-man-pages nil)
+
 (defun helm-man-default-action (candidate)
   "Default action for jumping to a woman or man page from Helm."
   (let ((wfiles (mapcar #'car (woman-file-name-all-completions candidate))))
@@ -90,15 +92,16 @@ source.")
     (setq helm-man--pages (mapcar 'car woman-topic-all-completions)))
   (helm-init-candidates-in-buffer 'global helm-man--pages))
 
-(defvar helm-source-man-pages
-  (helm-build-in-buffer-source "Manual Pages"
-    :init #'helm-man--init
-    :persistent-action #'ignore
-    :filtered-candidate-transformer
-     (lambda (candidates _source)
-       (sort candidates #'helm-generic-sort-fn))
-    :action  '(("Display Man page" . helm-man-default-action))
-    :group 'helm-man))
+(defun helm-man-popup-info (name)
+  (let ((output (shell-command-to-string (format "man -f '%s'" name))))
+    (when (string-match (format "\\(%s ?([^(]+)\\) *- ?\\(.*\\)\n" name)
+                        output)
+      (match-string 2 output))))
+
+(defclass helm-man-pages-class (helm-source-in-buffer)
+  ((helm-popup-info
+    :initarg :helm-popup-info
+    :initform #'helm-man-popup-info)))
 
 ;;;###autoload
 (defun helm-man-woman (arg)
@@ -106,6 +109,16 @@ source.")
 With a prefix arg reinitialize the cache."
   (interactive "P")
   (when arg (setq helm-man--pages nil))
+  (unless helm-source-man-pages
+    (setq helm-source-man-pages
+          (helm-make-source "Manual Pages" 'helm-man-pages-class
+            :init #'helm-man--init
+            :persistent-action #'ignore
+            :filtered-candidate-transformer
+            (lambda (candidates _source)
+              (sort candidates #'helm-generic-sort-fn))
+            :action  '(("Display Man page" . helm-man-default-action))
+            :group 'helm-man)))
   (helm :sources 'helm-source-man-pages
         :buffer "*helm man woman*"))
 
