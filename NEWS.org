@@ -2,6 +2,9 @@
 
 * NEWS
 ** Version 4.0-pre
+*** helm-popup-tip-mode is now usable in any source
+In addition of the various helm-grep-* now =helm-man-woman= can benefit
+of this mode.
 *** New command helm-outline to navigate buffers according to outline-regexp
 *** New helm grep ag action to search results from the helm ag/rg session
 This allows filtering the current results to another pattern or to
