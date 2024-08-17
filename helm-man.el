@@ -106,7 +106,9 @@ source.")
 ;;;###autoload
 (defun helm-man-woman (arg)
   "Preconfigured `helm' for Man and Woman pages.
-With a prefix arg reinitialize the cache."
+With a prefix ARG reinitialize the cache.  To have a popup
+showing a basic description of selected candidate, turn on
+`helm-popup-tip-mode'."
   (interactive "P")
   (when arg (setq helm-man--pages nil))
   (unless helm-source-man-pages
