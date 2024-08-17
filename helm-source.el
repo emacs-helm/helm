@@ -1310,4 +1310,4 @@ Args ARGS are keywords provided by `helm-source-in-file'."
 
 (provide 'helm-source)
 
-;;; helm-source ends here
+;;; helm-source.el ends here

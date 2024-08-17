@@ -2259,4 +2259,4 @@ broken."
 
 (provide 'helm-lib)
 
-;;; helm-lib ends here
+;;; helm-lib.el ends here

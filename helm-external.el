@@ -261,4 +261,4 @@ commands with `helm-external-commands-list'."
 
 (provide 'helm-external)
 
-;;; helm-external ends here
+;;; helm-external.el ends here

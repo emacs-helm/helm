@@ -389,4 +389,4 @@ to avoid errors with outdated packages no more availables."
 
 (provide 'helm-packages)
 
-;;; helm-packages ends here
+;;; helm-packages.el ends here
