@@ -363,7 +363,7 @@ with `C-j' inside an avfs directory mounted with mountavfs.
 See <http://sourceforge.net/projects/avf/>."
   :type  'string)
 
-(defcustom helm-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
+(defcustom helm-ff-file-compressed-list '("gz" "bz2" "zip" "7z" "xz")
   "Minimal list of compressed files extension."
   :type  '(repeat (choice string)))
 
