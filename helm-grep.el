@@ -1186,6 +1186,7 @@ of grep."
 (defclass helm-grep-class (helm-source-async)
   ((candidates-process :initform 'helm-grep-collect-candidates)
    (filtered-candidate-transformer :initform #'helm-grep-fc-transformer)
+   (popup-info :initform #'helm-grep-popup-info-fn)
    (keymap :initform 'helm-grep-map)
    (pcre :initarg :pcre :initform nil
          :documentation
@@ -1395,6 +1396,10 @@ matching `helm-zgrep-file-extension-regexp' only."
         candidate
         (and (stringp candidate)
              (helm-grep--filter-candidate-1 candidate nil pcre)))))
+
+(defun helm-grep-popup-info-fn (_candidate)
+  (helm-aif (get-text-property (pos-bol) 'helm-grep-fname)
+    (abbreviate-file-name it)))
 
 (defun helm-grep-fc-transformer (candidates source)
   (let ((helm-grep-default-directory-fn
@@ -1742,6 +1747,7 @@ continuing calling grep ag."
    (history :initform 'helm-grep-ag-history)
    (help-message :initform 'helm-grep-help-message)
    (filtered-candidate-transformer :initform #'helm-grep-fc-transformer)
+   (popup-info :initform #'helm-grep-popup-info-fn)
    (persistent-action :initform 'helm-grep-persistent-action)
    (persistent-help :initform "Jump to line (`C-u' Record in mark ring)")
    (candidate-number-limit :initform 99999)

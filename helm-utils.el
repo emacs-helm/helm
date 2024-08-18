@@ -104,11 +104,6 @@ Where PA means persistent action."
   :group 'helm-utils
   :type 'integer)
 
-(defcustom helm-sources-using-help-echo-popup '("Ack-Grep" "AG" "RG" "Gid" "Git-Grep")
-  "Show the buffer name or the filename in a popup at selection."
-  :group 'helm-utils
-  :type '(repeat (choice string)))
-
 (defcustom helm-html-decode-entities-function #'helm-html-decode-entities-string
   "Function used to decode HTML entities in HTML bookmarks.
 Helm comes by default with `helm-html-decode-entities-string', if
@@ -1042,9 +1037,7 @@ Assume regexp is a pcre based regexp."
          (popup-info-fn (assoc-default 'popup-info src)))
     (when (and helm-alive-p
                helm-popup-tip-mode
-               (or (member (assoc-default 'name src)
-                           helm-sources-using-help-echo-popup)
-                   popup-info-fn))
+               popup-info-fn)
       (setq helm--show-help-echo-timer
             (run-with-idle-timer
              1 nil
@@ -1054,23 +1047,18 @@ Assume regexp is a pcre based regexp."
                    ;; Use helm-grep-fname prop instead of help-echo as help-echo
                    ;; maybe used by mouse overlay after resume.
                    (let ((pos (save-excursion (end-of-visual-line) (point))))
-                     (helm-acond ((get-text-property (pos-bol) 'helm-grep-fname)
-                                  (helm-tooltip-show
-                                   (concat " " (abbreviate-file-name it))
-                                   pos))
-                                 (popup-info-fn
-                                  (helm-tooltip-show
-                                   (concat " " (funcall it (helm-get-selection)))
-                                   pos))))))))))))
+                     (when popup-info-fn
+                       (helm-tooltip-show
+                        (concat " " (funcall popup-info-fn (helm-get-selection)))
+                        pos)))))))))))
 
 ;;;###autoload
 (define-minor-mode helm-popup-tip-mode
     "Show additional informations in a popup tip at end of line.
 
-When the mode is enabled, popup showup either when the source is one of
-`helm-sources-using-help-echo-popup' or the source has a `popup-info'
-attribute which define a specific function for this source to fetch infos on
-candidate."
+When the mode is enabled, popup showup when the source the source
+has a `popup-info' attribute which define a specific function for
+this source to fetch infos on candidate."
   :global t
   (if helm-popup-tip-mode
       (progn
