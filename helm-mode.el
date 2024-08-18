@@ -646,7 +646,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             allow-nest
                             coerce
                             raw-candidate
-                            (group 'helm))
+                            (group 'helm)
+                            popup-info)
   "Read a string in the minibuffer, with helm completion.
 
 It is helm `completing-read' equivalent.
@@ -863,6 +864,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                        :keymap keymap
                        :must-match must-match
                        :group group
+                       :popup-info popup-info
                        :coerce coerce
                        :mode-line mode-line
                        :help-message help-message
@@ -883,6 +885,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                         :action action-fn))
            (src (helm-build-sync-source name
                   :candidates get-candidates
+                  :popup-info popup-info
                   :match-part match-part
                   :multiline multiline
                   :header-name header-name
@@ -916,6 +919,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                       (append transformers
                               (unless (member 'helm-cr-default-transformer transformers)
                                 '(helm-cr-default-transformer))))
+                    :popup-info popup-info
                     :requires-pattern requires-pattern
                     :persistent-action persistent-action
                     :fuzzy-match fuzzy
@@ -1049,7 +1053,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                 (category . library)))
     (charset . (metadata
                 (affixation-function . helm-completion-charset-affixation)
-                (category . charset))))
+                (category . charset)))
+    (man . (metadata
+            (popup-info-function . helm-completion-man-popup-info)
+            (category . man))))
   "Extra metadatas for completing-read.
 
 It is used to add `affixation-function' or `annotation-function' if original
@@ -1071,7 +1078,8 @@ Categories for a specific commands are stored in
 FLAGS is a list of variables to renitialize to nil when exiting or quitting.")
 
 (defvar helm-completing-read-command-categories
-  '(("customize-variable" . symbol-help)
+  '(("man" . man)
+    ("customize-variable" . symbol-help)
     ("customize-set-variable" . symbol-help)
     ("customize-set-value" . symbol-help)
     ("customize-save-variable" . symbol-help)
@@ -1121,6 +1129,19 @@ Some commands provide a completion-table with no category
 specified in metadata, we allow here specifying the category of
 the completion provided by a specific command.  The command
 should be specified as a string and the category as a symbol.")
+
+;; We can't reuse the function from helm-man.el because the candidates are here
+;; differents e.g. apt vs apt(8).
+(defun helm-completion-man-popup-info (candidate)
+  ;; Man has the stupid habit to use symbol at point as default, try to not
+  ;; match it.
+  (let* ((com (if (string-match "\\(.*\\) ?([^()]+)" candidate)
+                  (match-string 1 candidate)
+                candidate))
+         (output (shell-command-to-string (format "man -f '%s'" com))))
+    (when (string-match (format "\\(%s ?([^(]+)\\) *- ?\\(.*\\)\n" com)
+                        output)
+      (match-string 2 output))))
 
 (defvar helm-completing-read--buffer-lgst-mode nil)
 (defun helm-completing-read-buffer-affixation (completions)
@@ -1426,7 +1447,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
                       metadata 'display-sort-function)
                      (lambda (candidates)
                        (sort candidates #'helm-generic-sort-fn)))))
-         flags)
+         popup-info flags)
     (helm-aif (and (null category)
                    (assoc-default name helm-completing-read-command-categories))
         (setq metadata `(metadata (category . ,it))
@@ -1438,6 +1459,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
           (setq metadata it)
           (setq afun (completion-metadata-get metadata 'annotation-function)
                 afix (completion-metadata-get metadata 'affixation-function)
+                popup-info (completion-metadata-get metadata 'popup-info-function)
                 flags (completion-metadata-get metadata 'flags))))
     (unwind-protect
          (helm-comp-read
@@ -1464,6 +1486,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
                                                   candidates)
                                                 afun afix category))))
                                   '(helm-cr-default-transformer))
+          :popup-info popup-info
           :quit-when-no-cand (eq require-match t)
           :nomark (null helm-comp-read-use-marked)
           :candidates-in-buffer cands-in-buffer
