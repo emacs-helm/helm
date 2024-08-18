@@ -2,7 +2,7 @@
 
 * NEWS
 ** Version 4.0-pre
-*** helm-popup-tip-mode is now usable in any source
+*** helm-popup-tip-mode is now usable in any source having the popup-info attribute
 In addition of the various helm-grep-* now =helm-man-woman= can benefit
 of this mode.
 *** New command helm-outline to navigate buffers according to outline-regexp
