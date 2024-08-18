@@ -92,16 +92,14 @@ source.")
     (setq helm-man--pages (mapcar 'car woman-topic-all-completions)))
   (helm-init-candidates-in-buffer 'global helm-man--pages))
 
-(defun helm-man-popup-info (name)
-  (let ((output (shell-command-to-string (format "man -f '%s'" name))))
-    (when (string-match (format "\\(%s ?([^(]+)\\) *- ?\\(.*\\)\n" name)
+(defun helm-man-popup-info (candidate)
+  (let ((output (shell-command-to-string (format "man -f '%s'" candidate))))
+    (when (string-match (format "\\(%s ?([^(]+)\\) *- ?\\(.*\\)\n" candidate)
                         output)
       (match-string 2 output))))
 
 (defclass helm-man-pages-class (helm-source-in-buffer)
-  ((helm-popup-info
-    :initarg :helm-popup-info
-    :initform #'helm-man-popup-info)))
+  ((popup-info :initform #'helm-man-popup-info)))
 
 ;;;###autoload
 (defun helm-man-woman (arg)

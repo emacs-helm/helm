@@ -718,7 +718,15 @@
     :initform 'helm
     :custom symbol
     :documentation
-    "  The current source group, default to `helm' when not specified."))
+    "  The current source group, default to `helm' when not specified.")
+   (popup-info
+    :initarg :popup-info
+    :initform nil
+    :custom function
+    :documentation
+    "  A function that show infos in a popup on the selected candidate.
+  This happen when `helm-popup-tip-mode' is enabled.
+  The function is called on candidate."))
 
   "Main interface to define helm sources."
   :abstract t)

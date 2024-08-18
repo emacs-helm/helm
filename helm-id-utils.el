@@ -87,6 +87,7 @@ MacPorts to install id-utils, it should be `gid32'."
    (candidates-process :initform #'helm-gid-candidates-process)
    (filtered-candidate-transformer
     :initform #'helm-gid-filtered-candidate-transformer)
+   (popup-info :initform #'helm-grep-popup-info-fn)
    (candidate-number-limit :initform 99999)
    (action :initform (helm-make-actions
                       "Find File" 'helm-grep-action
