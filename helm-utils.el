@@ -1047,9 +1047,10 @@ Assume regexp is a pcre based regexp."
                    ;; Use helm-grep-fname prop instead of help-echo as help-echo
                    ;; maybe used by mouse overlay after resume.
                    (let ((pos (save-excursion (end-of-visual-line) (point))))
-                     (when popup-info-fn
+                     (helm-aif (and popup-info-fn
+                                    (funcall popup-info-fn (helm-get-selection)))
                        (helm-tooltip-show
-                        (concat " " (funcall popup-info-fn (helm-get-selection)))
+                        (concat " " it)
                         pos)))))))))))
 
 ;;;###autoload
