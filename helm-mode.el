@@ -1582,7 +1582,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                     (string= helm-pattern ""))
                 candidates
               (sort candidates 'helm-generic-sort-fn))))
-         flags)
+         popup-info flags)
     (helm-aif (and (null category)
                    (assoc-default name helm-completing-read-command-categories))
         (setq metadata `(metadata (category . ,it))
@@ -1594,6 +1594,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
           (setq metadata it)
           (setq afun (completion-metadata-get metadata 'annotation-function)
                 afix (completion-metadata-get metadata 'affixation-function)
+                popup-info (completion-metadata-get metadata 'popup-info-function)
                 flags (completion-metadata-get metadata 'flags))))
     (unwind-protect
         (helm-comp-read
@@ -1621,6 +1622,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                                         candidates source)
                                afun afix category))))
                  '(helm-cr-default-transformer))
+         :popup-info popup-info
          :match-dynamic (eq helm-completion-style 'emacs)
          :diacritics helm-mode-ignore-diacritics
          :fuzzy (eq helm-completion-style 'helm-fuzzy)
