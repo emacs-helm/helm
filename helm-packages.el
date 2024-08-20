@@ -403,15 +403,18 @@ To have more actions on packages, use `helm-packages'."
                          nconc (copy-sequence (package-desc--keywords desc)) into keywords
                          finally return (helm-fast-remove-dups keywords :test 'equal))
           :filtered-candidate-transformer
-          (lambda (candidates _source)
-            (cl-loop for cand in candidates
-                     for desc = (or (assoc-default (intern-soft cand) finder-known-keywords)
-                                    cand)
-                     for sep = (helm-make-separator cand)
-                     for disp = (helm-aand (propertize desc 'face 'font-lock-warning-face)
-                                           (propertize " " 'display (concat sep it))
-                                           (concat cand it))
-                     collect (cons disp cand)))
+          (list
+           (lambda (candidates _source)
+             (cl-loop for cand in candidates
+                      for desc = (or (assoc-default (intern-soft cand) finder-known-keywords)
+                                     cand)
+                      for sep = (helm-make-separator cand)
+                      for disp = (helm-aand (propertize desc 'face 'font-lock-warning-face)
+                                            (propertize " " 'display (concat sep it))
+                                            (concat cand it))
+                      collect (cons disp cand)))
+           (lambda (candidates _source)
+                    (sort candidates #'helm-generic-sort-fn)))
           :action (helm-make-actions
                    "Packages from keyword" 'helm-finder-packages-from-keyword))
         :buffer "*helm finder*"))
