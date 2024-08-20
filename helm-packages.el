@@ -211,10 +211,22 @@ Arg PACKAGES is a list of strings."
            for sym = (intern-soft c)
            for archive = (assq sym package-archive-contents)
            for id = (package-get-descriptor sym)
-           for provider = (and archive (package-desc-archive (cadr archive)))
-           for status = (and id (package-desc-status id))
-           for version = (and id (mapconcat #'number-to-string (package-desc-version id) "."))
-           for description = (and id (package-desc-summary id))
+           for provider = (if archive
+                              (package-desc-archive (cadr archive))
+                            (and (assq sym package--builtins) "emacs"))
+           for status = (if id
+                            (package-desc-status id)
+                          (and (assq sym package--builtins) "Built-in"))
+           for version = (if id
+                             (mapconcat #'number-to-string (package-desc-version id) ".")
+                           (or (helm-aand (assq sym package--builtins)
+                                          (aref (cdr it) 0)
+                                          (package-version-join it))
+                               "---"))
+           for description = (if id
+                                 (package-desc-summary id)
+                               (helm-aand (assq sym package--builtins)
+                                          (aref (cdr it) 2)))
            for disp = (format "%s%s%s%s%s%s%s%s%s"
                               ;; Package name.
                               (propertize
