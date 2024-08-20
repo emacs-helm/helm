@@ -1,7 +1,7 @@
 #+STARTUP:showall
 
 * NEWS
-** Version 4.0-pre
+** Version 4.0
 *** Enhance helm-finder
 Now helm-finder fetchs keywords from all packages, not only built-in
 and allows installing from there.
