@@ -366,7 +366,8 @@ to avoid errors with outdated packages no more availables."
 
 ;;;###autoload
 (defun helm-finder ()
-  "Helm interface to find packages by keywords with `finder'."
+  "Helm interface to find packages by keywords with `finder'.
+To have more actions on packages, use `helm-packages'."
   (interactive)
   (package-initialize) ; needed to feed package-archive-contents.
   (helm :sources
