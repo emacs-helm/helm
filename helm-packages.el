@@ -395,7 +395,8 @@ To have more actions on packages, use `helm-packages'."
                               :header-name (lambda (name) (format "%s (%s)" name c))
                               :init (lambda ()
                                       (helm-init-candidates-in-buffer
-                                          'global (helm-finder--list-matches c)))
+                                          'global (helm-fast-remove-dups
+                                                   (helm-finder--list-matches c))))
                               :filtered-candidate-transformer #'helm-packages-transformer
                               :action-transformer (lambda (actions candidate)
                                                     (if (package-installed-p candidate)
