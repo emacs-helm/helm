@@ -402,10 +402,11 @@ to avoid errors with outdated packages no more availables."
           :buffer "*helm packages*")))
 
 ;;;###autoload
-(defun helm-finder ()
+(defun helm-finder (&optional arg)
   "Helm interface to find packages by keywords with `finder'.
 To have more actions on packages, use `helm-packages'."
-  (interactive)
+  (interactive "P")
+  (when arg (package-refresh-contents))
   (package-initialize) ; needed to feed package-archive-contents.
   (helm :sources
         (helm-build-in-buffer-source "helm finder"
