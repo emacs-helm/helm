@@ -396,7 +396,14 @@ to avoid errors with outdated packages no more availables."
                                       (helm-init-candidates-in-buffer
                                           'global (helm-finder--list-matches c)))
                               :filtered-candidate-transformer #'helm-packages-transformer-1
-                              :action '(("Describe package" . helm-packages-describe)))
+                              :action-transformer (lambda (actions candidate)
+                                                    (if (package-installed-p candidate)
+                                                        actions
+                                                      (append actions
+                                                              '(("Install packages(s)"
+                                                                 . helm-packages-install)))))
+                              :action '(("Describe package" . helm-packages-describe)
+                                        ("Visit homepage" . helm-packages-visit-homepage)))
                             :buffer "*helm finder results*"))))
         :buffer "*helm finder*"))
 
