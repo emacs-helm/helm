@@ -264,10 +264,16 @@ Arg PACKAGES is a list of strings."
 
 (defun helm-finder--list-matches (key)
   (let* ((id (intern key))
-	 (packages (gethash id finder-keywords-hash)))
-    (unless packages
+         (built-in (gethash id finder-keywords-hash))
+	 (exts (cl-loop for p in package-archive-contents
+                        for sym = (car p)
+                        when (package--has-keyword-p
+                              (package-get-descriptor sym)
+                              (list key))
+                        collect sym)))
+    (unless (or exts built-in)
       (error "No packages matching key `%s'" key))
-    packages))
+    (nconc built-in exts)))
 
 (defun helm-package--upgradeable-packages (&optional include-builtins)
   ;; Initialize the package system to get the list of package
@@ -362,13 +368,19 @@ to avoid errors with outdated packages no more availables."
 (defun helm-finder ()
   "Helm interface to find packages by keywords with `finder'."
   (interactive)
+  (package-initialize) ; needed to feed package-archive-contents.
   (helm :sources
         (helm-build-in-buffer-source "helm finder"
-          :data (mapcar #'car finder-known-keywords)
+          :data (cl-loop for p in package-archive-contents
+                         for sym = (car p)
+                         for desc = (package-get-descriptor sym)
+                         nconc (copy-sequence (package-desc--keywords desc)) into keywords
+                         finally return (helm-fast-remove-dups keywords :test 'equal))
           :filtered-candidate-transformer
           (lambda (candidates _source)
             (cl-loop for cand in candidates
-                     for desc = (assoc-default (intern-soft cand) finder-known-keywords)
+                     for desc = (or (assoc-default (intern-soft cand) finder-known-keywords)
+                                    cand)
                      for sep = (helm-make-separator cand)
                      for disp = (helm-aand (propertize desc 'face 'font-lock-warning-face)
                                            (propertize " " 'display (concat sep it))
@@ -379,6 +391,7 @@ to avoid errors with outdated packages no more availables."
                         (finder-commentary c)
                       (helm :sources
                             (helm-make-source "packages" 'helm-packages-class
+                              :header-name (lambda (name) (format "%s (%s)" name c))
                               :init (lambda ()
                                       (helm-init-candidates-in-buffer
                                           'global (helm-finder--list-matches c)))
