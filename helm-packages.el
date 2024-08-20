@@ -273,7 +273,7 @@ Arg PACKAGES is a list of strings."
                         collect sym)))
     (unless (or exts built-in)
       (error "No packages matching key `%s'" key))
-    (nconc built-in exts)))
+    (nconc exts built-in)))
 
 (defun helm-package--upgradeable-packages (&optional include-builtins)
   ;; Initialize the package system to get the list of package
