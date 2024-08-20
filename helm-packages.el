@@ -396,7 +396,7 @@ To have more actions on packages, use `helm-packages'."
                               :init (lambda ()
                                       (helm-init-candidates-in-buffer
                                           'global (helm-finder--list-matches c)))
-                              :filtered-candidate-transformer #'helm-packages-transformer-1
+                              :filtered-candidate-transformer #'helm-packages-transformer
                               :action-transformer (lambda (actions candidate)
                                                     (if (package-installed-p candidate)
                                                         actions
