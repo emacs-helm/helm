@@ -275,6 +275,31 @@ Arg PACKAGES is a list of strings."
       (error "No packages matching key `%s'" key))
     (nconc exts built-in)))
 
+(defun helm-finder-packages-from-keyword (candidate)
+  (if (string-match "\\.el$" candidate)
+      (finder-commentary candidate)
+    (helm :sources
+          (helm-make-source "packages" 'helm-packages-class
+            :header-name (lambda (name) (format "%s (%s)" name candidate))
+            :init (lambda ()
+                    (helm-init-candidates-in-buffer
+                        'global (helm-fast-remove-dups
+                                 (helm-finder--list-matches candidate))))
+            :filtered-candidate-transformer
+            (list #'helm-packages-transformer
+                  (lambda (candidates _source)
+                    (sort candidates #'helm-generic-sort-fn)))
+            :action-transformer
+            (lambda (actions candidate)
+              (if (package-installed-p candidate)
+                  actions
+                (append actions
+                        '(("Install packages(s)"
+                           . helm-packages-install)))))
+            :action '(("Describe package" . helm-packages-describe)
+                      ("Visit homepage" . helm-packages-visit-homepage)))
+          :buffer "*helm finder results*")))
+
 (defun helm-package--upgradeable-packages (&optional include-builtins)
   ;; Initialize the package system to get the list of package
   ;; symbols for completion.
@@ -387,26 +412,8 @@ To have more actions on packages, use `helm-packages'."
                                            (propertize " " 'display (concat sep it))
                                            (concat cand it))
                      collect (cons disp cand)))
-          :action (lambda (c)
-                    (if (string-match "\\.el$" c)
-                        (finder-commentary c)
-                      (helm :sources
-                            (helm-make-source "packages" 'helm-packages-class
-                              :header-name (lambda (name) (format "%s (%s)" name c))
-                              :init (lambda ()
-                                      (helm-init-candidates-in-buffer
-                                          'global (helm-fast-remove-dups
-                                                   (helm-finder--list-matches c))))
-                              :filtered-candidate-transformer #'helm-packages-transformer
-                              :action-transformer (lambda (actions candidate)
-                                                    (if (package-installed-p candidate)
-                                                        actions
-                                                      (append actions
-                                                              '(("Install packages(s)"
-                                                                 . helm-packages-install)))))
-                              :action '(("Describe package" . helm-packages-describe)
-                                        ("Visit homepage" . helm-packages-visit-homepage)))
-                            :buffer "*helm finder results*"))))
+          :action (helm-make-actions
+                   "Packages from keyword" 'helm-finder-packages-from-keyword))
         :buffer "*helm finder*"))
 
 (provide 'helm-packages)
