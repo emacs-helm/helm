@@ -429,7 +429,9 @@ To have more actions on packages, use `helm-packages'."
            (lambda (candidates _source)
                     (sort candidates #'helm-generic-sort-fn)))
           :action (helm-make-actions
-                   "Packages from keyword" 'helm-finder-packages-from-keyword))
+                   "Packages from keyword" 'helm-finder-packages-from-keyword)
+          :persistent-action 'ignore
+          :persistent-help "Do nothing")
         :buffer "*helm finder*"))
 
 (provide 'helm-packages)
