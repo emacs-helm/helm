@@ -40,6 +40,8 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 ***
 
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/emacs-helm)
+
+
 [Support via Patreon](https://www.patreon.com/user?u=86324343)
 
 ***
