@@ -39,6 +39,7 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 
 ***
 
+[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/emacs-helm)
 [Support via Patreon](https://www.patreon.com/user?u=86324343)
 
 ***
@@ -56,7 +57,6 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 
 - [Introduction](#introduction)
 - [Features](#features)
-- [Alternatives](#alternatives)
 - [Requirements](#requirements)
 - [Getting Started](#getting-started)
     - [Install from Straight](#install-from-straight)
@@ -70,7 +70,7 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
         - [Windows and frames configuration](#windows-and-frames-configuration)
         - [Matching methods](#matching-methods)
         - [Creating custom helm sources](#creating-custom-helm-sources)
-- [Helm Applications](#helm-applications)
+- [Helm Applications ](#helm-applications)
 - [Recommended Helm extensions](#recommended-helm-extensions)
 - [Other emacs extensions recommended with helm](#other-emacs-extensions-recommended-with-helm)
 - [External programs recommended with helm](#external-programs-recommended-with-helm)
@@ -110,18 +110,14 @@ _Note:_ You will find many helm extensions providing diverse features sometimes 
 prefer generally the ones that are natively in `Helm`, e.g. `Helm` support natively most grep implementations as backend (ack, ag, rg),
 no need to install 3rd party packages for this, same for managing projects etc...
 
-# Alternatives
-
-There are several alternatives to Helm nowaday, they are all providing
-incremental completion but they lack all the Helm features due to
-their wrong implementation abusing minibuffer.
-
 # Requirements
 
 Helm requires Emacs-25.1 or later versions.
 
-Helm installs [async](https://github.com/jwiegley/emacs-async) and [popup-el](https://github.com/auto-complete/popup-el) package as dependencies
-when Helm is installed using [MELPA](https://melpa.org/). 
+Helm installs [async](https://github.com/jwiegley/emacs-async) and [wfnames](https://github.com/thierryvolpiatto/wfnames) package as dependencies
+when Helm is installed using [MELPA](https://melpa.org/).
+
+It is recomended to install [all-the-icons](https://github.com/domtronn/all-the-icons.el) to have icons in several places (files, buffers etc..) even if it is not mandatory.
 
 # Getting Started
 
@@ -133,13 +129,9 @@ See [Install from straight package manager](https://github.com/emacs-helm/helm/w
 
 See [Install Helm from Git](https://github.com/emacs-helm/helm/wiki#from-source)
 
-_NOTE:_ Installing helm using git and make is the safest way.
-
 ## Install from Emacs packaging system
 
 See [Install Helm from Melpa](https://github.com/emacs-helm/helm/wiki#from-melpa)
-
-_NOTE:_ This is not the recommended way to install packages.
 
 ## Installing just the helm-core package
 
@@ -176,7 +168,7 @@ requiring completions, see below how to enable `helm-mode`.
 
 - When you have problems like Helm beeing slow or something not working, always fallback to default settings.
 
-- Configure Helm yourself, don't use preconfigured Emacs that configure wrongly Helm for you.
+- Configure Helm yourself, don't use preconfigured Emacs that configure wrongly Helm for you (e.g. Spacemacs).
 
 - Refrain installing all Helm packages you find in Melpa, check first if the feature you are looking for is available in Helm.
 
@@ -265,9 +257,9 @@ for details.
 
 # Helm Applications 
 
-These are popular applications developed using helm completion and
-narrowing framework. They are available for individual installs
-through the Emacs package manager. This list is not exhaustive.
+Here are some popular applications developed using helm completion and
+narrowing framework and available in `Helm` package.
+This list is not exhaustive.
 
 - `helm-mode`: turns on helm completions for most standard emacs
   completions. Helm provides even more optimized helm completions for
@@ -317,7 +309,7 @@ through the Emacs package manager. This list is not exhaustive.
 
 - `helm-filtered-bookmarks`: enhanced browser for bookmarks.
 
-- `helm-list-elisp-packages`: enhanced browser for elisp package management.
+- `helm-packages`: enhanced browser for elisp package management.
 
 # Recommended Helm extensions
 
@@ -330,11 +322,14 @@ Here some of them I am using:
 - [helm-dictionary](https://github.com/emacs-helm/helm-dictionary)
 - [helm-mu](https://github.com/emacs-helm/helm-mu)
 - [helm-slime](https://github.com/emacs-helm/helm-slime)
-- [helm-system-packages](https://github.com/emacs-helm/helm-system-packages)
 - [helm-descbinds](https://github.com/emacs-helm/helm-descbinds)
 - [helm-firefox](https://github.com/emacs-helm/helm-firefox)
 - [helm-w3m](https://github.com/emacs-helm/helm-w3m)
 - [helm-emms](https://github.com/emacs-helm/helm-emms)
+- [helm-apt](https://github.com/emacs-helm/helm-apt)
+- [helm-org](https://github.com/emacs-helm/helm-org)
+- [helm-bm](https://github.com/emacs-helm/helm-bm)
+- [helm-wikipedia](https://github.com/emacs-helm/helm-wikipedia)
 
 **Warning** Helm development has sparked quite a few extensions, many
 of which duplicate features already included in helm. Some of these
@@ -349,6 +344,7 @@ extensions e.g. helm-swoop vs helm-occur which is part of Helm.
 # Other emacs extensions recommended with helm
 
 - [Emacs-wgrep](https://github.com/mhayashi1120/Emacs-wgrep)
+- [all-the-icons](https://github.com/domtronn/all-the-icons.el)
 
 # External programs recommended with helm
 
@@ -362,7 +358,7 @@ Please feel free to fix any of them; send a pull request.
 
 Most issues come from a wrong configuration or a use of Helm modified externally by third party package e.g. Spacemacs.
 Some other Helm packages that are no more maintained (or badly maintained) and use deprecated Helm code will clash also with recent Helm,
-be aware.
+be aware!
 
 # Contributors
 
@@ -392,7 +388,9 @@ described above to reproduce your bug.
 
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki)
 
-Or ask directly on [Helm discussions](https://github.com/emacs-helm/helm/discussions)
+Or ask directly on [Helm discussions](https://github.com/emacs-helm/helm/discussions).
+
+Do not expect the right answer when you ask on Reddit or similar Forums.
 
 Cheers,<br>
 The Helm Team
