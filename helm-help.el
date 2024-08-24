@@ -483,11 +483,20 @@ Use `xdg-open' to open files.
 
 *** Toggle auto-completion
 
+Normally auto-completion in helm-find-files is disabled by
+default but you can toggle it with `\\[helm-ff-run-toggle-auto-update]'. To enable it on startup by
+default, customize `helm-ff-auto-update-initial-value'.
+
 It is useful when trying to create a new file or directory and you don't want
 Helm to complete what you are writing.
 
 Note: On a terminal, the default binding `C-<backspace>' may not work.
 In this case use `C-c <backspace>'.
+
+*** Show infos of files
+
+To have infos on files like size, permissions etc... hit `\\[helm-ff-properties-persistent]'.
+To have automatically brief infos on selected file, turn on `helm-popup-tip-mode'.
 
 *** You can create a new directory and a new file at the same time
 
