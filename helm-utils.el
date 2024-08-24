@@ -1062,7 +1062,7 @@ Assume regexp is a pcre based regexp."
 (define-minor-mode helm-popup-tip-mode
     "Show additional informations in a popup tip at end of line.
 
-When the mode is enabled, popup showup when the source the source
+When the mode is enabled, popup showup when the source
 has a `popup-info' attribute which define a specific function for
 this source to fetch infos on candidate."
   :global t
