@@ -1069,8 +1069,10 @@ this source to fetch infos on candidate."
   (if helm-popup-tip-mode
       (progn
         (add-hook 'helm-move-selection-after-hook 'helm-maybe-show-help-echo)
+        (add-hook 'helm-help-mode-after-hook 'helm-maybe-show-help-echo)
         (add-hook 'helm-cleanup-hook 'helm-cancel-help-echo-timer))
     (remove-hook 'helm-move-selection-after-hook 'helm-maybe-show-help-echo)
+    (remove-hook 'helm-help-mode-after-hook 'helm-maybe-show-help-echo)
     (remove-hook 'helm-cleanup-hook 'helm-cancel-help-echo-timer)))
 
 (defun helm-open-file-with-default-tool (file)
