@@ -1042,16 +1042,21 @@ Assume regexp is a pcre based regexp."
             (run-with-idle-timer
              1 nil
              (lambda ()
-               (save-selected-window
-                 (with-helm-window
-                   ;; Use helm-grep-fname prop instead of help-echo as help-echo
-                   ;; maybe used by mouse overlay after resume.
-                   (let ((pos (save-excursion (end-of-visual-line) (point))))
-                     (helm-aif (and popup-info-fn
-                                    (funcall popup-info-fn (helm-get-selection)))
-                       (helm-tooltip-show
-                        (concat " " it)
-                        pos)))))))))))
+               ;; We may have an error (wrong-type-argument window-live-p nil)
+               ;; when switching to help window, the error may occur in the
+               ;; small lap of time where the helm-window is deleted and the
+               ;; help buffer not already displayed.
+               (ignore-error wrong-type-argument
+                 (save-selected-window
+                   (with-helm-window
+                     ;; Use helm-grep-fname prop instead of help-echo as help-echo
+                     ;; maybe used by mouse overlay after resume.
+                     (let ((pos (save-excursion (end-of-visual-line) (point))))
+                       (helm-aif (and popup-info-fn
+                                      (funcall popup-info-fn (helm-get-selection)))
+                           (helm-tooltip-show
+                            (concat " " it)
+                            pos))))))))))))
 
 ;;;###autoload
 (define-minor-mode helm-popup-tip-mode
