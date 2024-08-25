@@ -6537,7 +6537,7 @@ list."
   "Copy the car of marked candidates to the remaining marked candidates.
 
 The car of marked should be a regular file and the rest of marked (cdr) should
-be directories."
+be existing directories."
   (let* ((mkd     (helm-marked-candidates))
          (file    (car mkd))
          (targets (cdr mkd))
@@ -6546,7 +6546,7 @@ be directories."
     (cl-assert (file-regular-p file) nil (format "ERROR: Not a regular file `%s'" file))
     (cl-assert targets nil (format "ERROR: No destination specified for file `%s'" file))
     (cl-assert (cl-loop for f in targets always (file-directory-p f)) nil
-               "ERROR: Destinations must be directories")
+               "ERROR: Destinations must be existing directories")
     (when targets
       (cl-loop with yes-for-all
                for dest in targets
