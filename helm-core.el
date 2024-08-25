@@ -5835,17 +5835,17 @@ mode and header lines."
                                       (assoc-default 'mode-line source))
                                  (default-value 'helm-mode-line-string))
                              source))
-  (let ((follow (and (or (helm-follow-mode-p source)
+  (let* ((src-name (assoc-default 'name source))
+         (follow (and (or (helm-follow-mode-p source)
                          (and helm-follow-mode-persistent
-                              (member (assoc-default 'name source)
-                                      helm-source-names-using-follow)))
+                              (member src-name helm-source-names-using-follow)))
                      " (HF)"))
-        (marked (and helm-marked-candidates
-                     (cl-loop with cur-name = (assoc-default 'name source)
-                              for c in helm-marked-candidates
-                              for name = (assoc-default 'name (car c))
-                              when (string= name cur-name)
-                              collect c))))
+         (marked (if (assoc-default 'all-marked source)
+                     helm-marked-candidates
+                   (cl-loop for c in helm-marked-candidates
+                            for name = (assoc-default 'name (car c))
+                            when (string= name src-name)
+                            collect c))))
     ;; Setup mode-line.
     (if helm-mode-line-string
         (setq mode-line-format

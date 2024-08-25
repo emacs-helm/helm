@@ -726,7 +726,13 @@
     :documentation
     "  A function that show infos in a popup on the selected candidate.
   This happen when `helm-popup-tip-mode' is enabled.
-  The function is called on candidate."))
+  The function is called on candidate.")
+   (all-marked
+    :initarg :all-marked
+    :initform nil
+    :custom boolean
+    :documentation
+    "  When non nil display marked candidates from all sources in mode-line."))
 
   "Main interface to define helm sources."
   :abstract t)
