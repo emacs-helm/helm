@@ -795,7 +795,11 @@ when moving out of directory when non nil."
    "Find file in Dired" 'helm-point-file-in-dired
    "View file" 'view-file
    "Query replace fnames on marked `M-@'" 'helm-ff-query-replace-fnames-on-marked
-   "Marked files in dired `C-x C-q'" 'helm-ff-edit-marked-files
+   (lambda ()
+     (helm-acase helm-ff-edit-marked-files-fn
+       (helm-marked-files-in-dired "Edit filenames in Wdired `C-x C-q'")
+       (helm-ff-wfnames "Edit filenames in Wfnames `C-x C-q'")))
+   'helm-ff-edit-marked-files
    "Query replace contents on marked `M-%'" 'helm-ff-query-replace
    "Query replace regexp contents on marked `C-M-%'" 'helm-ff-query-replace-regexp
    "Attach file(s) to mail buffer `C-c C-a'" 'helm-ff-mail-attach-files
