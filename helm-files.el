@@ -1162,6 +1162,7 @@ want to use it, helm is still providing
    (action :initform 'helm-find-files-actions)
    (before-init-hook :initform 'helm-find-files-before-init-hook)
    (after-init-hook :initform 'helm-find-files-after-init-hook)
+   (all-marked :initform t)
    (group :initform 'helm-files)))
 
 ;; Bookmark handlers.
@@ -1275,7 +1276,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                 (cons "rsync" helm-rsync-switches) " ")
                                'helm-rsync-command-history)))))
          (ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
-                         (helm-marked-candidates :with-wildcard t)))
+                         ;; Use :all-sources to allow actions on wildcards
+                         ;; marked in dummy source.
+                         (helm-marked-candidates :with-wildcard t :all-sources t)))
          (cand   (unless (cdr ifiles) (helm-get-selection))) ; preselection.
          (prefarg helm-current-prefix-arg)
          (prompt (format "%s %s file(s) %s: "
@@ -5603,6 +5606,7 @@ Use it for non-interactive calls of `helm-find-files'."
     (lambda (_candidates _source)
       (unless (file-exists-p helm-pattern)
         (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))
+    :all-marked t
     :keymap 'helm-find-files-map
     :action 'helm-find-files-actions))
 
