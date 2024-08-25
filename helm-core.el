@@ -7751,7 +7751,11 @@ sources."
                      when (or all-sources
                               (equal (assq 'name source)
                                      (assq 'name current-src)))
-                     append (helm--compute-marked real source use-wc)))
+                     nconc (helm--compute-marked real source use-wc) into mkds
+                     finally return
+                     (if (and with-wildcard all-sources)
+                         (helm-fast-remove-dups mkds :test 'equal)
+                       mkds)))
            sel)
       (unless candidates
         (setq sel (helm-get-selection
