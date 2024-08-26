@@ -1017,7 +1017,7 @@ Assume regexp is a pcre based regexp."
 (defvar helm--show-help-echo-timer nil)
 (defvar helm--maybe-show-help-echo-overlay nil)
 (defface helm-tooltip
-  `((t :background "Goldenrod"
+  '((t :background "Goldenrod"
        :foreground "black"))
   "Face used by `helm-tooltip-show'."
   :group 'helm-grep-faces)
