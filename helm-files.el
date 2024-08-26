@@ -1143,7 +1143,9 @@ present in this list."
                 helm-ff-sort-candidates))
    (popup-info :initform (lambda (candidate)
                            (unless (helm-ff-dot-file-p candidate)
-                             (helm-file-attributes candidate :dired t :human-size t))))
+                             (helm-file-attributes
+                              candidate
+                              :dired t :human-size t :octal nil))))
    (persistent-action-if :initform 'helm-find-files-persistent-action-if)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
    (help-message :initform 'helm-ff-help-message)
