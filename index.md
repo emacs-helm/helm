@@ -58,6 +58,7 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 **Table of Contents**
 
 - [Introduction](#introduction)
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Requirements](#requirements)
 - [Getting Started](#getting-started)
@@ -95,7 +96,21 @@ Patrovic and can be considered to be its successor. `Helm` cleans the
 legacy code that is leaner, modular, and unchained from constraints of
 backward compatibility.
 
+# Screenshots
+
 ![helm-grep-ag](images/helm-grep-ag-persistent.png)
+
+![Screenshot1](images/screenshot001.png)
+
+![Screenshot2](images/screenshot002.png)
+
+![Screenshot3](images/screenshot003.png)
+
+![Screenshot4](images/screenshot004.png)
+
+![Screenshot5](images/screenshot005.png)
+
+![Screenshot6](images/screenshot006.png)
 
 # Features
 
