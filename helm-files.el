@@ -789,6 +789,19 @@ when moving out of directory when non nil."
   "History source in *eshell-command-on-file appears on top when non nil."
   :type 'boolean)
 
+(defcustom helm-ff-edit-marked-files-fn #'helm-ff-wfnames
+  "A function to edit filenames in a special buffer.
+
+By default `wfnames' package is used to avoid wdired which
+doesn't always work with all emacs versions and also is quite
+clumsy about default-directory among other things.  If you still
+want to use it, helm is still providing
+`helm-marked-files-in-dired'."
+  :type '(choice (function :tag "Use Wfnames package to edit filenames."
+                  helm-ff-wfnames)
+                 (function :tag "Use Wdired package to edit filenames."
+                  helm-marked-files-in-dired)))
+
 (defcustom helm-find-files-actions
   (helm-make-actions
    "Find File" 'helm-find-file-or-marked
@@ -930,19 +943,6 @@ present in this list."
          (set var val)
          ;; Force rebuilding the source to remove the highlight match FCT.
          (setq helm-source-find-files nil)))
-
-(defcustom helm-ff-edit-marked-files-fn #'helm-ff-wfnames
-  "A function to edit filenames in a special buffer.
-
-By default `wfnames' package is used to avoid wdired which
-doesn't always work with all emacs versions and also is quite
-clumsy about default-directory among other things.  If you still
-want to use it, helm is still providing
-`helm-marked-files-in-dired'."
-  :type '(choice (function :tag "Use Wfnames package to edit filenames."
-                  helm-ff-wfnames)
-                 (function :tag "Use Wdired package to edit filenames."
-                  helm-marked-files-in-dired)))
 
 (defcustom helm-ff-ignore-following-on-directory nil
   "In follow mode ignore silently directories when non nil."
