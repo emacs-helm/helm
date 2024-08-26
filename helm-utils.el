@@ -698,6 +698,18 @@ readable format,see `helm-file-human-size'."
                               (helm-file-human-size total)
                             total)))
 
+(defun helm-format-time-string (time)
+  "Format the time value TIME.
+If year of TIME is inferior to current year
+use \"%b %e  %Y\" otherwise use \"%b %e %H:%M\"."
+  (let ((current-year (nth 5 (decode-time)))
+        (year (nth 5 (decode-time time)))
+        (fmt-opt '("%b %e %H:%M"
+                   "%b %e  %Y")))
+    (if (< year current-year)
+        (format-time-string (nth 1 fmt-opt) time)
+      (format-time-string (nth 0 fmt-opt) time))))
+
 (cl-defun helm-file-attributes
     (file &key type links uid gid access-time modif-time
             status size mode gid-change inode device-num dired human-size
@@ -743,12 +755,10 @@ you have in `file-attributes'."
                           :uid         uid
                           :gid         gid
                           :access-time (if string
-                                           (format-time-string
-                                            "%Y-%m-%d %R" access-time)
+                                           (helm-format-time-string access-time)
                                          access-time)
                           :modif-time  (if string
-                                           (format-time-string
-                                            "%Y-%m-%d %R" modif-time)
+                                           (helm-format-time-string modif-time)
                                          modif-time)
                           :status      (if string
                                            (format-time-string
@@ -773,7 +783,8 @@ you have in `file-attributes'."
               (gid-change  (cl-getf all :gid-change))
               (inode       (cl-getf all :inode))
               (device-num  (cl-getf all :device-num))
-              (dired       (helm-file-attributes-dired-line all human-size))
+              (dired       (helm-file-attributes-dired-line
+                            all human-size octal))
               (human-size (helm-file-human-size (cl-getf all :size)))
               (mode-type  (cl-getf modes :mode-type))
               (mode-owner (cl-getf modes :user))
@@ -782,10 +793,10 @@ you have in `file-attributes'."
               (octal      (cl-getf modes :octal))
               (t          (append all modes))))))
 
-(defun helm-file-attributes-dired-line (all &optional human-size)
+(defun helm-file-attributes-dired-line (all &optional human-size show-octal)
   (format "%s %s %s:%s %s %s"
    (helm-split-mode-file-attributes
-    (cl-getf all :mode) t)
+    (cl-getf all :mode) t show-octal)
    (number-to-string (cl-getf all :links))
    (cl-getf all :uid)
    (cl-getf all :gid)
@@ -794,7 +805,7 @@ you have in `file-attributes'."
      (int-to-string (cl-getf all :size)))
    (cl-getf all :modif-time)))
 
-(defun helm-split-mode-file-attributes (modes &optional string)
+(defun helm-split-mode-file-attributes (modes &optional string show-octal)
   "Split MODES in a list of modes.
 MODES is same as what (nth 8 (file-attributes \"foo\")) would return."
   (if (string-match "\\`\\(.\\)\\(...\\)\\(...\\)\\(...\\)\\'" modes)
@@ -802,9 +813,11 @@ MODES is same as what (nth 8 (file-attributes \"foo\")) would return."
              (user  (match-string 2 modes))
              (group (match-string 3 modes))
              (other (match-string 4 modes))
-             (octal (helm-ff-numeric-permissions (list user group other))))
+             (octal (and show-octal
+                         (helm-ff-numeric-permissions
+                          (list user group other)))))
         (if string
-            (mapconcat 'identity (list type user group other octal) " ")
+            (mapconcat 'identity (list type user group other (or octal "")) "")
           (list :mode-type type :user user
                 :group group :other other
                 :octal octal)))
