@@ -34,11 +34,10 @@
 ***
 
 <p align="center">
-  Helm in action searching with <a href="https://github.com/ggreer/the_silver_searcher"<b>Grep Ag</b></a>
-                                   </p>
+  Helm in action browsing images</p>
 
 <p align="center">
-  <img src="https://github.com/emacs-helm/helm/blob/master/images/helm-grep-ag-persistent.png?raw=true" alt="Emacs-helm grep ag" title="" />
+  <img src="https://github.com/emacs-helm/helm/blob/master/images/screenshot002.png?raw=true" alt="Emacs-helm grep ag" title="" />
 </p>
 
 [badge-license]: https://img.shields.io/badge/license-GPL_3-green.svg
