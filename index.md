@@ -29,7 +29,7 @@
 Maintainance of Helm is a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>Lot of work</b></a>
 I have done freely since 2011.<br>
 As it is taking a lot of my time it starts to be more and more difficult<br>
-maintaining it without financial help.<br> 
+maintaining it without financial help.<br>
 If you feel Helm is making your daily work easier,<br><b>please consider making a donation.</b>
 </p>
 
@@ -72,8 +72,10 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
     - [Basic usage](#basic-usage)
         - [Windows and frames configuration](#windows-and-frames-configuration)
         - [Matching methods](#matching-methods)
+        - [Display icons with all-the-icons package](#display-icons-with-all-the-icons-package)
+        - [Have brief infos on the selected candidate](#have-brief-infos-on-the-selected-candidate)
         - [Creating custom helm sources](#creating-custom-helm-sources)
-- [Helm Applications ](#helm-applications)
+- [Helm Applications](#helm-applications)
 - [Recommended Helm extensions](#recommended-helm-extensions)
 - [Other emacs extensions recommended with helm](#other-emacs-extensions-recommended-with-helm)
 - [External programs recommended with helm](#external-programs-recommended-with-helm)
@@ -164,9 +166,9 @@ and fuzzy matching. See
 for details.
 
 ## Warning about alternate installation methods
-    
+
 Installation methods that circumvent `helm-config` are known to fail
-if the careful safeguards are not implemented in the hacks. 
+if the careful safeguards are not implemented in the hacks.
 
 ## Configuration
 
@@ -194,11 +196,24 @@ requiring completions, see below how to enable `helm-mode`.
 
 ## Basic usage
 
-`M-x helm-M-x RET helm-` lists helm commands ready for narrowing and selecting.
+Helm use by default a prefix key (`C-x c`) which is not very convenient but allow users to discover
+most important helm commands, once you find them you can rebind to a convenient key of your choice,
+here some of them:
 
-To bind to `M-x`: 
+`C-x c M-x helm-` lists helm commands ready for narrowing and selecting with `helm-M-x`.
+
+To bind to `M-x`:
 
 `(global-set-key (kbd "M-x") 'helm-M-x)`
+
+`C-x c C-x C-f` browses files on your system.
+
+To bind it to `C-c C-f`
+
+`(global-set-key (kbd "C-c C-f") 'helm-find-files)`
+
+To discover such commands more easily, you can install [helm-descbinds](https://github.com/emacs-helm/helm-descbinds).
+Once installed and `helm-descbinds-mode` enabled, you can do `C-x c C-h` to see all commands satrting with helm prefix key.
 
 - _IMPORTANT:_
 
@@ -217,22 +232,26 @@ features available through equivalent helm-specific commands.
 See [FAQ](https://github.com/emacs-helm/helm/wiki/FAQ#why-after-enabling-helm-mode-m-x-and-c-x-c-f-are-not-helmized)
 about `M-x` and `C-x C-f`.
 
-To make helm-mode start with Emacs init file: 
+To make helm-mode start with Emacs init file:
 
 ```elisp
 (helm-mode 1)
 ```
-NOTE: `helm-mode` is using Emacs `completion-styles` by default, you may want to configure your `completion-styles` for a better experience.
-The recommended setting is to use `(setq completion-styles '(flex))` if flex is available in your Emacs (27+ only) otherwhise use the helm-flex style (emacs-26).
+To make `helm-mode` nicer you can set the variable `completions-detailed` to non nil (emacs-28+),
+with emacs-27 use `helm-completions-detailed`.
 
-To discover basic helm commands, look at helm menu item in Emacs menu. 
+_NOTE_: `helm-mode` support Emacs `completion-styles` for matching candidates
+when `helm-completion-style` is set to `emacs`, it is not the default because
+it is slower than the `helm` style used by default.
+
+You can also discover basic helm commands with helm menu items in Emacs menu.
 
 Another way to discover helm commands: run the shell script:
 `./emacs-helm.sh` from helm directory and then look in the scratch
 buffer. `emacs-helm.sh` accepts emacs command line
 options. `emacs-helm.sh -h` opens an Info screen with more details.
 
-_Note:_ When helm is installed with "make install" 
+_Note:_ When helm is installed with "make install"
 you will have a shell command named helm that you can run from any
 places i.e. not only from the helm directory
 
@@ -246,6 +265,12 @@ Here helm started from emacs-helm.sh script and displaying its candidates in a s
 
 ![Helm displayed in frame](images/helm-displayed-in-a-separate-frame.gif)
 
+To use frames to display helm candidates see the variable `helm-display-function`.
+
+_NOTE_: A Helm package called `helm-posframe` exists which use itself the `posframe` package,
+please DO NOT use this to display helm completions in frame, it uses child frames internally
+which is the wrong approach for Helm.
+
 ### Matching methods
 
 Helm support by default multi pattern matching, it is the standard way
@@ -255,6 +280,17 @@ or "bar" and "foo".
 Each pattern can be a regexp.
 
 In addition helm support [fuzzy matching](https://github.com/emacs-helm/helm/wiki/Fuzzy-matching).
+
+### Display icons with all-the-icons package
+
+You can have icons in many places, see the corresponding variables or modes where you can have them.
+For example you can have icons in `helm-find-files` with M-x `helm-ff-icon-mode`
+once you have properly installed and configured `all-the-icons` package.
+
+### Have brief infos on the selected candidate
+
+For this turn on `helm-popup-tip-mode`, you will have a popup at end of line showing
+detailed infos on candidate (only available in some sources).
 
 ### Creating custom helm sources
 
@@ -272,7 +308,7 @@ The candidates list may be replaced by a function that produces a list.
 See ([helm wiki](https://github.com/emacs-helm/helm/wiki#25-developing-using-helm-framework))
 for details.
 
-# Helm Applications 
+# Helm Applications
 
 Here are some popular applications developed using helm completion and
 narrowing framework and available in `Helm` package.
@@ -282,10 +318,10 @@ This list is not exhaustive.
   completions. Helm provides even more optimized helm completions for
   some commands in helm-mode. Prefer these natively optimized versions
   over the ones in helm-mode.
-  
+
 - `helm-find-files`: one command that handles all the files related
   commands (bind to `C-x C-f`).
-  
+
 - `helm-buffers-list`: provides enhanced buffers listing.
 
 - `helm-browse-project`: handles project files and buffers; defaults
@@ -295,31 +331,31 @@ This list is not exhaustive.
    `helm-ls-svn` for a better handling of version control files.
    Each time a project under version control is visited it is added
    to `helm-browse-project-history` and can be visted with `helm-projects-history`.
-   
+
 - `helm-dabbrev`: enhanced dabbrev implementation with helm
   completion; does not use emacs code.
-  
+
 - `helm-occur`: enhanced occur for one or more buffers; launch from
   `helm-buffers-list` or `current-buffer`.
-  
+
 - `helm-M-x`: enhanced `execute-extended-command` (bind it to `M-x`).
 
 - `helm-imenu` and `helm-imenu-in-all-buffers`: provide imenus for
   current or all buffers.
-  
+
 - `helm-etags-select`: enhanced etags with helm-completion; usable
   everywhere with `helm-find-files`.
-  
+
 - `helm-apropos`: enhanced apropos for functions and variables that
   `C-h` commands provide.
-  
+
 - `Grep`: launch from any helm file commands; supports back-ends
   `grep`, `ack-grep`, `git-grep`, `ag` and custom implementation of
   `pt`.
-  
+
 - `helm-gid`: Helm interface for `gid` from
   [id-utils](https://www.gnu.org/software/idutils/).
-  
+
 - `helm-show-kill-ring`: A helm browser for kill ring.
 
 - `helm-all-mark-rings`: A helm browser for mark ring; retrieves last positions in buffers.
@@ -356,7 +392,7 @@ deprecated or unmaintained. Moreover, many remain out-of-sync with
 helm problems or unstable emacs, please look for comparable features
 within [helm](https://github.com/emacs-helm/helm) and
 [emacs-helm](https://github.com/emacs-helm) before installing such
-extensions e.g. helm-swoop vs helm-occur which is part of Helm.
+extensions e.g. helm-swoop which is badly written and unmaintained vs helm-occur which is part of Helm.
 
 # Other emacs extensions recommended with helm
 
@@ -369,7 +405,7 @@ extensions e.g. helm-swoop vs helm-occur which is part of Helm.
 
 # Known issues
 
-The Helm project has a current unresolved 
+The Helm project has a current unresolved
 [issue list](https://github.com/emacs-helm/helm/issues?sort=created&direction=desc&state=open).
 Please feel free to fix any of them; send a pull request.
 
@@ -397,15 +433,22 @@ also run M-x helm-packages and from the installed packages source run
 the "Isolate packages" action after having selected helm, this of
 course if you have installed Helm from package.
 
+If you want a specific feature not already implemented in Helm, fill a feature request
+report, I will be happy to implement this for you if possible.
+
 Helm comes now with a template for filling bugs, when reporting issues,
 be sure to fill all sections and to run helm from a minimal install as
 described above to reproduce your bug.
+
+_NOTE_: Please don't cheat when checking "I use a minimal configuration",
+you will make me loosing my time and your time to try to find what is wrong.
 
 # Getting help
 
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki)
 
-Or ask directly on [Helm discussions](https://github.com/emacs-helm/helm/discussions).
+Or ask directly on [Helm discussions](https://github.com/emacs-helm/helm/discussions),
+I will be happy to answer your questions or help you to configure Helm or more generally Emacs.
 
 Do not expect the right answer when you ask on Reddit or similar Forums.
 
