@@ -138,7 +138,7 @@ Helm requires Emacs-25.1 or later versions.
 Helm installs [async](https://github.com/jwiegley/emacs-async) and [wfnames](https://github.com/thierryvolpiatto/wfnames) package as dependencies
 when Helm is installed using [MELPA](https://melpa.org/).
 
-It is recomended to install [all-the-icons](https://github.com/domtronn/all-the-icons.el) to have icons in several places (files, buffers etc..) even if it is not mandatory.
+It is recommended to install [all-the-icons](https://github.com/domtronn/all-the-icons.el) to have icons in several places (files, buffers etc..) even if it is not mandatory.
 
 # Getting Started
 
