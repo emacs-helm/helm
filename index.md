@@ -213,7 +213,7 @@ To bind it to `C-c C-f`
 `(global-set-key (kbd "C-c C-f") 'helm-find-files)`
 
 To discover such commands more easily, you can install [helm-descbinds](https://github.com/emacs-helm/helm-descbinds).
-Once installed and `helm-descbinds-mode` enabled, you can do `C-x c C-h` to see all commands satrting with helm prefix key.
+Once installed and `helm-descbinds-mode` enabled, you can do `C-x c C-h` to see all commands starting with helm prefix key.
 
 - _IMPORTANT:_
 
