@@ -114,6 +114,8 @@ backward compatibility.
 
 ![Screenshot6](images/screenshot006.png)
 
+![Screenshot7](images/screenshot007.png)
+
 # Features
 
 In addition of its framework where you can build your own `Helm`
