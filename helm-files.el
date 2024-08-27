@@ -3996,7 +3996,7 @@ to avoid an unnecessary call to `file-truename'."
   "Show file properties of CANDIDATE in a tooltip or message."
   (require 'helm-external) ; For `helm-get-default-program-for-file'.
   (helm-aif (helm-file-attributes candidate)
-      (let* ((dired-line         (helm-file-attributes-dired-line it t))
+      (let* ((dired-line         (helm-file-attributes-dired-line it t t))
              (type               (cl-getf it :type))
              (mode-type          (cl-getf it :mode-type))
              (owner              (cl-getf it :uid))

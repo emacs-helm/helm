@@ -770,7 +770,7 @@ you have in `file-attributes'."
                           :inode       inode
                           :device-num  device-num)))
              (perms (cl-getf all :mode))
-             (modes (helm-split-mode-file-attributes perms)))
+             (modes (helm-split-mode-file-attributes perms nil t)))
         (cond (type        (cl-getf all :type))
               (links       (cl-getf all :links))
               (uid         (cl-getf all :uid))
