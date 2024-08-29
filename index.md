@@ -54,7 +54,7 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 </p>
 
 ***
-<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+<!-- markdown-toc start -->
 **Table of Contents**
 
 - [Introduction](#introduction)
@@ -127,7 +127,7 @@ user input.  Helm provides a full set of actions for each of its
 sources, each action apply on a single candidate or a set of marked
 candidates.
 
-_Note:_ You will find many helm extensions providing diverse features sometimes already implemented in `Helm`, 
+_Note:_ You will find many helm extensions providing diverse features sometimes already implemented in `Helm`,
 prefer generally the ones that are natively in `Helm`, e.g. `Helm` support natively most grep implementations as backend (ack, ag, rg),
 no need to install 3rd party packages for this, same for managing projects etc...
 
@@ -234,13 +234,17 @@ features available through equivalent helm-specific commands.
 See [FAQ](https://github.com/emacs-helm/helm/wiki/FAQ#why-after-enabling-helm-mode-m-x-and-c-x-c-f-are-not-helmized)
 about `M-x` and `C-x C-f`.
 
-To make helm-mode start with Emacs init file:
+To make helm-mode starts with Emacs init file:
 
 ```elisp
 (helm-mode 1)
 ```
 To make `helm-mode` nicer you can set the variable `completions-detailed` to non nil (emacs-28+),
 with emacs-27 use `helm-completions-detailed`.
+
+`helm-mode` is fully configurable throught the variables
+`helm-completing-read-handlers-alist`, `helm-completion-style`,
+`helm-completion-styles-alist`.
 
 _NOTE_: `helm-mode` support Emacs `completion-styles` for matching candidates
 when `helm-completion-style` is set to `emacs`, it is not the default because
@@ -253,9 +257,11 @@ Another way to discover helm commands: run the shell script:
 buffer. `emacs-helm.sh` accepts emacs command line
 options. `emacs-helm.sh -h` opens an Info screen with more details.
 
-_Note:_ When helm is installed with "make install"
-you will have a shell command named helm that you can run from any
-places i.e. not only from the helm directory
+_Note:_ When helm is installed with "make install" you will have a
+shell command named helm that you can run from any places i.e. not
+only from the helm directory, you can do this yourself if you have
+installed from package by making a symlink of emacs-helm.sh in your
+load-path e.g. "~/bin".
 
 See https://github.com/emacs-helm/helm/wiki#quick-try-with-emacs-helmsh
 
@@ -351,9 +357,14 @@ This list is not exhaustive.
 - `helm-apropos`: enhanced apropos for functions and variables that
   `C-h` commands provide.
 
-- `Grep`: launch from any helm file commands; supports back-ends
-  `grep`, `ack-grep`, `git-grep`, `ag` and custom implementation of
-  `pt`.
+- Helm `Grep`, `Ack-grep`, `Ag`, `Rg`: provided as actions in all helm
+  commands for file; Support back-ends `grep`, `ack-grep`, `git-grep`,
+  `ag`,`rg` and probably others.  You will find several grep actions
+  in the action menu of `helm-find-files`.  You can launch as well
+  from your current buffer on `default-directory` `helm-do-grep-ag`,
+  `helm-grep-do-git-grep`.
+  NOTE: helm-*-ag functions and command use
+  "ag" name for historical reason but support as well "rg".
 
 - `helm-gid`: Helm interface for `gid` from
   [id-utils](https://www.gnu.org/software/idutils/).
@@ -368,7 +379,7 @@ This list is not exhaustive.
 
 # Recommended Helm extensions
 
-Normally all Helm modules coming from [Emacs-helm](https://github.com/emacs-helm) organisation 
+Normally all Helm modules coming from [Emacs-helm](https://github.com/emacs-helm) organisation
 are safe to use otherwise it is mentioned in their README if they are broken or unmaintained.
 Here some of them I am using:
 
