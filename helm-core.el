@@ -7749,8 +7749,15 @@ sources."
                                        (string-match-p "\\*" real)
                                        (null (file-exists-p real)))
                      when (or all-sources
-                              (equal (assq 'name source)
-                                     (assq 'name current-src)))
+                              (and
+                               ;; Dummy sources use a unique candidate, two same
+                               ;; dummy sources (or more) should share their
+                               ;; (unique) marked candidate only when
+                               ;; :all-marked is non nil.
+                               (not (equal (helm-get-attr 'candidates)
+                                           '("dummy")))
+                               (equal (assq 'name source)
+                                      (assq 'name current-src))))
                      nconc (helm--compute-marked real source use-wc) into mkds
                      finally return
                      (if (and with-wildcard all-sources)
