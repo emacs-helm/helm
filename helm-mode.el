@@ -2051,17 +2051,13 @@ Keys description:
              :candidates
              (lambda ()
                (if test
-                   (append (and (not (file-exists-p helm-pattern))
-                                (not (helm-ff--invalid-tramp-name-p helm-pattern))
-                                (list (helm-ff-filter-candidate-one-by-one
-                                       helm-pattern nil t)))
-                           (cl-loop with hn = (helm-ff--tramp-hostnames)
-                                    ;; helm-find-files-get-candidates is
-                                    ;; returning a list of cons cells.
-                                    for (d . r) in (helm-find-files-get-candidates)
-                                    when (or (member r hn) ; A tramp host
-                                             (funcall test r)) ; Test ok
-                                    collect (cons d r)))
+                   (cl-loop with hn = (helm-ff--tramp-hostnames)
+                            ;; helm-find-files-get-candidates is
+                            ;; returning a list of cons cells.
+                            for (d . r) in (helm-find-files-get-candidates)
+                            when (or (member r hn)             ; A tramp host
+                                     (funcall test r))         ; Test ok
+                            collect (cons d r))
                  (helm-find-files-get-candidates)))
              :update (lambda ()
                        (remhash helm-ff-default-directory
