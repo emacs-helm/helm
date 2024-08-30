@@ -1283,7 +1283,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                'helm-rsync-command-history)))))
          (ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          ;; Use :all-sources to allow actions on wildcards
-                         ;; marked in dummy source.
+                         ;; marked in dummy source.  FIXME: We should use
+                         ;; :all-sources when :all-marked is non nil only, it is
+                         ;; true by default but user may modify HFF source by defmethod.
                          (helm-marked-candidates :with-wildcard t :all-sources t)))
          (cand   (unless (cdr ifiles) (helm-get-selection))) ; preselection.
          (prefarg helm-current-prefix-arg)
