@@ -2017,6 +2017,7 @@ Keys description:
               :keymap 'helm-read-file-map
               :must-match must-match
               :all-marked all-marked
+              :nomark nomark
               :filtered-candidate-transformer
               (lambda (_candidates _source)
                 (unless (file-exists-p helm-pattern)
