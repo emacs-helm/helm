@@ -68,6 +68,8 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
     - [Installing just the helm-core package](#installing-just-the-helm-core-package)
     - [Warning about alternate installation methods](#warning-about-alternate-installation-methods)
     - [Configuration](#configuration)
+        - [Minimal helm configuration: ](#minimal-helm-configuration)
+        - [Extended configuration](#extended-configuration)
     - [General recommandations](#general-recommandations)
     - [Basic usage](#basic-usage)
         - [Windows and frames configuration](#windows-and-frames-configuration)
@@ -174,13 +176,22 @@ if the careful safeguards are not implemented in the hacks.
 
 ## Configuration
 
-For minimal helm configuration, run the start-up script `./emacs-helm.sh`
-and then see the file `/tmp/helm-cfg.el`.
+Helm is fully configurable with dozen of user variables and for more advanced users,
+even some helm sources are configurable throught `cl-defmethod` and `helm-setup-user-source`.
 
+### Minimal helm configuration:
+
+```elisp
+(require 'helm)
+(helm-mode 1) ; facultative.
+```
+
+### Extended configuration
 The full configuration I (the helm maintainer) use is
 [here](https://github.com/thierryvolpiatto/emacs-config/blob/master/init-helm.el).
 
 Also see helm customizable variables with the customize interface.
+You have access to the specific custom-variables for a source with `C-h c` while running Helm.
 
 Enabling `helm-mode` will enable helm for many features of emacs
 requiring completions, see below how to enable `helm-mode`.
@@ -411,6 +422,9 @@ extensions e.g. helm-swoop which is badly written and unmaintained vs helm-occur
 
 - [Emacs-wgrep](https://github.com/mhayashi1120/Emacs-wgrep)
 - [all-the-icons](https://github.com/domtronn/all-the-icons.el)
+- [svg-lib](https://github.com/rougier/svg-lib)
+
+svg-lib allows using a svg progress-bar for Rsync in helm-find-files, see the variable `helm-rsync-progress-bar-function`.
 
 # External programs recommended with helm
 
