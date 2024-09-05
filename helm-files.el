@@ -2424,13 +2424,14 @@ COUNT is used for incrementing new name if needed."
                        target))
                      ;; Incremental replacement
                      ;; before or after \@.
-                     ((and (string-match-p "\\\\#" rep)
-                           (string-match "\\\\@" rep))
+                     ((or (string-match "\\`\\\\#\\\\@\\'" rep)
+                          (string-match "\\`\\\\@\\\\#\\'" rep))
                       (replace-regexp-in-string
                        "\\\\#" (format "%03d" (1+ count))
                        (replace-match target t t rep)))
                      ;; Simple incremental replacement.
-                     ((string-match "\\\\#" rep)
+                     ((or (string-match "\\`\\\\#" rep)
+                          (string-match "\\\\#\\'" rep))
                       (replace-match
                        (format "%03d" (1+ count)) t t rep))
                      ;; Substring replacement in placeholder.
