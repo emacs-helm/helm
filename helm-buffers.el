@@ -123,9 +123,6 @@ costly computation.  Also if some pretty names are too long you
 can add your own abbreviation here."
   :type '(alist :key-type symbol :value-type string))
 
-(defvar helm-old--tab-bar-tab-name-function
-  (default-value 'tab-bar-tab-name-function))
-
 (defcustom helm-buffers-maybe-switch-to-tab nil
   "Switch to buffer in its tab when non nil.
 Setting this change `tab-bar-tab-name-function' to `tab-bar-tab-name-all'.
@@ -139,9 +136,10 @@ This variable takes effect only when `tab-bar-mode' is available (emacs-27.1+)."
              (customize-set-variable
               'tab-bar-tab-name-function
               #'tab-bar-tab-name-all)
-           (customize-set-variable
-            'tab-bar-tab-name-function
-            helm-old--tab-bar-tab-name-function))))
+           (let* ((sym 'tab-bar-tab-name-function)
+                  (standard-value (eval (car (get sym 'standard-value)) t)))
+              (unless (equal standard-value (symbol-value sym))
+                (set sym standard-value))))))
 
 (defcustom helm-buffer-list-reorder-fn #'helm-buffers-reorder-buffer-list
   "A function in charge of ordering the initial buffer list.
