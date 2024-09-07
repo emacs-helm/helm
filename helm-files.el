@@ -6450,7 +6450,7 @@ selecting them."
               (t (find-file candidate)))))))
 
 (helm-make-command-from-action helm-ff-find-file-other-tab
-    "Run find file in other tab action from `helm-source-buffers-list'."
+    "Run find file in other tab action from `helm-find-files'."
   'find-file-other-tab
   (cl-assert (fboundp 'tab-bar-mode) nil "Tab-bar-mode not available"))
 
