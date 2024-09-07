@@ -305,7 +305,7 @@ The sexp should be an `all-the-icons' function with its args."
 (defun helm-imenu--maybe-switch-to-buffer (candidate)
   (let ((cand (cdr candidate)))
     (helm-aif (and (markerp cand) (marker-buffer cand))
-        (switch-to-buffer it))))
+        (helm-buffers-switch-to-buffer-or-tab it))))
 
 (defun helm-imenu--execute-action-at-once-p ()
   (let ((cur (helm-get-selection))
