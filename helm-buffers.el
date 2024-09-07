@@ -982,8 +982,10 @@ tab if some, otherwise, display it in a new tab."
           (progn
             (switch-to-buffer-other-tab (car bufs))
             (helm-window-show-buffers bufs))
-        (helm-buffers-maybe-switch-to-buffer-in-tab
-         candidate #'switch-to-buffer-other-tab)))))
+        (if helm-current-prefix-arg
+            (switch-to-buffer-other-tab candidate)
+          (helm-buffers-maybe-switch-to-buffer-in-tab
+           candidate #'switch-to-buffer-other-tab))))))
 
 (helm-make-command-from-action helm-buffers-switch-to-buffer-new-tab
   "Run switch to buffer in other tab action from `helm-source-buffers-list'."
