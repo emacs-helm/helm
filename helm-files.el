@@ -2416,14 +2416,12 @@ COUNT is used for incrementing new name if needed."
                       ;; replacement with \# in
                       ;; search and replace
                       ;; feature in placeholder \@.
-                      (string-match
-                       "\\\\@/\\(.*\\)/\\(\\(?99:.*\\)\\\\#\\)/"
-                       rep)
-                      (replace-regexp-in-string
-                       (match-string 1 rep)
-                       (concat (match-string 99 rep)
-                               (format "%03d" (1+ count)))
-                       target))
+                      (string-match "\\\\@/\\(.*\\)/\\(.*\\)/" rep)
+                      (helm-aand (replace-regexp-in-string
+                                  "\\\\#" (format "%03d" (1+ count))
+                                  (match-string 2 rep))
+                                 (replace-regexp-in-string
+                                  (match-string 1 rep) it target)))
                      ;; Incremental replacement
                      ;; before or after \@.
                      ((or (string-match "\\`\\\\#\\\\@\\'" rep)
@@ -2447,15 +2445,6 @@ COUNT is used for incrementing new name if needed."
                                         ((guard (string= it ""))
                                          (length target))
                                         (t (string-to-number it))))
-                                     t t rep))
-                     ;; Search and replace in
-                     ;; placeholder. Doesn't
-                     ;; handle incremental here.
-                     ((string-match "\\\\@/\\(.*\\)/\\(.*\\)/" rep)
-                      (replace-match (replace-regexp-in-string
-                                      (match-string 1 rep)
-                                      (match-string 2 rep)
-                                      target t)
                                      t t rep))
                      ;; Simple replacement by placeholder.
                      ((string-match "\\\\@" rep)
