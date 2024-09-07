@@ -131,6 +131,19 @@ Do not use `setq' to set this variable.
 This variable takes effect only when `tab-bar-mode' is available (emacs-27.1+)."
   :type 'boolean
   :set (lambda (var val)
+         ;; We should be able to retrieve all buffers assigned to a tab whatever
+         ;; the value used for `tab-bar-tab-name-function', unfortunately this
+         ;; is not the case, it seems the alist contains the buffer names only
+         ;; when `tab-bar-tab-name-all' is used and set globally. Then when the
+         ;; mode-line/header-line is rebuilded some code (probably C code in
+         ;; `force-mode-line-update' or elsewhare) changes the alist so just
+         ;; let-binding `tab-bar-tab-name-function' is not enough. This is
+         ;; reproductible when we have more than one window visible and we turn
+         ;; on `tab-bar-mode', the alist is showing only the first buffer of
+         ;; window-list omitting the others, however when starting with only one
+         ;; window, calling `tab-bar-mode' and splitting window afterward the
+         ;; alist is updated. Looks it is a bug or a limitation of
+         ;; `tab-bar-mode'.
          (set var val)
          (if val
              (customize-set-variable

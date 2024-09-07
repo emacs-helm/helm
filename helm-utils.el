@@ -322,7 +322,11 @@ If a prefix arg is given split windows vertically."
   (if (and (fboundp 'tab-bar-mode)
            helm-buffers-maybe-switch-to-tab
            tab-bar-mode)
-      (let* ((tab-bar-tab-name-function #'tab-bar-tab-name-all)
+      (let* (;; Normally `helm-buffers-maybe-switch-to-tab' custom set function
+             ;; bounded `tab-bar-tab-name-function' to `tab-bar-tab-name-all'
+             ;; but in case user bounded this with setq ensure it works
+             ;; at least partially by let-bounding it here.
+             (tab-bar-tab-name-function #'tab-bar-tab-name-all)
              (tabs (tab-bar-tabs))
              (tab-names (mapcar (lambda (tab)
                                   (cdr (assq 'name tab)))
