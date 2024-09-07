@@ -317,27 +317,31 @@ If a prefix arg is given split windows vertically."
 (declare-function tab-bar-switch-to-tab "tab-bar.el")
 (declare-function tab-bar-tab-name-all "tab-bar.el")
 
+(defun helm-buffers-maybe-switch-to-buffer-in-tab (buffer fallback-fn)
+  (let* (;; Normally `helm-buffers-maybe-switch-to-tab' custom set function
+         ;; bounded `tab-bar-tab-name-function' to `tab-bar-tab-name-all'
+         ;; but in case user bounded this with setq ensure it works
+         ;; at least partially by let-bounding it here.
+         (tab-bar-tab-name-function #'tab-bar-tab-name-all)
+         (tabs (tab-bar-tabs))
+         (tab-names (mapcar (lambda (tab)
+                              (cdr (assq 'name tab)))
+                            tabs))
+         (bname (buffer-name (get-buffer buffer)))
+         (tab (helm-buffers--get-tab-from-name bname tabs)))
+    (if (helm-buffers--buffer-in-tab-p bname tab-names)
+        (progn
+          (tab-bar-switch-to-tab (alist-get 'name tab))
+          (select-window (get-buffer-window bname)))
+      (funcall fallback-fn buffer))))
+
 (defun helm-buffers-switch-to-buffer-or-tab (buffer)
   "Switch to BUFFER in its tab if some."
   (if (and (fboundp 'tab-bar-mode)
            helm-buffers-maybe-switch-to-tab
            tab-bar-mode)
-      (let* (;; Normally `helm-buffers-maybe-switch-to-tab' custom set function
-             ;; bounded `tab-bar-tab-name-function' to `tab-bar-tab-name-all'
-             ;; but in case user bounded this with setq ensure it works
-             ;; at least partially by let-bounding it here.
-             (tab-bar-tab-name-function #'tab-bar-tab-name-all)
-             (tabs (tab-bar-tabs))
-             (tab-names (mapcar (lambda (tab)
-                                  (cdr (assq 'name tab)))
-                                tabs))
-             (bname (buffer-name (get-buffer buffer)))
-             (tab (helm-buffers--get-tab-from-name bname tabs)))
-        (if (helm-buffers--buffer-in-tab-p bname tab-names)
-            (progn
-              (tab-bar-switch-to-tab (alist-get 'name tab))
-              (select-window (get-buffer-window bname)))
-          (switch-to-buffer buffer)))
+      (helm-buffers-maybe-switch-to-buffer-in-tab
+       buffer #'switch-to-buffer)
     (switch-to-buffer buffer)))
 
 (defun helm-buffers--get-tab-from-name (tab-name tabs)
@@ -346,9 +350,15 @@ If a prefix arg is given split windows vertically."
            when (member tab-name (split-string (cdr (assq 'name tab)) ", " t))
            return tab))
 
-(defun helm-buffers--buffer-in-tab-p (buffer-name tab-names)
+(defun helm--get-tab-names ()
+  (let ((tab-bar-tab-name-function #'tab-bar-tab-name-all))
+    (mapcar (lambda (tab)
+              (cdr (assq 'name tab)))
+            (tab-bar-tabs))))
+
+(defun helm-buffers--buffer-in-tab-p (buffer-name &optional tab-names)
   "Check if BUFFER-NAME is in TAB-NAMES list."
-  (cl-loop for name in tab-names
+  (cl-loop for name in (or tab-names (helm--get-tab-names))
            ;; Buf names are separated with "," in TAB-NAMES
            ;; e.g. '("tab-bar.el" "*scratch*, helm-buffers.el").
            thereis (member buffer-name (split-string name ", " t))))
