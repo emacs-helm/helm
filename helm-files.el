@@ -62,6 +62,7 @@
 (declare-function term-next-prompt "term")
 (declare-function term-process-mark "term")
 (declare-function bookmark-prop-get "bookmark")
+(declare-function helm-bookmark-build-source "helm-bookmark")
 (declare-function comint-next-prompt "comint")
 (declare-function comint-delete-input "comint")
 (declare-function comint-send-input "comint")
@@ -299,6 +300,7 @@ It is the source handling new file or directory in `helm-find-files'.")
     (define-key map (kbd "C-_")           'helm-ff-undo)
     (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
     (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
+    (define-key map (kbd "C-x r b")       'helm-ff-bookmark-insert-location)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c t")         'helm-ff-toggle-thumbnails)
@@ -5672,6 +5674,25 @@ source is `helm-source-find-files'."
   (with-helm-alive-p
     (helm-run-after-exit 'helm-ff-bookmark)))
 (put 'helm-find-files-switch-to-bookmark 'helm-only t)
+
+(defun helm-ff-bookmark-insert-location ()
+  "Insert helm-find-files bookmark in minibuffer."
+  (interactive)
+  (require 'helm-bookmark)
+  (helm :sources (helm-bookmark-build-source
+                  "bookmark insert location"
+                  'helm-bookmark-helm-find-files-setup-alist
+                  helm-source-in-buffer
+                  :action (lambda (candidate)
+                            (with-selected-window (minibuffer-window)
+                              (goto-char (point-max))
+                              (when (re-search-backward "/" nil t)
+                                (delete-region (match-end 0) (point-max))
+                                (forward-char 1))
+                              (bookmark-insert-location candidate))))
+        :buffer "*helm bookmark insert*"
+        :allow-nest t))
+(put 'helm-ff-bookmark-insert-location 'helm-only t)
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
