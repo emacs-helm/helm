@@ -177,7 +177,7 @@
    'helm-buffers-maybe-raise-buffer-frame
    (lambda () (and (fboundp 'tab-bar-mode)
                    "Switch to buffer(s) other tab `C-c C-t'"))
-   'helm-buffers-switch-to-buffer-other-tab
+   'helm-buffers-switch-buffers-in-tab
    "Switch to buffer at line number"
    'helm-switch-to-buffer-at-linum
    "Browse project `C-x C-d'"
