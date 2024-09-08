@@ -5668,19 +5668,21 @@ source is `helm-source-find-files'."
   "Insert helm-find-files bookmark in minibuffer."
   (interactive)
   (require 'helm-bookmark)
-  (helm :sources (helm-bookmark-build-source
-                  "bookmark insert location"
-                  'helm-bookmark-helm-find-files-setup-alist
-                  helm-source-in-buffer
-                  :action (lambda (candidate)
-                            (with-selected-window (minibuffer-window)
-                              (goto-char (point-max))
-                              (when (re-search-backward "/" nil t)
-                                (delete-region (match-end 0) (point-max))
-                                (forward-char 1))
-                              (bookmark-insert-location candidate))))
-        :buffer "*helm bookmark insert*"
-        :allow-nest t))
+  (with-helm-alive-p
+    (helm :sources (helm-bookmark-build-source
+                    "bookmark insert location"
+                    'helm-bookmark-helm-find-files-setup-alist
+                    helm-source-in-buffer
+                    :filtered-candidate-transformer 'helm-adaptive-sort
+                    :action (lambda (candidate)
+                              (with-selected-window (minibuffer-window)
+                                (goto-char (point-max))
+                                (when (re-search-backward "/" nil t)
+                                  (delete-region (match-end 0) (point-max))
+                                  (forward-char 1))
+                                (bookmark-insert-location candidate))))
+          :buffer "*helm bookmark insert*"
+          :allow-nest t)))
 (put 'helm-ff-bookmark-insert-location 'helm-only t)
 
 (defun helm-find-files-initial-input (&optional input)
