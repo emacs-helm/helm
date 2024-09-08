@@ -355,10 +355,14 @@ If a prefix arg is given split windows vertically."
   "Display BUFFERS in a new tab.
 If only one buffer in BUFFERS, try to switch to it in its
 tab if some, otherwise, display it in a new tab.
-When a prefix arg is given, display each buffer of BUFFERS in new tabs."
+When a double prefix arg is given (C-u C-u), display each buffer of BUFFERS in
+new tabs. When a single buffer is given, a single prefix arg will force
+displaying buffer in a new tab even if it is already present in a tab.
+When there is more than one buffer in BUFFERS a single prefix arg display the
+buffers vertically according to `helm-window-show-buffers-function'."
   (when (fboundp 'switch-to-buffer-other-tab)
     (if (cdr buffers)
-        (if helm-current-prefix-arg
+        (if (equal helm-current-prefix-arg '(16))
             (cl-loop for b in buffers
                      do (switch-to-buffer-other-tab b))
           (switch-to-buffer-other-tab (car buffers))
