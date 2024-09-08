@@ -1,6 +1,23 @@
 #+STARTUP:showall
 
 * NEWS
+** Version 4.0.1-pre
+*** Enhance usage of tab-bar-mode from Helm
+Previously we were displaying each marked candidate in a tab, now all
+marked candidates go in same tab.
+Helm-find-files is now using the same functions as helm-buffers to
+display its candidates in tab.
+helm-imenu-all when jumping to a candidate jump to it in its tab if
+possible.
+*** Access to helm-find-files bookmarks from helm-read-file-name
+That's mean that when copying/renaming etc... you can use bookmarks as
+target.
+*** Fix a bug in query replace in file names
+It is now possible to match counter ("\#") inside the replacement
+string and not only before or after as before.
+*** Fix a bug with dummy sources in file related sources
+It is now possible to mark wildcard candidates from unrelated
+directories.
 ** Version 4.0
 *** Enhance helm-finder
 Now helm-finder fetchs keywords from all packages, not only built-in
