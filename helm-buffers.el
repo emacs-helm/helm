@@ -972,20 +972,10 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Run switch to other frame action from `helm-source-buffers-list'."
   'helm-buffer-switch-to-buffer-other-frame)
 
-(defun helm-buffers-switch-buffers-in-tab (candidate)
-  "Switch marked buffers in a new tab.
-If no marked candidates or only one marked, try to switch to CANDIDATE in its
-tab if some, otherwise, display it in a new tab."
-  (when (fboundp 'switch-to-buffer-other-tab)
-    (let ((bufs (helm-marked-candidates)))
-      (if (cdr bufs)
-          (progn
-            (switch-to-buffer-other-tab (car bufs))
-            (helm-window-show-buffers bufs))
-        (if helm-current-prefix-arg
-            (switch-to-buffer-other-tab candidate)
-          (helm-buffers-maybe-switch-to-buffer-in-tab
-           candidate #'switch-to-buffer-other-tab))))))
+(defun helm-buffers-switch-buffers-in-tab (_candidate)
+  "Display marked buffers in a new tab.
+See `helm-buffers-switch-buffers-in-tab-1' for more infos."
+  (helm-buffers-switch-buffers-in-tab-1 (helm-marked-candidates)))
 
 (helm-make-command-from-action helm-buffers-switch-to-buffer-new-tab
   "Run switch to buffer in other tab action from `helm-source-buffers-list'."

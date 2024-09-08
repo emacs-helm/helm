@@ -350,6 +350,20 @@ If a prefix arg is given split windows vertically."
            when (member tab-name (split-string (cdr (assq 'name tab)) ", " t))
            return tab))
 
+(defun helm-buffers-switch-buffers-in-tab-1 (buffers)
+  "Display BUFFERS in a new tab.
+If only one buffer in BUFFERS, try to switch to it in its
+tab if some, otherwise, display it in a new tab."
+  (when (fboundp 'switch-to-buffer-other-tab)
+    (if (cdr buffers)
+        (progn
+          (switch-to-buffer-other-tab (car buffers))
+          (helm-window-show-buffers buffers))
+      (if helm-current-prefix-arg
+          (switch-to-buffer-other-tab (car buffers))
+        (helm-buffers-maybe-switch-to-buffer-in-tab
+         (car buffers) #'switch-to-buffer-other-tab)))))
+
 (defun helm--get-tab-names ()
   (let ((tab-bar-tab-name-function #'tab-bar-tab-name-all))
     (mapcar (lambda (tab)

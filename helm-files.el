@@ -266,7 +266,7 @@ Should not be used among other sources.")
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
                                   nil 'helm-ff-delete-char-backward--exit-fn)
     (when (fboundp 'tab-bar-mode)
-      (define-key map (kbd "C-c C-t")       'helm-ff-find-file-other-tab))
+      (define-key map (kbd "C-c C-t")       'helm-ff-run-find-file-other-tab))
     map)
   "Keymap for `helm-find-files'.")
 
@@ -869,7 +869,7 @@ want to use it, helm is still providing
    "Find file other frame `C-c C-o'" 'find-file-other-frame
    (lambda () (and (fboundp 'tab-bar-mode)
                    "Find file other tab `C-c C-t'"))
-   'find-file-other-tab
+   'helm-ff-find-file-other-tab
    "Print File `C-c p, C-u to refresh'" 'helm-ff-print
    "Locate `C-x C-f, C-u to specify locate db'" 'helm-ff-locate)
   "Actions for `helm-find-files'."
@@ -6438,9 +6438,15 @@ selecting them."
               ;; unspecified e.g user hit C-k foo RET.
               (t (find-file candidate)))))))
 
-(helm-make-command-from-action helm-ff-find-file-other-tab
+(defun helm-ff-find-file-other-tab (_candidate)
+  "Display marked files in a new tab.
+See `helm-buffers-switch-buffers-in-tab-1' for more infos."
+  (helm-buffers-switch-buffers-in-tab-1
+   (mapcar 'find-file-noselect (helm-marked-candidates))))
+
+(helm-make-command-from-action helm-ff-run-find-file-other-tab
     "Run find file in other tab action from `helm-find-files'."
-  'find-file-other-tab
+  'helm-ff-find-file-other-tab
   (cl-assert (fboundp 'tab-bar-mode) nil "Tab-bar-mode not available"))
 
 (defun helm-ff--new-dirs-to-update (path)
