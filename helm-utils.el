@@ -353,7 +353,8 @@ If a prefix arg is given split windows vertically."
 (defun helm-buffers-switch-buffers-in-tab-1 (buffers)
   "Display BUFFERS in a new tab.
 If only one buffer in BUFFERS, try to switch to it in its
-tab if some, otherwise, display it in a new tab."
+tab if some, otherwise, display it in a new tab.
+When a prefix arg is given, display each buffer of BUFFERS in new tabs."
   (when (fboundp 'switch-to-buffer-other-tab)
     (if (cdr buffers)
         (if helm-current-prefix-arg
