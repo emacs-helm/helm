@@ -318,6 +318,7 @@ If a prefix arg is given split windows vertically."
 (declare-function tab-bar-tab-name-all "tab-bar.el")
 
 (defun helm-buffers-maybe-switch-to-buffer-in-tab (buffer fallback-fn)
+  "Switch to BUFFER in its tab if possible, otherwise call FALLBACK-FN."
   (let* (;; Normally `helm-buffers-maybe-switch-to-tab' custom set function
          ;; bounded `tab-bar-tab-name-function' to `tab-bar-tab-name-all'
          ;; but in case user bounded this with setq ensure it works
