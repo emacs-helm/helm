@@ -356,7 +356,9 @@ If only one buffer in BUFFERS, try to switch to it in its
 tab if some, otherwise, display it in a new tab."
   (when (fboundp 'switch-to-buffer-other-tab)
     (if (cdr buffers)
-        (progn
+        (if helm-current-prefix-arg
+            (cl-loop for b in buffers
+                     do (switch-to-buffer-other-tab b))
           (switch-to-buffer-other-tab (car buffers))
           (helm-window-show-buffers buffers))
       (if helm-current-prefix-arg
