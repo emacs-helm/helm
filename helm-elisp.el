@@ -413,6 +413,7 @@ the same time to variable and a function."
                          ((guard (class-p it))      " (Class)")
                          ((guard (cl-generic-p it)) " (Gen)")
                          ((guard (fboundp it))      " (Fun)")
+                         ((guard (keywordp it))     " (keyword)")
                          ((guard (boundp it))       " (Var)")
                          ((guard (facep it))        " (Face)"))
            collect (cons (concat c (helm-make-separator c) annot) c) into lst
