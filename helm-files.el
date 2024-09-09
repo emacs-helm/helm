@@ -2417,9 +2417,10 @@ COUNT is used for incrementing new name if needed."
                       ;; search and replace
                       ;; feature in placeholder \@.
                       (string-match "\\\\@/\\(.*\\)/\\(.*\\)/" rep)
-                      (helm-aand (replace-regexp-in-string
-                                  "\\\\#" (format "%03d" (1+ count))
-                                  (match-string 2 rep))
+                      (helm-aand (save-match-data
+                                   (replace-regexp-in-string
+                                    "\\\\#" (format "%03d" (1+ count))
+                                    (match-string 2 rep)))
                                  (replace-regexp-in-string
                                   (match-string 1 rep) it target)))
                      ;; Incremental replacement
