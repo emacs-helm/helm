@@ -2,6 +2,7 @@
 
 * NEWS
 ** Version 4.0.1-pre
+*** Add completion for Char Classes for regexps
 *** Enhance usage of tab-bar-mode from Helm
 Previously we were displaying each marked candidate in a tab, now all
 marked candidates go in same tab.
