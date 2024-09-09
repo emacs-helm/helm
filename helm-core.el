@@ -2748,9 +2748,10 @@ of current source only."
                    do (cl-incf ln)
                    do (forward-line 1) finally return ln))))))
 
-;; Entry point
-;; `:allow-nest' is not in this list because it is treated before.
+;;; Main functions
+;;
 (defconst helm-argument-keys
+  ;; `:allow-nest' is not in this list because it is treated before.
   '(:sources :input :prompt :resume
              :preselect :buffer :keymap :default :history))
 
@@ -2949,19 +2950,6 @@ in the source.
            unless (memq key helm-argument-keys)
            collect (cons sym value)))
 
-(defun helm--maybe-load-tramp-archive ()
-  ;; Should fix bug#2393 and bug#2394.  `while-no-input-ignore-events'
-  ;; is also let-bounded in `helm--maybe-use-while-no-input'.
-  (let ((while-no-input-ignore-events
-         (and (boundp 'while-no-input-ignore-events)
-              (cons 'dbus-event while-no-input-ignore-events))))
-    (unless helm--tramp-archive-maybe-loaded
-      ;; This for Emacs-27 not requiring tramp-archive.
-      (and (boundp 'tramp-archive-enabled)
-           (require 'tramp-archive nil t))
-      (setq helm--tramp-archive-maybe-loaded t))))
-
-;;; Entry point helper
 (defun helm-internal (&optional
                       sources input
                       prompt resume
@@ -3064,7 +3052,7 @@ HISTORY args see `helm'."
                 (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
               (add-hook 'post-command-hook 'helm--maybe-update-keymap)
               ;; Add also to update hook otherwise keymap is not updated
-              ;; until a key is hitted (Bug#1670).
+              ;; until a key is hit (Bug#1670).
               (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
               (add-hook 'post-command-hook 'helm--update-header-line)
               (helm-log "helm-internal" "show prompt")
@@ -3101,6 +3089,18 @@ HISTORY args see `helm'."
       (setq helm-pattern "")
       (setq helm--ignore-errors nil
             helm-debug nil))))
+
+(defun helm--maybe-load-tramp-archive ()
+  ;; Should fix bug#2393 and bug#2394.  `while-no-input-ignore-events'
+  ;; is also let-bounded in `helm--maybe-use-while-no-input'.
+  (let ((while-no-input-ignore-events
+         (and (boundp 'while-no-input-ignore-events)
+              (cons 'dbus-event while-no-input-ignore-events))))
+    (unless helm--tramp-archive-maybe-loaded
+      ;; This for Emacs-27 not requiring tramp-archive.
+      (and (boundp 'tramp-archive-enabled)
+           (require 'tramp-archive nil t))
+      (setq helm--tramp-archive-maybe-loaded t))))
 
 (defun helm--advice-linum-on ()
   (unless (or (minibufferp)
@@ -7873,7 +7873,7 @@ If PREV is non-nil move to precedent."
     (helm-next-visible-mark t)))
 (put 'helm-prev-visible-mark 'helm-only t)
 
-;;; Utility: Selection Paste
+;;; Kill/yank selection
 ;;
 (defun helm-yank-selection (arg)
   "Set minibuffer contents to current display selection.
