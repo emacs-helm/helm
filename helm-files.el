@@ -5676,10 +5676,7 @@ source is `helm-source-find-files'."
                     :filtered-candidate-transformer 'helm-adaptive-sort
                     :action (lambda (candidate)
                               (with-selected-window (minibuffer-window)
-                                (goto-char (point-max))
-                                (when (re-search-backward "/" nil t)
-                                  (delete-region (match-end 0) (point-max))
-                                  (forward-char 1))
+                                (delete-minibuffer-contents)
                                 (bookmark-insert-location candidate))))
           :buffer "*helm bookmark insert*"
           :allow-nest t)))
