@@ -238,27 +238,27 @@ If `helm-turn-on-show-completion' is nil do nothing."
                             (eq (char-before) ?\#)))))))
     (save-excursion
       (goto-char beg)
-      (if (or
-           ;; Complete on all symbols in non--lisp modes (logs mail etc..)
-           (not (memq major-mode '(emacs-lisp-mode
-                                   lisp-interaction-mode
-                                   inferior-emacs-lisp-mode)))
-           (not (or (funcall fn-sym-p)
-                    (and (eq (char-before) ?\')
-                         (save-excursion
-                           (forward-char (if (funcall fn-sym-p) -2 -1))
-                           (skip-syntax-backward " " (pos-bol))
-                           (memq (symbol-at-point)
-                                 helm-lisp-quoted-function-list)))
-                    (eq (char-before) ?\())) ; no paren before str.
-           ;; Looks like we are in a let statement.
-           (condition-case nil
-               (progn (up-list -2) (forward-char 1)
-                      (eq (char-after) ?\())
-             (error nil)))
-          (lambda (sym)
-            (or (boundp sym) (fboundp sym) (symbol-plist sym)))
-        #'fboundp))))
+      (cond ((or
+              ;; Complete on all symbols in non--lisp modes (logs mail etc..)
+              (not (memq major-mode '(emacs-lisp-mode
+                                      lisp-interaction-mode
+                                      inferior-emacs-lisp-mode)))
+              (not (or (funcall fn-sym-p)
+                       (and (eq (char-before) ?\')
+                            (save-excursion
+                              (forward-char (if (funcall fn-sym-p) -2 -1))
+                              (skip-syntax-backward " " (pos-bol))
+                              (memq (symbol-at-point)
+                                    helm-lisp-quoted-function-list)))
+                       (eq (char-before) ?\())) ; no paren before str.
+              ;; Looks like we are in a let statement.
+              (condition-case nil
+                  (progn (up-list -2) (forward-char 1)
+                         (eq (char-after) ?\())
+                (error nil)))
+             (lambda (sym)
+               (or (boundp sym) (fboundp sym) (symbol-plist sym))))
+            (t #'fboundp)))))
 
 (defun helm-thing-before-point (&optional limits regexp)
   "Return symbol name before point.
@@ -298,6 +298,15 @@ Return a cons (beg . end)."
     (when (and pos (< (point) pos))
       (push-mark pos t t))))
 
+(defconst helm-lisp-completion-re-chars-classes
+  '(":xdigit:" ":word:" ":upper:"
+    ":unibyte:" ":space:" ":punct:"
+    ":print:" ":nonascii:" ":ascii:"
+    ":multibyte:" ":lower:"
+    ":graph:" ":digit:" ":cntrl:"
+    ":blank:" ":alpha:" ":alnum:")
+  "Table of Char Classes for regexps.")
+
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
   "Preconfigured Helm for Lisp symbol completion at point."
@@ -306,11 +315,15 @@ Return a cons (beg . end)."
          (beg        (car (helm-bounds-of-thing-before-point)))
          (end        (point))
          (pred       (and beg (helm-lisp-completion--predicate-at-point beg)))
+         (re-class-p (and (eq 'string (syntax-ppss-context (syntax-ppss (point))))
+                          (looking-back "\\[:" 2)))
          (loc-vars   (and (fboundp 'elisp--local-variables)
                           (ignore-errors
                             (mapcar #'symbol-name (elisp--local-variables)))))
-         (glob-syms  (and target pred (all-completions target obarray pred)))
-         (candidates (append loc-vars glob-syms))
+         (glob-syms  (and target pred (not re-class-p) (all-completions target obarray pred)))
+         (candidates (if re-class-p
+                         helm-lisp-completion-re-chars-classes
+                       (append loc-vars glob-syms)))
          (helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
          (enable-recursive-minibuffers t))
@@ -392,8 +405,10 @@ the same time to variable and a function."
 (defun helm-lisp-completion-transformer (candidates _source)
   "Helm candidates transformer for Lisp completion."
   (cl-loop for c in candidates
-           for sym = (intern c)
+           for sym = (if (string-match "\\`:[[:alpha:]]+:\\'" c)
+                         c (intern-soft c))
            for annot = (helm-acase sym
+                         ((guard (stringp it))      " (regexp)")
                          ((guard (commandp it))     " (Com)")
                          ((guard (class-p it))      " (Class)")
                          ((guard (cl-generic-p it)) " (Gen)")
