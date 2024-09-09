@@ -316,7 +316,8 @@ Return a cons (beg . end)."
          (end        (point))
          (pred       (and beg (helm-lisp-completion--predicate-at-point beg)))
          (re-class-p (and (eq 'string (syntax-ppss-context (syntax-ppss (point))))
-                          (looking-back "\\[:" 2)))
+                          (save-excursion
+                            (re-search-backward "\\[:[[:alpha:]]*" (pos-bol) t))))
          (loc-vars   (and (fboundp 'elisp--local-variables)
                           (ignore-errors
                             (mapcar #'symbol-name (elisp--local-variables)))))
