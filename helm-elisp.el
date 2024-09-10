@@ -350,8 +350,7 @@ Return a cons (beg . end)."
                                    0.01 nil
                                    #'helm-insert-completion-at-point
                                    beg end candidate))))
-           :input (if helm-lisp-fuzzy-completion
-                      target (concat target " "))
+           :input target
            :resume 'noresume
            :truncate-lines t
            :buffer "*helm lisp completion*"
