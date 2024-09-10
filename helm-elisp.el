@@ -372,7 +372,11 @@ other window according to the value of
       (helm-elisp-show-help "Toggle show help for the symbol")))
 
 (defun helm-elisp--show-help-1 (candidate &optional name)
-  (helm-acase (intern-soft candidate)
+  (helm-acase (if (member candidate helm-lisp-completion-re-chars-classes)
+                  candidate
+                (intern-soft candidate))
+    ((guard (stringp it))
+     (helm-describe-re-char-classes it))
     ((guard (and (fboundp it) (boundp it)))
      (if (member name `(,helm-describe-function-function
                         ,helm-describe-variable-function))
