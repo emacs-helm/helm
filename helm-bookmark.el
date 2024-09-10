@@ -75,6 +75,8 @@ Don't use `setq' to set this."
 
 Value can be either \\='native' or \\='adaptive'.
 
+See `helm-adaptive-sort' for infos on \\='native'.
+
 Once you use \\='native' the bookmark variable `bookmark-sort-flag'
 will be honored."
   :type '(choice
