@@ -5674,7 +5674,9 @@ source is `helm-source-find-files'."
                     "bookmark insert location"
                     'helm-bookmark-helm-find-files-setup-alist
                     helm-source-in-buffer
-                    :filtered-candidate-transformer 'helm-adaptive-sort
+                    :filtered-candidate-transformer
+                    '(helm-adaptive-sort
+                      helm-highlight-bookmark)
                     :action (lambda (candidate)
                               (with-selected-window (minibuffer-window)
                                 (delete-minibuffer-contents)
