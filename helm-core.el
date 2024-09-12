@@ -4362,20 +4362,20 @@ Cache the candidates if there is no cached value yet."
       (helm-apply-functions-from-source source it candidates source)
     candidates))
 
-(defmacro helm--maybe-process-filter-one-by-one-candidate (candidate source)
-  "Execute `filter-one-by-one' function(s) on real value of CANDIDATE in SOURCE."
-  `(helm-aif (assoc-default 'filter-one-by-one ,source)
-       (let ((real (if (consp ,candidate)
-                       (cdr ,candidate)
-                     ,candidate)))
-         (when real
-           (if (and (listp it)
-                    (not (functionp it))) ;; Don't treat lambda's as list.
-               (cl-loop for f in it
-                        do (setq ,candidate (funcall f real))
-                        finally return ,candidate)
-             (setq ,candidate (funcall it real)))))
-     ,candidate))
+(defun helm--maybe-process-filter-one-by-one-candidate (candidate source)
+  "Execute `filter-one-by-one' function(s) on real value of CANDIDATE in SOURCE.
+Return CANDIDATE modified by the function(s)."
+  (helm-aif (assoc-default 'filter-one-by-one source)
+      (let ((real (if (consp candidate) (cdr candidate) candidate)))
+        (when real
+          (if (and (listp it)
+                   (not (functionp it))) ;; Don't treat lambda's as list.
+              (cl-loop with cand = candidate
+                       for f in it
+                       do (setq cand (funcall f real))
+                       finally return cand)
+            (funcall it real))))
+    candidate))
 
 (defun helm--initialize-one-by-one-candidates (candidates source)
   "Process CANDIDATES with the `filter-one-by-one' function in SOURCE.
@@ -4913,7 +4913,7 @@ emacs-27 to provide such scoring in emacs<27."
                             ;; inner loop to be able to check if
                             ;; the duplicate have not been found in previous loop.
                             (puthash c iter hash)
-                            (helm--maybe-process-filter-one-by-one-candidate c source)
+                            (setq c (helm--maybe-process-filter-one-by-one-candidate c source))
                             (cl-incf count))
                           ;; Filter out nil candidates maybe returned by
                           ;; `helm--maybe-process-filter-one-by-one-candidate'.
@@ -6879,7 +6879,8 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
                                     (helm-search-match-part cand pattern diacritics)))
                          do (progn
                               (puthash cand iter hash)
-                              (helm--maybe-process-filter-one-by-one-candidate cand source)
+                              (setq cand (helm--maybe-process-filter-one-by-one-candidate
+                                          cand source))
                               (cl-incf count))
                          and collect cand))))))
 
