@@ -8041,7 +8041,10 @@ source or `helm-follow-input-idle-delay' or
 ;;; Auto-resize mode
 ;;
 (defun helm--autoresize-hook (&optional max-height min-height)
-  (when (helm-window)
+  (when (if (helm--show-action-window-other-window-p)
+            (and (helm-window)
+                 (not (get-buffer-window helm-action-buffer 'visible)))
+          (helm-window))
     (with-helm-window
       (fit-window-to-buffer nil
                             (/ (* (frame-height)
