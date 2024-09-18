@@ -1435,13 +1435,11 @@ If object is a lambda, return \"Anonymous\"."
                          (mapcar 'helm-symbolify faces)
                          (helm-symbolify face))))))
 
-(defun helm-describe-re-char-classes (exp)
-  "Describe Char Classes for regexps."
-  (with-output-to-temp-buffer "*help*"
-    (princ (helm-acase exp
+(defun helm-describe-re-char-classes-1 (exp)
+  (helm-acase exp
              (":xdigit:"
               (format "%s
-This matches the hexadecimal digits:
+This matches the hexadecimal digits.
 ‘0’ through ‘9’, ‘a’ through ‘f’ and ‘A’ through ‘F’." it))
              (":word:"
               (format "%s
@@ -1450,10 +1448,11 @@ Note that the syntax of a character, and thus which characters are considered
 “word-constituent”, depends on the major mode." it))
              (":upper:"
               (format "%s
-This matches any upper-case letter, as determined by the current
-case table.  If ‘case-fold-search’ is non-‘nil’, this also matches
-any lower-case letter.  Note that a buffer can have its own local
-case table different from the default one." it))
+This matches any upper-case letter.
+It is determined by the current case table.
+If ‘case-fold-search’ is non-‘nil’, this
+also matches any lower-case letter.  Note that a buffer can have
+its own local case table different from the default one." it))
              (":unibyte:"
               (format "%s
 This matches any unibyte character." it))
@@ -1464,14 +1463,14 @@ Note that the syntax of a character, and thus
 which characters are considered “whitespace”, depends on the major mode." it))
              (":punct:"
               (format "%s
-This matches any punctuation character.  (At present, for multibyte
-characters, it matches anything that has non-word syntax, and thus
-its exact definition can vary from one major mode to another, since
+This matches any punctuation character.
+At present, for multibyte characters, it matches anything that has non-word syntax,
+and thus its exact definition can vary from one major mode to another, since
 the syntax of a character depends on the major mode.)" it))
              (":print:"
               (format "%s
-This matches any printing character—either spaces or graphic
-characters matched by ‘[:graph:]’." it))
+This matches any printing character.
+Either spaces or graphic characters matched by ‘[:graph:]’." it))
              (":nonascii:"
               (format "%s
 This matches any non-ASCII character." it))
@@ -1480,41 +1479,52 @@ This matches any non-ASCII character." it))
 This matches any multibyte character." it))
              (":lower:"
               (format "%s
-This matches any lower-case letter, as determined by the current
-case table.  If ‘case-fold-search’ is non-‘nil’, this also matches
+This matches any lower-case letter.
+It is determined by the current case table.
+If ‘case-fold-search’ is non-‘nil’, this also matches
 any upper-case letter.  Note that a buffer can have its own local
 case table different from the default one." it))
              (":graph:"
               (format "%s
-This matches graphic characters—everything except spaces, ASCII and
+This matches graphic characters.
+Everything except spaces, ASCII and
 non-ASCII control characters, surrogates, and codepoints unassigned
 by Unicode, as indicated by the Unicode ‘general-category’ property." it))
              (":digit:"
               (format "%s
-This matches ‘0’ through ‘9’.  Thus, ‘[-+[:digit:]]’ matches any
-digit, as well as ‘+’ and ‘-’." it))
+This matches ‘0’ through ‘9’.
+Thus, ‘[-+[:digit:]]’ matches any digit,as well as ‘+’ and ‘-’." it))
              (":cntrl:"
               (format "%s
-This matches any character whose code is in the range 0–31." it))
+This matches any cntrl character.
+That is any character whose code is in the range 0–31." it))
              (":blank:"
               (format "%s
-This matches horizontal whitespace, as defined by Annex C of the
-Unicode Technical Standard #18.  In particular, it matches spaces,
-tabs, and other characters whose Unicode ‘general-category’
+This matches horizontal whitespace.
+It is defined by Annex C of the Unicode Technical Standard #18.
+In particular, it matches spaces,tabs,
+and other characters whose Unicode ‘general-category’
 property indicates they are spacing separators." it))
              (":alpha:"
               (format "%s
-This matches any letter.  For multibyte characters, it matches
-characters whose Unicode ‘general-category’ property indicates
+This matches any letter.
+For multibyte characters, it matches characters
+whose Unicode ‘general-category’ property indicates
 they are alphabetic characters." it))
              (":alnum:"
               (format "%s
-This matches any letter or digit.  For multibyte characters, it
-matches characters whose Unicode ‘general-category’ property
+This matches any letter or digit.
+For multibyte characters, it matches characters
+whose Unicode ‘general-category’ property
 indicates they are alphabetic or decimal number characters." it))
              (":ascii:"
               (format "%s
-This matches any ASCII character (codes 0–127)." it))))))
+This matches any ASCII character (codes 0–127)." it))))
+
+(defun helm-describe-re-char-classes (exp)
+  "Describe Char Classes for regexps."
+  (with-output-to-temp-buffer "*help*"
+    (princ (helm-describe-re-char-classes-1 exp))))
 
 (defun helm-elisp--persistent-help (candidate fun &optional name)
   "Used to build persistent actions describing CANDIDATE with FUN.

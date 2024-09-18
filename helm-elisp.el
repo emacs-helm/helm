@@ -341,6 +341,9 @@ Return a cons (beg . end)."
                       :nomark t
                       :match-part (lambda (c) (car (split-string c)))
                       :fuzzy-match helm-lisp-fuzzy-completion
+                      :popup-info (lambda (c) (helm-get-first-line-documentation
+                                               (if (string-match "\\`:[[:alpha:]]+:\\'" c)
+                                                   c (intern-soft c))))
                       :persistent-help (helm-lisp-completion-persistent-help)
                       :filtered-candidate-transformer
                       #'helm-lisp-completion-transformer
@@ -412,15 +415,21 @@ the same time to variable and a function."
            for sym = (if (string-match "\\`:[[:alpha:]]+:\\'" c)
                          c (intern-soft c))
            for annot = (helm-acase sym
-                         ((guard (stringp it))      " (regexp)")
-                         ((guard (commandp it))     " (Com)")
-                         ((guard (class-p it))      " (Class)")
-                         ((guard (cl-generic-p it)) " (Gen)")
-                         ((guard (fboundp it))      " (Fun)")
-                         ((guard (keywordp it))     " (keyword)")
-                         ((guard (boundp it))       " (Var)")
-                         ((guard (facep it))        " (Face)"))
-           collect (cons (concat c (helm-make-separator c) annot) c) into lst
+                         ((guard (stringp it))      "<reg> ")
+                         ((guard (commandp it))     "<com> ")
+                         ((guard (class-p it))      "<cla> ")
+                         ((guard (cl-generic-p it)) "<gen> ")
+                         ((guard (fboundp it))      "<fun> ")
+                         ((guard (keywordp it))     "<kwd> ")
+                         ((guard (boundp it))       "<var> ")
+                         ((guard (facep it))        "<face> "))
+           collect (cons (concat (helm-aand
+                                  (propertize
+                                   annot 'face 'helm-completions-annotations)
+                                  (propertize " " 'display it))
+                                 c)
+                         c)
+           into lst
            finally return (sort lst #'helm-generic-sort-fn)))
 
 ;;;###autoload
@@ -433,6 +442,8 @@ Argument NAME allows specifiying what function to use to display
 documentation when SYM name is the same for function and variable."
   (let ((doc (condition-case _err
                  (helm-acase sym
+                   ((guard (stringp it))
+                    (cadr (split-string (helm-describe-re-char-classes-1 it) "\n")))
                    ((guard (class-p it))
                     (cl--class-docstring (cl--find-class it)))
                    ((guard (and (fboundp it) (boundp it)))
