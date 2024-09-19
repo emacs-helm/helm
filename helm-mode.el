@@ -2620,6 +2620,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                  ;; completion-in-region, try anyway never know.
                  (afix (or (plist-get completion-extra-properties :affixation-function)
                            (completion-metadata-get metadata 'affixation-function)))
+                 (docsig (plist-get completion-extra-properties :company-docsig))
                  (category (or (eq (completion-metadata-get metadata 'category) 'file)
                                (eq (plist-get completion-extra-properties :category) 'file)))
                  (file-comp-p (or (eq category 'file)
@@ -2711,6 +2712,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                                                            candidates source)
                                                   afun afix category))))
                                     '(helm-cr-default-transformer))
+                            :popup-info docsig
                             :match-dynamic (eq helm-completion-style 'emacs)
                             :fuzzy (eq helm-completion-style 'helm-fuzzy)
                             :exec-when-only-one t
