@@ -422,7 +422,9 @@ the same time to variable and a function."
                          ((guard (fboundp it))      "<fun> ")
                          ((guard (keywordp it))     "<kwd> ")
                          ((guard (boundp it))       "<var> ")
-                         ((guard (facep it))        "<face> "))
+                         ((guard (facep it))        "<fac> ")
+                         ((guard (helm-group-p it)) "<grp> ")
+                         (t                         "      "))
            collect (cons (concat (helm-aand
                                   (propertize
                                    annot 'face 'helm-completions-annotations)
