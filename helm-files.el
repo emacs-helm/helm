@@ -3034,7 +3034,7 @@ hitting C-j on \"..\"."
       (with-helm-window
         (when (re-search-forward
                (format helm-ff-last-expanded-candidate-regexp
-                       (regexp-quote presel))
+                       (concat (regexp-quote presel) "$"))
                nil t)
           (forward-line 0)
           (helm-mark-current-line)))
