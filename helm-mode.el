@@ -2621,6 +2621,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                  (afix (or (plist-get completion-extra-properties :affixation-function)
                            (completion-metadata-get metadata 'affixation-function)))
                  (docsig (plist-get completion-extra-properties :company-docsig))
+                 (helm-truncate-lines (and docsig helm-popup-tip-mode))
                  (category (or (eq (completion-metadata-get metadata 'category) 'file)
                                (eq (plist-get completion-extra-properties :category) 'file)))
                  (file-comp-p (or (eq category 'file)
