@@ -2,7 +2,12 @@
 
 * NEWS
 ** Version 4.0.1-pre
+*** Maybe provide a popup-info in completion-at-point
+If CAPFns provide such information via `completion-extra-properties`,
+display it in a popup-info when helm-popup-tip-mode is enabled.
+`helm-lisp-completion-at-point` provides this as well.
 *** Add completion for Char Classes for regexps
+This is available in `helm-lisp-completion-at-point`.
 *** Enhance usage of tab-bar-mode from Helm
 Previously we were displaying each marked candidate in a tab, now all
 marked candidates go in same tab.
@@ -67,7 +72,7 @@ So it can safely be used as a replacement of "i" in Info.
 as it is not working in some cases (e.g. symlinks).
 *** Fix persistent action in helm mark-ring when follow mode is on
 *** Fix Imenu preselection when point is on a name with special chars
-*** Provide a new progress bar for rsync with a svg widget 
+*** Provide a new progress bar for rsync with a svg widget
 Needs svg-lib package but it is not mandatory.
 
 ** Version 3.9.8
