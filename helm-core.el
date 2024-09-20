@@ -5190,6 +5190,13 @@ Argument OVERLAY is a ref-cell."
                                   :follow t)
     (forward-line 1)
     (helm-mark-current-line)
+    ;; If we are here, it is because helm-window is not ready, if one of the
+    ;; functions in `helm-move-selection-after-hook' is called with
+    ;; `with-helm-window' (it shouldn't but never know) we will have an error.
+    (condition-case-unless-debug _err
+        (helm-log-run-hook "helm--update-move-first-line"
+                           'helm-move-selection-after-hook)
+      (error nil))
     (helm-follow-execute-persistent-action-maybe)))
 
 (cl-defun helm-force-update (&optional preselect (recenter t))
