@@ -1048,7 +1048,7 @@ Assume regexp is a pcre based regexp."
 (add-hook 'helm-after-action-hook 'helm-match-line-cleanup-pulse)
 (add-hook 'helm-after-persistent-action-hook 'helm-match-line-update)
 
-;;; Popup buffer-name or filename in grep/moccur/imenu-all.
+;;; Popup-info
 ;;
 (defvar helm--show-help-echo-timer nil)
 (defvar helm--maybe-show-help-echo-overlay nil)
@@ -1098,14 +1098,13 @@ Assume regexp is a pcre based regexp."
                (ignore-error wrong-type-argument
                  (save-selected-window
                    (with-helm-window
-                     ;; Use helm-grep-fname prop instead of help-echo as help-echo
-                     ;; maybe used by mouse overlay after resume.
-                     (let ((pos (save-excursion (end-of-visual-line) (point))))
-                       (helm-aif (and popup-info-fn
-                                      (funcall popup-info-fn (helm-get-selection)))
-                           (helm-tooltip-show
-                            (concat " " it)
-                            pos))))))))))))
+                     (let ((pos (save-excursion (end-of-visual-line) (point)))
+                           (str (and popup-info-fn
+                                     (funcall popup-info-fn (helm-get-selection)))))
+                       (when (and str (not (string= str "")))
+                         (helm-tooltip-show
+                          (concat " " str)
+                          pos))))))))))))
 
 ;;;###autoload
 (define-minor-mode helm-popup-tip-mode
