@@ -307,30 +307,29 @@ This function aggregates three sources of tag files:
                  (buffer-substring-no-properties
                   (region-beginning) (region-end))
                (thing-at-point 'symbol))))
-    (if (cl-notany 'file-exists-p tag-files)
-        (message "Error: No tag file found.\
-Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.")
-        (cl-loop for k being the hash-keys of helm-etags-cache
-                 unless (member k tag-files)
-                 do (remhash k helm-etags-cache))
-        (mapc (lambda (f)
-                (when (or (equal reinit '(4))
-                          (and helm-etags-mtime-alist
-                               (helm-etags-file-modified-p f)))
-                  (remhash f helm-etags-cache)))
-              tag-files)
-        (unless helm-source-etags-select
-          (setq helm-source-etags-select
-                (helm-etags-build-source)))
-        (helm :sources 'helm-source-etags-select
-              :keymap helm-etags-map
-              :default (and (stringp str)
-                            (if (or helm-etags-fuzzy-match
-                                    (and (eq major-mode 'haskell-mode)
-                                         (string-match "[']\\'" str)))
-                                str
-                              (list (concat "\\_<" str "\\_>") str)))
-              :buffer "*helm etags*"))))
+    (cl-assert (cl-loop for f in tag-files thereis (file-exists-p f))
+               nil "No TAGS file found")
+    (cl-loop for k being the hash-keys of helm-etags-cache
+             unless (member k tag-files)
+             do (remhash k helm-etags-cache))
+    (mapc (lambda (f)
+            (when (or (equal reinit '(4))
+                      (and helm-etags-mtime-alist
+                           (helm-etags-file-modified-p f)))
+              (remhash f helm-etags-cache)))
+          tag-files)
+    (unless helm-source-etags-select
+      (setq helm-source-etags-select
+            (helm-etags-build-source)))
+    (helm :sources 'helm-source-etags-select
+          :keymap helm-etags-map
+          :default (and (stringp str)
+                        (if (or helm-etags-fuzzy-match
+                                (and (eq major-mode 'haskell-mode)
+                                     (string-match "[']\\'" str)))
+                            str
+                          (list (concat "\\_<" str "\\_>") str)))
+          :buffer "*helm etags*")))
 
 (provide 'helm-tags)
 
