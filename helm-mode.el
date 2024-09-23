@@ -1480,7 +1480,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
                                 1 0)
           :fc-transformer (append (and (or afix afun (memq category '(file library)) sort-fn)
                                        (list (lambda (candidates _source)
-                                               (helm-completion--initial-filter
+                                               (helm-completion--decorate
                                                 (if (and sort-fn (> (length helm-pattern) 0))
                                                     (funcall sort-fn candidates)
                                                   candidates)
@@ -1617,7 +1617,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          :fc-transformer
          (append (and (or afix afun (memq category '(file library)))
                       (list (lambda (candidates source)
-                              (helm-completion--initial-filter
+                              (helm-completion--decorate
                                (funcall helm-completion-in-region-default-sort-fn
                                         candidates source)
                                afun afix category))))
@@ -2330,8 +2330,8 @@ The `helm-find-files' history `helm-ff-history' is used here."
       (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t)
     str))
 
-(defun helm-completion--initial-filter (comps afun afix category)
-  "Compute COMPS with function AFIX or AFUN.
+(defun helm-completion--decorate (comps afun afix category)
+  "Decorate COMPS with function AFIX or AFUN.
 
 When CATEGORY is file or library remove dot files from COMPS.
 
@@ -2707,10 +2707,10 @@ Can be used for `completion-in-region-function' by advicing it with an
                             :buffer buf-name
                             :fc-transformer
                             ;; When afun afix and category are nil
-                            ;; helm-completion--initial-filter returns
+                            ;; helm-completion--decorate returns
                             ;; candidates (COMPS) unmodified.
                             (append (list (lambda (candidates source)
-                                            (helm-completion--initial-filter
+                                            (helm-completion--decorate
                                              (funcall helm-completion-in-region-default-sort-fn
                                                       candidates source)
                                              afun afix category)))
