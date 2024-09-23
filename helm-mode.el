@@ -2706,12 +2706,14 @@ Can be used for `completion-in-region-function' by advicing it with an
                                   (t (helm-mode--completion-in-region-initial-input initial-input)))
                             :buffer buf-name
                             :fc-transformer
-                            (append (and (or afix afun (memq category '(file library)))
-                                         (list (lambda (candidates source)
-                                                 (helm-completion--initial-filter
-                                                  (funcall helm-completion-in-region-default-sort-fn
-                                                           candidates source)
-                                                  afun afix category))))
+                            ;; When afun afix and category are nil
+                            ;; helm-completion--initial-filter returns
+                            ;; candidates (COMPS) unmodified.
+                            (append (list (lambda (candidates source)
+                                            (helm-completion--initial-filter
+                                             (funcall helm-completion-in-region-default-sort-fn
+                                                      candidates source)
+                                             afun afix category)))
                                     '(helm-cr-default-transformer))
                             :popup-info docsig
                             :match-dynamic (eq helm-completion-style 'emacs)
