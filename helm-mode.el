@@ -1478,14 +1478,17 @@ dynamically otherwise use `helm-completing-read-default-2'."
                                      (memq require-match
                                            '(confirm confirm-after-completion)))
                                 1 0)
-          :fc-transformer (append (and (or afix afun (memq category '(file library)) sort-fn)
-                                       (list (lambda (candidates _source)
-                                               (helm-completion--decorate
-                                                (if (and sort-fn (> (length helm-pattern) 0))
-                                                    (funcall sort-fn candidates)
-                                                  candidates)
-                                                afun afix category))))
-                                  '(helm-cr-default-transformer))
+          :fc-transformer
+          ;; When afun afix and category are nil
+          ;; helm-completion--decorate returns
+          ;; candidates (COMPS) unmodified.
+          (append (list (lambda (candidates _source)
+                          (helm-completion--decorate
+                           (if (and sort-fn (> (length helm-pattern) 0))
+                               (funcall sort-fn candidates)
+                             candidates)
+                           afun afix category)))
+                  '(helm-cr-default-transformer))
           :popup-info popup-info
           :quit-when-no-cand (eq require-match t)
           :nomark (null helm-comp-read-use-marked)
@@ -1615,12 +1618,16 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          ;; whereas it has to stay on top.
          :default (or default "")
          :fc-transformer
-         (append (and (or afix afun (memq category '(file library)))
-                      (list (lambda (candidates source)
-                              (helm-completion--decorate
-                               (funcall helm-completion-in-region-default-sort-fn
-                                        candidates source)
-                               afun afix category))))
+         ;; When afun afix and category are nil
+         ;; helm-completion--decorate returns
+         ;; candidates (COMPS) unmodified and
+         ;; helm-completion-in-region-default-sort-fn returns
+         ;; its candidates unmodified when sorting is already done.
+         (append (list (lambda (candidates source)
+                         (helm-completion--decorate
+                          (funcall helm-completion-in-region-default-sort-fn
+                                   candidates source)
+                          afun afix category)))
                  '(helm-cr-default-transformer))
          :popup-info popup-info
          :match-dynamic (eq helm-completion-style 'emacs)
@@ -2708,7 +2715,9 @@ Can be used for `completion-in-region-function' by advicing it with an
                             :fc-transformer
                             ;; When afun afix and category are nil
                             ;; helm-completion--decorate returns
-                            ;; candidates (COMPS) unmodified.
+                            ;; candidates (COMPS) unmodified and
+                            ;; helm-completion-in-region-default-sort-fn returns
+                            ;; its candidates unmodified when sorting is already done.
                             (append (list (lambda (candidates source)
                                             (helm-completion--decorate
                                              (funcall helm-completion-in-region-default-sort-fn
