@@ -2154,7 +2154,7 @@ the sort function provided by the completion-style in
 use (emacs-27 only), otherwise (emacs-26) the sort function has
 to be provided if needed either with an FCT function in source or
 by passing the sort function with METADATA
-E.g.: (metadata (display-sort-function . foo)).
+E.g.: \\='((metadata (display-sort-function . foo))).
 
 If you don't want the sort fn provided by style to kick
 in (emacs-27) you can use as metadata value the symbol `nosort'.
