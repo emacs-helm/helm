@@ -2414,61 +2414,28 @@ Currently does nothing."
       (helm-completion--multi-all-completions string table pred point)
     (when all (nconc all (length prefix)))))
 
-(defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
+(defun helm-completion--multi-all-completions-1 (string collection
+                                                 &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
-  ;; Doing an initial call of all-completions on the first element of
-  ;; STRING speedup completion and fix file completion when CAPF
-  ;; returns relative paths to initial pattern (eshell and shell).
   (let* ((split (helm-mm-split-pattern string))
-         (fpat (or (car split) ""))
-         (file-comp-p (or minibuffer-completing-file-name
-                          (eq
-                           (completion-metadata-get
-                            (completion-metadata string collection predicate)
-                            'category)
-                           'file)))
-         (all (and file-comp-p
-                   (or (cdr split)
-                       (and (not (cdr split))
-                            ;; Kickin when STRING is a simple string.
-                            ;; Handle as well "foo " (space at end).
-                            (not (string= fpat "")))
-                       (string= string ""))
-                   (not (string-match "\\`!" fpat))
-                   ;; all-completions should return nil if FPAT is a
-                   ;; regexp, it is what we expect.
-                   (all-completions fpat collection
-                                    (lambda (x &optional _y)
-                                      (let ((elm (if (listp x) (car x) x)))
-                                        (funcall (or predicate #'identity) elm))))))
-         (pattern (helm-aand all (string-match " " string)
-                             ;; Returns the part of STRING after space
-                             ;; e.g. "foo bar baz" => "bar baz".
-                             (substring string (1+ it)))))
-    (if (or (and all (not (cdr split)))
-            (equal pattern "")) ; e.g. STRING == "foo ".
-        all
-      (all-completions "" (or all collection)
-                       (lambda (x &optional _y)
-                         ;; Second arg _y is needed when
-                         ;; COLLECTION is a hash-table (Bug#2231)
-                         ;; (C-x 8 RET).
-                         ;; Elements of COLLECTION may be
-                         ;; lists or alists, in this case consider the
-                         ;; car of element (Bug#2219 org-refile).
-                         (let ((elm (if (listp x) (car x) x)))
-                           ;; PREDICATE have been already called in
-                           ;; initial all-completions, no need to call
-                           ;; it a second time, thus ALL is now a list
-                           ;; of strings maybe not supported by
-                           ;; PREDICATE (e.g. symbols vs strings).
-                           (if (and predicate (null all))
-                               (and (funcall predicate elm)
-                                    ;; ALL is nil so use whole STRING
-                                    ;; against COLLECTION.
-                                    (helm-mm-match (helm-stringify elm) string))
-                             (helm-mm-match (helm-stringify elm)
-                                            (or (and all pattern) string)))))))))
+         (negations '())
+         (completion-regexp-list
+          (and (cdr split)
+               (cl-loop for r in split
+                        if (string-match "\\`!\\(.*\\)" r)
+                        do (push (match-string 1 r) negations)
+                        else collect r)))
+         (pred (lambda (x &optional _y)
+                 (let ((elm (if (listp x) (car x) x)))
+                   (and (funcall (or predicate #'identity) elm)
+                        ;; Returns t when negations == nil.
+                        (cl-loop for r in negations
+                                 for str = (helm-stringify x)
+                                 never (string-match r str)))))))
+    (or (and (null (cdr split)) (car split) (null negations)
+             ;; Returns nil when (car split) is a regexp.
+             (all-completions (car split) collection pred))
+        (all-completions "" collection pred))))
 
 (defun helm-completion--multi-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
