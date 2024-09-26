@@ -223,7 +223,7 @@ If `helm-turn-on-show-completion' is nil do nothing."
 ;;; Lisp symbol completion.
 ;;
 ;;
-(defun helm-lisp-completion--predicate-at-point (beg re-class-p)
+(defun helm-lisp-completion--predicate-at-point (beg)
   ;; Return a predicate for `all-completions'.
   (let ((fn-sym-p (lambda ()
                     (or
@@ -255,10 +255,9 @@ If `helm-turn-on-show-completion' is nil do nothing."
               (condition-case nil
                   (progn (up-list -2) (forward-char 1)
                          (eq (char-after) ?\())
-                (error nil))
-              re-class-p)
+                (error nil)))
              (lambda (sym)
-               (or (stringp sym) (boundp sym) (fboundp sym) (symbol-plist sym))))
+               (or (boundp sym) (fboundp sym) (symbol-plist sym))))
             (t #'fboundp)))))
 
 (defun helm-thing-before-point (&optional limits regexp)
@@ -308,68 +307,58 @@ Return a cons (beg . end)."
     ":blank:" ":alpha:" ":alnum:")
   "Table of Char Classes for regexps.")
 
-(defun helm-elisp--space-p (str)
-  "Return non nil when string STR is composed of only spaces."
-  (null (split-string str)))
-
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
   "Preconfigured Helm for Lisp symbol completion at point."
   (interactive)
   (let* ((target     (helm-thing-before-point))
-         (bounds     (helm-bounds-of-thing-before-point))
-         (beg        (car bounds))
+         (beg        (car (helm-bounds-of-thing-before-point)))
          (end        (point))
-         (re-class-p (and (eq 'string
-                              (syntax-ppss-context (syntax-ppss (point))))
+         (pred       (and beg (helm-lisp-completion--predicate-at-point beg)))
+         (re-class-p (and (eq 'string (syntax-ppss-context (syntax-ppss (point))))
                           (save-excursion
-                            (re-search-backward
-                             "\\[:[[:alpha:]]*" (pos-bol) t))))
-         (pred       (and beg (helm-lisp-completion--predicate-at-point
-                               beg re-class-p)))
-         (helm-quit-if-no-candidate (lambda () (message "[No Match]")))
+                            (re-search-backward "\\[:[[:alpha:]]*" (pos-bol) t))))
+         (loc-vars   (and (fboundp 'elisp--local-variables)
+                          (ignore-errors
+                            (mapcar #'symbol-name (elisp--local-variables)))))
+         (glob-syms  (and target pred (not re-class-p) (all-completions target obarray pred)))
+         (candidates (if re-class-p
+                         helm-lisp-completion-re-chars-classes
+                       (append loc-vars glob-syms)))
+         (helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
          (enable-recursive-minibuffers t))
-    (with-helm-show-completion beg end
-      ;; Overlay is initialized now in helm-current-buffer.
-      (helm
-       :sources (helm-build-sync-source "Lisp completion"
-                  :candidates
-                  (helm-dynamic-completion
-                   (lambda (_str _predicate _)
-                     (let ((loc-vars (and (fboundp 'elisp--local-variables)
-                                          (elisp--local-variables)))
-                           (glob-syms  (and (not (helm-elisp--space-p target))
-                                            pred (not re-class-p)
-                                            obarray)))
-                       (if re-class-p
-                           helm-lisp-completion-re-chars-classes
-                         (nconc loc-vars glob-syms))))
-                   pred)
-                  :match-dynamic t
-                  :persistent-action `(helm-lisp-completion-persistent-action
-                                       .
-                                       ,(and (eq helm-elisp-help-function
-                                                 'helm-elisp-show-doc-modeline)
-                                             'never-split))
-                  :nomark t
-                  :popup-info (lambda (c) (helm-get-first-line-documentation
-                                           (if (string-match "\\`:[[:alpha:]]+:\\'" c)
-                                               c (intern-soft c))))
-                  :persistent-help (helm-lisp-completion-persistent-help)
-                  :filtered-candidate-transformer
-                  #'helm-lisp-completion-transformer
-                  :action (lambda (candidate)
-                            (with-helm-current-buffer
-                              (run-with-timer
-                               0.01 nil
-                               #'helm-insert-completion-at-point
-                               beg end candidate))))
-       :input target
-       :resume 'noresume
-       :truncate-lines t
-       :buffer "*helm lisp completion*"
-       :allow-nest t))))
+    (if candidates
+        (with-helm-show-completion beg end
+          ;; Overlay is initialized now in helm-current-buffer.
+          (helm
+           :sources (helm-build-in-buffer-source "Lisp completion"
+                      :data candidates
+                      :persistent-action `(helm-lisp-completion-persistent-action .
+                                           ,(and (eq helm-elisp-help-function
+                                                     'helm-elisp-show-doc-modeline)
+                                                 'never-split))
+                      :nomark t
+                      :match-part (lambda (c) (car (split-string c)))
+                      :fuzzy-match helm-lisp-fuzzy-completion
+                      :popup-info (lambda (c) (helm-get-first-line-documentation
+                                               (if (string-match "\\`:[[:alpha:]]+:\\'" c)
+                                                   c (intern-soft c))))
+                      :persistent-help (helm-lisp-completion-persistent-help)
+                      :filtered-candidate-transformer
+                      #'helm-lisp-completion-transformer
+                      :action (lambda (candidate)
+                                (with-helm-current-buffer
+                                  (run-with-timer
+                                   0.01 nil
+                                   #'helm-insert-completion-at-point
+                                   beg end candidate))))
+           :input target
+           :resume 'noresume
+           :truncate-lines t
+           :buffer "*helm lisp completion*"
+           :allow-nest t))
+      (message "[No Match]"))))
 
 (defun helm-lisp-completion-persistent-action (candidate &optional name)
   "Show documentation for the function.
