@@ -2499,7 +2499,9 @@ Currently does nothing."
          . ,compose-helm-sort-fn)
         (cycle-sort-function
          . ,compose-helm-sort-fn)
-        ,@(cdr metadata)))))
+        ,@(cl-loop for (elm . val) in (cdr metadata)
+                   unless (memq elm '(display-sort-function cycle-sort-function))
+                   collect (cons elm val))))))
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
 ;; Helm-flex style.
