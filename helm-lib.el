@@ -668,6 +668,8 @@ E.g.: helm.el$
     ("M-f" . forward-word)
     ("M-b" . backward-word)
     ("M->" . end-of-buffer)
+    ("C-M-f" . forward-sexp)
+    ("C-M-b" . backward-sexp)
     ("M-<" . beginning-of-buffer)
     ("C-SPC" . helm-help-toggle-mark)
     ("C-M-SPC" . mark-sexp)
