@@ -2090,7 +2090,7 @@ property."
               completion-styles-alist
               :test 'equal)
   (unless (assq 'flex completion-styles-alist)
-    ;; Add helm-fuzzy style only if flex is not available.
+    ;; Add helm-flex style only if flex is not available.
     (cl-pushnew '(helm-flex helm-flex-completion-try-completion
                             helm-flex-completion-all-completions
                             "helm flex completion style.\nProvide flex matching for emacs-26.")
