@@ -358,13 +358,19 @@ There are three possible values to use:
   is not available (Emacs<27) helm provides `helm-flex' style which is
   similar to `flex' and helm fuzzy matching.
 
-For a better experience with emacs style, if you don't know what to use, set
+NOTE: The flex style may become unstable after some time in same session due to
+its buggy adjust metadata function which make the metadata object huge and
+circular, this may crash emacs. You can force the usage of the helm-flex style
+which is safer by removing flex style from `completion-styles-alist' BEFORE
+loading helm.
+
+For a better experience with \\='emacs style, if you don't know what to use, set
 `completion-styles' to \\='(flex) if you are using emacs-27 or to
-\\='(helm-flex) if you are using emacs-26 and keep \\='emacs as default
-value for `helm-completion-style'.  Advanced users can also have a
-look to `completion-category-overrides' to set styles according to category.
-You can as well use `helm-completion-styles-alist' to override
-`helm-completion-style' in specific modes.
+\\='(helm-flex) if you are using emacs-26 or you want to force using helm-flex
+instead of flex (see note above about flex).
+
+See also `helm-completion-styles-alist' to override
+`helm-completion-style' for specific modes and commands.
 
 Of course when using `helm' or `helm-fuzzy' as `helm-completion-style'
 emacs `completion-styles' have no effect.
