@@ -393,10 +393,11 @@ NOT `setq'."
            (choice ,@(mapcar (lambda (x) (list 'const x))
                              helm-completion--all-styles))))
 
-(defcustom helm-completion-styles-alist '((gud-mode . helm)
+(defcustom helm-completion-styles-alist `((gud-mode . helm)
                                           ;; See https://github.com/djcb/mu/issues/2181.
                                           (mu4e-compose-mode . emacs)
-                                          (wfnames-mode . (emacs helm flex)))
+                                          (wfnames-mode . (emacs helm ,(if (assq 'flex completion-styles-alist)
+                                                                           'flex 'helm-flex))))
   "Allow configuring `helm-completion-style' per mode or command.
 
 NOTE: Commands involving `completing-read' specified in
