@@ -4160,7 +4160,7 @@ returned prefixed with its icon or unchanged."
 (defun helm-ff-score-candidate-for-pattern (real disp pattern)
   (cond ((member real '("." "..")) 900000)
         ((and (string-match-p "\\`\\s-\\{2\\}" disp)
-               (string= real (substring-no-properties disp 2)))
+              (string= real (substring-no-properties disp 2)))
          ;; Incomplete filenames are prefixed with two spaces, the
          ;; first one beeing propertized with a 'display prop
          ;; i.e. "[+] foo".
@@ -4191,7 +4191,9 @@ Return candidates prefixed with basename of INPUT first."
                                         (puthash r1 (funcall score r1 d1) memo-src)))
                                (sc2 (or (gethash r2 memo-src)
                                         (puthash r2 (funcall score r2 d2) memo-src))))
-                          (cond ((= sc1 sc2)
+                          ;; The score fn may return a string (happens with "/adb:").
+                          (cond ((or (stringp sc1) (stringp sc2)))
+                                ((= sc1 sc2)
                                  (< (string-width r1)
                                     (string-width r2)))
                                 ((> sc1 sc2))))))))
