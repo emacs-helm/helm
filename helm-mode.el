@@ -545,6 +545,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  ;; Handle here specially such cases.
                  ((and (functionp collection) (not (string= input ""))
                        (or minibuffer-completing-file-name
+                           helm--minibuffer-completing-file-name
                            (eq (completion-metadata-get
                                 (completion-metadata input collection test)
                                 'category)
@@ -2015,7 +2016,11 @@ Keys description:
                              history nil nil alistp)))
          (helm-ff--RET-disabled noret)
          (minibuffer-completion-predicate test)
-         (minibuffer-completing-file-name t)
+         ;; Since Emacs-30+ `minibuffer-completing-file-name' affect
+         ;; `file-directory-p' in that it returns `t' when testing e.g. "/ssh"
+         ;; which is not a directory, as a result we end up with error in
+         ;; `helm-find-files-get-candidates' when minibuffer contains only "/ssh".
+         (helm--minibuffer-completing-file-name t)
          ;; Ensure not being prompted for password each time we
          ;; navigate to a directory.
          (password-cache t)
@@ -2429,6 +2434,7 @@ Currently does nothing."
   (let* ((split (helm-mm-split-pattern string))
          (fpat (or (car split) ""))
          (file-comp-p (or minibuffer-completing-file-name
+                          helm--minibuffer-completing-file-name
                           (eq
                            (completion-metadata-get
                             (completion-metadata string collection predicate)
@@ -2520,7 +2526,8 @@ Currently does nothing."
   (unless (string-match-p " " string)
     (cl-multiple-value-bind (all pattern prefix suffix _carbounds)
         (helm-completion--flex-all-completions string table pred point)
-      (when minibuffer-completing-file-name
+      (when (or minibuffer-completing-file-name
+                helm--minibuffer-completing-file-name)
         (setq all (completion-pcm--filename-try-filter all)))
       (completion-pcm--merge-try pattern all prefix suffix))))
 
