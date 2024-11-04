@@ -2019,7 +2019,9 @@ Keys description:
          ;; Since Emacs-30+ `minibuffer-completing-file-name' affect
          ;; `file-directory-p' in that it returns `t' when testing e.g. "/ssh"
          ;; which is not a directory, as a result we end up with error in
-         ;; `helm-find-files-get-candidates' when minibuffer contains only "/ssh".
+         ;; `helm-find-files-get-candidates' when minibuffer contains only
+         ;; "/ssh" so we use now our own variable
+         ;; `helm--minibuffer-completing-file-name'. See emacsbug 74191.
          (helm--minibuffer-completing-file-name t)
          ;; Ensure not being prompted for password each time we
          ;; navigate to a directory.
