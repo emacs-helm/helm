@@ -198,7 +198,9 @@ window handling a buffer, it is this one we store.")
   "[INTERNAL] Recenter when deleting minibuffer-contents and preselecting.
 This is a flag used internally.")
 (defvar helm--minibuffer-completing-file-name nil
-  "Same as `minibuffer-completing-file-name' but doesn't affect `file-directory-p'.")
+  "A flag notifying Helm is in file completion.
+It is let-bounded in `helm-read-file-name'. Same as
+`minibuffer-completing-file-name' but doesn't affect `file-directory-p'.")
 
 ;;; Multi keys
 ;;

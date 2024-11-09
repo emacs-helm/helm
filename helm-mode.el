@@ -545,7 +545,6 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  ;; Handle here specially such cases.
                  ((and (functionp collection) (not (string= input ""))
                        (or minibuffer-completing-file-name
-                           helm--minibuffer-completing-file-name
                            (eq (completion-metadata-get
                                 (completion-metadata input collection test)
                                 'category)
@@ -2436,7 +2435,6 @@ Currently does nothing."
   (let* ((split (helm-mm-split-pattern string))
          (fpat (or (car split) ""))
          (file-comp-p (or minibuffer-completing-file-name
-                          helm--minibuffer-completing-file-name
                           (eq
                            (completion-metadata-get
                             (completion-metadata string collection predicate)
@@ -2528,8 +2526,7 @@ Currently does nothing."
   (unless (string-match-p " " string)
     (cl-multiple-value-bind (all pattern prefix suffix _carbounds)
         (helm-completion--flex-all-completions string table pred point)
-      (when (or minibuffer-completing-file-name
-                helm--minibuffer-completing-file-name)
+      (when minibuffer-completing-file-name
         (setq all (completion-pcm--filename-try-filter all)))
       (completion-pcm--merge-try pattern all prefix suffix))))
 
