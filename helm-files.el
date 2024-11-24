@@ -5362,7 +5362,7 @@ image file in `helm-ff-image-dired-thumbnails-cache'."
   "Launch a recursive search in `helm-ff-default-directory'."
   (with-helm-default-directory helm-ff-default-directory
       (helm-find-files-recursive-dirs
-       (helm-current-directory)
+       default-directory
        (helm-basename (helm-get-selection)))))
 
 (defun helm-ff-file-compressed-p (candidate)
