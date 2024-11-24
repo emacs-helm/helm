@@ -159,6 +159,14 @@ the customize functions e.g. `customize-set-variable' and NOT
   :group 'helm-elisp
   :type 'function)
 
+(defcustom helm-current-directory-alist
+  '((dired-mode . dired-current-directory)
+    (mu4e-main-mode . mu4e-maildir))
+  "Tell `helm-current-directory' what to use according to `major-mode'.
+Each element of alist is (MAJOR-MODE . SYMBOL) where SYMBOL is either a variable
+or a function."
+  :type '(alist :key-type symbol :value-type sexp)
+  :group 'helm-files)
 
 ;;; Internal vars
 ;;
@@ -1798,9 +1806,10 @@ is same as with PARENT."
   "Return current-directory name at point.
 Useful in dired buffers when there is inserted subdirs."
   (expand-file-name
-   (if (eq major-mode 'dired-mode)
-       (dired-current-directory)
-       default-directory)))
+   (helm-acase major-mode
+     ((guard (assoc-default it helm-current-directory-alist))
+      (helm-interpret-value guard))
+     (t default-directory))))
 
 (defun helm-shadow-boring-files (files)
   "Files matching `helm-boring-file-regexp' will be
