@@ -1633,8 +1633,12 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          ;; its candidates unmodified when sorting is already done.
          (append (list (lambda (candidates source)
                          (helm-completion--decorate
-                          (funcall helm-completion-in-region-default-sort-fn
-                                   candidates source)
+                          ;; When `helm-completion-in-region-default-sort-fn' is
+                          ;; nil use CANDIDATES unmodified (bug #2689).
+                          (if helm-completion-in-region-default-sort-fn
+                              (funcall helm-completion-in-region-default-sort-fn
+                                       candidates source)
+                            candidates)
                           afun afix category)))
                  '(helm-cr-default-transformer))
          :popup-info popup-info
@@ -2736,8 +2740,14 @@ Can be used for `completion-in-region-function' by advicing it with an
                             ;; its candidates unmodified when sorting is already done.
                             (append (list (lambda (candidates source)
                                             (helm-completion--decorate
-                                             (funcall helm-completion-in-region-default-sort-fn
-                                                      candidates source)
+                                             ;; Magit is disabling sorting in its
+                                             ;; `magit-completing-read-multiple' by let binding
+                                             ;; `helm-completion-in-region-default-sort-fn' to
+                                             ;; nil to prevent modifying candidates order (bug #2689).
+                                             (if helm-completion-in-region-default-sort-fn
+                                                 (funcall helm-completion-in-region-default-sort-fn
+                                                          candidates source)
+                                               candidates)
                                              afun afix category)))
                                     '(helm-cr-default-transformer))
                             :popup-info docsig
