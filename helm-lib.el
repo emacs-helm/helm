@@ -1804,7 +1804,7 @@ is same as with PARENT."
 
 (defun helm-current-directory ()
   "Return current-directory name at point.
-Useful in dired buffers when there is inserted subdirs."
+It is done according to `helm-current-directory-alist'."
   (expand-file-name
    (helm-acase major-mode
      ((guard (assoc-default it helm-current-directory-alist))
