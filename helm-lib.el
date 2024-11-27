@@ -1267,7 +1267,8 @@ behaviour of this function is really needed."
       (goto-char (point-min)))
     (decode-coding-string (buffer-string) 'utf-8)))
 
-(defun helm-read-answer (prompt answer-list &optional help)
+(cl-defun helm-read-answer (prompt answer-list
+                            &optional (help 'helm-read-answer-default-help-fn))
   "Prompt user for an answer.
 Arg PROMPT is the prompt to present user the different possible
 answers, ANSWER-LIST is a list of strings.
@@ -1281,13 +1282,9 @@ is pressed (don't forget to add \"h\" in prompt).
 
 Example:
 
-     (helm-acase (helm/read-answer
+     (helm-acase (helm-read-answer
                  \"answer [y,n,!,q,h]: \"
-                 \\='(\"y\" \"n\" \"!\" \"q\")
-                 \"(y)es:  do this
-\(n)o:   skip
-\(!)all: do this for all
-\(q)uit: quit skipping remaining candidates\")
+                 \\='(\"y\" \"n\" \"!\" \"q\"))
       (\"y\" \"yes\")
       (\"n\" \"no\")
       (\"!\" \"all\")
