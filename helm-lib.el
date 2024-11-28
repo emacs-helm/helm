@@ -570,6 +570,14 @@ used in the cdr of clause.  When KEYLIST match EXPR or `guard'
 evaluation is non-nil, BODY is executed and `helm-acase' exits
 with its value.
 
+KEYLIST can also be a list starting with `dst' followed by an expression
+suitable for `cl-destructuring-bind'.  In this case all elements of `it' are
+bound to the elements of this expression e.g.
+
+    (helm-acase \\='(1 2 3 4 5)
+      ((dst (l &rest args)) args))
+    => (2 3 4 5)
+
 If KEYLIST is a non-quoted list, each elements of the list are
 checked with `member' to see if one match EXPR.  To compare a
 whole list with EXPR, you have to quote it.
@@ -581,29 +589,35 @@ will override all next clauses, if you want to match an EXPR value equal
 to `t' in any clauses quote it, i.e. `'t' or use an explicit
 \(guard (eq it t)).
 
-NOTE: `guard' as a temp var is reserved for `helm-acase', so if
-you let-bind a local var outside the `helm-acase' body, it will
-be overriden deliberately by `helm-acase'.
-
 EXPR is bound to a temporary variable called `it' which is
 usable in all clauses to refer to EXPR.
 
 \(fn EXPR (KEYLIST BODY...)...)"
   (declare (indent 1) (debug (form &rest ([&or (symbolp form) sexp] body))))
   (unless (null clauses)
-    (let* ((clause1 (car clauses))
-           (key     (car clause1))
-           (isguard (eq 'guard (car-safe key)))
-           (sexp    (and isguard (cadr key))))
+    (let* ((clause1  (car clauses))
+           (key      (car clause1))
+           (isguard  (eq 'guard (car-safe key)))
+           (isdst    (eq 'dst (car-safe key)))
+           (sexp     (and isguard (cadr key)))
+           (dst-sexp (and isdst (cadr key))))
       `(let* ((it ,expr)
-              (guard ,sexp))
-         (if (or guard
-                 (equal it ',key)
-                 (and (not ,isguard) (listp ',key) (member it ',key))
-                 (and (symbolp ',key)
-                      (or (eq ',key t) (eq ',key 'otherwise))))
-             (progn ,@(cdr clause1))
-           (helm-acase it ,@(cdr clauses)))))))
+              (guard ,sexp)
+              (dst (and (consp it) ',dst-sexp)))
+         (cond ((or guard
+                    (equal it ',key)
+                    (and (not ,isguard) (listp ',key) (member it ',key))
+                    (and (symbolp ',key)
+                         (or (eq ',key t) (eq ',key 'otherwise))))
+                ;; When this branch is expanded the compiler complain about not
+                ;; referenced variables (the ones in `dst' that will be used in
+                ;; next branch) Merci Stefan!
+                (with-no-warnings ,@(cdr clause1)))
+               (dst
+                (cl-destructuring-bind ,dst-sexp it
+                  ,@(cdr clause1)))
+               (t
+                (helm-acase it ,@(cdr clauses))))))))
 
 ;;; Fuzzy matching routines
 ;;
