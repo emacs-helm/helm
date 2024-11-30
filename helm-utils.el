@@ -938,9 +938,9 @@ Optional arguments START, END and FACE are only here for debugging purpose."
         ;; `helm-highlight-matches-around-point-max-lines' is
         ;; compared as a number by other clauses and return an error.
         (never (cl-return-from helm-highlight-current-line))
-        ((guard (consp it))
-         (setq start-match (save-excursion (forward-line (- (car it))) (pos-bol))
-               end-match   (save-excursion (forward-line (cdr it)) (pos-bol))))
+        ((dst (x . y))
+         (setq start-match (save-excursion (forward-line (- x)) (pos-bol))
+               end-match   (save-excursion (forward-line y) (pos-bol))))
         ((guard (or (null it) (zerop it)))
          (setq start-match start
                end-match   end))
