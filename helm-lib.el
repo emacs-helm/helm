@@ -613,9 +613,11 @@ usable in all clauses to refer to EXPR.
                 ;; referenced variables (the ones in `dst' that will be used in
                 ;; next branch) Merci Stefan!
                 (with-no-warnings ,@(cdr clause1)))
-               (dst
-                (cl-destructuring-bind ,dst-sexp it
-                  ,@(cdr clause1)))
+               ((and dst
+                     (condition-case nil
+                         (cl-destructuring-bind ,dst-sexp it
+                           ,@(cdr clause1))
+                       (wrong-number-of-arguments nil))))
                (t
                 (helm-acase it ,@(cdr clauses))))))))
 
