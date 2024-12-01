@@ -611,7 +611,8 @@ usable in all clauses to refer to EXPR.
                          (or (eq ',key t) (eq ',key 'otherwise))))
                 ;; When this branch is expanded the compiler complain about not
                 ;; referenced variables (the ones in `dst' that will be used in
-                ;; next branch) Merci Stefan!
+                ;; next branch) so prevent warnings instead of using a progn
+                ;; Merci Stefan!
                 (with-no-warnings ,@(cdr clause1)))
                ((and dst
                      (condition-case nil
