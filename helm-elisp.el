@@ -473,9 +473,8 @@ documentation when SYM name is the same for function and variable."
         ;; <https://debbugs.gnu.org/70163>.
         (truncate-string-to-width
          (helm-acase (split-string (substitute-command-keys doc) "\n")
-           ((guard (and (string= (car it) "") (cdr it)))
-            (cadr guard))
-           (t (car it)))
+           ((dst (l &rest args))
+            (if (string= l "") (cadr args) l)))
          end-column nil nil t)
       (if (or (symbol-function sym) (boundp sym) (facep sym) (helm-group-p sym))
           "Not documented"
