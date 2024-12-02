@@ -603,10 +603,11 @@ usable in all clauses to refer to EXPR.
            (dst-sexp (and isdst (cadr key))))
       `(let* ((it ,expr)
               (guard ,sexp)
-              (dst (and (consp it) ',dst-sexp)))
+              (dst (and (consp it) ',dst-sexp))
+              (special (or ,isguard ,isdst)))
          (cond ((or guard
-                    (equal it ',key)
-                    (and (not ,isguard) (listp ',key) (member it ',key))
+                    (and (not special) (equal it ',key))
+                    (and (not special) (listp ',key) (member it ',key))
                     (and (symbolp ',key)
                          (or (eq ',key t) (eq ',key 'otherwise))))
                 ;; When this branch is expanded the compiler complain about not
