@@ -602,16 +602,16 @@ usable in all clauses to refer to EXPR.
            (special  (or isguard isdst))
            (sexp     (and isguard (cadr key)))
            (dst-sexp (and isdst (cadr key))))
-      `(let* ((it ,expr)
+      `(let* ((it    ,expr)
               (guard ,sexp)
-              (dst (and (consp it) ',dst-sexp)))
+              (dst   (and (consp it) ',dst-sexp)))
          (cond ((or guard
                     (and ,(not special)
                          (or (equal it ',key)
                              (and (listp ',key) (member it ',key))))
                     (and (symbolp ',key)
                          (or (eq ',key t) (eq ',key 'otherwise))))
-                ;; When this branch is expanded the compiler complain about not
+                ;; When this branch is expanded the compiler complains about not
                 ;; referenced variables (the ones in `dst' that will be used in
                 ;; next branch) so prevent warnings instead of using a progn
                 ;; Merci Stefan!
