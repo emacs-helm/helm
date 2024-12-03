@@ -1080,7 +1080,7 @@ Fallback to default face foreground when nil"
   :group 'helm
   :type 'string)
 
-(defcustom helm-frame-alpha nil
+(defcustom helm-frame-alpha 100
   "Alpha parameter for Helm frames, an integer.
 Fallback to 100 when nil."
   :group 'helm
