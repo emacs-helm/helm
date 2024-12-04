@@ -238,9 +238,7 @@ Arg PACKAGES is a list of strings."
                                  (t 'font-lock-keyword-face))
                                'match-part c)
                               ;; Separator.
-                              (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
-                                                  (length c)))
-                                           ? )
+                              (helm-make-separator c)
                               ;; Package status.
                               (propertize
                                (or status "")
@@ -249,15 +247,15 @@ Arg PACKAGES is a list of strings."
                                        ("disabled" 'font-lock-property-name-face)
                                        (t 'default)))
                               ;; Separator.
-                              (make-string (1+ (- 10 (length status))) ? )
+                              (helm-make-separator status 10)
                               ;; Package provider.
                               (or provider "")
                               ;; Separator.
-                              (make-string (1+ (- 10 (length provider))) ? )
+                              (helm-make-separator provider 10)
                               ;; Package version.
                               (or version "")
                               ;; Separator.
-                              (make-string (1+ (- 20 (length version))) ? )
+                              (helm-make-separator version 20)
                               ;; Package description.
                               (if description
                                   (propertize description 'face 'font-lock-warning-face)
