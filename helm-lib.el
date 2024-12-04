@@ -578,9 +578,9 @@ bound to the elements of this expression e.g.
       ((dst (l &rest args)) args))
     => (2 3 4 5)
 
-If KEYLIST is a non-quoted list, each elements of the list are
-checked with `member' to see if one match EXPR.  To compare a
-whole list with EXPR, you have to quote it.
+If KEYLIST is a list, it is compared with EXPR, also each
+elements of the list are checked with `member' to see if one
+matches EXPR e.g.
 
 The last clause can use `t' or \\='otherwise as KEYLIST to specify a
 fallback clause when previous clauses didn't match, if such a clause
