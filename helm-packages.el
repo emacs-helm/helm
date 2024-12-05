@@ -207,7 +207,9 @@ Arg PACKAGES is a list of strings."
 ;;
 (defun helm-packages-transformer (candidates _source)
   "Transformer function for `helm-packages'."
-  (cl-loop for c in candidates
+  (cl-loop with lgst_arch = (cl-loop for (arch . _) in package-archives
+                                     maximize (length arch))
+           for c in candidates
            for sym = (intern-soft c)
            for archive = (assq sym package-archive-contents)
            for id = (package-get-descriptor sym)
@@ -251,7 +253,7 @@ Arg PACKAGES is a list of strings."
                               ;; Package provider.
                               (or provider "")
                               ;; Separator.
-                              (helm-make-separator provider 10)
+                              (helm-make-separator provider lgst_arch)
                               ;; Package version.
                               (or version "")
                               ;; Separator.
