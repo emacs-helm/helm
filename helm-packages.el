@@ -327,13 +327,13 @@ Arg PACKAGES is a list of strings."
              for pkg = (assq sym package-archive-contents)
              for cversion = (and pkg (package-desc-version desc))
              for available = (and pkg (not (package-disabled-p sym cversion)) pkg)
-             when (or (and available
-                           (or (and include-builtins (not cversion))
-                               (and cversion
-                                    (version-list-<
-                                     cversion
-                                     (package-desc-version (cadr available))))))
-                      (and (fboundp 'package-vc-p) (package-vc-p desc)))
+             ;; Exclude packages installed with package-vc (issue#2692).
+             when (and available
+                       (or (and include-builtins (not cversion))
+                           (and cversion
+                                (version-list-<
+                                 cversion
+                                 (package-desc-version (cadr available))))))
              collect sym)))
 
 ;;;###autoload
