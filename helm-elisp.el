@@ -919,7 +919,7 @@ a string, i.e. the `symbol-name' of any existing symbol."
 (defun helm-manage-advice ()
   "Preconfigured `helm' to disable/enable function advices."
   (interactive)
-  (helm-other-buffer 'helm-source-advice "*helm advice*"))
+  (helm :sources 'helm-source-advice :buffer "*helm advice*"))
 
 
 ;;; Locate elisp library

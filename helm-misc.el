@@ -333,27 +333,27 @@ This mode is enabled by `helm-mode', so there is no need to enable it directly."
   "Preconfigured `helm' to show world time.
 Default action change TZ environment variable locally to emacs."
   (interactive)
-  (helm-other-buffer 'helm-source-time-world "*helm world time*"))
+  (helm :sources 'helm-source-time-world :buffer "*helm world time*"))
 
 ;;;###autoload
 (defun helm-insert-latex-math ()
   "Preconfigured helm for latex math symbols completion."
   (interactive)
-  (helm-other-buffer 'helm-source-latex-math "*helm latex*"))
+  (helm :sources 'helm-source-latex-math :buffer "*helm latex*"))
 
 ;;;###autoload
 (defun helm-ratpoison-commands ()
   "Preconfigured `helm' to execute ratpoison commands."
   (interactive)
-  (helm-other-buffer 'helm-source-ratpoison-commands
-                     "*helm ratpoison commands*"))
+  (helm :sources 'helm-source-ratpoison-commands
+        :buffer "*helm ratpoison commands*"))
 
 ;;;###autoload
 (defun helm-stumpwm-commands()
   "Preconfigured helm for stumpwm commands."
   (interactive)
-  (helm-other-buffer 'helm-source-stumpwm-commands
-                     "*helm stumpwm commands*"))
+  (helm :sources 'helm-source-stumpwm-commands
+        :buffer "*helm stumpwm commands*"))
 
 ;;;###autoload
 (defun helm-minibuffer-history ()

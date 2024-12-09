@@ -8125,7 +8125,7 @@ help."
   "Simplified Helm interface with other `helm-buffer'.
 Call `helm' only with SOURCES and BUFFER as args."
   (helm :sources sources :buffer buffer))
-
+(make-obsolete 'helm-other-buffer 'helm "4.0.1")
 
 (provide 'helm-core)
 ;;; helm-core.el ends here

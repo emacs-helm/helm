@@ -429,7 +429,7 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
 (defun helm-google-suggest ()
   "Preconfigured `helm' for Google search with Google suggest."
   (interactive)
-  (helm-other-buffer 'helm-source-google-suggest "*helm google*"))
+  (helm :sources 'helm-source-google-suggest :buffer "*helm google*"))
 
 (provide 'helm-net)
 
