@@ -1542,28 +1542,32 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          (category (completion-metadata-get metadata 'category))
          (compfn (lambda (str _predicate _action)
                    (let* ((completion-ignore-case (helm-set-case-fold-search))
+                          ;; Use a copy of metadata to avoid accumulation of
+                          ;; adjustment in metadata (This is not needed in
+                          ;; emacs-31+, it has been fixed in emacsbug
+                          ;; #74718). This also avoid the flex adjustment fn
+                          ;; reusing the previous sort fn.
+                          (md (copy-sequence metadata))
                           (comps
                            (completion-all-completions
                             str         ; This is helm-pattern
                             collection
                             predicate
                             (length str)
-                            metadata))
+                            md))
                           (last-data (last comps))
-                          ;; Helm syle sort fn is added to
-                          ;; metadata only in emacs-27, so in
-                          ;; emacs-26 use helm-generic-sort-fn
-                          ;; which handle both helm and
-                          ;; helm-flex styles. When
-                          ;; helm-completion-style is helm or
-                          ;; helm-fuzzy, sorting will be done
-                          ;; later in FCT.
+                          ;; Helm style sort fn is added to metadata only in
+                          ;; emacs-27 by adjustment , so in emacs-26 use
+                          ;; helm-generic-sort-fn which handle both helm and
+                          ;; helm-flex styles. When helm-completion-style is
+                          ;; helm or helm-fuzzy, sorting will be done later in
+                          ;; FCT.
                           (sort-fn
                            (and (eq helm-completion-style 'emacs)
                                 (or
-                                 ;; Emacs-27
+                                 ;; Emacs-27+
                                  (completion-metadata-get
-                                  metadata 'display-sort-function)
+                                  md 'display-sort-function)
                                  ;; Emacs-26
                                  (lambda (candidates)
                                    (sort candidates #'helm-generic-sort-fn)))))
@@ -2659,6 +2663,12 @@ Can be used for `completion-in-region-function' by advicing it with an
                  (compfn (lambda (str _predicate _action)
                            (let* ((completion-lazy-hilit t)
                                   (completion-ignore-case (helm-set-case-fold-search))
+                                  ;; Use a copy of metadata to avoid accumulation of
+                                  ;; adjustment in metadata (This is not needed in
+                                  ;; emacs-31+, it has been fixed in emacsbug
+                                  ;; #74718). This also avoid the flex adjustment fn
+                                  ;; reusing the previous sort fn.
+                                  (md (copy-sequence metadata))
                                   (comps
                                    (completion-all-completions
                                     str ; This is helm-pattern
@@ -2668,7 +2678,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                                     ;; allow styles matching
                                     ;; "prefix*suffix" to kick in.
                                     (length (or prefix str))
-                                    metadata))
+                                    md))
                                   (last-data (last comps))
                                   (bs (helm-aif (cdr last-data)
                                           (prog1 it
@@ -2676,20 +2686,18 @@ Can be used for `completion-in-region-function' by advicing it with an
                                             ;; comps by side-effect.
                                             (setcdr last-data nil))
                                         0))
-                                  ;; Helm syle sort fn is added to
-                                  ;; metadata only in emacs-27, so in
-                                  ;; emacs-26 use helm-generic-sort-fn
-                                  ;; which handle both helm and
-                                  ;; helm-flex styles. When
-                                  ;; helm-completion-style is helm or
-                                  ;; helm-fuzzy, sorting will be done
-                                  ;; later in FCT.
+                                  ;; Helm style sort fn is added to metadata only in
+                                  ;; emacs-27 by adjustment , so in emacs-26 use
+                                  ;; helm-generic-sort-fn which handle both helm and
+                                  ;; helm-flex styles. When helm-completion-style is
+                                  ;; helm or helm-fuzzy, sorting will be done later in
+                                  ;; FCT.
                                   (sort-fn
                                    (and (eq helm-completion-style 'emacs)
                                         (or
-                                         ;; Emacs-27
+                                         ;; Emacs-27+
                                          (completion-metadata-get
-                                          metadata 'display-sort-function)
+                                          md 'display-sort-function)
                                          ;; Emacs-26
                                          (lambda (candidates)
                                            (sort candidates #'helm-generic-sort-fn)))))
