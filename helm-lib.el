@@ -2216,6 +2216,12 @@ Also `helm-completion-style' settings have no effect here,
            (nosort (eq metadata 'nosort))
            (compsfn (lambda (str pred _action)
                       (let* ((completion-ignore-case (helm-set-case-fold-search))
+                             ;; Use a copy of metadata to avoid accumulation of
+                             ;; adjustment in metadata (This is not needed in
+                             ;; emacs-31+, it has been fixed in emacsbug
+                             ;; #74718). This also avoid the flex adjustment fn
+                             ;; reusing the previous sort fn.
+                             (md (copy-sequence metadata))
                              (comps (completion-all-completions
                                      str
                                      (if (functionp collection)
@@ -2223,12 +2229,12 @@ Also `helm-completion-style' settings have no effect here,
                                        collection)
                                      pred
                                      (or point 0)
-                                     (or (and (listp metadata) metadata)
+                                     (or (and (consp md) md)
                                          (setq metadata '(metadata)))))
                              (last-data (last comps))
                              (sort-fn (unless nosort
                                         (completion-metadata-get
-                                         metadata 'display-sort-function)))
+                                         md 'display-sort-function)))
                              all)
                         (when (cdr last-data)
                           (setcdr last-data nil))
