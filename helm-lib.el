@@ -2182,6 +2182,7 @@ use (emacs-27 only), otherwise (emacs-26) the sort function has
 to be provided if needed either with an FCT function in source or
 by passing the sort function with METADATA
 E.g.: \\='((metadata (display-sort-function . foo))).
+Candidates can be modified by passing an affixation-function in METADATA.
 
 If you don't want the sort fn provided by style to kick
 in (emacs-27) you can use as metadata value the symbol `nosort'.
@@ -2235,12 +2236,15 @@ Also `helm-completion-style' settings have no effect here,
                              (sort-fn (unless nosort
                                         (completion-metadata-get
                                          md 'display-sort-function)))
+                             (affix (completion-metadata-get
+                                     md 'affixation-function))
                              all)
-                        (when (cdr last-data)
-                          (setcdr last-data nil))
-                        (setq all (copy-sequence comps))
-                        (if (and sort-fn (> (length str) 0))
-                            (funcall sort-fn all)
+                        (when (cdr last-data) (setcdr last-data nil))
+                        (setq all (if (and sort-fn (> (length str) 0))
+                                      (funcall sort-fn comps)
+                                    comps))
+                        (if affix
+                            (helm-completion--decorate all nil affix nil)
                           all)))))
       ;; Ensure circular objects are removed.
       (complete-with-action t compsfn helm-pattern predicate))))
