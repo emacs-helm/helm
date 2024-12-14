@@ -2381,21 +2381,22 @@ When AFUN, AFIX are nil and CATEGORY is not file return COMPS unmodified."
           (cl-loop for f in comps
                    unless (string-match "\\`\\.\\{1,2\\}/\\'" f)
                    collect f)))
-  (cond (afix (let ((affixations (funcall afix comps)))
-                (if (functionp affixations)
-                    (cl-loop for comp in comps
-                             for cand = (funcall affixations comp)
-                             when cand
-                             collect (cons (propertize (concat (nth 1 cand) ;prefix
-                                                               (nth 0 cand) ;comp
-                                                               (nth 2 cand)) ;suffix
-                                                       'match-part (nth 0 cand)) 
-                                           comp))
-                  (cl-loop for (comp prefix suffix) in affixations
-                           collect (cons (propertize
-                                          (concat prefix comp suffix)
-                                          'match-part comp)
-                                         comp)))))
+  (cond (afix
+         (let ((affixations (funcall afix comps)))
+           (if (functionp affixations)
+               (cl-loop for comp in comps
+                        for cand = (funcall affixations comp)
+                        when cand
+                        collect (cons (propertize (concat (nth 1 cand) ;prefix
+                                                          (nth 0 cand) ;comp
+                                                          (nth 2 cand)) ;suffix
+                                                  'match-part (nth 0 cand))
+                                      comp))
+             (cl-loop for (comp prefix suffix) in affixations
+                      collect (cons (propertize
+                                     (concat prefix comp suffix)
+                                     'match-part comp)
+                                    comp)))))
         (afun
          ;; Add annotation at end of
          ;; candidate if needed, e.g. foo<f>, this happen when
