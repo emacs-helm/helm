@@ -564,30 +564,32 @@ is usable in next condition."
 and `cond'.
 
 KEYLIST can be any object that will be compared with `equal' or
-an expression starting with `guard' which is then evaluated.
-Once evaluated `guard' is bound to the returned value that can be
-used in the cdr of clause.  When KEYLIST match EXPR or `guard'
-evaluation is non-nil, BODY is executed and `helm-acase' exits
-with its value.
+an expression starting with special symbol `guard*' which is then
+evaluated.  Once evaluated the symbol `guard' is bound to the
+returned value that can be used in the cdr of clause.  When
+KEYLIST match EXPR or `guard*' sexp evaluation is non-nil, BODY is
+executed and `helm-acase' exits with its value.
 
-KEYLIST can also be a list starting with `dst' followed by an expression
-suitable for `cl-destructuring-bind'.  In this case all elements of `it' are
-bound to the elements of this expression e.g.
+KEYLIST can also be a list starting with special symbol `dst*'
+followed by an expression suitable for `cl-destructuring-bind'.
+In this case all elements of `it' are bound to the elements of
+this expression e.g.
 
     (helm-acase \\='(1 2 3 4 5)
-      ((dst (l &rest args)) args))
+      ((dst* (l &rest args)) args))
     => (2 3 4 5)
 
 If KEYLIST is a list, it is compared with EXPR, also each
 elements of the list are checked with `member' to see if one
-matches EXPR e.g.
+matches EXPR, as a special case, the special symbols `guard*' and
+`dst*' have to NOT be at start of such list.
 
 The last clause can use `t' or \\='otherwise as KEYLIST to specify a
 fallback clause when previous clauses didn't match, if such a clause
 starting with `t' or \\='otherwise is specified before last clause it
 will override all next clauses, if you want to match an EXPR value equal
 to `t' in any clauses quote it, i.e. `'t' or use an explicit
-\(guard (eq it t)).
+\(guard* (eq it t)).
 
 EXPR is bound to a temporary variable called `it' which is
 usable in all clauses to refer to EXPR.
@@ -597,8 +599,8 @@ usable in all clauses to refer to EXPR.
   (unless (null clauses)
     (let* ((clause1  (car clauses))
            (key      (car clause1))
-           (isguard  (eq 'guard (car-safe key)))
-           (isdst    (eq 'dst (car-safe key)))
+           (isguard  (eq 'guard* (car-safe key)))
+           (isdst    (eq 'dst* (car-safe key)))
            (special  (or isguard isdst))
            (sexp     (and isguard (cadr key)))
            (dst-sexp (and isdst (cadr key))))
@@ -791,7 +793,7 @@ displayed in BUFNAME."
 (defun helm-help-org-cycle ()
   "Runs `org-cycle' in `helm-help'."
   (helm-acase (helm-iter-next helm-help--iter-org-state)
-    ((guard (numberp it)) (org-content))
+    ((guard* (numberp it)) (org-content))
     ;; See `helm--help-org-prefargs' about `org-cycle' ARG.
     (t (org-cycle it))))
 
@@ -1160,9 +1162,9 @@ Examples:
   "Return the representation of ELM as a string.
 ELM can be a string, a number or a symbol."
   (helm-acase elm
-    ((guard (stringp it)) it)
-    ((guard (numberp it)) (number-to-string it))
-    ((guard (symbolp it)) (symbol-name it))))
+    ((guard* (stringp it)) it)
+    ((guard* (numberp it)) (number-to-string it))
+    ((guard* (symbolp it)) (symbol-name it))))
 
 (defun helm-substring (str width)
   "Return the substring of string STR from 0 to WIDTH.
@@ -1377,13 +1379,13 @@ in LIST to be displayed in PROMPT."
                        (apply #'format
                               (concat prompt "[y,n,!,q,h]")
                               (helm-acase prompt-formater
-                                ((guard (consp it))
+                                ((guard* (consp it))
                                  (mapcar (lambda (x)
                                            (if (functionp x)
                                                (funcall x elm)
                                              x))
                                          it))
-                                ((guard (functionp it))
+                                ((guard* (functionp it))
                                  (list (funcall it elm)))
                                 (t (list elm))))
                        '("y" "n" "!" "q")
@@ -1407,7 +1409,7 @@ This avoid possible infloop when a wrong regexp is entered in minibuffer."
   ;; See Issue#2652 and Issue#2653.
   (let ((pos (point)))
     (helm-acase (re-search-forward regexp bound noerror count)
-      ((guard (eql it pos)) nil)
+      ((guard* (eql it pos)) nil)
       (t it))))
 
 ;;; Symbols routines
@@ -1415,7 +1417,7 @@ This avoid possible infloop when a wrong regexp is entered in minibuffer."
 (defun helm-symbolify (str-or-sym)
   "Get symbol of STR-OR-SYM."
   (helm-acase str-or-sym
-    ((guard (symbolp it)) it)
+    ((guard* (symbolp it)) it)
     ("" nil)
     (t (intern it))))
 
@@ -1823,7 +1825,7 @@ is same as with PARENT."
 It is done according to `helm-current-directory-alist'."
   (expand-file-name
    (helm-acase major-mode
-     ((guard (assoc-default it helm-current-directory-alist))
+     ((guard* (assoc-default it helm-current-directory-alist))
       (helm-interpret-value guard))
      (t default-directory))))
 
@@ -2149,7 +2151,7 @@ flex or helm-flex completion style if present."
       (or
        styles
        (helm-acase (cdr (assq from helm-completion-styles-alist))
-         ((dst (_l &rest args)) args))
+         ((dst* (_l &rest args)) args))
        ;; We need to have flex always behind helm, otherwise
        ;; when matching against e.g. '(foo foobar foao frogo bar
        ;; baz) with pattern "foo" helm style if before flex will

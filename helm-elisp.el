@@ -377,18 +377,18 @@ other window according to the value of
   (helm-acase (if (member candidate helm-lisp-completion-re-chars-classes)
                   candidate
                 (intern-soft candidate))
-    ((guard (stringp it))
+    ((guard* (stringp it))
      (helm-describe-re-char-classes it))
-    ((guard (and (fboundp it) (boundp it)))
+    ((guard* (and (fboundp it) (boundp it)))
      (if (member name `(,helm-describe-function-function
                         ,helm-describe-variable-function))
          (funcall (intern (format "helm-%s" name)) it)
        ;; When there is no way to know what to describe
        ;; prefer describe-function.
        (helm-describe-function it)))
-    ((guard (fboundp it)) (helm-describe-function it))
-    ((guard (boundp it))  (helm-describe-variable it))
-    ((guard (facep it))   (helm-describe-face it))))
+    ((guard* (fboundp it)) (helm-describe-function it))
+    ((guard* (boundp it))  (helm-describe-variable it))
+    ((guard* (facep it))   (helm-describe-face it))))
 
 (defun helm-elisp-show-help (candidate &optional name)
   "Show full help for the function CANDIDATE.
@@ -415,15 +415,15 @@ the same time to variable and a function."
            for sym = (if (string-match "\\`:[[:alpha:]]+:\\'" c)
                          c (intern-soft c))
            for annot = (helm-acase sym
-                         ((guard (stringp it))      "<reg> ")
-                         ((guard (commandp it))     "<com> ")
-                         ((guard (class-p it))      "<cla> ")
-                         ((guard (cl-generic-p it)) "<gen> ")
-                         ((guard (fboundp it))      "<fun> ")
-                         ((guard (keywordp it))     "<kwd> ")
-                         ((guard (boundp it))       "<var> ")
-                         ((guard (facep it))        "<fac> ")
-                         ((guard (helm-group-p it)) "<grp> ")
+                         ((guard* (stringp it))      "<reg> ")
+                         ((guard* (commandp it))     "<com> ")
+                         ((guard* (class-p it))      "<cla> ")
+                         ((guard* (cl-generic-p it)) "<gen> ")
+                         ((guard* (fboundp it))      "<fun> ")
+                         ((guard* (keywordp it))     "<kwd> ")
+                         ((guard* (boundp it))       "<var> ")
+                         ((guard* (facep it))        "<fac> ")
+                         ((guard* (helm-group-p it)) "<grp> ")
                          (t                         "      "))
            collect (cons (concat (helm-aand
                                   (propertize
@@ -444,23 +444,23 @@ Argument NAME allows specifiying what function to use to display
 documentation when SYM name is the same for function and variable."
   (let ((doc (condition-case _err
                  (helm-acase sym
-                   ((guard (stringp it))
+                   ((guard* (stringp it))
                     (cadr (split-string (helm-describe-re-char-classes-1 it) "\n")))
-                   ((guard (class-p it))
+                   ((guard* (class-p it))
                     (cl--class-docstring (cl--find-class it)))
-                   ((guard (and (fboundp it) (boundp it)))
+                   ((guard* (and (fboundp it) (boundp it)))
                     (if (string= name "describe-variable")
                         (documentation-property it 'variable-documentation t)
                       (documentation it t)))
-                   ((guard (custom-theme-p it))
+                   ((guard* (custom-theme-p it))
                     (documentation-property it 'theme-documentation t))
-                   ((guard (and (helm-group-p it) (not (fboundp it))))
+                   ((guard* (and (helm-group-p it) (not (fboundp it))))
                     (documentation-property it 'group-documentation t))
-                   ((guard (fboundp it))
+                   ((guard* (fboundp it))
                     (documentation it t))
-                   ((guard (boundp it))
+                   ((guard* (boundp it))
                     (documentation-property it 'variable-documentation t))
-                   ((guard (facep it)) (face-documentation it)))
+                   ((guard* (facep it)) (face-documentation it)))
                (void-function "Void function -- Not documented"))))
     (if (and doc (not (string= doc ""))
              ;; `documentation' return "\n\n(args...)"
@@ -473,7 +473,7 @@ documentation when SYM name is the same for function and variable."
         ;; <https://debbugs.gnu.org/70163>.
         (truncate-string-to-width
          (helm-acase (split-string (substitute-command-keys doc) "\n")
-           ((dst (l &rest args))
+           ((dst* (l &rest args))
             (if (string= l "") (cadr args) l)))
          end-column nil nil t)
       (if (or (symbol-function sym) (boundp sym) (facep sym) (helm-group-p sym))
@@ -780,16 +780,16 @@ is only used to test DEFAULT."
 (defun helm-info-lookup-fallback-source (candidate)
   (cl-multiple-value-bind (fn src-name)
       (helm-acase (helm-symbolify candidate)
-        ((guard (class-p it))
+        ((guard* (class-p it))
          (list #'helm-describe-function
                "Describe class"))
-        ((guard (cl-generic-p it))
+        ((guard* (cl-generic-p it))
          (list #'helm-describe-function
                "Describe generic function"))
-        ((guard (fboundp it))
+        ((guard* (fboundp it))
          (list #'helm-describe-function
                "Describe function"))
-        ((guard (facep it))
+        ((guard* (facep it))
          (list #'helm-describe-face
                "Describe face"))
         (t

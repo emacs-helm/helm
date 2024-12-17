@@ -541,7 +541,7 @@ Have no effect when grep backend use \"--color=\"."
              pipe-switches))
     ;; Use ack-grep for PCRE based tools.
     ;; Sometimes ack-grep cmd is ack only so compare by matching ack.
-    ((guard (string-match-p "ack" it))
+    ((guard* (string-match-p "ack" it))
      (format "%s --smart-case --color %s" it pipe-switches))))
 
 (defun helm-grep--prepare-cmd-line (only-files &optional include zgrep)

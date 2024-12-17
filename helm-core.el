@@ -2386,8 +2386,8 @@ show ARG number of candidates."
         (with-helm-default-directory (helm-default-directory)
           (setq-local helm-candidate-number-limit
                       (helm-acase arg
-                        ((guard (consp arg)) nil)
-                        ((guard (numberp arg)) it)
+                        ((guard* (consp arg)) nil)
+                        ((guard* (numberp arg)) it)
                         (t (default-value 'helm-candidate-number-limit))))
           (helm-set-source-filter
            (list (helm-get-current-source))))))))
@@ -3465,7 +3465,7 @@ The function used to display `helm-buffer' by calling
                   helm-reuse-last-window-split-state)
              (helm-acase helm-split-window-default-side
                ((same other) it) ; take precedence on *-window-side-state.
-               ((guard helm--window-side-state) guard)
+               ((guard* helm--window-side-state) guard)
                (t it))
            helm-split-window-default-side))
         (disp-fn (with-current-buffer buffer
@@ -3815,9 +3815,9 @@ See :after-init-hook and :before-init-hook in `helm-source'."
   ;; etc...
   (dolist (s sources)
     (helm-acase (assoc-default hook s)
-      ((guard (and (functionp it) (not (symbolp it))))
+      ((guard* (and (functionp it) (not (symbolp it))))
        (funcall it))
-      ((guard (listp it))
+      ((guard* (listp it))
        (dolist (h it) (funcall h)))
       (t (helm-log-run-hook "helm--run-init-hooks" it)))))
 
@@ -4752,7 +4752,7 @@ useful when the order of the candidates is meaningful, e.g. with
                                                       (helm--maybe-get-migemo-pattern
                                                        pat diacritics))
                                            (helm-acase (split-string pattern "" t)
-                                             ((guard (string= "!" (car it))) nil)
+                                             ((guard* (string= "!" (car it))) nil)
                                              (t it)))
                          for p in patterns
                          ;; Multi matches (regexps patterns).
@@ -5341,7 +5341,7 @@ specified as respectively `helm-cand-num' and `helm-cur-source'."
          `(mouse-face highlight
                       keymap ,map
                       help-echo ,(helm-acase (get-text-property start 'help-echo)
-                                   ((guard (stringp it))
+                                   ((guard* (stringp it))
                                     (concat it "\nmouse-1: select candidate\nmouse-3: menu actions"))
                                    (t "mouse-1: select candidate\nmouse-3: menu actions")))))
       (when num
@@ -6425,7 +6425,7 @@ message \\='no match'."
   (with-helm-buffer
     (setq minibuffer-completion-confirm
           (helm-acase (helm-get-attr 'must-match src)
-            ((guard (and (functionp it)
+            ((guard* (and (functionp it)
                          (helm-get-selection nil nil src)))
              (if (funcall it guard) 'exit 'noexit))
             (t it)))))

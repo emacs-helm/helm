@@ -408,9 +408,9 @@ The sexp should be an `all-the-icons' function with its args."
                         ;; Semantic uses overlays whereas imenu uses
                         ;; markers (Bug#1706).
                         (setcdr elm (helm-acase (cdr elm) ; Same as [1].
-                                      ((guard (overlayp it))
+                                      ((guard* (overlayp it))
                                        (copy-overlay it))
-                                      ((guard (or (markerp it) (integerp it)))
+                                      ((guard* (or (markerp it) (integerp it)))
                                        (copy-marker it))))
                         (list elm))))))
 
@@ -444,8 +444,8 @@ The icon is found in `helm-imenu-icon-type-alist', if not
            ;; (k . v) == (symbol-name . marker)
            for bufname = (buffer-name
                           (helm-acase v
-                            ((guard (overlayp it)) (overlay-buffer it))
-                            ((guard (markerp it)) (marker-buffer it))))
+                            ((guard* (overlayp it)) (overlay-buffer it))
+                            ((guard* (markerp it)) (marker-buffer it))))
            for types = (or (helm-imenu--get-prop k)
                            (list (if (with-current-buffer bufname
                                        (derived-mode-p 'prog-mode))

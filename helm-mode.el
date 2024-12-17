@@ -1433,8 +1433,8 @@ This handler should be used when candidate list doesn't need to be rebuilt
 dynamically otherwise use `helm-completing-read-default-2'."
   (let* ((history (or (car-safe hist) hist))
          (initial-input (helm-acase init
-                          ((guard (stringp it)) it)
-                          ((guard (consp it)) (car it))))
+                          ((guard* (stringp it)) it)
+                          ((guard* (consp it)) (car it))))
          (minibuffer-completion-table collection)
          (metadata (or (completion-metadata (or initial-input "") collection test)
                        '(metadata)))
@@ -1521,8 +1521,8 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
   (let* ((completion-lazy-hilit t)
          (history (or (car-safe hist) hist))
          (input (helm-acase init
-                  ((guard (stringp it)) it)
-                  ((guard (consp it)) (car it))))
+                  ((guard* (stringp it)) it)
+                  ((guard* (consp it)) (car it))))
          (completion-flex-nospace t)
          (minibuffer-completion-table collection)
          ;; (completion-styles
@@ -2783,7 +2783,7 @@ Can be used for `completion-in-region-function' by advicing it with an
         (when (and (stringp string) exit-fun)
           (funcall exit-fun string
                    (helm-acase (try-completion initial-input collection predicate)
-                     ((guard (and (stringp it)
+                     ((guard* (and (stringp it)
                                   (or (string-match "/\\'" it)
                                       ;; Fix bug#2669.
                                       (string-match "/\\'" string))))

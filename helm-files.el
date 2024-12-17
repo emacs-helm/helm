@@ -2443,7 +2443,7 @@ COUNT is used for incrementing new name if needed."
                                       (string-to-number
                                        (match-string 1 rep))
                                       (helm-acase (match-string 2 rep)
-                                        ((guard (string= it ""))
+                                        ((guard* (string= it ""))
                                          (length target))
                                         (t (string-to-number it))))
                                      t t rep))
@@ -3316,8 +3316,8 @@ editing absolute fnames in previous Emacs versions."
 (defun helm-ff--tramp-cons-or-vector (vector-or-cons)
   "Return VECTOR-OR-CONS as a vector."
   (helm-acase vector-or-cons
-    ((guard (and (consp it) (cdr it))) (vconcat guard))
-    ((guard (vectorp it)) it)
+    ((guard* (and (consp it) (cdr it))) (vconcat guard))
+    ((guard* (vectorp it)) it)
     (t (error "Wrong type argument: %s" it))))
 
 (defun helm-ff--get-tramp-methods ()
@@ -5221,7 +5221,7 @@ Special commands:
           (cl-loop with scale = (image-compute-scaling-factor nil)
                    for (disp . img) in candidates
                    for type = (helm-acase (file-name-extension img)
-                                ((guard (and (member it '("png" "jpg" "jpeg"))
+                                ((guard* (and (member it '("png" "jpg" "jpeg"))
                                              (memq image-dired-thumbnail-storage
                                                    '(standard standard-large))))
                                  'png)
