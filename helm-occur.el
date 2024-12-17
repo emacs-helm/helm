@@ -352,7 +352,7 @@ When GSHORTHANDS is nil use PATTERN unmodified."
                     (match-string 2 candidate)))
                 :diacritics helm-occur-ignore-diacritics
                 :search (lambda (pattern)
-                          (when (string-match "\\`\\^\\([^ ]*\\)" pattern)
+                          (when (string-match "\\`\\^\\(.*\\)" pattern)
                             (setq pattern (concat "^[0-9]*\\s-" (match-string 1 pattern))))
                           (condition-case _err
                               (re-search-forward pattern nil t)
