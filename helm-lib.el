@@ -581,7 +581,9 @@ this expression e.g.
 
 If KEYLIST is a list, it is compared with EXPR, also each
 elements of the list are checked with `member' to see if one
-matches EXPR.
+matches EXPR, ensure to not use special symbols `guard*' and
+`dst*' at start of such KEYLIST to avoid confusing helm-acase
+even if this is partially supported.
 
 The last clause can use `t' or \\='otherwise as KEYLIST to specify a
 fallback clause when previous clauses didn't match, if such a clause
