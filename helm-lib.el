@@ -601,7 +601,9 @@ usable in all clauses to refer to EXPR.
     (let* ((clause1  (car clauses))
            (key      (car clause1))
            ;; Ensure dst* and guard* are not treated as special symbols when
-           ;; they are not followed by a sexp and nothing else.
+           ;; they are not followed by one sexp and nothing else, however if the
+           ;; following sexp is not meant to be evaluated but just compared we
+           ;; fail miserably, is it worth fixing it?
            (issexp   (and (consp (car-safe (cdr-safe key)))
                           (= (length key) 2)))
            (isguard  (and (eq 'guard* (car-safe key)) issexp))
