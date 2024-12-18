@@ -581,8 +581,7 @@ this expression e.g.
 
 If KEYLIST is a list, it is compared with EXPR, also each
 elements of the list are checked with `member' to see if one
-matches EXPR, as a special case, the special symbols `guard*' and
-`dst*' have to NOT be at start of such list.
+matches EXPR.
 
 The last clause can use `t' or \\='otherwise as KEYLIST to specify a
 fallback clause when previous clauses didn't match, if such a clause
@@ -599,8 +598,9 @@ usable in all clauses to refer to EXPR.
   (unless (null clauses)
     (let* ((clause1  (car clauses))
            (key      (car clause1))
-           (isguard  (eq 'guard* (car-safe key)))
-           (isdst    (eq 'dst* (car-safe key)))
+           (issexp   (listp (car-safe (cdr-safe key))))
+           (isguard  (and (eq 'guard* (car-safe key)) issexp))
+           (isdst    (and (eq 'dst* (car-safe key)) issexp))
            (special  (or isguard isdst))
            (sexp     (and isguard (cadr key)))
            (dst-sexp (and isdst (cadr key))))
