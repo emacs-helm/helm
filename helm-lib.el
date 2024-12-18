@@ -598,7 +598,10 @@ usable in all clauses to refer to EXPR.
   (unless (null clauses)
     (let* ((clause1  (car clauses))
            (key      (car clause1))
-           (issexp   (listp (car-safe (cdr-safe key))))
+           ;; Ensure dst* and guard* are not treated as special symbols when
+           ;; they are not followed by a sexp and nothing else.
+           (issexp   (and (consp (car-safe (cdr-safe key)))
+                          (= (length key) 2)))
            (isguard  (and (eq 'guard* (car-safe key)) issexp))
            (isdst    (and (eq 'dst* (car-safe key)) issexp))
            (special  (or isguard isdst))
