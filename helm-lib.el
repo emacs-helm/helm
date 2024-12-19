@@ -598,21 +598,22 @@ usable in all clauses to refer to EXPR.
 \(fn EXPR (KEYLIST BODY...)...)"
   (declare (indent 1) (debug (form &rest ([&or (symbolp form) sexp] body))))
   (unless (null clauses)
-    (let* ((clause1  (car clauses))
-           (key      (car clause1))
+    (let* ((clause1    (car clauses))
+           (key        (car clause1))
+           (sexp       (car-safe (cdr-safe key)))
+           (sp-sym     (car-safe key))
            ;; Ensure dst* and guard* are not treated as special symbols when
            ;; they are not followed by one sexp and nothing else, however if the
            ;; following sexp is not meant to be evaluated but just compared we
            ;; fail miserably, is it worth fixing it?
-           (issexp   (and (consp (car-safe (cdr-safe key)))
-                          (= (length key) 2)))
-           (isguard  (and (eq 'guard* (car-safe key)) issexp))
-           (isdst    (and (eq 'dst* (car-safe key)) issexp))
-           (special  (or isguard isdst))
-           (sexp     (and isguard (cadr key)))
-           (dst-sexp (and isdst (cadr key))))
+           (issexp     (and (consp sexp) (= (length key) 2)))
+           (isguard    (and (eq 'guard* sp-sym) issexp))
+           (isdst      (and (eq 'dst* sp-sym) issexp))
+           (special    (or isguard isdst))
+           (guard-sexp (and isguard sexp))
+           (dst-sexp   (and isdst sexp)))
       `(let* ((it    ,expr)
-              (guard ,sexp)
+              (guard ,guard-sexp)
               (dst   (and (consp it) ',dst-sexp)))
          (cond ((or guard
                     (and ,(not special)
