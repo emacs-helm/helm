@@ -924,10 +924,17 @@ See `helm-help-hkmap' for supported keys and functions."
       (flatten seq))
     (nreverse result)))
 
+(defun helm-proper-list-p (obj)
+  "Compatibility function for `proper-list-p'."
+  (if (fboundp 'proper-list-p)
+      (proper-list-p obj) ; 27+
+    (and (listp obj) (not (cdr (last obj))))))
+
 (defun helm-mklist (obj)
-  "Return OBJ as a list.
-Otherwise make a list with one element OBJ."
-  (if (and (listp obj) (not (functionp obj)))
+  "Return OBJ as a proper list.
+Otherwise make a proper list with one element OBJ.
+Anonymous functions (lambdas) are treated as single elements."
+  (if (and (helm-proper-list-p obj) (not (functionp obj)))
       obj
     (list obj)))
 
@@ -1049,13 +1056,9 @@ Examples:
     (helm-append-at-nth \\='(a b c d) \\='((x . 1) (y . 2)) 2)
     =>(a b (x . 1) (y . 2) c d)
 
-    But this is not working:
-    (helm-append-at-nth \\='(a b c d) \\='(x . 1) 2)
-    =>Wrong type argument: listp, 1
-
-NOTE: This function uses `append' internally, so ELM is expected
-to be a list to be appended to SEQ, even if for convenience an
-atom is supported as ELM value."
+    (helm-append-at-nth \\='((a . 1) (b . 2) (c . 3)) \\='(x . 1) 1)
+    =>((a . 1) (x . 1) (b . 2) (c . 3))
+"
   (setq index (min (max index 0) (length seq))
         elm   (helm-mklist elm))
   (if (zerop index)
