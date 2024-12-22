@@ -402,6 +402,12 @@ This is done recursively."
 	      (when (> k 127)
 	        (setf (aref vec i) (+ k ?\M-\C-@ -128))))))
         vec))))
+
+(defun helm-proper-list-p (obj)
+  "Compatibility function for `proper-list-p'."
+  (if (fboundp 'proper-list-p)
+      (proper-list-p obj) ; 27+
+    (and (listp obj) (not (cdr (last obj))))))
 
 ;;; Macros helper.
 ;;
@@ -923,12 +929,6 @@ See `helm-help-hkmap' for supported keys and functions."
                           else do (and elm (push elm result)))))
       (flatten seq))
     (nreverse result)))
-
-(defun helm-proper-list-p (obj)
-  "Compatibility function for `proper-list-p'."
-  (if (fboundp 'proper-list-p)
-      (proper-list-p obj) ; 27+
-    (and (listp obj) (not (cdr (last obj))))))
 
 (defun helm-mklist (obj)
   "Return OBJ as a proper list.
