@@ -7678,12 +7678,7 @@ starting it is not needed."
                             ;; https://github.com/yyoncho/helm-treemacs-icons/issues/5
                             ;; and also Bug#2296.
                             prefix
-                            (and filecomp-p
-                                 (or
-                                  ;; autosave files
-                                  (string-match-p "\\`[.]?#.*#?\\'" bn)
-                                  ;; dot files
-                                  (member bn '("." "..")))))
+                            (and filecomp-p (member bn '("." ".."))))
                       (helm-make-visible-mark src cand)))
                   (when (helm-pos-multiline-p)
                     (goto-char
