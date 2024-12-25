@@ -7644,49 +7644,47 @@ starting it is not needed."
          (src-name   (assoc-default 'name src))
          (filecomp-p (or (helm-file-completion-source-p src)
                          (string= src-name "Files from Current Directory"))))
-    ;; Note that `cl-letf' prevents edebug working properly.
-    (cl-letf (((symbol-function 'message) #'ignore))
-      (helm-follow-mode -1)
-      (unwind-protect
-          (if nomark
-              (user-error "Marking not allowed in this source")
-            (save-excursion
-              (when ensure-beg-of-source
-                (goto-char (helm-get-previous-header-pos))
-                (forward-line 1))
-              (let* ((next-head (helm-get-next-header-pos))
-                     (end       (and next-head
-                                     (save-excursion
-                                       (goto-char next-head)
-                                       (forward-line -1)
-                                       (point))))
-                     (maxpoint  (or end (point-max))))
-                (while (< (point) maxpoint)
-                  (helm-mark-current-line)
-                  (let* ((prefix (or (get-text-property (pos-bol) 'helm-new-file)
-                                     (get-text-property (pos-bol) 'unknown)))
-                         (cand   (helm-get-selection
-                                  nil (helm-get-attr 'marked-with-props src)
-                                  src))
-                         (bn     (and filecomp-p (helm-basename cand))))
-                    ;; Don't mark possibles directories ending with . or ..
-                    ;; autosave files/links and non--existent files.
-                    (unless
-                        (or (helm-this-visible-mark)
-                            ;; Non existing files in HFF and
-                            ;; RFN. Display may be an image. See
-                            ;; https://github.com/yyoncho/helm-treemacs-icons/issues/5
-                            ;; and also Bug#2296.
-                            prefix
-                            (and filecomp-p (member bn '("." ".."))))
-                      (helm-make-visible-mark src cand)))
-                  (when (helm-pos-multiline-p)
-                    (goto-char
-                     (or (helm-get-next-candidate-separator-pos)
-                         (point-max))))
-                  (forward-line 1))))
-            (helm-mark-current-line))
-        (helm-follow-mode follow)))))
+    (helm-follow-mode -1)
+    (unwind-protect
+         (if nomark
+             (user-error "Marking not allowed in this source")
+           (save-excursion
+             (when ensure-beg-of-source
+               (goto-char (helm-get-previous-header-pos))
+               (forward-line 1))
+             (let* ((next-head (helm-get-next-header-pos))
+                    (end       (and next-head
+                                    (save-excursion
+                                      (goto-char next-head)
+                                      (forward-line -1)
+                                      (point))))
+                    (maxpoint  (or end (point-max))))
+               (while (< (point) maxpoint)
+                 (helm-mark-current-line)
+                 (let* ((prefix (or (get-text-property (pos-bol) 'helm-new-file)
+                                    (get-text-property (pos-bol) 'unknown)))
+                        (cand   (helm-get-selection
+                                 nil (helm-get-attr 'marked-with-props src)
+                                 src))
+                        (bn     (and filecomp-p (helm-basename cand))))
+                   ;; Don't mark possibles directories ending with . or ..
+                   ;; autosave files/links and non--existent files.
+                   (unless
+                       (or (helm-this-visible-mark)
+                           ;; Non existing files in HFF and
+                           ;; RFN. Display may be an image. See
+                           ;; https://github.com/yyoncho/helm-treemacs-icons/issues/5
+                           ;; and also Bug#2296.
+                           prefix
+                           (and filecomp-p (member bn '("." ".."))))
+                     (helm-make-visible-mark src cand)))
+                 (when (helm-pos-multiline-p)
+                   (goto-char
+                    (or (helm-get-next-candidate-separator-pos)
+                        (point-max))))
+                 (forward-line 1))))
+           (helm-mark-current-line))
+      (helm-follow-mode follow))))
 
 (defun helm-unmark-all ()
   "Unmark all candidates in all sources of current helm session."
