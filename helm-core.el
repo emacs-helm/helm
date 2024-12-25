@@ -7968,7 +7968,11 @@ They are bound by default to \\[helm-follow-action-forward] and
              (enabled  (or (helm-follow-mode-p src)
                            (and helm-follow-mode-persistent
                                 (member (assoc-default 'name src)
-                                        helm-source-names-using-follow)))))
+                                        helm-source-names-using-follow))))
+             ;; No messages when called non interactively.
+             (set-message-function (lambda (msg)
+                                     (if (and (not current-prefix-arg) arg)
+                                         1 msg))))
         (if src
             (progn
               (if (eq (cdr fol-attr) 'never)
@@ -7977,12 +7981,13 @@ They are bound by default to \\[helm-follow-action-forward] and
                 (helm-follow-mode-set-source
                  (if (or enabled (and (numberp arg) (< arg 0))) -1 1)
                  src)
-                ;; When arg is nil assume the call is interactive.
-                ;; However if user call helm-follow-mode with a prefix arg,
-                ;; the call will be considered non--interactive and
-                ;; src-name will NOT be saved to helm-source-names-using-follow.
                 ;; When called from lisp (non--interactive) src-name
                 ;; will never be saved.
+                ;; When arg is nil assume the call is interactive and save
+                ;; src-name to `helm-source-names-using-follow'.
+                ;; However if user call helm-follow-mode with a prefix arg,
+                ;; behave like a non--interactive call and
+                ;; DONT save src-name to `helm-source-names-using-follow'.
                 (when (and helm-follow-mode-persistent (null arg))
                   (if (null enabled)
                       (unless (member name helm-source-names-using-follow)
