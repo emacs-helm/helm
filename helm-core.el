@@ -4445,12 +4445,13 @@ If (candidate-number-limit . 123) is in SOURCE limit candidate to 123."
   "Get searched display part from CANDIDATE.
 CANDIDATE is either a string, a symbol, or a (DISPLAY . REAL)
 cons cell."
-  (cond ((car-safe candidate))
-        ((symbolp candidate)
-         (symbol-name candidate))
-        ((numberp candidate)
-         (number-to-string candidate))
-        (t candidate)))
+  (helm-acase candidate
+    ((dst* (disp . real)) disp)
+    ((guard* (symbolp candidate))
+     (symbol-name candidate))
+    ((guard* (numberp candidate))
+     (number-to-string candidate))
+    (t candidate)))
 
 (defun helm-process-pattern-transformer (pattern source)
   "Execute pattern-transformer attribute function(s) on PATTERN in SOURCE."
