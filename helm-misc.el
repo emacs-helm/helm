@@ -176,22 +176,6 @@
     :action 'helm-timezone-actions
     :filtered-candidate-transformer 'helm-time-zone-transformer))
 
-;;; Commands
-;;
-(defun helm-call-interactively (cmd-or-name)
-  "Execute CMD-OR-NAME as Emacs command.
-It is added to `extended-command-history'.
-`helm-current-prefix-arg' is used as the command's prefix argument."
-  (setq extended-command-history
-        (cons (helm-stringify cmd-or-name)
-              (delete (helm-stringify cmd-or-name) extended-command-history)))
-  (let ((current-prefix-arg helm-current-prefix-arg)
-        (cmd (helm-symbolify cmd-or-name)))
-    (if (stringp (symbol-function cmd))
-        (execute-kbd-macro (symbol-function cmd))
-      (setq this-command cmd)
-      (call-interactively cmd))))
-
 ;;; Minibuffer History
 ;;
 ;;
