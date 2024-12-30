@@ -854,74 +854,6 @@ a string, i.e. the `symbol-name' of any existing symbol."
           :truncate-lines t)))
 
 
-;;; Advices
-;;
-;;
-(defvar ad-advised-functions)
-(defvar ad-advice-classes)
-(declare-function ad-make-single-advice-docstring "advice")
-(declare-function ad-get-advice-info-field "advice")
-(declare-function ad-advice-set-enabled "advice")
-(declare-function ad-advice-set-enabled "advice")
-(declare-function ad-advice-enabled "advice")
-
-(defvar helm-source-advice
-  (helm-build-sync-source "Function Advice"
-    :init (lambda () (require 'advice))
-    :candidates 'helm-advice-candidates
-    :action (helm-make-actions "Toggle Enable/Disable" 'helm-advice-toggle)
-    :persistent-action 'helm-advice-persistent-action
-    :nomark t
-    :multiline t
-    :persistent-help "Toggle describe function / C-u C-j: Toggle advice"))
-
-(defun helm-advice-candidates ()
-  (cl-loop for fname in ad-advised-functions
-           for function = (intern fname)
-           append
-           (cl-loop for class in ad-advice-classes append
-                    (cl-loop for advice in (ad-get-advice-info-field function class)
-                             for enabled = (ad-advice-enabled advice)
-                             collect
-                             (cons (format
-                                    "%s %s %s"
-                                    (if enabled "Enabled " "Disabled")
-                                    (propertize fname 'face 'font-lock-function-name-face)
-                                    (ad-make-single-advice-docstring advice class nil))
-                                   (list function class advice))))))
-
-(defun helm-advice-persistent-action (func-class-advice)
-  (if current-prefix-arg
-      (helm-advice-toggle func-class-advice)
-    (describe-function (car func-class-advice))))
-
-(defun helm-advice-toggle (func-class-advice)
-  (cl-destructuring-bind (function _class advice) func-class-advice
-    (cond ((ad-advice-enabled advice)
-           (ad-advice-set-enabled advice nil)
-           (message "Disabled"))
-          (t
-           (ad-advice-set-enabled advice t)
-           (message "Enabled")))
-    (ad-activate function)
-    (and helm-in-persistent-action
-         (helm-advice-update-current-display-string))))
-
-(defun helm-advice-update-current-display-string ()
-  (helm-edit-current-selection
-    (let ((newword (cond ((looking-at "Disabled") "Enabled")
-                         ((looking-at "Enabled")  "Disabled"))))
-      (when newword
-        (delete-region (point) (progn (forward-word 1) (point)))
-        (insert newword)))))
-
-;;;###autoload
-(defun helm-manage-advice ()
-  "Preconfigured `helm' to disable/enable function advices."
-  (interactive)
-  (helm :sources 'helm-source-advice :buffer "*helm advice*"))
-
-
 ;;; Locate elisp library
 ;;
 ;;
