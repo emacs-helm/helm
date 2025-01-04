@@ -1844,16 +1844,20 @@ e.g. (helm-basename \"~/ucs-utils-6.0-delta.py.gz\" \\='(2 . \"\\\\.py\\\\\\='\"
 
 (defun helm-basedir (fname &optional parent)
   "Return the base directory of FNAME ending by a slash.
-If PARENT is specified and FNAME is a directory return the parent
-directory of FNAME.
+If PARENT is non nil and FNAME is a directory return the parent
+directory of FNAME, if PARENT is a number return the parent directory up to
+PARENT level.
 If PARENT is not specified but FNAME doesn't end by a slash, the returned value
 is same as with PARENT."
   (helm-aif (and fname
                  (or (and (string= fname "~") "~")
                      (file-name-directory
-                      (if parent
-                          (directory-file-name fname)
-                        fname))))
+                      (helm-acase parent
+                        ((guard* (numberp it))
+                         (cl-loop repeat it
+                                  for bd = (helm-basedir (or bd fname) t)
+                                  finally return bd))
+                        (t (directory-file-name fname))))))
       (file-name-as-directory it)))
 
 (defun helm-current-directory ()
