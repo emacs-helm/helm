@@ -376,32 +376,33 @@ Default action change TZ environment variable locally to emacs."
     (insert elm)))
 
 ;;;###autoload
-(defun helm-outline ()
+(defun helm-outline (&optional arg)
   "Basic helm navigation tool for outline buffers."
-  (interactive)
-  (helm :sources (helm-build-sync-source "helm outline"
-                 :candidates
-                 (lambda ()
-                   (with-helm-current-buffer
-                     (save-excursion
-                       (goto-char (point-min))
-                       (cl-loop while (re-search-forward outline-regexp nil t)
-                                for beg = (match-beginning 0)
-                                for end = (progn
-                                            (outline-end-of-heading) (point))
-                                collect
-                                (cons (buffer-substring beg end) beg)))))
-                 :action (lambda (pos)
-                           (helm-goto-char pos)
-                           (helm-highlight-current-line)))
-        :preselect (save-excursion
-                     (when (condition-case _err
-                               (outline-back-to-heading)
-                             (error nil))
-                       (regexp-quote
-                        (buffer-substring
-                         (point) (progn (outline-end-of-heading) (point))))))
-        :buffer "*helm outline*"))
+  (interactive "P")
+  (let ((outline-regexp (if arg (read-regexp "Outline regexp") outline-regexp)))
+    (helm :sources (helm-build-sync-source "helm outline"
+                     :candidates
+                     (lambda ()
+                       (with-helm-current-buffer
+                         (save-excursion
+                           (goto-char (point-min))
+                           (cl-loop while (re-search-forward outline-regexp nil t)
+                                    for beg = (match-beginning 0)
+                                    for end = (progn
+                                                (outline-end-of-heading) (point))
+                                    collect
+                                    (cons (buffer-substring beg end) beg)))))
+                     :action (lambda (pos)
+                               (helm-goto-char pos)
+                               (helm-highlight-current-line)))
+          :preselect (save-excursion
+                       (when (condition-case _err
+                                 (outline-back-to-heading)
+                               (error nil))
+                         (regexp-quote
+                          (buffer-substring
+                           (point) (progn (outline-end-of-heading) (point))))))
+          :buffer "*helm outline*")))
 
 (provide 'helm-misc)
 
