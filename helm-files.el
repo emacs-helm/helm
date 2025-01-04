@@ -4278,7 +4278,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
           (helm-acond (;; Dot directories . and ..
                        dot
                        (cons (helm-ff-prefix-filename
-                              (propertize file 'face 'helm-ff-dotted-directory)
+                              (propertize disp 'face 'helm-ff-dotted-directory)
                               file)
                              file))
                       ;; Directories.
@@ -4354,13 +4354,13 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                 ;; A dotted directory symlinked.
                 ((and dot (stringp type))
                  (cons (helm-ff-prefix-filename
-                        (propertize file 'face 'helm-ff-dotted-symlink-directory)
+                        (propertize disp 'face 'helm-ff-dotted-symlink-directory)
                         file)
                        file))
                 ;; A dotted directory.
                 (dot
                  (cons (helm-ff-prefix-filename
-                        (propertize file 'face 'helm-ff-dotted-directory)
+                        (propertize disp 'face 'helm-ff-dotted-directory)
                         file)
                        file))
                 ;; Backup files.
