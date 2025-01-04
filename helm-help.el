@@ -322,6 +322,10 @@ It will then behave slighly differently depending of
 
 Called with a prefix arg open menu unconditionally.
 
+*** Show information on files (permissions etc...)
+
+Turn on `helm-popup-tip-mode'.
+
 *** Filter out files or directories
 
 You can show files or directories only with respectively
