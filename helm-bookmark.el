@@ -463,7 +463,7 @@ If `browse-url-browser-function' is set to something else than
 ;;; Woman Man
 ;;
 (defun helm-bookmark-man-setup-alist ()
-  "Specialized filter function for bookmarks w3m."
+  "Specialized filter function for Man pages bookmarks."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-woman-man-bookmark-p))
 
 (defun helm-source-bookmark-man-builder ()
