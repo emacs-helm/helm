@@ -6218,17 +6218,8 @@ is nil."
     (let ((helm--reading-passwd-or-string t)
           (file-attrs (file-attributes file))
           (trash (or trash (helm-ff--delete-by-moving-to-trash file)))
-          (delete-by-moving-to-trash trash)
-          (already-trashed
-           (and trash (helm-ff-file-already-trashed
-                       file helm-ff--trashed-files))))
-      (cond (already-trashed
-             ;; We use message here to avoid exiting loop when
-             ;; deleting more than one file.
-             (message "User error: `%s' is already trashed" file)
-             (sit-for 1.5)
-             (cl-return 'skip))
-            ((and (eq (nth 0 file-attrs) t) ; a not empty directory.
+          (delete-by-moving-to-trash trash))
+      (cond ((and (eq (nth 0 file-attrs) t) ; a not empty directory.
                   (directory-files file t directory-files-no-dot-files-regexp))
              (if (or helm-ff-allow-recursive-deletes trash)
                  (delete-directory file 'recursive trash)
@@ -6333,22 +6324,18 @@ directories are always deleted with no warnings."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (trash (helm-ff--delete-by-moving-to-trash (car files)))
          (prmt (if trash "Trash" "Delete"))
-         buffers callback already-trashed
+         buffers callback
          ;; Workaround emacs-26 bug with tramp see
          ;; https://github.com/jwiegley/emacs-async/issues/80.
          (async-quiet-switch "-q"))
-    (cl-loop with trash-alist = (and trash (helm-ff-trash-list (helm-trash-directory)))
-             for f in files
+    (cl-loop for f in files
              for buf = (helm-file-buffers f)
-             for trashed = (helm-ff-file-already-trashed f trash-alist)
              for dot-file-p = (helm-ff-dot-file-p f)
              when (and helm-ff-signal-error-on-dot-files
                              dot-file-p)
              do (cl-return (error "Error: Cannot operate on `.' or `..'"))
              when buf
-             do (setq buffers (nconc buf buffers))
-             when trashed
-             do (push trashed already-trashed))
+             do (setq buffers (nconc buf buffers)))
     (setq callback (lambda (result)
                      (unless (dired-async-processes 'helm-delete-async)
                        (helm-ff--delete-async-modeline-mode -1))
@@ -6392,11 +6379,7 @@ directories are always deleted with no warnings."
              (let ((result 0))
                (dolist (file ',files result)
                  (condition-case err
-                     (cond ((and ,trash
-                                 (cl-loop for f in ',already-trashed
-                                          thereis (file-equal-p f file)))
-                            (error (format "`%s' is already trashed" file)))
-                           ((eq (nth 0 (file-attributes file)) t)
+                     (cond ((eq (nth 0 (file-attributes file)) t)
                             (delete-directory file 'recursive ,trash)
                             (setq result (1+ result)))
                            (t (delete-file file ,trash)
