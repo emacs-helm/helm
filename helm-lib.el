@@ -1086,8 +1086,8 @@ instead.  It is meant to be used in config files only."
     (cond ((and (member elm val) (equal elm (nth index val))))
           ((member elm val)
            (setq val (delete elm val) flag t))
-          (replace
-           (setq val (delete (nth index val) val) flag t))
+          ((and replace (not (< index 0)) (not (> index (length val))))
+             (setq val (delete (nth index val) val) flag t))
           (t (setq flag t)))
     (if flag
         (set var (helm-append-at-nth val elm index))
