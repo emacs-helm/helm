@@ -837,7 +837,6 @@ consecutive words from the buffer into the new bookmark name."
                        now-map)
                      nil 'bookmark-history old))))
       (bookmark-set-name old newname)
-      (setq bookmark-current-bookmark  newname)
       (helm-bookmark-maybe-save-bookmark) newname)))
 
 (defun helm-bookmark-rename-marked (_candidate)
