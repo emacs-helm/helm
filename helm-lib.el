@@ -1857,7 +1857,9 @@ is same as with PARENT."
                          (cl-loop repeat it
                                   for bd = (helm-basedir (or bd fname) t)
                                   finally return bd))
-                        (t (directory-file-name fname))))))
+                        ((guard* (eq it t))
+                         (directory-file-name fname))
+                        (t fname)))))
       (file-name-as-directory it)))
 
 (defun helm-current-directory ()
