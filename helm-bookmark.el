@@ -881,6 +881,15 @@ E.g. prepended with *."
   (dolist (i (helm-marked-candidates))
     (bookmark-delete (helm-bookmark-get-bookmark-from-name i)
                      'batch)))
+
+(defun helm-bookmark-get-defaults ()
+  "Get default bookmark names at point for `bookmark-set'."
+  (let* (bookmark-current-bookmark
+         (record (bookmark-make-record)))
+    ;; Not sure `bookmark-make-record' set 'defaults prop in older Emacs.
+    (helm-aif (bookmark-prop-get record 'defaults)
+        it
+      (list (buffer-name helm-current-buffer)))))
 
 ;;; bookmark annotations
 ;;
@@ -959,8 +968,7 @@ if external addressbook-bookmark package is installed."
   (helm :sources helm-bookmark-default-filtered-sources
         :prompt "Search Bookmark: "
         :buffer "*helm filtered bookmarks*"
-        :default (list (thing-at-point 'symbol)
-                       (buffer-name helm-current-buffer))))
+        :default (helm-bookmark-get-defaults)))
 
 (provide 'helm-bookmark)
 
