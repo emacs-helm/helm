@@ -2013,20 +2013,16 @@ Directories expansion is not supported."
 
 (defun helm-locate-lib-get-summary (file)
   "Extract library description from FILE."
-  (let* ((shell-file-name "sh")
-         (shell-command-switch "-c")
-         (cmd "%s %s | head -n1 | awk 'match($0,\"%s\",a) {print a[2]}'\
- | awk -F ' -*-' '{print $1}'")
-         (regexp "^;;;(.*) ---? (.*)$")
-         (desc (shell-command-to-string
-                (format cmd
-                        (if (string-match-p "\\.gz\\'" file)
-                            "gzip -c -q -d" "cat")
-                        (shell-quote-argument file)
-                        regexp))))
-    (if (string= desc "")
-        "Not documented"
-      (replace-regexp-in-string "\n" "" desc))))
+  (with-temp-buffer
+    (let (desc)
+      (cl-letf (((symbol-function 'message) 'ignore))
+        (insert-file-contents file nil 0 80))
+      (goto-char (point-min))
+      (when (re-search-forward "^;;;\\(.*\\) ---? \\(.*\\)" (pos-eol) t)
+        (setq desc (match-string-no-properties 2)))
+      (if (or (null desc) (string= "" desc))
+          "Not documented"
+        (car (split-string desc " +-*-"))))))
 
 (defun helm-local-directory-files (directory &rest args)
   "Run `directory-files' without tramp file name handlers.
