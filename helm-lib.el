@@ -2015,7 +2015,7 @@ Directories expansion is not supported."
   "Extract library description from FILE."
   (with-temp-buffer
     (let (desc)
-      (cl-letf (((symbol-function 'message) 'ignore))
+      (cl-letf (((symbol-function 'message) #'ignore))
         (insert-file-contents file nil 0 128))
       (goto-char (point-min))
       (when (re-search-forward "^;;;?\\(.*\\) ---? \\(.*\\)" (pos-eol) t)
