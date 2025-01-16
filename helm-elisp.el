@@ -916,7 +916,7 @@ a prefix arg."
                        for disp = (and path
                                        (if (and doc
                                                 (or completions-detailed helm-completions-detailed))
-                                           (helm-aand (propertize doc 'face 'font-lock-warning-face)
+                                           (helm-aand (propertize doc 'face 'helm-completions-detailed)
                                                       (propertize " " 'display (concat sep it))
                                                       (concat bn it))
                                          bn))
