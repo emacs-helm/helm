@@ -1371,6 +1371,7 @@ is used."
                        (propertize " " 'display (concat sep it)))))))
 
 (defun helm-completion-library-affixation (_comps)
+  ;; We share here the same cache as `helm-locate-library'.
   (require 'helm-elisp)
   (lambda (comp)
     ;; Because find-library-include-other-files default to t, we have all the
