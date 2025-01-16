@@ -1389,7 +1389,7 @@ is used."
                                helm--locate-library-doc-cache))))
         (list comp
               ""
-              (helm-aand (propertize doc 'face 'font-lock-warning-face)
+              (helm-aand (propertize doc 'face 'helm-completions-detailed)
                          (propertize " " 'display (concat sep it))))))))
 
 (defun helm-completion-eww-affixation (_completions)
