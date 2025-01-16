@@ -883,6 +883,7 @@ new libraries are found, however when a library update its
 headers and the description change you can reset the caches with
 a prefix arg."
   (interactive "P")
+  (require 'helm-mode)
   (let (done)
     (when arg
       (setq helm--locate-library-cache nil)
