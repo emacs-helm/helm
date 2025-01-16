@@ -2016,13 +2016,13 @@ Directories expansion is not supported."
   (with-temp-buffer
     (let (desc)
       (cl-letf (((symbol-function 'message) 'ignore))
-        (insert-file-contents file nil 0 80))
+        (insert-file-contents file nil 0 128))
       (goto-char (point-min))
-      (when (re-search-forward "^;;;\\(.*\\) ---? \\(.*\\)" (pos-eol) t)
+      (when (re-search-forward "^;;;?\\(.*\\) ---? \\(.*\\)" (pos-eol) t)
         (setq desc (match-string-no-properties 2)))
       (if (or (null desc) (string= "" desc))
           "Not documented"
-        (car (split-string desc " +-*-"))))))
+        (car (split-string desc "-\\*-" nil "[ \t\n\r-]+"))))))
 
 (defun helm-local-directory-files (directory &rest args)
   "Run `directory-files' without tramp file name handlers.
