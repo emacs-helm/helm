@@ -884,12 +884,14 @@ E.g. prepended with *."
 
 (defun helm-bookmark-get-defaults ()
   "Get default bookmark names at point for `bookmark-set'."
-  (let* (bookmark-current-bookmark
-         (record (bookmark-make-record)))
+  (let* (bookmark-current-bookmark no-defaults
+         (record (condition-case _err
+                     (bookmark-make-record)
+                   (error (setq no-defaults t)))))
     ;; Not sure `bookmark-make-record' set 'defaults prop in older Emacs.
-    (helm-aif (bookmark-prop-get record 'defaults)
-        it
-      (list (buffer-name helm-current-buffer)))))
+    (or (bookmark-prop-get record 'defaults)
+        (unless no-defaults
+          (list (buffer-name helm-current-buffer))))))
 
 ;;; bookmark annotations
 ;;
