@@ -464,23 +464,6 @@ Like `this-command' but return the real command, and not
 
 ;;; Iterators
 ;;
-(cl-defmacro helm-position (item seq &key test all)
-  "A simple and faster replacement of CL `position'.
-
-Returns ITEM first occurence position found in SEQ.
-When SEQ is a string, ITEM have to be specified as a char.
-Argument TEST when unspecified default to `eq'.
-When argument ALL is non-nil return a list of all ITEM positions
-found in SEQ."
-  (let ((key (if (stringp seq) 'across 'in)))
-    `(cl-loop with deftest = 'eq
-              for c ,key ,seq
-              for index from 0
-              when (funcall (or ,test deftest) c ,item)
-              if ,all collect index into ls
-              else return index
-              finally return ls)))
-
 (defun helm-iter-list (seq &optional cycle)
   "Return an iterator object from SEQ.
 The iterator die and return nil when it reach end of SEQ.
@@ -1191,6 +1174,21 @@ Examples:
                      sequence))
          (pos      (1+ (helm-position elm new-seq :test 'equal))))
     (append (nthcdr pos new-seq) (helm-take new-seq pos))))
+
+(cl-defun helm-position (elm seq &key (test 'eq) from-end)
+  "Return position of ELM in SEQ.
+Comparison is tested with keyword TEST which default to `eq'.
+If keyword FROM-END is non nil search from end."
+  (let ((count (if from-end (1- (length seq)) 0)))
+    (while (if from-end
+               (not (zerop count))
+             (<= count (1- (length seq))))
+      (when (funcall test (if (listp seq)
+                              (car (nthcdr count seq))
+                            (aref seq count))
+                     elm)
+        (cl-return-from helm-position count))
+      (setq count (funcall (if from-end #'1- #'1+) count)))))
 
 ;;; Strings processing.
 ;;
