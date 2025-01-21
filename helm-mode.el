@@ -1167,9 +1167,11 @@ should be specified as a string and the category as a symbol.")
                      (propertize
                       (symbol-name major-mode) 'face 'helm-completions-detailed)))
              (size (helm-buffer-size buf))
-             (max-len helm-buffer-max-length)
+             (max-len (helm-acase helm-buffer-max-length
+                        ((guard* (numberp it)) it)
+                        (t 20)))
              (bname (truncate-string-to-width
-                     comp helm-buffer-max-length nil nil
+                     comp max-len nil nil
                      helm-buffers-end-truncated-string))
              (suffix (format "%s%s%s%s%s `%s'"
                              (make-string (1+ (- max-len (length bname))) ? )
