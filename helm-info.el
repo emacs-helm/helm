@@ -279,9 +279,10 @@ helm-info-<CANDIDATE>."
                  for sep = (helm-make-separator c longest)
                  for file = (or
                              (assoc-default c helm-info--files-cache)
-                             (let ((file (Info-find-file c)))
-                               (push (cons c file) helm-info--files-cache)
-                               file))
+                             (let ((file (Info-find-file c t)))
+                               (when file
+                                 (push (cons c file) helm-info--files-cache)
+                                 file)))
                  for doc = (and file
                                 (or completions-detailed helm-completions-detailed)
                                 (or (gethash file helm-info--files-doc-cache)

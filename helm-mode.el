@@ -1447,9 +1447,10 @@ is used."
                                 blist nil))))
                     found)
                   (assoc-default comp helm-info--files-cache)
-                  (let ((file (Info-find-file comp)))
-                    (push (cons comp file) helm-info--files-cache)
-                    file)))
+                  (let ((file (Info-find-file comp t)))
+                    (when file
+                      (push (cons comp file) helm-info--files-cache)
+                      file))))
            (summary (or (gethash file helm-info--files-doc-cache)
                         (puthash file (helm-info-file-doc file)
                                  helm-info--files-doc-cache))))
