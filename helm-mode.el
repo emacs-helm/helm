@@ -1062,7 +1062,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                 (category . charset)))
     (man . (metadata
             (popup-info-function . helm-completion-man-popup-info)
-            (category . man))))
+            (category . man)))
+    (info . (metadata
+             (affixation-function . helm-completion-info-file-affixation)
+             (category . info))))
   "Extra metadatas for completing-read.
 
 It is used to add `affixation-function' or `annotation-function' if original
@@ -1128,6 +1131,7 @@ FLAGS is a list of variables to renitialize to nil when exiting or quitting.")
     ("universal-coding-system-argument" . coding-system)
     ("read-color" . color)
     ("list-charset-chars" . charset)
+    ("info-display-manual" . info)
     ;; Emacs-30 only
     ("eww" . eww-help))
   "An alist to specify metadata category by command.
@@ -1456,22 +1460,6 @@ is used."
             ""
             (helm-aand (propertize summary 'face 'helm-completions-detailed)
                        (propertize " " 'display (concat sep it)))))))
-
-(defun helm--info-display-manual-with-affixation (orig-fun &rest args)
-  ;; The `info-display-manual' uses just a plain list and `completion-metadata'
-  ;; doesn't return a metadata with category. Use advice to inject affixation
-  ;; function, but only when user hasn't specify a one already.
-  (interactive
-   (lambda (spec)
-     (let ((completion-extra-properties
-            (if (and
-                 (or completions-detailed helm-completions-detailed)
-                 (not (plist-get :affixation-function completion-extra-properties)))
-                (plist-put completion-extra-properties
-                           :affixation-function #'helm-completion-info-file-affixation)
-              completion-extra-properties)))
-       (advice-eval-interactive-spec spec))))
-    (apply orig-fun args))
 
 
 ;;; Completing read handlers
@@ -2984,7 +2972,6 @@ Note: This mode is incompatible with Emacs23."
           ;; to advice it.
           (advice-add 'ffap-read-file-or-url :override #'helm-advice--ffap-read-file-or-url))
         (advice-add 'read-buffer-to-switch :override #'helm-mode--read-buffer-to-switch)
-        (advice-add 'info-display-manual :around  #'helm--info-display-manual-with-affixation)
         (helm-minibuffer-history-mode 1))
     (progn
       (remove-function completing-read-function #'helm--completing-read-default)
@@ -2995,7 +2982,6 @@ Note: This mode is incompatible with Emacs23."
       (when (fboundp 'ffap-read-file-or-url-internal)
         (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url))
       (advice-remove 'read-buffer-to-switch #'helm-mode--read-buffer-to-switch)
-      (advice-remove 'info-display-manual #'helm--info-display-manual-with-affixation)
       (helm-minibuffer-history-mode -1))))
 
 (provide 'helm-mode)
