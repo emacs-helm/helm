@@ -144,6 +144,7 @@ If line have a node use the node, otherwise use directly first name found."
    (filtered-candidate-transformer
     :initform
     (lambda (candidates _source)
+      (require 'helm-mode)
       (cl-loop for line in candidates
                when (string-match helm-info--node-regexp line)
                do (progn
@@ -153,7 +154,7 @@ If line have a node use the node, otherwise use directly first name found."
                      nil line)
                     (helm-add-face-text-properties
                      (match-beginning 2) (match-end 2)
-                     'font-lock-warning-face
+                     'helm-completions-detailed
                      nil line))
                collect line)))
    (display-to-real :initform #'helm-info-display-to-real)
