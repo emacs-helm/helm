@@ -34,6 +34,7 @@
 (declare-function ring-ref "ring")
 (defvar Info-history)
 (defvar Info-directory-list)
+(defvar helm-completions-detailed)
 ;; `Info-minibuf-history' is not declared in Emacs, see emacs bug/58786.
 (when (and (> emacs-major-version 28)
            (not (boundp 'Info-minibuf-history)))
@@ -240,15 +241,71 @@ helm-info-<CANDIDATE>."
       (funcall helm-info-function)
       (ring-insert helm-info-searched candidate))))
 
+(defvar helm-info--files-cache nil)
+(defvar helm-info--files-doc-cache (make-hash-table :test 'equal))
+
+(defun helm-info-file-doc (file)
+  "Return dir entry from the Info FILE."
+  (or
+   (with-temp-buffer
+     (ignore-errors (info-insert-file-contents file))
+     (goto-char (point-min))
+     (when (re-search-forward (rx line-start "START-INFO-DIR-ENTRY" line-end)
+                              nil t)
+       (forward-line 1)
+       (when (re-search-forward
+              (rx line-start
+                  "*" (one-or-more whitespace)
+                  (group (one-or-more (not ":")))
+                  ":" (one-or-more whitespace)
+                  "(" (one-or-more (not ")"))
+                  ")." (one-or-more whitespace)
+                  (group (one-or-more any)))
+              (pos-eol) t)
+         (format "%s: %s"
+                 (match-string 1) (match-string 2)))))
+   "No summary"))
+
 (defun helm-def-source--info-files ()
   "Return a Helm source for Info files."
+  (require 'helm-mode)
   (helm-build-sync-source "Helm Info"
     :candidates
     (lambda () (copy-sequence helm-default-info-index-list))
     :candidate-number-limit 999
     :candidate-transformer
     (lambda (candidates)
-      (sort candidates #'string-lessp))
+      (let ((candidates (sort candidates #'string-lessp))
+            (longest (apply #'max (mapcar #'length candidates)))
+            done)
+        (cl-loop with reporter = (unless done
+                                   (make-progress-reporter
+                                    "Scanning libraries..." 0 (length candidates)))
+                 for c in candidates
+                 for count from 0
+                 for sep = (helm-make-separator c longest)
+                 for file = (or
+                             (assoc-default c helm-info--files-cache)
+                             (let ((file (Info-find-file c)))
+                               (push (cons c file) helm-info--files-cache)
+                               file))
+                 for doc = (and file
+                                (or completions-detailed helm-completions-detailed)
+                                (or (gethash file helm-info--files-doc-cache)
+                                    (puthash file (helm-info-file-doc file)
+                                             helm-info--files-doc-cache)))
+                 for disp = (and file
+                                 (if (and doc
+                                          (or completions-detailed helm-completions-detailed))
+                                     (helm-aand (propertize doc 'face 'helm-completions-detailed)
+                                                (propertize " " 'display (concat sep it))
+                                                (concat c it))
+                                   c))
+                 when disp
+                 collect (cons disp c)
+                 when reporter do (progress-reporter-update reporter count)
+                 finally do (setq done t)))
+      )
     :nomark t
     :action '(("Search index" . helm-info-search-index))))
 
@@ -260,18 +317,28 @@ With a prefix argument \\[universal-argument], set REFRESH to
 non-nil.
 
 Optional parameter REFRESH, when non-nil, re-evaluates
-`helm-default-info-index-list'.  If the variable has been
-customized, set it to its saved value.  If not, set it to its
-standard value. See `custom-reevaluate-setting' for more.
+`helm-default-info-index-list' and clears caches (see below).
+If the variable has been customized, set it to its saved value.
+If not, set it to its standard value.  See
+`custom-reevaluate-setting' for more.
 
 REFRESH is useful when new Info files are installed.  If
 `helm-default-info-index-list' has not been customized, the new
-Info files are made available."
+Info files are made available.
+
+When `completions-detailed' or `helm-completions-detailed' is non
+nil, a description of Info files is provided.  The Info files are
+partially cached in the variables `helm-info--files-cache' and
+`helm-info--files-docs-cache'.  TIP: You can make these vars
+persistent for faster start with the psession package, using
+\\[psession-make-persistent-variable]."
   (interactive "P")
   (let ((default (unless (ring-empty-p helm-info-searched)
                    (ring-ref helm-info-searched 0))))
     (when refresh
-      (custom-reevaluate-setting 'helm-default-info-index-list))
+      (custom-reevaluate-setting 'helm-default-info-index-list)
+      (setq helm-info--files-cache nil)
+      (clrhash helm-info--files-doc-cache))
     (helm :sources (helm-def-source--info-files)
           :buffer "*helm Info*"
           :preselect (and default
