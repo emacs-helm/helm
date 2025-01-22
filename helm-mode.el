@@ -1435,10 +1435,7 @@ is used."
                   ;; wrong file. For example, the latter can happen after a
                   ;; development version of info file has been opened.
                   (let ((blist (buffer-list))
-                           (manual-re (rx-to-string `(seq (or "/" string-start)
-                                                          ,comp
-                                                          (or "." string-end))
-                                                    t))
+                           (manual-re (concat "/\\|\\`" comp "\\.\\|\\'"))
                            (case-fold-search t)
                            found)
                     (dolist (buffer blist)

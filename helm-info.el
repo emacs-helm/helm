@@ -250,17 +250,10 @@ helm-info-<CANDIDATE>."
    (with-temp-buffer
      (ignore-errors (info-insert-file-contents file))
      (goto-char (point-min))
-     (when (re-search-forward (rx line-start "START-INFO-DIR-ENTRY" line-end)
-                              nil t)
+     (when (re-search-forward "^START-INFO-DIR-ENTRY$" nil t)
        (forward-line 1)
        (when (re-search-forward
-              (rx line-start
-                  "*" (one-or-more whitespace)
-                  (group (one-or-more (not ":")))
-                  ":" (one-or-more whitespace)
-                  "(" (one-or-more (not ")"))
-                  ")." (one-or-more whitespace)
-                  (group (one-or-more any)))
+              "^\\*[[:space:]]+\\([^:]+\\):[[:space:]]+([^)]+)\\.[[:space:]]+\\(.+\\)"
               (pos-eol) t)
          (format "%s: %s"
                  (match-string 1) (match-string 2)))))
