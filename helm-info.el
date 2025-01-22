@@ -331,7 +331,13 @@ nil, a description of Info files is provided.  The Info files are
 partially cached in the variables `helm-info--files-cache' and
 `helm-info--files-docs-cache'.  TIP: You can make these vars
 persistent for faster start with the psession package, using
-\\[psession-make-persistent-variable]."
+\\[psession-make-persistent-variable].
+
+NOTE: The caches affect as well `info-dislpay-manual' when
+`helm-mode' is enabled and `completions-detailed' is non nil.
+When new Info files are installed, for example a library update
+changed Info dir node entry, you can reset the caches with
+a prefix arg."
   (interactive "P")
   (let ((default (unless (ring-empty-p helm-info-searched)
                    (ring-ref helm-info-searched 0))))

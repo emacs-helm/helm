@@ -34,6 +34,9 @@
 (defvar helm--locate-library-cache)
 (defvar completion-lazy-hilit) ; Emacs-30 only.
 (defvar eww-bookmarks)
+(defvar helm-info--files-cache)
+(defvar helm-info--files-doc-cache)
+(defvar Info-current-file)
 
 ;; No warnings in Emacs built --without-x
 (declare-function x-file-dialog "xfns.c")
@@ -51,6 +54,8 @@
 (declare-function print-coding-system-briefly "mul-diag.el")
 (declare-function color-rgb-to-hex "color.el")
 (declare-function find-library-name "find-func.el")
+(declare-function helm-info-file-doc "helm-info")
+(declare-function Info-find-file "info")
 
 (defgroup helm-mode nil
   "Enable helm completion."
@@ -1409,6 +1414,65 @@ is used."
                                    'face 'helm-completions-detailed)
                        (propertize " " 'display (concat it sep)))
             ""))))
+
+(defun helm-completion-info-file-affixation (_completions)
+  ;; We share here the same cache as `helm-info'.
+  (require 'info)
+  (require 'helm-info)
+  (lambda (comp)
+    (let* ((sep (helm-make-separator comp))
+           (file (or
+                  ;; The `info-display-manual' favours `Info-mode'
+                  ;; buffers. However, each buffer like that may be opened from
+                  ;; a file that has not been installed and is not visible to a
+                  ;; `Info-find-file'. Retrieve the such a file name from the
+                  ;; buffer, and use it to scan for affixation, however don't
+                  ;; cache the result in `helm-info--files-cache' to avoid using
+                  ;; wrong file. For example, the latter can happen after a
+                  ;; development version of info file has been opened.
+                  (let ((blist (buffer-list))
+                           (manual-re (rx-to-string `(seq (or "/" string-start)
+                                                          ,comp
+                                                          (or "." string-end))
+                                                    t))
+                           (case-fold-search t)
+                           found)
+                    (dolist (buffer blist)
+                      (with-current-buffer buffer
+                        (when (and (derived-mode-p 'Info-mode)
+		                           (stringp Info-current-file)
+		                           (string-match manual-re Info-current-file))
+	                      (setq found Info-current-file
+                                blist nil))))
+                    found)
+                  (assoc-default comp helm-info--files-cache)
+                  (let ((file (Info-find-file comp)))
+                    (push (cons comp file) helm-info--files-cache)
+                    file)))
+           (summary (or (gethash file helm-info--files-doc-cache)
+                        (puthash file (helm-info-file-doc file)
+                                 helm-info--files-doc-cache))))
+      (list comp
+            ""
+            (helm-aand (propertize summary 'face 'helm-completions-detailed)
+                       (propertize " " 'display (concat sep it)))))))
+
+(defun helm--info-display-manual-with-affixation (orig-fun &rest args)
+  ;; The `info-display-manual' uses just a plain list and `completion-metadata'
+  ;; doesn't return a metadata with category. Use advice to inject affixation
+  ;; function, but only when user hasn't specify a one already.
+  (interactive
+   (lambda (spec)
+     (let ((completion-extra-properties
+            (if (and
+                 (or completions-detailed helm-completions-detailed)
+                 (not (plist-get :affixation-function completion-extra-properties)))
+                (plist-put completion-extra-properties
+                           :affixation-function #'helm-completion-info-file-affixation)
+              completion-extra-properties)))
+       (advice-eval-interactive-spec spec))))
+    (apply orig-fun args))
+
 
 ;;; Completing read handlers
 ;;
@@ -2920,6 +2984,7 @@ Note: This mode is incompatible with Emacs23."
           ;; to advice it.
           (advice-add 'ffap-read-file-or-url :override #'helm-advice--ffap-read-file-or-url))
         (advice-add 'read-buffer-to-switch :override #'helm-mode--read-buffer-to-switch)
+        (advice-add 'info-display-manual :around  #'helm--info-display-manual-with-affixation)
         (helm-minibuffer-history-mode 1))
     (progn
       (remove-function completing-read-function #'helm--completing-read-default)
@@ -2930,6 +2995,7 @@ Note: This mode is incompatible with Emacs23."
       (when (fboundp 'ffap-read-file-or-url-internal)
         (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url))
       (advice-remove 'read-buffer-to-switch #'helm-mode--read-buffer-to-switch)
+      (advice-remove 'info-display-manual #'helm--info-display-manual-with-affixation)
       (helm-minibuffer-history-mode -1))))
 
 (provide 'helm-mode)
