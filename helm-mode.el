@@ -1442,9 +1442,10 @@ is used."
                       (with-current-buffer buffer
                         (when (and (derived-mode-p 'Info-mode)
 		                           (stringp Info-current-file)
-		                           (string-match manual-re Info-current-file))
+		                           (string-match manual-re
+                                                         Info-current-file))
 	                      (setq found Info-current-file
-                                blist nil))))
+                                    blist nil))))
                     found)
                   (assoc-default comp helm-info--files-cache)
                   (let ((file (Info-find-file comp t)))

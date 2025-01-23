@@ -273,7 +273,8 @@ helm-info-<CANDIDATE>."
             done)
         (cl-loop with reporter = (unless done
                                    (make-progress-reporter
-                                    "Scanning libraries..." 0 (length candidates)))
+                                    "Scanning libraries..."
+                                    0 (length candidates)))
                  for c in candidates
                  for count from 0
                  for sep = (helm-make-separator c longest)
@@ -284,22 +285,26 @@ helm-info-<CANDIDATE>."
                                  (push (cons c file) helm-info--files-cache)
                                  file)))
                  for doc = (and file
-                                (or completions-detailed helm-completions-detailed)
+                                (or completions-detailed
+                                    helm-completions-detailed)
                                 (or (gethash file helm-info--files-doc-cache)
                                     (puthash file (helm-info-file-doc file)
                                              helm-info--files-doc-cache)))
                  for disp = (and file
                                  (if (and doc
-                                          (or completions-detailed helm-completions-detailed))
-                                     (helm-aand (propertize doc 'face 'helm-completions-detailed)
-                                                (propertize " " 'display (concat sep it))
+                                          (or completions-detailed
+                                              helm-completions-detailed))
+                                     (helm-aand (propertize
+                                                 doc 'face
+                                                 'helm-completions-detailed)
+                                                (propertize
+                                                 " " 'display (concat sep it))
                                                 (concat c it))
                                    c))
                  when disp
                  collect (cons disp c)
                  when reporter do (progress-reporter-update reporter count)
-                 finally do (setq done t)))
-      )
+                 finally do (setq done t))))
     :nomark t
     :action '(("Search index" . helm-info-search-index))))
 
