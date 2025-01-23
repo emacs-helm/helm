@@ -255,7 +255,7 @@ helm-info-<CANDIDATE>."
        (when (re-search-forward
               "^\\*[[:space:]]+\\([^:]+\\):[[:space:]]+([^)]+)\\.[[:space:]]+\\(.+\\)"
               (pos-eol) t)
-         (format "%s: %s"
+         (format-message "%s: %s"
                  (match-string 1) (match-string 2)))))
    "No summary"))
 
