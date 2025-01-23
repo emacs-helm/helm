@@ -1434,20 +1434,16 @@ is used."
                   ;; cache the result in `helm-info--files-cache' to avoid using
                   ;; wrong file. For example, the latter can happen after a
                   ;; development version of info file has been opened.
-                  (let ((blist (buffer-list))
-                        (manual-re (concat "\\(/\\|\\`\\)" comp
+                  (let ((manual-re (concat "\\(/\\|\\`\\)" comp
                                            "\\(\\.\\|\\'\\)"))
-                        (case-fold-search t)
-                        found)
-                    (dolist (buffer blist)
-                      (with-current-buffer buffer
-                        (when (and (derived-mode-p 'Info-mode)
-		                   (stringp Info-current-file)
-		                   (string-match manual-re
-                                                 Info-current-file))
-	                  (setq found Info-current-file
-                                blist nil))))
-                    found)
+                        (case-fold-search t))
+                    (cl-loop for buffer in (buffer-list) thereis
+                             (with-current-buffer buffer
+                               (when (and (derived-mode-p 'Info-mode)
+		                          (stringp Info-current-file)
+		                          (string-match
+                                           manual-re Info-current-file))
+	                         Info-current-file))))
                   (assoc-default comp helm-info--files-cache)
                   (let ((file (Info-find-file comp t)))
                     (when file
