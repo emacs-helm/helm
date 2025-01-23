@@ -1445,10 +1445,8 @@ is used."
                                            manual-re Info-current-file))
 	                         Info-current-file))))
                   (assoc-default comp helm-info--files-cache)
-                  (let ((file (Info-find-file comp t)))
-                    (when file
-                      (push (cons comp file) helm-info--files-cache)
-                      file))))
+                  (helm-aif (Info-find-file comp t)
+                      (prog1 it (push (cons comp it) helm-info--files-cache)))))
            (summary (or (gethash file helm-info--files-doc-cache)
                         (puthash file (helm-info-file-doc file)
                                  helm-info--files-doc-cache))))
