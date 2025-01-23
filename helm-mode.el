@@ -1435,8 +1435,8 @@ is used."
                   ;; cache the result in `helm-info--files-cache' to avoid using
                   ;; wrong file. For example, the latter can happen after a
                   ;; development version of info file has been opened.
-                  (let ((manual-re (concat "\\(/\\|\\`\\)" comp
-                                           "\\(\\.\\|\\'\\)"))
+                  (let ((manual-re (concat "\\(?:/\\|\\`\\)" comp
+                                           "\\(?:\\.\\|\\'\\)"))
                         (case-fold-search t))
                     (cl-loop for buffer in (buffer-list) thereis
                              (with-current-buffer buffer
