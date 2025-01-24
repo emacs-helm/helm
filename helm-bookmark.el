@@ -20,6 +20,7 @@
 (require 'bookmark)
 (require 'helm)
 (require 'helm-lib)
+(require 'helm-icons)
 (require 'helm-help)
 (require 'helm-types)
 (require 'helm-utils)
@@ -29,14 +30,7 @@
 
 (declare-function helm-browse-project "helm-files" (arg))
 (declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
-(declare-function all-the-icons-fileicon     "ext:all-the-icons.el")
-(declare-function all-the-icons-icon-for-file"ext:all-the-icons.el")
-(declare-function all-the-icons-octicon      "ext:all-the-icons.el")
-(declare-function all-the-icons-match-to-alist "ext:all-the-icons.el")
-(declare-function all-the-icons-faicon "ext:all-the-icons.el")
-(declare-function eww-read-bookmarks "eww")
 
-(defvar all-the-icons-dir-icon-alist)
 (defvar eww-bookmarks)
 
 
@@ -63,14 +57,9 @@
   "List of sources to use in `helm-filtered-bookmarks'."
   :type '(repeat (choice symbol)))
 
-(defcustom helm-bookmark-use-icon nil
-  "Display candidates with an icon with `all-the-icons' when non nil.
-Don't use `setq' to set this."
-  :type 'boolean
-  :set (lambda (var val)
-         (if (require 'all-the-icons nil t)
-             (set var val)
-           (set var nil))))
+(defcustom helm-bookmark-use-icon t
+  "Display candidates with an icon with `helm-icons-provider' when non nil."
+  :type 'boolean)
 
 (defcustom helm-bookmark-default-sort-method 'adaptive
   "Sort method for `helm-filtered-bookmarks'.
@@ -644,20 +633,27 @@ If `browse-url-browser-function' is set to something else than
           for handlerp      = (and (fboundp 'bookmark-get-handler)
                                    (bookmark-get-handler i))
           for isw3m         = (and (fboundp 'helm-bookmark-w3m-bookmark-p)
-                                   (helm-bookmark-w3m-bookmark-p i))
+                                   (helm-bookmark-w3m-bookmark-p i)
+                                   'w3m-mode)
           for isgnus        = (and (fboundp 'helm-bookmark-gnus-bookmark-p)
-                                   (helm-bookmark-gnus-bookmark-p i))
+                                   (helm-bookmark-gnus-bookmark-p i)
+                                   'gnus-article-mode)
           for ismu4e        = (and (fboundp 'helm-bookmark-mu4e-bookmark-p)
-                                   (helm-bookmark-mu4e-bookmark-p i))
+                                   (helm-bookmark-mu4e-bookmark-p i)
+                                   'mu4e-view-mode)
           for isman         = (and (fboundp 'helm-bookmark-man-bookmark-p) ; Man
-                                   (helm-bookmark-man-bookmark-p i))
+                                   (helm-bookmark-man-bookmark-p i)
+                                   'man-common)
           for iswoman       = (and (fboundp 'helm-bookmark-woman-bookmark-p) ; Woman
-                                   (helm-bookmark-woman-bookmark-p i))
+                                   (helm-bookmark-woman-bookmark-p i)
+                                   'man-common)
           for isannotation  = (bookmark-get-annotation i)
           for isabook       = (string= (bookmark-prop-get i 'type)
                                        "addressbook")
-          for isinfo        = (eq handlerp 'Info-bookmark-jump)
-          for iseww         = (eq handlerp 'eww-bookmark-jump)
+          for iseww         = (and (eq handlerp 'eww-bookmark-jump)
+                                   'eww-mode)
+          for isinfo        = (and (eq handlerp 'Info-bookmark-jump)
+                                   'Info-mode)
           for loc = (bookmark-location i)
           for len =  (string-width i)
           for trunc = (if (and helm-bookmark-show-location
@@ -667,22 +663,28 @@ If `browse-url-browser-function' is set to something else than
                         i)
           for icon = (when helm-bookmark-use-icon
                        (cond ((and isfile hff)
-                              (helm-aif (or (all-the-icons-match-to-alist
-                                             (helm-basename (helm-basedir isfile t))
-                                             all-the-icons-dir-icon-alist)
-                                            (all-the-icons-match-to-alist
-                                             (helm-basename isfile)
-                                             all-the-icons-dir-icon-alist))
-                                  (apply (car it) (cdr it))
-                                (all-the-icons-octicon "file-directory")))
-                             ((or isw3m iseww)
-                              (all-the-icons-faicon "firefox"))
-                             ((and isfile isinfo) (all-the-icons-octicon "info"))
+                             ;;  (helm-aif (or (all-the-icons-match-to-alist
+                             ;;                 (helm-basename (helm-basedir isfile t))
+                             ;;                 all-the-icons-dir-icon-alist)
+                             ;;                (all-the-icons-match-to-alist
+                             ;;                 (helm-basename isfile)
+                             ;;                 all-the-icons-dir-icon-alist))
+                             ;;      (apply (car it) (cdr it))
+                             ;;    (all-the-icons-octicon "file-directory")))
+                             ;; ((or isw3m iseww)
+                             ;;  (all-the-icons-faicon "firefox"))
+                             ;; ((and isfile isinfo) (all-the-icons-octicon "info"))
+                              (helm-icons-file-icon isfile)
+                              (helm-icons-octicon-icon "file-directory"))
+                             (isw3m (helm-icons-mode-icon isw3m))
+                             (iseww (helm-icons-mode-icon iseww))
+                             ((and isfile isinfo) (helm-icons-mode-icon isinfo))
                              ((or iswoman isman)
-                              (all-the-icons-fileicon "man-page"))
+                              (helm-icons-mode-icon isman))
                              ((or isgnus ismu4e)
-                              (all-the-icons-octicon "mail-read"))
-                             (isfile (all-the-icons-icon-for-file (helm-basename isfile)))))
+                              (helm-icons-mode-icon (or isgnus
+                                                         ismu4e)))
+                             (isfile (helm-icons-file-icon (helm-basename isfile)))))
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))
           do (setq trunc (concat helm-bookmark-annotation-sign

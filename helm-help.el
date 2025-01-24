@@ -1245,7 +1245,7 @@ you will have to refresh manually directories when needed with `\\<helm-map>\\[h
 
 *** Prefix file candidates with icons
 
-If `all-the-icons' package is installed, turning on
+If `helm-icons-provider' package is installed, turning on
 `helm-ff-icon-mode' will show icons before files and directories.
 
 ** Commands

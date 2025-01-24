@@ -26,6 +26,7 @@
 (require 'helm-locate)
 (require 'helm-tags)
 (require 'helm-buffers)
+(require 'helm-icons)
 (require 'tramp)
 (eval-when-compile
   (require 'thingatpt)
@@ -87,16 +88,11 @@
 (declare-function dired-async-processes "ext:dired-async.el")
 (declare-function dired-async-mode-line-message "ext:dired-async.el")
 (declare-function dired-async--modeline-mode "ext:dired-async.el")
-(declare-function all-the-icons-icon-for-file "ext:all-the-icons.el")
-(declare-function all-the-icons-octicon "ext:all-the-icons.el")
-(declare-function all-the-icons-match-to-alist "ext:all-the-icons.el")
-(declare-function all-the-icons-material "ext:all-the-icons.el")
 (declare-function helm-adaptive-sort "ext:helm-adaptive.el")
 (declare-function wfnames-setup-buffer "ext:wfnames.el")
 (declare-function svg-lib-progress-bar "ext:svg-lib")
 (declare-function svg-lib-tag "ext:svg-lib")
 
-(defvar all-the-icons-dir-icon-alist)
 (defvar term-char-mode-point-at-process-mark)
 (defvar term-char-mode-buffer-read-only)
 (defvar recentf-list)
@@ -4142,8 +4138,8 @@ returned prefixed with its icon or unchanged."
                  (if helm-ff-icon-mode
                      (helm-acase (match-string 1 disp)
                        ("mailto:"
-                        (all-the-icons-octicon "mail"))
-                       (t (all-the-icons-octicon "link-external")))
+                        (helm-icons-octicon-icon "mail"))
+                       (t (helm-icons-octicon-icon "link-external")))
                    (propertize
                     " " 'display
                     (propertize "[@]" 'face 'helm-ff-prefix))))
@@ -4153,8 +4149,8 @@ returned prefixed with its icon or unchanged."
            (setq prefix-new
                  (if helm-ff-icon-mode
                      (if (string-match "/\\'" disp)
-                         (all-the-icons-material "create_new_folder")
-                       (all-the-icons-material "note_add"))
+                         (helm-icons-action-icon 'new-folder)
+                       (helm-icons-action-icon 'new-file))
                    (propertize
                     " " 'display
                     (propertize "[+]" 'face 'helm-ff-prefix))))
@@ -4427,29 +4423,17 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                        file))))))))
 
 (defun helm-ff-get-icon (disp file)
-  "Get icon from all-the-icons for FILE.
+  "Get icon from `helm-icons-provider' for FILE.
 Arg DISP is the display part of the candidate.
 Arg FILE is the real part of candidate, a filename with no props."
   (when helm-ff-icon-mode
-    (let ((icon (helm-acond (;; Non symlink directories.
-                             (helm-ff--is-dir-from-disp disp)
-                             (helm-aif (all-the-icons-match-to-alist
-                                        (helm-basename file)
-                                        all-the-icons-dir-icon-alist)
-                                 (apply (car it) (cdr it))
-                               (all-the-icons-octicon "file-directory")))
-                            (;; All files, symlinks may be symlink directories.
-                             (helm-ff--is-file-from-disp disp)
-                             ;; Detect symlink directories. We must call
-                             ;; `file-directory-p' here but it is
-                             ;; limited to symlinks, so it should not
-                             ;; degrade too much performances.
-                             (if (and (memq it '(helm-ff-symlink
-                                                 helm-ff-dotted-symlink-directory))
-                                      (file-directory-p file))
-                                 (all-the-icons-octicon "file-symlink-directory")
-                               (all-the-icons-icon-for-file (helm-basename file)))))))
-      (when icon (concat icon " ")))))
+    (when-let* ((icon (cond ((helm-ff--is-dir-from-disp disp)
+                             (helm-icons-directory-icon (helm-basename file)))
+                            ((helm-ff--is-file-from-disp disp)
+                             (helm-icons-file-icon (helm-basename file))))))
+      (concat icon " "))))
+
+
 
 (defun helm-ff--is-dir-from-disp (disp)
   "Return the face used for candidate when candidate is a directory."
@@ -4476,10 +4460,6 @@ Arg FILE is the real part of candidate, a filename with no props."
     "Display icons from `all-the-icons' package in HFF when enabled."
   :global t
   :group 'helm-files
-  (when helm-ff-icon-mode
-    (unless (require 'all-the-icons nil t)
-      (setq helm-ff-icon-mode nil)
-      (message "All The Icons package is not installed")))
   (clrhash helm-ff--list-directory-cache))
 
 (defun helm-find-files-action-transformer (actions candidate)
@@ -6710,10 +6690,9 @@ be existing directories."
                                  (propertize c 'face 'helm-history-deleted))))
            when disp
            collect (cons (if helm-ff-icon-mode
-                             (concat (all-the-icons-icon-for-file
+                             (concat (helm-icons-file-icon
                                       (helm-basename elm))
-                                     " " disp)
-                           disp)
+                                     " " disp) disp)
                          elm)))
 
 (defun helm-ff-file-name-history-ff (candidate)

@@ -21,6 +21,7 @@
 (require 'helm)
 (require 'helm-types)
 (require 'helm-utils)
+(require 'helm-icons)
 (require 'helm-grep)
 (require 'helm-regexp)
 (require 'helm-help)
@@ -29,10 +30,9 @@
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-browse-project "helm-files")
 (declare-function helm-ff-switch-to-shell "helm-files")
-(declare-function all-the-icons-icon-for-file "ext:all-the-icons.el")
-(declare-function all-the-icons-octicon "ext:all-the-icons.el")
 
-(defvar all-the-icons-mode-icon-alist)
+
+(defvar helm-icons-provider)
 (defvar dired-buffers)
 (defvar org-directory)
 (defvar helm-ff-default-directory)
@@ -173,14 +173,9 @@ Default to `helm-fuzzy-sort-fn' you can use
 you want to keep the recentest order when narrowing candidates."
   :type 'function)
 
-(defcustom helm-buffers-show-icons nil
-  "Prefix buffer names with an icon when non nil.
-Don't use `setq' to set this."
-  :type 'boolean
-  :set (lambda (var val)
-         (if (require 'all-the-icons nil t)
-             (set var val)
-           (set var nil))))
+(defcustom helm-buffers-show-icons t
+  "Prefix buffer names with an icon when non nil."
+  :type 'boolean)
 
 
 ;;; Faces
@@ -460,13 +455,11 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
            (ext (if buf-fname (helm-file-name-extension buf-fname) ""))
            (bmode (with-current-buffer buf-name major-mode))
            (icon (when helm-buffers-show-icons
-                   (helm-aif (assq bmode all-the-icons-mode-icon-alist)
-                       (apply (cadr it) (cddr it))
-                     (cond ((eq type 'dired)
-                            (all-the-icons-octicon "file-directory"))
-                           (buf-fname
-                            (all-the-icons-icon-for-file buf-name))
-                           (t (all-the-icons-octicon "star" :v-adjust 0.0))))))
+                   (cond ((eq type 'dired)
+                          (helm-icons-mode-icon 'dired-mode))
+                         (buf-fname
+                            (helm-icons-file-icon buf-name))
+                         (t (helm-icons-mode-icon bmode)))))
            (buf-name (propertize buf-name 'face face1
                                  'help-echo help-echo
                                  'type type)))
