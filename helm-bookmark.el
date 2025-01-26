@@ -231,7 +231,10 @@ will be honored."
     (lambda (_candidates _source)
       (list (or (and (not (string= helm-pattern ""))
                      helm-pattern)
-                "Enter a bookmark name to record")))
+                (concat (if helm-bookmark-use-icon
+                            (concat (helm-icons-action-icon 'new-file)
+                             " "))
+                "Enter a bookmark name to record"))))
     :action '(("Set bookmark" . (lambda (candidate)
                                   (if (string= helm-pattern "")
                                       (message "No bookmark name given for record")
