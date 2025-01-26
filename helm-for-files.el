@@ -183,22 +183,30 @@ Colorize only symlinks, directories and files."
            collect
            (cond ((and (null type) isremote) (cons disp i))
                  ((stringp type)
-                  (cons (propertize disp
-                                    'face 'helm-ff-symlink
-                                    'match-part (funcall mp-fn disp)
-                                    'help-echo (expand-file-name i))
-                        i))
+                  (cons (concat
+                         (cond (helm-ff-icon-mode
+                                (concat (helm-icons-file-icon i) " ")))
+                         (propertize disp
+                               'face 'helm-ff-symlink
+                               'match-part (funcall mp-fn disp)
+                               'help-echo (expand-file-name i))) i))
                  ((eq type t)
-                  (cons (propertize disp
-                                    'face 'helm-ff-directory
-                                    'match-part (funcall mp-fn disp)
-                                    'help-echo (expand-file-name i))
-                        i))
+                  (cons (concat
+                         (cond (helm-ff-icon-mode
+                                (concat (helm-icons-directory-icon i) " ")))
+                         (propertize disp
+                                     'face 'helm-ff-directory
+                                     'match-part (funcall mp-fn disp)
+                                     'help-echo (expand-file-name i))) i))
                  (t (let* ((ext (helm-file-name-extension disp))
-                           (disp (propertize disp
-                                             'face 'helm-ff-file
-                                             'match-part (funcall mp-fn disp)
-                                             'help-echo (expand-file-name i))))
+                           (disp (concat
+                                  (cond (helm-ff-icon-mode
+                                         (concat (helm-icons-file-icon i)
+                                                 " ")))
+                                  (propertize disp
+                                              'face 'helm-ff-file
+                                              'match-part (funcall mp-fn disp)
+                                              'help-echo (expand-file-name i)))))
                       (when (condition-case _err
                                 (string-match (format "\\.\\(%s\\)$" ext) disp)
                               (invalid-regexp nil))
