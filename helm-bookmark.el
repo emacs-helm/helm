@@ -165,7 +165,7 @@ will be honored."
                             (mapcar 'bookmark-name-from-full-record
                                     (bookmark-maybe-sort-alist))
                           (bookmark-all-names)))))
-    (filtered-candidate-transformer :initform 'helm-bookmark-transformer)
+    (filtered-candidate-transformer :initform 'helm-highlight-bookmark)
     (find-file-target :initform #'helm-bookmarks-quit-an-find-file-fn)))
 
 (defvar helm-source-bookmarks
