@@ -40,7 +40,7 @@
                  (const :tag "Disabled" nil)))
 
 (defcustom helm-icons-mode-icons-alist
-  '((dired-mode . dir-closed)
+  '((dired-mode . "dir-closed")
     (emacs-lisp-mode . "el")
     (spacemacs-buffer-mode . "el"))
   "Alist describing which mode should use which icon.
@@ -93,7 +93,7 @@ ARG-OVERRIDES is forwarded as is."
   "Return for MODE from `helm-icons-provider'.
 ARG-OVERRIDES is forwarded as is."
   (if-let* ((mode-icon (assoc mode helm-icons-mode-icons-alist)))
-      (helm-icons-file-icon mode-icon)
+      (helm-icons-file-icon (cdr mode-icon))
     (apply (helm-icons--provider-function
               helm-icons-provider
               'icon-for-mode) mode arg-overrides)))

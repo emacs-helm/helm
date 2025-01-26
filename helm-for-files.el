@@ -121,7 +121,6 @@ Be aware that a nil value will make tramp display very slow."
                      (when helm-turn-on-recentf (recentf-mode 1))))
    (candidates :initform (lambda () recentf-list))
    (pattern-transformer :initform 'helm-recentf-pattern-transformer)
-   (filtered-candidate-transformer #'helm-file-name-history-transformer)
    (match-part :initform (lambda (candidate)
                            (if (or helm-ff-transformer-show-only-basename
                                    helm-recentf--basename-flag)

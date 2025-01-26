@@ -30,6 +30,7 @@
 
 (declare-function helm-browse-project "helm-files" (arg))
 (declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
+(declare-function eww-read-bookmarks "eww")
 
 (defvar eww-bookmarks)
 
@@ -674,8 +675,7 @@ If `browse-url-browser-function' is set to something else than
                              ;; ((or isw3m iseww)
                              ;;  (all-the-icons-faicon "firefox"))
                              ;; ((and isfile isinfo) (all-the-icons-octicon "info"))
-                              (helm-icons-file-icon isfile)
-                              (helm-icons-octicon-icon "file-directory"))
+                              (helm-icons-directory-icon isfile))
                              (isw3m (helm-icons-mode-icon isw3m))
                              (iseww (helm-icons-mode-icon iseww))
                              ((and isfile isinfo) (helm-icons-mode-icon isinfo))
