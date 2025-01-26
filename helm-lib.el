@@ -357,9 +357,11 @@ object."
         "Return a list of all dependencies PKG has.
 This is done recursively."
         ;; Can we have circular dependencies?  Assume "nope".
-        (when-let* ((desc (cadr (assq pkg package-archive-contents)))
-                    (deps (mapcar #'car (package-desc-reqs desc))))
-          (delete-dups (apply #'nconc deps (mapcar #'package--dependencies deps))))))))
+        (let* ((desc (cadr (assq pkg package-archive-contents)))
+               (deps (and desc (mapcar #'car (package-desc-reqs desc)))))
+          (when deps
+            (delete-dups
+             (apply #'nconc deps (mapcar #'package--dependencies deps)))))))))
 
 ;;; Provide `help--symbol-class' not available in emacs-27
 ;;
