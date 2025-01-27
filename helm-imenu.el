@@ -23,9 +23,12 @@
 (require 'imenu)
 (require 'helm-utils)
 (require 'helm-help)
+(require 'helm-x-icons)
 
 (defvar all-the-icons-default-adjust)
 (defvar all-the-icons-scale-factor)
+(defvar nerd-icons-default-adjust)
+(defvar nerd-icons-scale-factor)
 
 (declare-function which-function "which-func")
 (declare-function all-the-icons-material "ext:all-the-icons.el")
@@ -100,7 +103,7 @@ Don't use `setq' to set this."
   :group 'helm-imenu
   :type 'boolean
   :set (lambda (var val)
-         (if (require 'all-the-icons nil t)
+         (if (require helm-x-icons-provider nil t)
              (set var val)
            (set var nil))))
 
@@ -111,11 +114,88 @@ Don't use `setq' to set this."
   :group 'helm-imenu
   :type 'boolean
   :set (lambda (var val)
-         (if (require 'all-the-icons nil t)
+         (if (require helm-x-icons-provider nil t)
              (set var val)
            (set var nil))))
 
-(defcustom helm-imenu-icon-type-alist
+(defcustom helm-imenu-nerd-icons-type-alist
+  '(("Array"           . (nerd-icons-faicon "nf-fa-crop" :face font-lock-builtin-face))
+    ("Arrays"          . (nerd-icons-faicon "nf-fa-crop" :face font-lock-builtin-face))
+    ("Boolean"         . (nerd-icons-faicon "nf-fa-crop" :face font-lock-builtin-face))
+    ("Booleans"        . (nerd-icons-octicon "nf-oct-package" :face font-lock-builtin-face))
+    ("Class"           . (nerd-icons-octicon "nf-oct-package" :face font-lock-type-face))
+    ("Classes"         . (nerd-icons-octicon "nf-oct-package" :face font-lock-type-face))
+    ("Color"           . (nerd-icons-mdicon "nf-md-color_lens" :face font-lock-builtin-face))
+    ("Colors"          . (nerd-icons-mdicon "nf-md-color_lens" :face font-lock-builtin-face))
+    ("Constant"        . (nerd-icons-faicon "nf-fa-crop" :face font-lock-builtin-face))
+    ("Constants"       . (nerd-icons-faicon "nf-fa-crop" :face font-lock-builtin-face))
+    ("Constructor"     . (nerd-icons-mdicon "nf-md-cube" :face font-lock-function-name-face))
+    ("Constructors"    . (nerd-icons-mdicon "nf-md-cube" :face font-lock-function-name-face))
+    ("Enum Member"     . (nerd-icons-codicon "nf-code-three_bars" :face font-lock-type-face))
+    ("Enum Members"    . (nerd-icons-codicon "nf-code-three_bars" :face font-lock-type-face))
+    ("Enum"            . (nerd-icons-mdicon "nf-md-cog" :face font-lock-type-face))
+    ("Enums"           . (nerd-icons-mdicon "nf-md-cog" :face font-lock-type-face))
+    ("Event"           . (nerd-icons-mdicon "nf-md-lightning_bolt" :face font-lock-builtin-face))
+    ("Events"          . (nerd-icons-mdicon "nf-md-lightning_bolt" :face font-lock-builtin-face))
+    ("Field"           . (nerd-icons-octicon "nf-code-three_bars" :face font-lock-type-face))
+    ("Fields"          . (nerd-icons-octicon "nf-code-three_bars" :face font-lock-type-face))
+    ("File"            . (nerd-icons-mdicon "nf-md-file" :face font-lock-variable-name-face))
+    ("Files"           . (nerd-icons-mdicon "nf-md-file" :face font-lock-variable-name-face))
+    ("Folder"          . (nerd-icons-mdicon "nf-md-folder" :face font-lock-variable-name-face))
+    ("Folders"         . (nerd-icons-mdicon "nf-md-folder" :face font-lock-variable-name-face))
+    ("Interface"       . (nerd-icons-octicon "nf-oct-package" :face font-lock-type-face))
+    ("Interfaces"      . (nerd-icons-octicon "nf-oct-package" :face font-lock-type-face))
+    ("Keyword"         . (nerd-icons-faicon  "nf-fa-key" :face font-lock-builtin-face))
+    ("Keywords"        . (nerd-icons-faicon  "nf-fa-key" :face font-lock-builtin-face))
+    ("Method"          . (nerd-icons-mdicon "nf-md-cube" :face font-lock-function-name-face))
+    ("Methods"         . (nerd-icons-mdicon "nf-md-cube" :face font-lock-function-name-face))
+    ("Defun"           . (nerd-icons-mdicon "nf-md-cube" :face font-lock-function-name-face))
+    ("Defuns"          . (nerd-icons-mdicon "nf-md-cube" :face font-lock-function-name-face))
+    ("Fn"              . (nerd-icons-mdicon "nf-md-cube" :face font-lock-function-name-face))
+    ("Fns"             . (nerd-icons-mdicon "nf-md-cube" :face font-lock-function-name-face))
+    ("Function"        . (nerd-icons-mdicon "nf-md-cube" :face font-lock-function-name-face))
+    ("Functions"       . (nerd-icons-mdicon "nf-md-cube" :face font-lock-function-name-face))
+    ("Misc"            . (nerd-icons-codicon "nf-cod-globe" :face font-lock-function-name-face))
+    ("Miscs"           . (nerd-icons-codicon "nf-cod-globe" :face font-lock-function-name-face))
+    ("Module"          . (nerd-icons-faicon "nf-fa-angle-double-right" :face font-lock-builtin-face))
+    ("Modules"         . (nerd-icons-faicon "nf-fa-angle-double-right" :face font-lock-builtin-face))
+    ("Numeric"         . (nerd-icons-faicon "nf-fa-crop" :face font-lock-builtin-face))
+    ("Numerics"        . (nerd-icons-faicon "nf-fa-crop" :face font-lock-builtin-face))
+    ("Object"          . (nerd-icons-faicon "nf-fa-angle-double-right" :face font-lock-builtin-face))
+    ("Objects"         . (nerd-icons-faicon "nf-fa-angle-double-right" :face font-lock-builtin-face))
+    ("Operator"        . (nerd-icons-mdicon "nf-md-calculator" :face font-lock-builtin-face))
+    ("Operators"       . (nerd-icons-mdicon "nf-md-calculator" :face font-lock-builtin-face))
+    ("Property"        . (nerd-icons-codicon "nf-cod-book" :face font-lock-variable-name-face))
+    ("Properties"      . (nerd-icons-codicon "nf-cod-book" :face font-lock-variable-name-face))
+    ("Reference"       . (nerd-icons-codicon "nf-cod-book" :face font-lock-variable-name-face))
+    ("References"      . (nerd-icons-codicon "nf-cod-book" :face font-lock-variable-name-face))
+    ("Snippet"         . (nerd-icons-mdicon "nf-md-border_style" :face font-lock-variable-name-face))
+    ("Snippets"        . (nerd-icons-mdicon "nf-md-border_style" :face font-lock-variable-name-face))
+    ("String"          . (nerd-icons-mdicon "nf-md-text" :face font-lock-variable-name-face))
+    ("Strings"         . (nerd-icons-mdicon "nf-md-text" :face font-lock-variable-name-face))
+    ("Struct"          . (nerd-icons-mdicon "nf-md-cog" :face font-lock-type-face))
+    ("Structs"         . (nerd-icons-mdicon "nf-md-cog" :face font-lock-type-face))
+    ("Text"            . (nerd-icons-mdicon "nf-md-text" :face font-lock-variable-name-face))
+    ("Texts"           . (nerd-icons-mdicon "nf-md-text" :face font-lock-variable-name-face))
+    ("Top level"       . (nerd-icons-octicon "nf-oct-package" :face font-lock-type-face))
+    ("Trait"           . (nerd-icons-octicon "nf-oct-package" :face font-lock-type-face))
+    ("Traits"          . (nerd-icons-octicon "package" :face font-lock-builtin-face))
+    ("Type"            . (nerd-icons-mdicon "nf-md-cog" :face font-lock-type-face))
+    ("Types"           . (nerd-icons-mdicon "nf-md-cog" :face font-lock-type-face))
+    ("Type Parameter"  . (nerd-icons-faicon "nf-fa-code" :face font-lock-type-face))
+    ("Type Parameters" . (nerd-icons-faicon "nf-fa-code" :face font-lock-type-face))
+    ("Unit"            . (nerd-icons-faicon "nf-fa-bar_chart" :face font-lock-builtin-face))
+    ("Units"           . (nerd-icons-faicon "nf-fa-bar_chart" :face font-lock-builtin-face))
+    ("Value"           . (nerd-icons-mdicon "nf-md-cog" :face font-lock-type-face))
+    ("Values"          . (nerd-icons-mdicon "nf-md-cog" :face font-lock-type-face))
+    ("Variable"        . (nerd-icons-codicon "nf-cod-book" :face font-lock-variable-name-face))
+    ("Variables"       . (nerd-icons-codicon "nf-cod-book":face font-lock-variable-name-face)))
+  "An alist of types associated with a sexp returning an icon.
+The sexp should be an `nerd-icons' function with its args."
+  :type '(alist :key-type string :value-type sexp)
+  :group 'helm-imenu)
+
+(defcustom helm-imenu-all-the-icons-type-alist
   '(("Array"           . (all-the-icons-material "crop" :face font-lock-builtin-face))
     ("Arrays"          . (all-the-icons-material "crop" :face font-lock-builtin-face))
     ("Boolean"         . (all-the-icons-material "crop" :face font-lock-builtin-face))
@@ -192,8 +272,13 @@ The sexp should be an `all-the-icons' function with its args."
   :type '(alist :key-type string :value-type sexp)
   :group 'helm-imenu)
 
+(defun helm-imenu-icon-type-alist ()
+  (helm-acase helm-x-icons-provider
+    (all-the-icons helm-imenu-all-the-icons-type-alist)
+    (nerd-icons helm-imenu-nerd-icons-type-alist)))
+
 (defcustom helm-imenu-default-type-sexp
-  '(all-the-icons-faicon "globe" :face font-lock-function-name-face)
+  '(helm-x-icons-faicon "globe" :face font-lock-function-name-face)
   "Default sexp to use when no type for an object is found."
   :type 'sexp
   :group 'helm-imenu)
@@ -432,9 +517,11 @@ The sexp should be an `all-the-icons' function with its args."
 The icon is found in `helm-imenu-icon-type-alist', if not
 `helm-imenu-default-type-sexp' is evaled to provide a default icon."
   (let ((all-the-icons-scale-factor 1.0)
-        (all-the-icons-default-adjust 0.0))
+        (all-the-icons-default-adjust 0.0)
+        (nerd-icons-scale-factor 1.0)
+        (nerd-icons-default-adjust 0.0))
     (or (helm-aand (assoc-default
-                    type helm-imenu-icon-type-alist)
+                    type (helm-imenu-icon-type-alist))
                    (apply (car it) (cdr it)))
         (apply (car helm-imenu-default-type-sexp)
                (cdr helm-imenu-default-type-sexp)))))
