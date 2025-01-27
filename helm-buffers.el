@@ -25,6 +25,7 @@
 (require 'helm-regexp)
 (require 'helm-help)
 (require 'helm-occur)
+(require 'helm-x-icons)
 
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-browse-project "helm-files")
@@ -37,6 +38,7 @@
 (defvar org-directory)
 (defvar helm-ff-default-directory)
 (defvar major-mode-remap-alist)
+(defvar nerd-icons-mode-icon-alist)
 
 
 (defgroup helm-buffers nil
@@ -178,7 +180,7 @@ you want to keep the recentest order when narrowing candidates."
 Don't use `setq' to set this."
   :type 'boolean
   :set (lambda (var val)
-         (if (require 'all-the-icons nil t)
+         (if (require helm-x-icons-provider nil t)
              (set var val)
            (set var nil))))
 
@@ -459,14 +461,18 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
     (let* ((buf-fname (buffer-file-name (get-buffer buf-name)))
            (ext (if buf-fname (helm-file-name-extension buf-fname) ""))
            (bmode (with-current-buffer buf-name major-mode))
+           (icon-alist (if (eq helm-x-icons-provider 'all-the-icons)
+                           all-the-icons-mode-icon-alist
+                         nerd-icons-mode-icon-alist))
            (icon (when helm-buffers-show-icons
-                   (helm-aif (assq bmode all-the-icons-mode-icon-alist)
-                       (apply (cadr it) (cddr it))
+                   (helm-aif (assq bmode icon-alist)
+                       (and helm-x-icons-provider
+                            (apply (cadr it) (cddr it)))
                      (cond ((eq type 'dired)
-                            (all-the-icons-octicon "file-directory"))
+                            (helm-x-icons-octicon "file-directory"))
                            (buf-fname
-                            (all-the-icons-icon-for-file buf-name))
-                           (t (all-the-icons-octicon "star" :v-adjust 0.0))))))
+                            (helm-x-icons-icon-for-file buf-name))
+                           (t (helm-x-icons-octicon "star" :v-adjust 0.0))))))
            (buf-name (propertize buf-name 'face face1
                                  'help-echo help-echo
                                  'type type)))
