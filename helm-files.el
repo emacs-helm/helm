@@ -35,6 +35,7 @@
 (require 'filenotify)
 (require 'image-mode)
 (require 'image-dired)
+(require 'helm-x-icons)
 
 (declare-function find-library-name "find-func.el" (library))
 (declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
@@ -4142,8 +4143,8 @@ returned prefixed with its icon or unchanged."
                  (if helm-ff-icon-mode
                      (helm-acase (match-string 1 disp)
                        ("mailto:"
-                        (all-the-icons-octicon "mail"))
-                       (t (all-the-icons-octicon "link-external")))
+                        (helm-x-icons-octicon "mail"))
+                       (t (helm-x-icons-octicon "link-external")))
                    (propertize
                     " " 'display
                     (propertize "[@]" 'face 'helm-ff-prefix))))
@@ -4153,8 +4154,8 @@ returned prefixed with its icon or unchanged."
            (setq prefix-new
                  (if helm-ff-icon-mode
                      (if (string-match "/\\'" disp)
-                         (all-the-icons-material "create_new_folder")
-                       (all-the-icons-material "note_add"))
+                         (helm-x-icons-material "create_new_folder")
+                       (helm-x-icons-material "note_add"))
                    (propertize
                     " " 'display
                     (propertize "[+]" 'face 'helm-ff-prefix))))
@@ -4429,17 +4430,17 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                        file))))))))
 
 (defun helm-ff-get-icon (disp file)
-  "Get icon from all-the-icons for FILE.
+  "Get icon from `helm-x-icons-provider' for FILE.
 Arg DISP is the display part of the candidate.
 Arg FILE is the real part of candidate, a filename with no props."
   (when helm-ff-icon-mode
     (let ((icon (helm-acond (;; Non symlink directories.
                              (helm-ff--is-dir-from-disp disp)
-                             (helm-aif (all-the-icons-match-to-alist
+                             (helm-aif (helm-x-icons-match-to-alist
                                         (helm-basename file)
-                                        all-the-icons-dir-icon-alist)
+                                        'dir)
                                  (apply (car it) (cdr it))
-                               (all-the-icons-octicon "file-directory")))
+                               (helm-x-icons-octicon "file-directory")))
                             (;; All files, symlinks may be symlink directories.
                              (helm-ff--is-file-from-disp disp)
                              ;; Detect symlink directories. We must call
@@ -4449,8 +4450,8 @@ Arg FILE is the real part of candidate, a filename with no props."
                              (if (and (memq it '(helm-ff-symlink
                                                  helm-ff-dotted-symlink-directory))
                                       (file-directory-p file))
-                                 (all-the-icons-octicon "file-symlink-directory")
-                               (all-the-icons-icon-for-file (helm-basename file)))))))
+                                 (helm-x-icons-octicon "file-symlink-directory")
+                               (helm-x-icons-icon-for-file (helm-basename file)))))))
       (when icon (concat icon " ")))))
 
 (defun helm-ff--is-dir-from-disp (disp)
@@ -4475,13 +4476,13 @@ Arg FILE is the real part of candidate, a filename with no props."
 
 ;;;###autoload
 (define-minor-mode helm-ff-icon-mode
-    "Display icons from `all-the-icons' package in HFF when enabled."
+    "Display icons from `helm-x-icons-provider' package in HFF when enabled."
   :global t
   :group 'helm-files
   (when helm-ff-icon-mode
-    (unless (require 'all-the-icons nil t)
+    (unless (require helm-x-icons-provider nil t)
       (setq helm-ff-icon-mode nil)
-      (message "All The Icons package is not installed")))
+      (message "No suitable Icons package found")))
   (clrhash helm-ff--list-directory-cache))
 
 (defun helm-find-files-action-transformer (actions candidate)
@@ -6712,7 +6713,7 @@ be existing directories."
                                  (propertize c 'face 'helm-history-deleted))))
            when disp
            collect (cons (if helm-ff-icon-mode
-                             (concat (all-the-icons-icon-for-file
+                             (concat (helm-x-icons-icon-for-file
                                       (helm-basename elm))
                                      " " disp)
                            disp)
