@@ -26,6 +26,7 @@
 (require 'helm-info)
 (require 'helm-adaptive)
 (require 'helm-net)
+(require 'helm-x-icons)
 
 (declare-function helm-browse-project "helm-files" (arg))
 (declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
@@ -68,7 +69,8 @@
 Don't use `setq' to set this."
   :type 'boolean
   :set (lambda (var val)
-         (if (require 'all-the-icons nil t)
+         (if (or (require 'all-the-icons nil t)
+                 (require 'nerd-icons nil t))
              (set var val)
            (set var nil))))
 
@@ -667,22 +669,22 @@ If `browse-url-browser-function' is set to something else than
                         i)
           for icon = (when helm-bookmark-use-icon
                        (cond ((and isfile hff)
-                              (helm-aif (or (all-the-icons-match-to-alist
+                              (helm-aif (or (helm-x-icons-match-to-alist
                                              (helm-basename (helm-basedir isfile t))
-                                             all-the-icons-dir-icon-alist)
-                                            (all-the-icons-match-to-alist
+                                             'dir)
+                                            (helm-x-icons-match-to-alist
                                              (helm-basename isfile)
-                                             all-the-icons-dir-icon-alist))
+                                             'dir))
                                   (apply (car it) (cdr it))
-                                (all-the-icons-octicon "file-directory")))
+                                (helm-x-icons-octicon "file-directory")))
                              ((or isw3m iseww)
-                              (all-the-icons-faicon "firefox"))
-                             ((and isfile isinfo) (all-the-icons-octicon "info"))
+                              (helm-x-icons-faicon "firefox"))
+                             ((and isfile isinfo) (helm-x-icons-octicon "info"))
                              ((or iswoman isman)
-                              (all-the-icons-fileicon "man-page"))
+                              (helm-x-icons-fileicon "man-page"))
                              ((or isgnus ismu4e)
-                              (all-the-icons-octicon "mail-read"))
-                             (isfile (all-the-icons-icon-for-file (helm-basename isfile)))))
+                              (helm-x-icons-octicon "mail-read"))
+                             (isfile (helm-x-icons-icon-for-file (helm-basename isfile)))))
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))
           do (setq trunc (concat helm-bookmark-annotation-sign
