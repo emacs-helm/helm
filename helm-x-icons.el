@@ -112,10 +112,14 @@ May use other provider than faicon if ICON-NAME is not found in faicon."
   (let ((fn (helm-acase helm-x-icons-provider
               (all-the-icons #'all-the-icons-faicon)
               (nerd-icons #'nerd-icons-faicon))))
-    (if (and (eq helm-x-icons-provider 'nerd-icons)
-             (string= icon-name "firefox"))
-        (apply #'nerd-icons-faicon "nf-fa-firefox" args)
-      (and fn (apply fn icon-name args)))))
+    (when (eq helm-x-icons-provider 'nerd-icons)
+      (cond ((string= icon-name "firefox")
+             (setq fn #'nerd-icons-faicon
+                   icon-name "nf-fa-firefox"))
+            ((string= icon-name "globe")
+             (setq fn #'nerd-icons-faicon
+                   icon-name "nf-fa-globe"))))
+    (and fn (apply fn icon-name args))))
 
 (defun helm-x-icons-wicon (icon-name &rest args)
   "Compatibility function for wicon.
