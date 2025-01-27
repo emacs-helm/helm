@@ -64,8 +64,7 @@
 Don't use `setq' to set this."
   :type 'boolean
   :set (lambda (var val)
-         (if (or (require 'all-the-icons nil t)
-                 (require 'nerd-icons nil t))
+         (if (require helm-x-icons-provider nil t)
              (set var val)
            (set var nil))))
 
