@@ -4381,9 +4381,11 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                    (add-face-text-property 0 len-abbrev 'helm-ff-truename t abbrev)
                    ;; Colorize extension only on truename.
                    (add-face-text-property 0 len 'helm-ff-symlink nil disp)
-                   ;; As we use match-on-real we can use this safely,
-                   ;; abbrev will not be matched.
-                   (cons (concat (helm-ff-prefix-filename disp file) " -> " abbrev)
+                   (cons (helm-ff-prefix-filename
+                          ;; Use display prop instead of concating prevent
+                          ;; failure when preselecting after going up in tree (C-l).
+                          (propertize disp 'display (concat disp " -> " abbrev))
+                          file)
                          file)))
                 ;; A directory.
                 ((eq t type)
