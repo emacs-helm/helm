@@ -31,10 +31,6 @@
 (defvar nerd-icons-scale-factor)
 
 (declare-function which-function "which-func")
-(declare-function all-the-icons-material "ext:all-the-icons.el")
-(declare-function all-the-icons-octicon  "ext:all-the-icons.el")
-(declare-function all-the-icons-faicon   "ext:all-the-icons.el")
-(declare-function all-the-icons-wicon    "ext:all-the-icons.el")
 
 
 (defgroup helm-imenu nil

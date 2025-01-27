@@ -30,11 +30,6 @@
 
 (declare-function helm-browse-project "helm-files" (arg))
 (declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
-(declare-function all-the-icons-fileicon     "ext:all-the-icons.el")
-(declare-function all-the-icons-icon-for-file"ext:all-the-icons.el")
-(declare-function all-the-icons-octicon      "ext:all-the-icons.el")
-(declare-function all-the-icons-match-to-alist "ext:all-the-icons.el")
-(declare-function all-the-icons-faicon "ext:all-the-icons.el")
 (declare-function eww-read-bookmarks "eww")
 
 (defvar all-the-icons-dir-icon-alist)

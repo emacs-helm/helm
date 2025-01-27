@@ -30,8 +30,6 @@
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-browse-project "helm-files")
 (declare-function helm-ff-switch-to-shell "helm-files")
-(declare-function all-the-icons-icon-for-file "ext:all-the-icons.el")
-(declare-function all-the-icons-octicon "ext:all-the-icons.el")
 
 (defvar all-the-icons-mode-icon-alist)
 (defvar dired-buffers)
