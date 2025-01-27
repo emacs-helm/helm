@@ -161,7 +161,7 @@ the customize functions e.g. `customize-set-variable' and NOT
 
 (defcustom helm-current-directory-alist
   '((dired-mode . dired-current-directory)
-    (mu4e-main-mode . mu4e-maildir))
+    (mu4e-main-mode . mu4e-root-maildir))
   "Tell `helm-current-directory' what to use according to `major-mode'.
 Each element of alist is (MAJOR-MODE . SYMBOL) where SYMBOL is either a variable
 or a function."
