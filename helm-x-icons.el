@@ -33,7 +33,7 @@ The currently supported providers are `all-the-icons' and `nerd-icons'."
 
 (defun helm-x-icons-match-to-alist (file type)
   "Match FILE against an entry in ALIST using `string-match-p'.
-Supported TYPE are ext, regexp, url and dir."
+Supported TYPE are ext, regexp, mode, url and dir."
   (cl-loop with alist = (helm-x-icons-resolve-alist type)
            for (elm . rest) in alist
            for target = (if (eq type 'url) file (helm-basename file))
@@ -48,7 +48,8 @@ The returned alist is computed according to `helm-x-icons-provider'."
                       (ext "extension-icon-alist")
                       (regexp "regexp-icon-alist")
                       (dir "dir-icon-alist")
-                      (url "url-alist"))))
+                      (url "url-alist")
+                      (mode "mode-icon-alist"))))
     (symbol-value
      (intern-soft (concat provider-name "-" alist-name)))))
 

@@ -459,9 +459,7 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
     (let* ((buf-fname (buffer-file-name (get-buffer buf-name)))
            (ext (if buf-fname (helm-file-name-extension buf-fname) ""))
            (bmode (with-current-buffer buf-name major-mode))
-           (icon-alist (if (eq helm-x-icons-provider 'all-the-icons)
-                           all-the-icons-mode-icon-alist
-                         nerd-icons-mode-icon-alist))
+           (icon-alist (helm-x-icons-resolve-alist 'mode))
            (icon (when helm-buffers-show-icons
                    (helm-aif (assq bmode icon-alist)
                        (and helm-x-icons-provider
