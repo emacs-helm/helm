@@ -1,6 +1,6 @@
 ;;; helm-easymenu.el --- Helm easymenu definitions. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2015 ~ 2020 Thierry Volpiatto 
+;; Copyright (C) 2015 ~ 2020 Thierry Volpiatto
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

@@ -3,7 +3,7 @@
 ;; Original Author: rubikitch
 
 ;; Copyright (C) 2008 ~ 2011 rubikitch
-;; Copyright (C) 2011 ~ 2020 Thierry Volpiatto 
+;; Copyright (C) 2011 ~ 2020 Thierry Volpiatto
 
 ;; Author: Thierry Volpiatto 
 ;; URL: http://github.com/emacs-helm/helm

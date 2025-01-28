@@ -1,6 +1,6 @@
 ;;; helm-epa.el --- helm interface for epa/epg  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2012 ~ 2023 Thierry Volpiatto <thievol@posteo.net>
+;; Copyright (C) 2012 ~ 2025 Thierry Volpiatto <thievol@posteo.net>
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
