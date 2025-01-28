@@ -93,7 +93,6 @@
 (declare-function svg-lib-progress-bar "ext:svg-lib")
 (declare-function svg-lib-tag "ext:svg-lib")
 
-(defvar all-the-icons-dir-icon-alist)
 (defvar term-char-mode-point-at-process-mark)
 (defvar term-char-mode-buffer-read-only)
 (defvar recentf-list)

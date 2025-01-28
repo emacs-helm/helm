@@ -32,7 +32,6 @@
 (declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
 (declare-function eww-read-bookmarks "eww")
 
-(defvar all-the-icons-dir-icon-alist)
 (defvar eww-bookmarks)
 
 
