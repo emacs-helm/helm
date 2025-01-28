@@ -156,6 +156,10 @@ small.")
 ;;; Files in current dir
 ;;
 ;;
+;; Function `helm-highlight-files' is used in type `helm-type-file'. Ensure that
+;; the definition is available for clients, should they need it.
+;; See https://github.com/bbatsov/helm-projectile/issues/184.
+;;;###autoload
 (defun helm-highlight-files (files _source)
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
