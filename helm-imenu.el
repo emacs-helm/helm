@@ -274,7 +274,7 @@ The sexp should be an `all-the-icons' function with its args."
     (nerd-icons helm-imenu-nerd-icons-type-alist)))
 
 (defcustom helm-imenu-default-type-sexp
-  '(helm-x-icons-faicon "globe" :face font-lock-function-name-face)
+  '(helm-x-icons-generic "globe" :face font-lock-function-name-face)
   "Default sexp to use when no type for an object is found."
   :type 'sexp
   :group 'helm-imenu)

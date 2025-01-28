@@ -467,10 +467,10 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
                        (and helm-x-icons-provider
                             (apply (cadr it) (cddr it)))
                      (cond ((eq type 'dired)
-                            (helm-x-icons-octicon "file-directory"))
+                            (helm-x-icons-generic "file-directory"))
                            (buf-fname
                             (helm-x-icons-icon-for-file buf-name))
-                           (t (helm-x-icons-octicon "star" :v-adjust 0.0))))))
+                           (t (helm-x-icons-generic "star" :v-adjust 0.0))))))
            (buf-name (propertize buf-name 'face face1
                                  'help-echo help-echo
                                  'type type)))

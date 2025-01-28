@@ -4139,8 +4139,8 @@ returned prefixed with its icon or unchanged."
                  (if helm-ff-icon-mode
                      (helm-acase (match-string 1 disp)
                        ("mailto:"
-                        (helm-x-icons-octicon "mail"))
-                       (t (helm-x-icons-octicon "link-external")))
+                        (helm-x-icons-generic "mail"))
+                       (t (helm-x-icons-generic "link-external")))
                    (propertize
                     " " 'display
                     (propertize "[@]" 'face 'helm-ff-prefix))))
@@ -4150,8 +4150,8 @@ returned prefixed with its icon or unchanged."
            (setq prefix-new
                  (if helm-ff-icon-mode
                      (if (string-match "/\\'" disp)
-                         (helm-x-icons-material "create_new_folder")
-                       (helm-x-icons-material "note_add"))
+                         (helm-x-icons-generic "create_new_folder")
+                       (helm-x-icons-generic "note_add"))
                    (propertize
                     " " 'display
                     (propertize "[+]" 'face 'helm-ff-prefix))))
@@ -4436,7 +4436,7 @@ Arg FILE is the real part of candidate, a filename with no props."
                                         (helm-basename file)
                                         'dir)
                                  (apply (car it) (cdr it))
-                               (helm-x-icons-octicon "file-directory")))
+                               (helm-x-icons-generic "file-directory")))
                             (;; All files, symlinks may be symlink directories.
                              (helm-ff--is-file-from-disp disp)
                              ;; Detect symlink directories. We must call
@@ -4446,7 +4446,7 @@ Arg FILE is the real part of candidate, a filename with no props."
                              (if (and (memq it '(helm-ff-symlink
                                                  helm-ff-dotted-symlink-directory))
                                       (file-directory-p file))
-                                 (helm-x-icons-octicon "file-symlink-directory")
+                                 (helm-x-icons-generic "file-symlink-directory")
                                (helm-x-icons-icon-for-file (helm-basename file)))))))
       (when icon (concat icon " ")))))
 
