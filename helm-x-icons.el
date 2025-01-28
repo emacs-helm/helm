@@ -20,11 +20,6 @@
 (require 'all-the-icons nil t)
 (require 'nerd-icons nil t)
 
-(declare-function nerd-icons-octicon "ext:nerd-icons")
-(declare-function nerd-icons-faicon  "ext:nerd-icons")
-(declare-function nerd-icons-mdicon  "ext:nerd-icons")
-(declare-function nerd-icons-codicon "ext:nerd-icons")
-
 (defgroup helm-x-icons nil
   "Compatibility functions between icons provider packages."
   :group 'helm)
