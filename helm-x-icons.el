@@ -64,82 +64,49 @@ The returned alist is computed according to `helm-x-icons-provider'."
               (nerd-icons 'nerd-icons-icon-for-file))))
     (when fn (apply fn args))))
 
-(defun helm-x-icons-octicon (icon-name &rest args)
-  "Compatibility function for octicon.
-May use other provider than octicon if ICON-NAME is not found in octicon."
-  (let ((fn (helm-acase helm-x-icons-provider
-              (all-the-icons #'all-the-icons-octicon)
-              (nerd-icons #'nerd-icons-octicon))))
-    (when (eq helm-x-icons-provider 'nerd-icons)
-      (cond ((string= icon-name "file-symlink-directory")
-             (setq fn #'nerd-icons-codicon
-                   icon-name "nf-cod-file_symlink_directory"))
-            ((string= icon-name "star")
-             (setq fn #'nerd-icons-mdicon
-                   icon-name "nf-md-star"))
-            ((string= icon-name "mail-read")
-             (setq fn #'nerd-icons-codicon
-                   icon-name "nf-cod-mail_read"))
-            ((string= icon-name "info")
-             (setq fn #'nerd-icons-faicon
-                   icon-name "nf-fa-info"))
-            ((string= icon-name "link-external")
-             (setq fn #'nerd-icons-faicon
-                   icon-name "nf-fa-external_link"))
-            ((string= icon-name "mail")
-             (setq fn #'nerd-icons-mdicon
-                   icon-name "nf-md-email"))))
-      (when fn (apply fn icon-name args))))
+(defvar helm-x-icons-nerd-icons-compat-alist
+  '(("file-symlink-directory" . (nerd-icons-codicon . "nf-cod-file_symlink_directory"))
+    ("star" . (nerd-icons-mdicon . "nf-md-star"))
+    ("mail-read" . (nerd-icons-codicon . "nf-cod-mail_read"))
+    ("info" . (nerd-icons-faicon . "nf-fa-info"))
+    ("link-external" . (nerd-icons-faicon . "nf-fa-external_link"))
+    ("mail" . (nerd-icons-mdicon . "nf-md-email"))
+    ("note_add" . (nerd-icons-codicon . "nf-cod-new_file"))
+    ("create_new_folder" . (nerd-icons-codicon . "nf-cod-new_folder"))
+    ("firefox" . (nerd-icons-faicon . "nf-fa-firefox"))
+    ("globe" . (nerd-icons-faicon . "nf-fa-globe"))
+    ("man-page" . (nerd-icons-octicon . "nf-oct-command_palette"))))
 
-(defun helm-x-icons-material (icon-name &rest args)
-  "Compatibility function for material.
-May use other provider than material if ICON-NAME is not found in material."
-  (let ((fn (helm-acase helm-x-icons-provider
-              (all-the-icons #'all-the-icons-material)
-              (nerd-icons #'nerd-icons-mdicon))))
-    (when (eq helm-x-icons-provider 'nerd-icons)
-      (cond ((string= icon-name "note_add")
-             (setq fn #'nerd-icons-codicon
-                   icon-name "nf-cod-new_file"))
-            ((string= icon-name "create_new_folder")
-             (setq fn #'nerd-icons-codicon
-                   icon-name "nf-cod-new_folder"))))
+(defvar helm-x-icons-all-the-icons-compat-alist
+  '(("file-symlink-directory" . (all-the-icons-octicon . "file-symlink-directory"))
+    ("star" . (all-the-icons-octicon . "star"))
+    ("mail-read" . (all-the-icons-octicon . "mail-read"))
+    ("info" . (all-the-icons-octicon . "info"))
+    ("link-external" . (all-the-icons-octicon . "link-external"))
+    ("mail" . (all-the-icons-octicon . "mail"))
+    ("note_add" . (all-the-icons-material . "note_add"))
+    ("create_new_folder" . (all-the-icons-material . "create_new_folder"))
+    ("firefox" . (all-the-icons-faicon . "firefox"))
+    ("globe" . (all-the-icons-faicon . "globe"))
+    ("man-page" . (all-the-icons-fileicon . "man-page"))))
+
+(defun helm-x-icons-generic (icon-name &rest args)
+  "Compatibility function for icons.
+Run an `all-the-icons' or `nerd-icons' function according to
+`helm-x-icons-provider'and ICON-NAME.
+Functions and icon names are found in `helm-x-icons-all-the-icons-compat-alist'
+and `helm-x-icons-nerd-icons-compat-alist'."
+  (let (fn)
+    (helm-acase helm-x-icons-provider
+      (nerd-icons
+       (helm-acase (assoc-default icon-name helm-x-icons-nerd-icons-compat-alist)
+        ((dst* (sym . name))
+         (setq fn sym icon-name name))))
+      (all-the-icons
+       (helm-acase (assoc-default icon-name helm-x-icons-all-the-icons-compat-alist)
+        ((dst* (sym . name))
+         (setq fn sym icon-name name)))))
     (when fn (apply fn icon-name args))))
-
-(defun helm-x-icons-faicon (icon-name &rest args)
-  "Compatibility function for faicon.
-May use other provider than faicon if ICON-NAME is not found in faicon."
-  (let ((fn (helm-acase helm-x-icons-provider
-              (all-the-icons #'all-the-icons-faicon)
-              (nerd-icons #'nerd-icons-faicon))))
-    (when (eq helm-x-icons-provider 'nerd-icons)
-      (cond ((string= icon-name "firefox")
-             (setq fn #'nerd-icons-faicon
-                   icon-name "nf-fa-firefox"))
-            ((string= icon-name "globe")
-             (setq fn #'nerd-icons-faicon
-                   icon-name "nf-fa-globe"))))
-    (and fn (apply fn icon-name args))))
-
-(defun helm-x-icons-wicon (icon-name &rest args)
-  "Compatibility function for wicon.
-May use other provider than wicon if ICON-NAME is not found in wicon."
-  (let ((fn (helm-acase helm-x-icons-provider
-              (all-the-icons #'all-the-icons-wicon)
-              (nerd-icons #'nerd-icons-wicon))))
-    (when fn (apply fn icon-name args))))
-
-(defun helm-x-icons-fileicon (icon-name &rest args)
-  "Compatibility function for fileicon.
-May use other provider than fileicon if ICON-NAME is not found in fileicon."
-  (let ((fn (helm-acase helm-x-icons-provider
-              (all-the-icons #'all-the-icons-fileicon)
-              (nerd-icons #'nerd-icons-sucicon))))
-    (if (and (eq helm-x-icons-provider 'nerd-icons)
-             (string= icon-name "man-page"))
-        (apply #'nerd-icons-octicon "nf-oct-command_palette" args)
-      (and fn (apply fn icon-name args)))))
-
 
 
 (provide 'helm-x-icons)
