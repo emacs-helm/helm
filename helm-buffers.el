@@ -31,12 +31,10 @@
 (declare-function helm-browse-project "helm-files")
 (declare-function helm-ff-switch-to-shell "helm-files")
 
-(defvar all-the-icons-mode-icon-alist)
 (defvar dired-buffers)
 (defvar org-directory)
 (defvar helm-ff-default-directory)
 (defvar major-mode-remap-alist)
-(defvar nerd-icons-mode-icon-alist)
 
 
 (defgroup helm-buffers nil
