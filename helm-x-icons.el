@@ -17,19 +17,20 @@
 
 ;;; Code:
 
-(require 'all-the-icons nil t)
-(require 'nerd-icons nil t)
-
 (defgroup helm-x-icons nil
   "Compatibility functions between icons provider packages."
   :group 'helm)
 
 (defcustom helm-x-icons-provider 'all-the-icons
   "The icons provider package.
-The currently supported providers are `all-the-icons' and `nerd-icons'."
+The currently supported providers are `all-the-icons' and `nerd-icons'.
+Do not use setq to set this variable but customize."
   :type '(choice
           (const :tag "Use `all-the-icons' package" all-the-icons)
-          (const :tag "Use `nerd-icons' package" nerd-icons)))
+          (const :tag "Use `nerd-icons' package" nerd-icons))
+  :set (lambda (var val)
+         (when val (require val nil t))
+         (set var val)))
 
 (defun helm-x-icons-match-to-alist (file type)
   "Match FILE against an entry in ALIST using `string-match-p'.
