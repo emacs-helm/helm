@@ -17,6 +17,8 @@
 
 ;;; Code:
 
+(require 'helm-lib)
+
 (defgroup helm-x-icons nil
   "Compatibility functions between icons provider packages."
   :group 'helm)
