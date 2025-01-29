@@ -5,12 +5,16 @@
 *** Allow using both all-the-icons and nerd-icons as icon providers
 Use the variable `helm-x-icons-provider`.
 *** Add affixations to helm-info
-Add a description of info file when using helm-info or info-display-manual.
+Add a description of info file when using `helm-info` or `info-display-manual`.
 *** Provide minimal support for eww bookmarks
 *** Stop preventing dups when trashing files
 *** Add a helm-add-to-list function for user init file settings
 *** Drop support for deprecated defadvice management
 *** Allow destructuring in helm-acase
+*** Popup-info can be provided in metadata and added to any completion
+via the vars `helm-completing-read-command-categories` and
+`helm-completing-read-extra-metadata`, for example it is now enabled
+in M-x man.
 *** Maybe provide a popup-info in completion-at-point
 If CAPFns provide such information via `completion-extra-properties`,
 display it in a popup-info when helm-popup-tip-mode is enabled.
