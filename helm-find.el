@@ -37,6 +37,18 @@ I.e. use the -path/ipath arguments of find instead of
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-find-show-full-path-fn #'identity
+  "Function used in transformer to show the full path of candidate.
+You may want to show the relative path or the abbreviated path instead of the
+full path.  The basename is accessible with
+\\<helm-find-map>\\[helm-ff-run-toggle-basename], so no need to use a function
+that display the basename of candidate here."
+  :group 'helm-files
+  :type '(choice
+          (const :tag "Display absolute path" identity)
+          (const :tag "Display relative path" file-relative-name)
+          (const :tag "Display abbreviated path" abbreviate-file-name)))
+
 (defvar helm-find-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-generic-files-map)
@@ -67,7 +79,8 @@ I.e. use the -path/ipath arguments of find instead of
              for type = (car (file-attributes abs))
              for disp = (if (and helm-ff-transformer-show-only-basename
                                  (not (string-match "[.]\\{1,2\\}$" i)))
-                            (helm-basename abs) abs)
+                            (helm-basename abs)
+                          (funcall helm-find-show-full-path-fn abs))
              collect (cond ((eq t type)
                             (cons (propertize disp 'face 'helm-ff-directory)
                                   abs))
