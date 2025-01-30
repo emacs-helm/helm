@@ -246,6 +246,10 @@ Colorize only symlinks, directories and files."
    (fuzzy-match :initform t)
    (migemo :initform t)))
 
+(cl-defmethod helm--setup-source :after ((source helm-files-in-current-dir-source))
+  (setf (slot-value source 'filtered-candidate-transformer)
+        '(helm-ff-sort-candidates helm-highlight-files)))
+
 (defvar helm-source-files-in-current-dir
   (helm-make-source "Files from Current Directory"
       'helm-files-in-current-dir-source))
