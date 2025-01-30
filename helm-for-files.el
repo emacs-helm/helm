@@ -185,7 +185,8 @@ Colorize only symlinks, directories and files."
                           (helm-basename i) (abbreviate-file-name i))
            for isremote = (or (file-remote-p i)
                               (helm-file-on-mounted-network-p i))
-           ;; Call file-attributes only if:
+           ;; file-attributes is too slow on remote files,
+           ;; so call it only if:
            ;; - file is not remote
            ;; - helm-for-files--tramp-not-fancy is nil and file is remote AND
            ;; connected. (Bug#1679)
@@ -194,31 +195,42 @@ Colorize only symlinks, directories and files."
                                     (file-remote-p i nil t)))
                            (car (file-attributes i)))
            collect
-           (cond ((and (null type) isremote) (cons disp i))
-                 ((stringp type)
-                  (cons (propertize disp
-                                    'face 'helm-ff-symlink
-                                    'match-part (funcall mp-fn disp)
-                                    'help-echo (expand-file-name i))
-                        i))
-                 ((eq type t)
-                  (cons (propertize disp
-                                    'face 'helm-ff-directory
-                                    'match-part (funcall mp-fn disp)
-                                    'help-echo (expand-file-name i))
-                        i))
-                 (t (let* ((ext (helm-file-name-extension disp))
-                           (disp (propertize disp
-                                             'face 'helm-ff-file
-                                             'match-part (funcall mp-fn disp)
-                                             'help-echo (expand-file-name i))))
+           (cond (;; No fancy display on remote files with basic predicates.
+                  (and (null type) isremote) (cons disp i))
+                 (;; Symlinks
+                  (stringp type)
+                  (add-text-properties 0 (length disp) `(face helm-ff-symlink
+                                                         match-part ,(funcall mp-fn disp)
+                                                         help-echo ,(expand-file-name i))
+                                       disp)
+                  (cons (helm-ff-prefix-filename disp i) i))
+                 (;; Dotted dirs
+                  (and (eq type t) (helm-ff-dot-file-p i))
+                  (add-text-properties 0 (length disp) `(face helm-ff-dotted-directory
+                                                         match-part ,(funcall mp-fn disp)
+                                                         help-echo ,(expand-file-name i))
+                                       disp)
+                  (cons (helm-ff-prefix-filename disp i) i))
+                 (;; Dirs
+                  (eq type t)
+                  (add-text-properties 0 (length disp) `(face helm-ff-directory
+                                                         match-part ,(funcall mp-fn disp)
+                                                         help-echo ,(expand-file-name i))
+                                       disp)
+                  (cons (helm-ff-prefix-filename disp i) i))
+                 (t ;; Files.
+                  (add-text-properties 0 (length disp) `(face helm-ff-file
+                                                         match-part ,(funcall mp-fn disp)
+                                                         help-echo ,(expand-file-name i))
+                                       disp)
+                  (helm-aif (helm-file-name-extension disp)
                       (when (condition-case _err
-                                (string-match (format "\\.\\(%s\\)$" ext) disp)
+                                (string-match (format "\\.\\(%s\\)\\'" it) disp)
                               (invalid-regexp nil))
                         (add-face-text-property
                          (match-beginning 1) (match-end 1)
-                         'helm-ff-file-extension nil disp))
-                      (cons disp i))))))
+                         'helm-ff-file-extension t disp)))
+                  (cons (helm-ff-prefix-filename disp i) i)))))
 
 (defclass helm-files-in-current-dir-source (helm-source-sync helm-type-file)
   ((candidates :initform (lambda ()
