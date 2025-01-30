@@ -119,7 +119,17 @@ Be aware that a nil value will make tramp display very slow."
   ((init :initform (lambda ()
                      (require 'recentf)
                      (when helm-turn-on-recentf (recentf-mode 1))))
-   (candidates :initform (lambda () recentf-list))
+   (candidates :initform (lambda ()
+                           ;; Previously we were using directly `recentf-list'
+                           ;; which is unsafe when the transformer makes changes
+                           ;; directly on the elements of the list (props were
+                           ;; added to the elements of `recentf-list' and saved
+                           ;; like this, as a result the recentf file could not
+                           ;; be read at startup), until now it was working by
+                           ;; chance because the display candidate was
+                           ;; let-bounded before being modified.
+                           (cl-loop for file in recentf-list
+                                    collect (substring-no-properties file))))
    (pattern-transformer :initform 'helm-recentf-pattern-transformer)
    (match-part :initform (lambda (candidate)
                            (if (or helm-ff-transformer-show-only-basename
