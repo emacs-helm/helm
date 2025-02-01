@@ -91,7 +91,12 @@ The returned alist is computed according to `helm-x-icons-provider'."
     ("border_style" . (nerd-icons-mdicon . "nf-md-border_style"))
     ("text_fields" . (nerd-icons-mdicon . "nf-md-text"))
     ("code" . (nerd-icons-faicon . "nf-fa-code"))
-    ("bar-chart" . (nerd-icons-faicon . "nf-fa-bar_chart"))))
+    ("bar-chart" . (nerd-icons-faicon . "nf-fa-bar_chart")))
+  "The `nerd-icons' counterpart for icon names.
+The `helm-x-icons-generic' function uses this alist to find `nerd-icons'
+functions and names to display icons.
+To each icon added here, its all-the-icons counterpart have to be added in
+`helm-x-icons-all-the-icons-compat-alist'.")
 
 (defvar helm-x-icons-all-the-icons-compat-alist
   '(("file-symlink-directory" . (all-the-icons-octicon . "file-symlink-directory"))
@@ -121,7 +126,12 @@ The returned alist is computed according to `helm-x-icons-provider'."
     ("border_style" . (all-the-icons-material . "border_style"))
     ("text_fields" . (all-the-icons-material . "text_fields"))
     ("code" . (all-the-icons-material . "code"))
-    ("bar-chart" . (all-the-icons-faicon . "bar-chart"))))
+    ("bar-chart" . (all-the-icons-faicon . "bar-chart")))
+  "The `all-the-icons' counterpart for icon names.
+The `helm-x-icons-generic' function uses this alist to find `all-the-icons'
+functions and names to display icons.
+To each icon added here, its all-the-icons counterpart have to be added in
+`helm-x-icons-nerd-icons-compat-alist'.")
 
 (defun helm-x-icons-generic (icon-name &rest args)
   "Compatibility function for icons.
