@@ -1436,8 +1436,8 @@ in LIST to be displayed in PROMPT."
 (defsubst helm-string-numberp (str)
   "Return non nil if string STR represent a number."
   (cl-assert (stringp str) t)
-  (or (cl-loop for c across str always (char-equal c ?0))
-      (not (zerop (string-to-number str)))))
+  (cl-loop with chars = '(?0 ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9)
+           for c across str always (memql c chars)))
 
 (defsubst helm-re-search-forward (regexp &optional bound noerror count)
   "Same as `re-search-forward' but return nil when point doesn't move.
