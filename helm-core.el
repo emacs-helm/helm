@@ -542,6 +542,8 @@ Default to Helm group when group is not defined in source."
 This is a format spec where %d will be replaced by the candidate
 number.
 
+This is useful when `helm-display-line-numbers-mode' is turned on.
+
 NOTE: `setq' have no effect until you restart Emacs, use
 customize for immediate effect."
   :group 'helm
@@ -553,6 +555,8 @@ customize for immediate effect."
 
 This is a format spec where %d will be replaced by the candidate
 number.
+
+This is useful when `helm-display-line-numbers-mode' is turned on.
 
 NOTE: `setq' have no effect until you restart Emacs, use
 customize for immediate effect."
