@@ -3030,7 +3030,9 @@ hitting C-j on \"..\"."
       (with-helm-window
         (when (re-search-forward
                (format helm-ff-last-expanded-candidate-regexp
-                       (concat (regexp-quote presel) "$"))
+                       ;; The space at eol may contain a display property
+                       ;; e.g. "-> symlink truename".
+                       (concat (regexp-quote presel) " ?$"))
                nil t)
           (forward-line 0)
           (helm-mark-current-line)))
@@ -4377,11 +4379,14 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                    (add-face-text-property 0 len-abbrev 'helm-ff-truename t abbrev)
                    ;; Colorize extension only on truename.
                    (add-face-text-property 0 len 'helm-ff-symlink nil disp)
-                   (cons (helm-ff-prefix-filename
-                          ;; Use display prop instead of concating prevent
-                          ;; failure when preselecting after going up in tree (C-l).
-                          (propertize disp 'display (concat disp " -> " abbrev))
-                          file)
+                   (cons (concat (helm-ff-prefix-filename disp file)
+                                 ;; Displaying this in a space with display prop
+                                 ;; allows retrieving the candidate with
+                                 ;; `helm-ff-retrieve-last-expanded'.  If we put
+                                 ;; the display prop on the whole candidate
+                                 ;; `helm-fuzzy-highlight-matches' don't match
+                                 ;; properly.
+                                 (propertize " " 'display (concat " -> " abbrev)))
                          file)))
                 ;; A directory.
                 ((eq t type)
