@@ -905,8 +905,7 @@ to nil to avoid error messages when using `helm-find-files'."
   :type 'boolean
   :set (lambda (var val)
 	 (set-default var val)
-         (cl-loop for dir being the hash-keys of helm-ff--file-notify-watchers
-                  do (remhash dir helm-ff--list-directory-cache))))
+         (clrhash helm-ff--list-directory-cache)))
 
 (defcustom helm-ff-inotify-unsupported-methods '("adb")
   "Tramp methods unsupported by file-notify."
