@@ -900,6 +900,14 @@ to nil to avoid error messages when using `helm-find-files'."
            (cl-loop for dir being the hash-keys of helm-ff--file-notify-watchers
                     do (remhash dir helm-ff--list-directory-cache)))))
 
+(defcustom helm-ff-show-dot-file-path nil
+  "Show full path of dotted directories when non nil."
+  :type 'boolean
+  :set (lambda (var val)
+	 (set-default var val)
+         (cl-loop for dir being the hash-keys of helm-ff--file-notify-watchers
+                  do (remhash dir helm-ff--list-directory-cache))))
+
 (defcustom helm-ff-inotify-unsupported-methods '("adb")
   "Tramp methods unsupported by file-notify."
   :type '(repeat string))
@@ -4248,7 +4256,8 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                    ;; Filename with cntrl chars e.g. foo^J
                    (replace-regexp-in-string
                     "[[:cntrl:]]" "?"
-                    (if (or reverse urlp) file basename))))
+                    (if (or reverse urlp (and dot helm-ff-show-dot-file-path))
+                        file basename))))
          (len (length disp))
          (backup (backup-file-name-p disp)))
     (when (string-match "/\\'" file)
