@@ -1,7 +1,7 @@
 #+STARTUP:showall
 
 * NEWS
-** Version 4.0.1-pre
+** Version 4.0.1
 *** Provide icons in some more places (helm-for-files.el)
 *** Package-vc-* commands have now affixations (package category)
 *** Show only basename of dot files in helm-find-files
