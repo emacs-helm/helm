@@ -3558,7 +3558,7 @@ version < emacs-28."
            (half-screen-size (/ (display-pixel-height x-display-name) 2))
            (frame-info (frame-geometry))
            (screen-width (display-pixel-width x-display-name))
-           (helm-frame-width (* (frame-char-width) helm-display-buffer-width))
+           (helm-frame-width (* (frame-char-width) (+ 2 helm-display-buffer-width)))
            (prmt-size (length helm--prompt))
            (prmt-width (* prmt-size (frame-char-width)))
            (line-height (frame-char-height))
@@ -3572,10 +3572,10 @@ version < emacs-28."
                  (tool-bar-lines . 0)
                  ;; lateral constraint to keep the frame inside of the screen
                  (left . ,
-                       (if (> (+ px helm-frame-width) screen-width)
+                       (if (> (+ px helm-frame-width)
+                              screen-width)
                            (- screen-width
-                              helm-frame-width
-                              prmt-width)
+                              helm-frame-width )
                          (if (< (- px prmt-width) 0)
                              0
                            (- px prmt-width))))
