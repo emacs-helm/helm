@@ -381,6 +381,13 @@ This can be toggled at anytime from `helm-find-files' with \
 \\<helm-find-files-map>\\[helm-ff-run-toggle-basename]."
   :type 'boolean)
 
+(defcustom helm-ff-show-dot-file-path nil
+  "Show full path of dotted directories when non nil."
+  :type 'boolean
+  :set (lambda (var val)
+	 (set-default var val)
+         (clrhash helm-ff--list-directory-cache)))
+
 (defcustom helm-ff-signal-error-on-dot-files t
   "Signal error when file is `.' or `..' on file deletion when non-nil.
 Default is non-nil.
@@ -899,13 +906,6 @@ to nil to avoid error messages when using `helm-find-files'."
 	 (unless (symbol-value var)
            (cl-loop for dir being the hash-keys of helm-ff--file-notify-watchers
                     do (remhash dir helm-ff--list-directory-cache)))))
-
-(defcustom helm-ff-show-dot-file-path nil
-  "Show full path of dotted directories when non nil."
-  :type 'boolean
-  :set (lambda (var val)
-	 (set-default var val)
-         (clrhash helm-ff--list-directory-cache)))
 
 (defcustom helm-ff-inotify-unsupported-methods '("adb")
   "Tramp methods unsupported by file-notify."
