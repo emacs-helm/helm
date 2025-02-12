@@ -2,6 +2,10 @@
 
 * NEWS
 ** Version 4.0.1-pre
+*** Provide icons in some more places (helm-for-files.el)
+*** Package-vc-* commands have now affixations (package category)
+*** Show only basename of dot files in helm-find-files
+It is now the default, but it can be configured with `helm-ff-show-dot-file-path`.
 *** Allow using both all-the-icons and nerd-icons as icon providers
 Use the variable `helm-x-icons-provider`.
 *** Add affixations to helm-info
