@@ -378,7 +378,10 @@ printers for you."
 (defcustom helm-ff-transformer-show-only-basename t
   "Show only basename of candidates in `helm-find-files'.
 This can be toggled at anytime from `helm-find-files' with \
-\\<helm-find-files-map>\\[helm-ff-run-toggle-basename]."
+\\<helm-find-files-map>\\[helm-ff-run-toggle-basename].  Note
+that even when non nil, the dotted directories on top i.e. \".\"
+and \"..\" are still displayed as full path when
+`helm-ff-show-dot-file-path' is non nil."
   :type 'boolean)
 
 (defcustom helm-ff-show-dot-file-path nil
