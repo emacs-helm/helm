@@ -65,6 +65,7 @@ The returned alist is computed according to `helm-x-icons-provider'."
 
 (defvar helm-x-icons-nerd-icons-compat-alist
   '(("file-symlink-directory" . (nerd-icons-codicon . "nf-cod-file_symlink_directory"))
+    ("file-directory" . (nerd-icons-sucicon . "nf-custom-folder_oct"))
     ("star" . (nerd-icons-mdicon . "nf-md-star"))
     ("mail-read" . (nerd-icons-codicon . "nf-cod-mail_read"))
     ("info" . (nerd-icons-faicon . "nf-fa-info"))
@@ -100,6 +101,7 @@ To each icon added here, its all-the-icons counterpart have to be added in
 
 (defvar helm-x-icons-all-the-icons-compat-alist
   '(("file-symlink-directory" . (all-the-icons-octicon . "file-symlink-directory"))
+    ("file-directory" . (all-the-icons-octicon . "file-directory"))
     ("star" . (all-the-icons-octicon . "star"))
     ("mail-read" . (all-the-icons-octicon . "mail-read"))
     ("info" . (all-the-icons-octicon . "info"))
