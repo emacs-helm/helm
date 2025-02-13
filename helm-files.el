@@ -4467,24 +4467,23 @@ Arg FILE is the real part of candidate, a filename with no props."
 
 (defun helm-ff--is-dir-from-disp (disp)
   "Return the face used for candidate when candidate is a directory."
-  (cl-loop with faces = (helm-mklist (get-text-property 0 'face disp))
-           for face in '(helm-ff-directory helm-ff-dotted-directory)
-           thereis (memq face faces)))
+  (helm-aand (get-text-property 0 'face disp)
+             (memq it '(helm-ff-directory helm-ff-dotted-directory))
+             (car it)))
 
 (defun helm-ff--is-file-from-disp (disp)
   "Return the face used for file's candidate or dotted-symlink dirs."
-  (cl-loop with faces = (helm-mklist (get-text-property 0 'face disp))
-           for face in '(helm-ff-file
-                         helm-ff-suid
-                         helm-ff-executable
-                         helm-ff-socket
-                         helm-ff-pipe
-                         helm-ff-symlink
-                         helm-ff-dotted-symlink-directory
-                         helm-ff-backup-file
-                         helm-ls-git-untracked-face)
-           when (memq face faces)
-           return face))
+  (helm-aand (get-text-property 0 'face disp)
+             (memq it '(helm-ff-file
+                        helm-ff-suid
+                        helm-ff-executable
+                        helm-ff-socket
+                        helm-ff-pipe
+                        helm-ff-symlink
+                        helm-ff-dotted-symlink-directory
+                        helm-ff-backup-file
+                        helm-ls-git-untracked-face))
+             (car it)))
 
 ;;;###autoload
 (define-minor-mode helm-ff-icon-mode
