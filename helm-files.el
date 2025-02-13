@@ -4481,7 +4481,8 @@ Arg FILE is the real part of candidate, a filename with no props."
                          helm-ff-pipe
                          helm-ff-symlink
                          helm-ff-dotted-symlink-directory
-                         helm-ff-backup-file)
+                         helm-ff-backup-file
+                         helm-ls-git-untracked-face)
            when (memq face faces)
            return face))
 

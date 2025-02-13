@@ -77,18 +77,16 @@ that display the basename of candidate here."
                         (helm-aif (file-remote-p default-directory)
                             (concat it i) i))
              for type = (car (file-attributes abs))
-             for disp = (if (and helm-ff-transformer-show-only-basename
-                                 (not (string-match "[.]\\{1,2\\}$" i)))
-                            (helm-basename abs)
-                          (funcall helm-find-show-full-path-fn abs))
-             collect (cond ((eq t type)
-                            (cons (propertize disp 'face 'helm-ff-directory)
-                                  abs))
-                           ((stringp type)
-                            (cons (propertize disp 'face 'helm-ff-symlink)
-                                  abs))
-                           (t (cons (propertize disp 'face 'helm-ff-file)
-                                    abs))))))
+             for fname = (if (and helm-ff-transformer-show-only-basename
+                                  (not (string-match "[.]\\{1,2\\}$" i)))
+                             (helm-basename abs)
+                           (funcall helm-find-show-full-path-fn abs))
+             for disp = (helm-acase type
+                          ('t (propertize fname 'face 'helm-ff-directory))
+                          ((guard* (stringp it))
+                           (propertize fname 'face 'helm-ff-symlink))
+                          (otherwise (propertize fname 'face 'helm-ff-file)))
+             collect (cons (helm-ff-prefix-filename disp abs) abs))))
 
 (defun helm-find--build-cmd-line ()
   (require 'find-cmd)
