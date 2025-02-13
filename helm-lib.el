@@ -1191,6 +1191,16 @@ If keyword FROM-END is non nil search from end."
                      elm)
         (cl-return-from helm-position count))
       (setq count (funcall (if from-end #'1- #'1+) count)))))
+
+(defsubst helm-copy-sequence (seq)
+  "Return a copy of SEQ.
+When the elements of SEQ are strings, they are
+copied; they are not shared with the original.
+Otherwise returns SEQ unchanged, the elements are not copied."
+  (cl-loop for elm in seq collect
+           (if (stringp elm)
+               (copy-sequence elm)
+             elm)))
 
 ;;; Strings processing.
 ;;

@@ -128,8 +128,7 @@ Be aware that a nil value will make tramp display very slow."
                            ;; be read at startup), until now it was working by
                            ;; chance because the display candidate was
                            ;; let-bounded before being modified.
-                           (cl-loop for file in recentf-list
-                                    collect (substring-no-properties file))))
+                           (helm-copy-sequence recentf-list)))
    (pattern-transformer :initform 'helm-recentf-pattern-transformer)
    (match-part :initform (lambda (candidate)
                            (if (or helm-ff-transformer-show-only-basename
