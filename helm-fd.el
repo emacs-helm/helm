@@ -125,7 +125,14 @@
 (defun helm-fd-fct (candidates _source)
   "The filtered-candidate-transformer function for helm-fd."
   (cl-loop for i in candidates
-           collect (ansi-color-apply i)))
+           for fname = (ansi-color-apply i)
+           if helm-ff-icon-mode collect
+           (let* ((abs (expand-file-name fname default-directory))
+                  (icon (if (file-directory-p abs)
+                            (helm-x-icons-generic "file-directory")
+                          (helm-x-icons-icon-for-file (helm-basename fname)))))
+             (cons (concat icon fname) fname))
+           else collect fname))
 
 (defun helm-fd-1 (directory)
   "Run fd shell command on DIRECTORY with helm interface."
