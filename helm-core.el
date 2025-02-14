@@ -3552,8 +3552,7 @@ version < emacs-28."
       ;; Fallback to default when frames are not usable.
       (helm-default-display-buffer buffer)
     (setq helm--buffer-in-new-frame-p t)
-    (let* ((pos (window-absolute-pixel-position))
-           (px (car (window-absolute-pixel-position)))
+    (let* ((px (car (window-absolute-pixel-position)))
            (py (cdr (window-absolute-pixel-position)))
            (half-screen-size (/ (display-pixel-height x-display-name) 2))
            (frame-info (frame-geometry))
@@ -3571,14 +3570,12 @@ version < emacs-28."
                  (height . ,helm-display-buffer-height)
                  (tool-bar-lines . 0)
                  ;; lateral constraint to keep the frame inside of the screen
-                 (left . ,
-                       (if (> (+ px helm-frame-width)
-                              screen-width)
-                           (- screen-width
-                              helm-frame-width )
-                         (if (< (- px prmt-width) 0)
-                             0
-                           (- px prmt-width))))
+                 (left . ,(cond ((> (+ px helm-frame-width) screen-width)
+                                 (- screen-width helm-frame-width))
+                                ((< (- px prmt-width) 0)
+                                 0)
+                                (t
+                                 (- px prmt-width))))
                  ;; Try to put frame at the best possible place.
                  ;; Frame should be below point if enough
                  ;; place, otherwise above point and
