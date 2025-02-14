@@ -3573,8 +3573,7 @@ version < emacs-28."
                  ;; lateral constraint to keep the frame inside of the screen
                  (left . ,(cond ((> (+ px helm-frame-width) screen-width)
                                  (- screen-width helm-frame-width))
-                                ((< (- px prmt-width) 0) 0)
-                                (t (- px prmt-width))))
+                                (t (max (- px prmt-width) 0))))
                  ;; Try to put frame at the best possible place.
                  ;; Frame should be below point if enough
                  ;; place, otherwise above point and
