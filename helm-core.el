@@ -3552,10 +3552,14 @@ version < emacs-28."
       ;; Fallback to default when frames are not usable.
       (helm-default-display-buffer buffer)
     (setq helm--buffer-in-new-frame-p t)
-    (let* ((pos (window-absolute-pixel-position))
+    (let* ((px (car (window-absolute-pixel-position)))
+           (py (cdr (window-absolute-pixel-position)))
            (half-screen-size (/ (display-pixel-height x-display-name) 2))
            (frame-info (frame-geometry))
+           (screen-width (display-pixel-width x-display-name))
+           (helm-frame-width (* (frame-char-width) (+ 2 helm-display-buffer-width)))
            (prmt-size (length helm--prompt))
+           (prmt-width (* prmt-size (frame-char-width)))
            (line-height (frame-char-height))
            tab-bar-mode
            (new-frame-alist
@@ -3565,25 +3569,27 @@ version < emacs-28."
                `((width . ,helm-display-buffer-width)
                  (height . ,helm-display-buffer-height)
                  (tool-bar-lines . 0)
-                 (left . ,(- (car pos)
-                             (* (frame-char-width)
-                                (if (< (- (point) (pos-bol)) prmt-size)
-                                    (- (point) (pos-bol))
-                                  prmt-size))))
+                 ;; lateral constraint to keep the frame inside of the screen
+                 (left . ,(cond ((> (+ px helm-frame-width) screen-width)
+                                 (- screen-width helm-frame-width))
+                                ((< (- px prmt-width) 0)
+                                 0)
+                                (t
+                                 (- px prmt-width))))
                  ;; Try to put frame at the best possible place.
                  ;; Frame should be below point if enough
                  ;; place, otherwise above point and
                  ;; current line should not be hidden
                  ;; by helm frame.
-                 (top . ,(if (> (cdr pos) half-screen-size)
+                 (top . ,(if (> py half-screen-size)
                              ;; Above point
-                             (- (cdr pos)
+                             (- py
                                 ;; add 2 lines to make sure there is always a gap
                                 (* (+ helm-display-buffer-height 2) line-height)
                                 ;; account for title bar height too
                                 (cddr (assq 'title-bar-size frame-info)))
                            ;; Below point
-                           (+ (cdr pos) line-height)))
+                           (+ py line-height)))
                  (title . "Helm")
                  (undecorated . ,helm-use-undecorated-frame-option)
                  (background-color . ,(or helm-frame-background-color
@@ -3609,7 +3615,7 @@ version < emacs-28."
         (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
         (with-helm-buffer
           (setq-local helm-echo-input-in-header-line
-                      (not (> (cdr pos) half-screen-size)))))
+                      (not (> py half-screen-size)))))
       (helm-display-buffer-popup-frame buffer new-frame-alist)
       ;; When frame size have been modified manually by user restore
       ;; it to default value unless resuming or not using
