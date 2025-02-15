@@ -451,35 +451,39 @@ Sort is done on basename of CANDIDATES."
    (group :initform 'helm-locate)))
 
 (defun helm-locate-init-subdirs ()
-  (let ((cmd (cond ((string-match-p "\\`fd" helm-locate-recursive-dirs-command)
-                    (format helm-locate-recursive-dirs-command
-                            ;; fd pass path at end.
-                            (helm-get-attr 'subdir) (helm-get-attr 'basedir)))
-                   ((string-match-p "\\`es" helm-locate-recursive-dirs-command)
-                    (format helm-locate-recursive-dirs-command
-		            (replace-regexp-in-string
-                             "/" "\\\\\\\\" (helm-get-attr 'basedir))
-	                    (helm-get-attr 'subdir)))
-                   ((string-match-p "\\`locate" helm-locate-recursive-dirs-command)
-                    (let* ((db (locate-dominating-file (helm-get-attr 'basedir)
-                                                       helm-ff-locate-db-filename))
-                           (lcmd (if (and db (not (string-match-p
-                                                   "-d" helm-locate-recursive-dirs-command)))
-                                     (mapconcat
-                                      #'identity
-                                      (helm-append-at-nth
-                                       (split-string helm-locate-recursive-dirs-command)
-                                       (format "-d %s" (expand-file-name
-                                                        helm-ff-locate-db-filename db))
-                                       1)
-                                      " ")
-                                   helm-locate-recursive-dirs-command)))
-                    (format lcmd (helm-get-attr 'basedir) (helm-get-attr 'subdir))))
-                   (t (format helm-locate-recursive-dirs-command
-                              (helm-get-attr 'basedir) (helm-get-attr 'subdir))))))
-  (with-temp-buffer
-    (call-process-shell-command cmd nil t nil)
-    (buffer-string))))
+  (let ((cmd (helm-acase helm-locate-recursive-dirs-command
+               (;; Fd
+                (guard* (string-match-p "\\`fd" it))
+                ;; fd pass path at end.
+                (format it (helm-get-attr 'subdir) (helm-get-attr 'basedir)))
+               (;; Es
+                (guard* (string-match-p "\\`es" it))
+                (format it (replace-regexp-in-string
+                            "/" "\\\\\\\\" (helm-get-attr 'basedir))
+	                (helm-get-attr 'subdir)))
+               (;; Locate
+                (guard* (string-match-p "\\`locate" it))
+                ;; Try to use a locale DB if some.
+                (let* ((db (locate-dominating-file
+                            (helm-get-attr 'basedir)
+                            helm-ff-locate-db-filename))
+                       (lcmd (if (and db (not (string-match-p "-d" it)))
+                                 (mapconcat
+                                  #'identity
+                                  (helm-append-at-nth
+                                   (split-string it)
+                                   (format "-d %s"
+                                           (expand-file-name
+                                            helm-ff-locate-db-filename db))
+                                   1)
+                                  " ")
+                               it)))
+                  (format lcmd (helm-get-attr 'basedir) (helm-get-attr 'subdir))))
+               ;; Find
+               (t (format it (helm-get-attr 'basedir) (helm-get-attr 'subdir))))))
+    (with-temp-buffer
+      (call-process-shell-command cmd nil t nil)
+      (buffer-string))))
 
 ;;;###autoload
 (defun helm-projects-find-files (update)
