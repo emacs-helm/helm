@@ -557,30 +557,22 @@ you want to go to \"/home/you/foo/bar/baz/somewhere/else\", simply type
 the final \"/\".  Helm will then list all possible directories under \"foo\"
 matching \"else\".
 
-Note: Completion on subdirectories uses \"locate\" as backend, you can configure
-the command with `helm-locate-recursive-dirs-command'.  Because this completion
-uses an index, the directory tree displayed may be out-of-date and not reflect
-the latest change until you update the index (using \"updatedb\" for \"locate\").
+You can use either find, locate or fdfind as backend, see the variable
+`helm-locate-recursive-dirs-command', the default is to use find as backend.
 
-If for some reason you cannot use an index, the \"find\" command from
-\"findutils\" can be used instead.  It will be slower though.  You need to pass
-the basedir as first argument of \"find\" and the subdir as the value for
-'-(i)regex' or '-(i)name' with the two format specs that are mandatory in
-`helm-locate-recursive-dirs-command'.
+NOTE: When using `locate' as backend which uses an index, the
+directory tree displayed may be out-of-date and not reflect the
+latest change until you update the index (using \"updatedb\" for
+\"locate\").
+On recent systems, the updatedb command doesn't
+index anymore user directories, see the option PRUNE_BIND_MOUNTS
+in the updatedb man page.
 
-Examples:
-- \"find %s -type d -name '*%s*'\"
-- \"find %s -type d -regex .*%s.*$\"
+If a locale db file is found under current directory it will be
+used instead of the global updatedb index.
 
-[[https://github.com/sharkdp/fd][Fd]] command is now also
-supported which is regexp based and very fast.  Here is the command
-line to use:
-
-- \"fd --hidden --type d .*%s.*$ %s\"
-
-You can use also a glob based search, in this case use the --glob option:
-
-- \"fd --hidden --type d --glob '*%s*' %s\"
+To create a locale db file under current directory, use `C-u C-u
+C-x C-f' from helm-find-files.
 
 *** Insert filename at point or complete filename at point
 
@@ -1767,6 +1759,10 @@ match regexp (i.e. \"helm\" will match \"helm\" but \"hlm\" will *not* match
 
 NOTE: On Windows use Everything with its command line ~es~ as a replacement of locate.
 See [[https://github.com/emacs-helm/helm/wiki/Locate#windows][Locate on Windows]]
+
+On recent systems, the updatedb command doesn't
+index anymore user directories, see the option PRUNE_BIND_MOUNTS
+in the updatedb man page.
 
 *** Browse project
 
