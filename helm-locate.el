@@ -461,14 +461,17 @@ Sort is done on basename of CANDIDATES."
                              "/" "\\\\\\\\" (helm-get-attr 'basedir))
 	                    (helm-get-attr 'subdir)))
                    ((string-match-p "\\`locate" helm-locate-recursive-dirs-command)
-                    (let* ((db (locate-dominating-file (helm-get-attr 'basedir) "locate.db"))
+                    (let* ((db (locate-dominating-file (helm-get-attr 'basedir)
+                                                       helm-ff-locate-db-filename))
                            (lcmd (if (and db (not (string-match-p
                                                    "-d" helm-locate-recursive-dirs-command)))
                                      (mapconcat
                                       #'identity
                                       (helm-append-at-nth
                                        (split-string helm-locate-recursive-dirs-command)
-                                       (format "-d %s" (expand-file-name "locate.db" db)) 1)
+                                       (format "-d %s" (expand-file-name
+                                                        helm-ff-locate-db-filename db))
+                                       1)
                                       " ")
                                    helm-locate-recursive-dirs-command)))
                     (format lcmd (helm-get-attr 'basedir) (helm-get-attr 'subdir))))
