@@ -114,17 +114,34 @@ When set, allow browsing recursively files in all directories of
 this list with `helm-projects-find-files'."
   :type '(repeat string))
 
-(defcustom helm-locate-recursive-dirs-command "locate -i -e -A --regex '^%s' '%s.*$'"
+(defcustom helm-locate-recursive-dirs-command "find %s -type d -regex .*%s.*$"
   "Command used for recursive directories completion in `helm-find-files'.
 
 For Windows and `es' use something like \"es -r ^%s.*%s.*$\"
 
 The two format specs are mandatory.
 
-If for some reasons you can't use locate because your filesystem
-doesn't have a database, you can use find command from findutils
-but be aware that it will be much slower.  See `helm-find-files'
-embedded help for more infos."
+We were using locate command in the past like this:
+
+    \"locate -i -e -A --regex '^%s' '%s.*$'\"
+
+But it seems broken in last versions of locate, so we use now the find shell
+command by default which is available on most distributions.
+Here the possible values you can use:
+
+    \"find %s -type d -regex .*%s.*$\"
+    \"find %s -type d -name '*%s*'\"
+
+You can use also the \"fdfind\" command which may be slow at first call because
+it creates an index, but is then very fast on subsequent calls, here is the
+command you can use:
+
+    \"fdfind --hidden --type d --glob '*%s*' %s\"
+
+NOTE: The \"fdfind\" executable name may change on some systems,
+it can be \"fd\" or whatever.
+
+See `helm-find-files' embedded help for more infos."
   :type 'string
   :group 'helm-files)
 
