@@ -1,6 +1,13 @@
 #+STARTUP:showall
 
 * NEWS
+** Version 4.0.2-pre
+*** Change default value of `helm-locate-recursive-dirs-command'
+It is no more using `locate` but `find`, this because locate is not
+working anymore out of the box without some tweaks (plocate backend).
+It is still anyway the faster alternative once tweaked, see HFF
+documentation.
+*** Provide icons in find and fdfind
 ** Version 4.0.1
 *** Provide icons in some more places (helm-for-files.el)
 *** Package-vc-* commands have now affixations (package category)
