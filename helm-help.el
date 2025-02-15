@@ -533,7 +533,7 @@ Same but the cache is refreshed.
 
 **** You can start a recursive search with \"locate\", \"find\" or [[https://github.com/sharkdp/fd][Fd]]
 
-See \"Note\" in the [[Recursive completion on subdirectories][section on subdirectories]].
+See \"NOTE\" in the [[Recursive completion on subdirectories][section on subdirectories]].
 
 Using \"locate\", you can enable the local database with a prefix argument. If the
 local database doesn't already exists, you will be prompted for its creation.
@@ -548,14 +548,18 @@ locate search with this pattern.  If you want Helm to automatically do this, add
 NOTE: On Windows use Everything with its command line ~es~ as a replacement of locate.
 See [[https://github.com/emacs-helm/helm/wiki/Locate#windows][Locate on Windows]]
 
+If your system use plocate as backend and you have no results when searching,
+see [[Recursive completion on subdirectories][section on subdirectories]].
+
 **** Recursive completion on subdirectories
 
-Starting from the directory you are currently browsing, it is possible to have
-completion of all directories underneath.  Say you are at \"/home/you/foo/\" and
-you want to go to \"/home/you/foo/bar/baz/somewhere/else\", simply type
-\"/home/you/foo/..else\" and hit `\\[helm-execute-persistent-action]' or enter
-the final \"/\".  Helm will then list all possible directories under \"foo\"
-matching \"else\".
+Starting from the directory you are currently browsing, it is
+possible to have completion of all directories underneath.  Say
+you are at \"/home/you/foo/\" and you want to go to
+\"/home/you/foo/bar/baz/somewhere/else\", simply type
+\"/home/you/foo/..else\" and enter the final \"/\".  Helm will
+then list all possible directories under \"foo\" matching
+\"else\".
 
 You can use either find, locate or fdfind as backend, see the variable
 `helm-locate-recursive-dirs-command', the default is to use find as backend.
@@ -564,9 +568,11 @@ NOTE: When using `locate' as backend which uses an index, the
 directory tree displayed may be out-of-date and not reflect the
 latest change until you update the index (using \"updatedb\" for
 \"locate\").
-On recent systems, the updatedb command doesn't
-index anymore user directories, see the option PRUNE_BIND_MOUNTS
-in the updatedb man page.
+
+On recent systems plocate is used instead of mlocate and the
+corresponding updatedb command doesn't index anymore user
+directories, see the option PRUNE_BIND_MOUNTS in the updatedb man
+page.
 
 If a locale db file is found under current directory it will be
 used instead of the global updatedb index.
