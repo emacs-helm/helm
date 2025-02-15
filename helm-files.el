@@ -5338,6 +5338,11 @@ image file in `helm-ff-image-dired-thumbnails-cache'."
     (helm :sources
           (helm-make-source
               "Recursive directories" 'helm-locate-subdirs-source
+            :header-name
+            (lambda (name)
+              (format "%s from `%s'"
+                      name
+                      (abbreviate-file-name helm-ff-default-directory)))
             :basedir (if (string-match-p
                           "\\`es" helm-locate-recursive-dirs-command)
                          directory
