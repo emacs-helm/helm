@@ -121,13 +121,19 @@ For Windows and `es' use something like \"es -r ^%s.*%s.*$\"
 
 The two format specs are mandatory.
 
-We were using locate command in the past like this:
+We were using locate command as default in the past like this:
 
     \"locate -i -e -A --regex '^%s' '%s.*$'\"
 
-But it seems broken in last versions of locate, so we use now the find shell
-command by default which is available on most distributions.
-Here the possible values you can use:
+But in most distributions updatedb is not indexing user dirs
+among others (see PRUNE_BIND_MOUNTS in updatedb.conf man page).
+However if you use a local db file, it will be used instead of
+the global updatedb cache and will be very fast.
+
+So we use now the find shell command by default which is available on most
+distributions and doesn't suffer of these indexing problems.  It
+is however slower than locate.  Here the possible values you can
+use:
 
     \"find %s -type d -regex .*%s.*$\"
     \"find %s -type d -name '*%s*'\"
@@ -445,21 +451,32 @@ Sort is done on basename of CANDIDATES."
    (group :initform 'helm-locate)))
 
 (defun helm-locate-init-subdirs ()
+  (let ((cmd (cond ((string-match-p "\\`fd" helm-locate-recursive-dirs-command)
+                    (format helm-locate-recursive-dirs-command
+                            ;; fd pass path at end.
+                            (helm-get-attr 'subdir) (helm-get-attr 'basedir)))
+                   ((string-match-p "\\`es" helm-locate-recursive-dirs-command)
+                    (format helm-locate-recursive-dirs-command
+		            (replace-regexp-in-string
+                             "/" "\\\\\\\\" (helm-get-attr 'basedir))
+	                    (helm-get-attr 'subdir)))
+                   ((string-match-p "\\`locate" helm-locate-recursive-dirs-command)
+                    (let* ((db (locate-dominating-file (helm-get-attr 'basedir) "locate.db"))
+                           (lcmd (if (and db (not (string-match-p
+                                                   "-d" helm-locate-recursive-dirs-command)))
+                                     (mapconcat
+                                      #'identity
+                                      (helm-append-at-nth
+                                       (split-string helm-locate-recursive-dirs-command)
+                                       (format "-d %s" (expand-file-name "locate.db" db)) 1)
+                                      " ")
+                                   helm-locate-recursive-dirs-command)))
+                    (format lcmd (helm-get-attr 'basedir) (helm-get-attr 'subdir))))
+                   (t (format helm-locate-recursive-dirs-command
+                              (helm-get-attr 'basedir) (helm-get-attr 'subdir))))))
   (with-temp-buffer
-    (call-process-shell-command
-     (if (string-match-p "\\`fd" helm-locate-recursive-dirs-command)
-         (format helm-locate-recursive-dirs-command
-                 ;; fd pass path at end.
-                 (helm-get-attr 'subdir) (helm-get-attr 'basedir))
-       (format helm-locate-recursive-dirs-command
-	       (if (string-match-p "\\`es" helm-locate-recursive-dirs-command)
-                   ;; Fix W32 paths.
-		   (replace-regexp-in-string
-                    "/" "\\\\\\\\" (helm-get-attr 'basedir))
-                 (helm-get-attr 'basedir))
-	       (helm-get-attr 'subdir)))
-     nil t nil)
-    (buffer-string)))
+    (call-process-shell-command cmd nil t nil)
+    (buffer-string))))
 
 ;;;###autoload
 (defun helm-projects-find-files (update)
