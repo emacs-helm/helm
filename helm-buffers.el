@@ -214,6 +214,11 @@ Don't use `setq' to set this."
   "Face used for modified buffers."
   :group 'helm-buffers-faces)
 
+(defface helm-indirect-buffer
+  `((t :foreground "DimGray" :background "black"))
+  "Face used for indirect buffers."
+  :group 'helm-buffers-faces)
+
 (defface helm-buffer-size
   `((((background dark))
      ,@(and (>= emacs-major-version 27) '(:extend t))
@@ -459,11 +464,14 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
            (bmode (with-current-buffer buf-name major-mode))
            (icon-alist (helm-x-icons-resolve-alist 'mode))
            (icon (when helm-buffers-show-icons
-                   (helm-aif (assq bmode icon-alist)
+                   (helm-aif (and (not (eq type 'indirect))
+                                  (assq bmode icon-alist))
                        (and helm-x-icons-provider
                             (apply (cadr it) (cddr it)))
                      (cond ((eq type 'dired)
                             (helm-x-icons-generic "file-directory"))
+                           ((eq type 'indirect)
+                            (helm-x-icons-generic "clone"))
                            (buf-fname
                             (helm-x-icons-icon-for-file buf-name))
                            (t (helm-x-icons-generic "star" :v-adjust 0.0))))))
@@ -526,7 +534,7 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
           (helm-buffer--show-details
            name name-prefix file-name size mode dir
            'helm-buffer-file 'helm-buffer-process nil details 'filebuf)
-        (cond
+        (helm-acond
           (;; A dired buffer.
            (rassoc buf dired-buffers)
            (helm-buffer--show-details
@@ -554,6 +562,18 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
            (helm-buffer--show-details
             name name-prefix file-name size mode dir
             'helm-buffer-file 'helm-buffer-process nil details 'filebuf))
+          ;; Indirect buffer.=>DimGray
+          ((buffer-base-buffer buf)
+           (let ((face (if (or (buffer-modified-p it)
+                               (with-current-buffer it
+                                 (and helm-buffers-tick-counter
+                                      (/= helm-buffers-tick-counter
+                                          (buffer-modified-tick)))))
+                           'helm-buffer-modified
+                         'helm-indirect-buffer)))
+             (helm-buffer--show-details
+              name name-prefix dir size mode dir
+              face 'helm-buffer-process nil details 'indirect)))
           ;; A non-file, modified buffer See bug#1917
           ((with-current-buffer name
              (and helm-buffers-tick-counter
@@ -842,7 +862,8 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 (defun helm-revert-buffer (candidate)
   (with-current-buffer candidate
-    (helm-aif (buffer-file-name)
+    (helm-aif (or (buffer-file-name)
+                  (buffer-file-name (buffer-base-buffer)))
         (and (file-exists-p it) (revert-buffer t t)))))
 
 (defun helm-revert-marked-buffers (_ignore)
@@ -869,7 +890,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
       (cl-assert marked nil "No buffers need to be saved")
       (cl-loop for buf in marked do
                (with-current-buffer (get-buffer buf)
-                 (when (buffer-file-name) (save-buffer))))
+                 (when (or (buffer-file-name)
+                           (buffer-file-name (buffer-base-buffer)))
+                   (save-buffer))))
       (when helm-marked-candidates (helm-unmark-all))
       (helm-force-update (regexp-quote preselect)))))
 
