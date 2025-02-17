@@ -208,6 +208,7 @@ Indianred2 => Buffer exists but its file has been deleted.
 Orange     => Buffer is modified and not saved to disk.
 Italic     => A non-file buffer.
 Yellow     => Tramp archive buffer.
+DimGray    => Indirect buffer.
 
 ** Commands
 \\<helm-buffer-map>
