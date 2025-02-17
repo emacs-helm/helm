@@ -558,8 +558,11 @@ KEYLIST can be any object that will be compared with `equal' or
 an expression starting with special symbol `guard*' which is then
 evaluated.  Once evaluated the symbol `guard' is bound to the
 returned value that can be used in the cdr of clause.  When
-KEYLIST match EXPR or `guard*' sexp evaluation is non-nil, BODY is
-executed and `helm-acase' exits with its value.
+KEYLIST match EXPR or `guard*' sexp evaluation is non-nil, BODY
+is executed and `helm-acase' exits with its value.
+Note:
+`guard*' sexp should not be a single symbol to eval, e.g. (guard* foo)
+in such cases you should use (guard* (progn foo)).
 
 KEYLIST can also be a list starting with special symbol `dst*'
 followed by an expression suitable for `cl-destructuring-bind'.
