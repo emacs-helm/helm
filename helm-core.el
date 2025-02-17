@@ -3469,7 +3469,7 @@ The function used to display `helm-buffer' by calling
                   helm-reuse-last-window-split-state)
              (helm-acase helm-split-window-default-side
                ((same other) it) ; take precedence on *-window-side-state.
-               ((guard* helm--window-side-state) guard)
+               ((guard* (progn helm--window-side-state)) guard)
                (t it))
            helm-split-window-default-side))
         (disp-fn (with-current-buffer buffer
