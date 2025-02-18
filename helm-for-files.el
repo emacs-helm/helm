@@ -181,7 +181,11 @@ Colorize only symlinks, directories and files."
                                (not (and helm--url-regexp
                                          (string-match helm--url-regexp i)))
                                (not (string-match helm-ff-url-regexp i)))
-                          (helm-basename i) (abbreviate-file-name i))
+                          (helm-basename i)
+                        ;; (abbreviate-file-name i) and i may be the same object
+                        ;; when abbreviate-file-name doesn't modify i
+                        ;; e.g. (abbreviate-file-name "/foo") bug#2709.
+                        (copy-sequence (abbreviate-file-name i)))
            for isremote = (or (file-remote-p i)
                               (helm-file-on-mounted-network-p i))
            ;; file-attributes is too slow on remote files,
