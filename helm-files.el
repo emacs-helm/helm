@@ -6673,7 +6673,8 @@ be existing directories."
                  ;; and we don't want to introduce duplicates.
                  (add-to-history 'file-name-history
                                  (abbreviate-file-name
-                                  (expand-file-name sel))))))))
+                                  (expand-file-name
+                                   (substring-no-properties sel)))))))))
 (add-hook 'helm-exit-minibuffer-hook 'helm-files-save-file-name-history)
 
 (defvar helm-source-file-name-history
