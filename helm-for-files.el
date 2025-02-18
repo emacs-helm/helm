@@ -21,6 +21,8 @@
 (require 'helm-external)
 (require 'helm-bookmark)
 
+(defvar recentf-list)
+
 (defcustom helm-multi-files-toggle-locate-binding "C-c p"
   "Default binding to switch back and forth locate in `helm-multi-files'."
   :group 'helm-files
@@ -119,16 +121,7 @@ Be aware that a nil value will make tramp display very slow."
   ((init :initform (lambda ()
                      (require 'recentf)
                      (when helm-turn-on-recentf (recentf-mode 1))))
-   (candidates :initform (lambda ()
-                           ;; Previously we were using directly `recentf-list'
-                           ;; which is unsafe when the transformer makes changes
-                           ;; directly on the elements of the list (props were
-                           ;; added to the elements of `recentf-list' and saved
-                           ;; like this, as a result the recentf file could not
-                           ;; be read at startup), until now it was working by
-                           ;; chance because the display candidate was
-                           ;; let-bounded before being modified.
-                           (helm-copy-sequence recentf-list)))
+   (candidates :initform (lambda () recentf-list))
    (pattern-transformer :initform 'helm-recentf-pattern-transformer)
    (match-part :initform (lambda (candidate)
                            (if (or helm-ff-transformer-show-only-basename
@@ -159,8 +152,15 @@ small.")
          (let ((helm-fuzzy-sort-fn 'helm-fuzzy-matching-sort-fn-preserve-ties-order))
            (setq helm-source-recentf
                  (helm-make-source "Recentf" 'helm-recentf-source
-                   :fuzzy-match val)))))
+                   :fuzzy-match val
+                   :cleanup #'helm-recentf-cleanup)))))
 
+(defun helm-recentf-cleanup ()
+  ;; Fix bug#2709 by stripping out text properties on exit.
+  (run-at-time 0.1 nil
+               (lambda ()
+                 (setq-default recentf-list
+                               (mapcar #'substring-no-properties recentf-list)))))
 
 ;;; Files in current dir
 ;;
