@@ -2772,7 +2772,8 @@ Can be used for `completion-in-region-function' by advicing it with an
                              data
                            (helm-comp-read
                             ;; Completion-at-point and friends have no prompt.
-                            (or (and (boundp 'prompt) prompt) "Pattern: ")
+                            (or (and (boundp 'prompt) prompt)
+                                (minibuffer-prompt) "Pattern: ")
                             data
                             :name str-command
                             :nomark (null crm)
