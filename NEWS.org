@@ -1,12 +1,18 @@
 #+STARTUP:showall
 
 * NEWS
-** Version 4.0.2-pre
+** Version 4.0.2
+*** Fix bug in recentf
+Properties may corrupt recentf data, prevent this.
+*** Fix bug with *-window-side-state no more working
+*** Remove the ability of switching to recursive search with C-j in HFF
+It was broken and not needed as we can just add the final "/" to expand.
 *** Change default value of `helm-locate-recursive-dirs-command'
 It is no more using `locate` but `find`, this because locate is not
 working anymore out of the box without some tweaks (plocate backend).
 It is still anyway the faster alternative once tweaked, see HFF
 documentation.
+*** Improve position of helm frame
 *** Provide icons in find and fdfind
 ** Version 4.0.1
 *** Provide icons in some more places (helm-for-files.el)
