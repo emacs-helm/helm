@@ -99,6 +99,7 @@ Be aware that a nil value will make tramp display very slow."
 ;;
 ;;
 (defvar helm-recentf--basename-flag nil)
+(defvar helm-recentf-cache nil)
 
 (defun helm-recentf-pattern-transformer (pattern)
   (let ((pattern-no-flag (replace-regexp-in-string " -b" "" pattern)))
@@ -120,14 +121,11 @@ Be aware that a nil value will make tramp display very slow."
 (defclass helm-recentf-source (helm-source-sync helm-type-file)
   ((init :initform (lambda ()
                      (require 'recentf)
-                     (when helm-turn-on-recentf (recentf-mode 1))))
-   (candidates :initform (lambda ()
-                           ;; Make a copy of candidates to not corrupt them with
-                           ;; properties added by the transformer, unfortunately
-                           ;; it is not enough and we need to cleanup the
-                           ;; candidate passed to action as well with coerce,
-                           ;; see below.
-                           (helm-copy-sequence recentf-list)))
+                     (when helm-turn-on-recentf (recentf-mode 1))
+                     ;; Use a copy of not recentf-list itself but the of its
+                     ;; elements to not corrupt them with text props.
+                     (setq helm-recentf-cache (helm-copy-sequence recentf-list))))
+   (candidates :initform 'helm-recentf-cache)
    (pattern-transformer :initform 'helm-recentf-pattern-transformer)
    (match-part :initform (lambda (candidate)
                            (if (or helm-ff-transformer-show-only-basename
