@@ -6674,6 +6674,8 @@ be existing directories."
                  (add-to-history 'file-name-history
                                  (abbreviate-file-name
                                   (expand-file-name
+                                   ;; See comments in `helm-recentf-source'
+                                   ;; about bug#2709.
                                    (substring-no-properties sel)))))))))
 (add-hook 'helm-exit-minibuffer-hook 'helm-files-save-file-name-history)
 
@@ -6681,6 +6683,8 @@ be existing directories."
   (helm-build-sync-source "File Name History"
     :candidates 'file-name-history
     :persistent-action #'ignore
+    ;; See comments in `helm-recentf-source' about bug#2709.
+    :coerce 'substring-no-properties
     :filtered-candidate-transformer #'helm-file-name-history-transformer
     :action 'helm-type-file-actions))
 
