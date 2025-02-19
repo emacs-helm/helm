@@ -121,12 +121,25 @@ Be aware that a nil value will make tramp display very slow."
   ((init :initform (lambda ()
                      (require 'recentf)
                      (when helm-turn-on-recentf (recentf-mode 1))))
-   (candidates :initform (lambda () recentf-list))
+   (candidates :initform (lambda ()
+                           ;; Make a copy of candidates to not corrupt them with
+                           ;; properties added by the transformer, unfortunately
+                           ;; it is not enough and we need to cleanup the
+                           ;; candidate passed to action as well with coerce,
+                           ;; see below.
+                           (helm-copy-sequence recentf-list)))
    (pattern-transformer :initform 'helm-recentf-pattern-transformer)
    (match-part :initform (lambda (candidate)
                            (if (or helm-ff-transformer-show-only-basename
                                    helm-recentf--basename-flag)
                                (helm-basename candidate) candidate)))
+   ;; When real candidate is equal to display it gets corrupted with the text
+   ;; properties added by the transformer, so ensure to strip out properties
+   ;; before passing the candidate to action otherwise recentf will save the
+   ;; candidate passed to find-file with the properties and corrupt
+   ;; recentf-list. This happen when abbreviate-file-name is passed to a
+   ;; candidate with no leading "~" e.g. "/foo" bug#2709.
+   (coerce :initform 'substring-no-properties)
    (migemo :initform t)
    (persistent-action :initform 'helm-ff-kill-or-find-buffer-fname)))
 
@@ -152,15 +165,8 @@ small.")
          (let ((helm-fuzzy-sort-fn 'helm-fuzzy-matching-sort-fn-preserve-ties-order))
            (setq helm-source-recentf
                  (helm-make-source "Recentf" 'helm-recentf-source
-                   :fuzzy-match val
-                   :cleanup #'helm-recentf-cleanup)))))
+                   :fuzzy-match val)))))
 
-(defun helm-recentf-cleanup ()
-  ;; Fix bug#2709 by stripping out text properties on exit.
-  (run-at-time 0.1 nil
-               (lambda ()
-                 (setq-default recentf-list
-                               (mapcar #'substring-no-properties recentf-list)))))
 
 ;;; Files in current dir
 ;;
