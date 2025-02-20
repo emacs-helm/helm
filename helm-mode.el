@@ -2640,7 +2640,6 @@ is non-nil."
 Can be used for `completion-in-region-function' by advicing it with an
 :around advice to allow passing the old
 `completion-in-region-function' value in ORIGFUN."
-  (cl-declare (special require-match prompt))
   (if (memq major-mode helm-mode-no-completion-in-region-in-modes)
       (funcall origfun start end collection predicate)
     (advice-add
@@ -2683,13 +2682,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                  (crm (eq current-command 'crm-complete))
                  (str-command (helm-symbol-name current-command))
                  (buf-name (format "*helm-mode-%s*" str-command))
-                 (require-match (cond ((boundp 'require-match) require-match)
-                                      (minibuffer-completion-confirm)
-                                      ;; If prompt have not been propagated here, that's
-                                      ;; probably mean we have no prompt and we are in
-                                      ;; completion-at-point or friend, so use a non--nil
-                                      ;; value for require-match.
-                                      ((not (boundp 'prompt)))))
+                 (require-match minibuffer-completion-confirm)
                  (metadata (completion-metadata input collection predicate))
                  ;; `completion-extra-properties' is let-bounded in `completion-at-point'.
                  ;; `afun' is a closure to call against each string in `data'.
@@ -2772,8 +2765,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                              data
                            (helm-comp-read
                             ;; Completion-at-point and friends have no prompt.
-                            (or (and (boundp 'prompt) prompt)
-                                (minibuffer-prompt) "Pattern: ")
+                            (or (minibuffer-prompt) "Pattern: ")
                             data
                             :name str-command
                             :nomark (null crm)
@@ -2787,9 +2779,6 @@ Can be used for `completion-in-region-function' by advicing it with an
                                       initial-input)))
                                   ((string-match "/\\'" initial-input)
                                    (and (eq helm-completion-style 'emacs) initial-input))
-                                  ((or (null require-match)
-                                       (stringp require-match))
-                                   (helm-mode--completion-in-region-initial-input initial-input))
                                   (t (helm-mode--completion-in-region-initial-input initial-input)))
                             :buffer buf-name
                             :fc-transformer
