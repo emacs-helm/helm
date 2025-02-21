@@ -2885,6 +2885,9 @@ Be sure to know what you are doing when modifying this.")
                          ;; it matches or default to "," if no match.
                          (eq (length crm-separator) 1)
                          crm-separator)
+                        (and (stringp crm-separator)
+                             (or (get-text-property 0 'separator crm-separator)
+                                 (string-replace "[ \t]*" "" crm-separator)))
                         helm-crm-default-separator)))
            ;; Try to find a default separator. If `crm-separator' is a
            ;; regexp use the string the regexp is matching.
