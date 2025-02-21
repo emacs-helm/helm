@@ -2901,9 +2901,24 @@ Be sure to know what you are doing when modifying this.")
                  (when (looking-back crm-separator (1- (point)))
                    (setq sep (match-string 0))))
              (setq sep nil))
+           (when (boundp 'crm-prompt) ; Emacs-30+.
+             (add-function :override (local 'completion-list-insert-choice-function)
+                           #'helm--crm-insert-fn))
            (funcall completion-list-insert-choice-function
                     beg end (mapconcat 'identity (append result '("")) sep))))
         (t nil)))
+
+(defun helm--crm-insert-fn (_start _end choice)
+  ;; Fix Emacs bug~76461.
+  (let* ((beg (save-excursion
+                (if (re-search-backward crm-separator nil t)
+                    (if (field-at-pos (point)) (field-end) (1+ (point)))
+                  (minibuffer-prompt-end))))
+         (end (save-excursion
+                (if (re-search-forward crm-separator nil t)
+                    (1- (point))
+                  (point-max)))))
+    (completion--replace beg end choice)))
 
 (defun helm-mode--disable-ido-maybe (&optional from-hook)
   (when (and (boundp 'ido-everywhere) ido-everywhere)
