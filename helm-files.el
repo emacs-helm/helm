@@ -6920,15 +6920,30 @@ VC handled directories.")
 
 ;;;###autoload
 (defun helm-projects-history (&optional arg)
-  "Jump to project already visisted with `helm-browse-project'."
+  "Jump to project already visisted with `helm-browse-project'.
+Prefix arg allows browsing files recursively under a project not handled
+by git or hg, otherwise it has no effect."
   (interactive "P")
+  (setq helm-browse-project-history
+        (cl-loop for p in helm-browse-project-history
+                 when (file-directory-p p)
+                 collect p))
   (helm :sources
         (helm-build-sync-source "Project history"
           :candidates helm-browse-project-history
-          :action (lambda (candidate)
-                    (with-helm-default-directory candidate
-                        (helm-browse-project
-                         (or arg helm-current-prefix-arg)))))
+          :action (helm-make-actions
+                   "Browse project"
+                   (lambda (candidate)
+                     (with-helm-default-directory candidate
+                       (helm-browse-project
+                        (or arg helm-current-prefix-arg))))
+                   "Remove project(s)"
+                   (lambda (_candidate)
+                     (let ((mkd (helm-marked-candidates)))
+                       (cl-loop for c in mkd do
+                                (setq helm-browse-project-history
+                                      (delete c helm-browse-project-history)))
+                       (message "%s projects removed" (length mkd))))))
         :buffer "*helm browse project history*"))
 
 ;;;###autoload
