@@ -79,6 +79,7 @@ compile: $(ELC)
 
 # Compile all files at once
 batch-compile:
+	echo Compiling helm with $(EMACS_COMMAND)
 	$(EMACS) $(LOADPATH) -f batch-byte-compile $(EL)
 
 # Remove all generated files
