@@ -428,8 +428,11 @@ Sort is done on basename of CANDIDATES."
                                      candidate
                                      directory))
                            0)
-                  (error "Failed to create locatedb file `%s'" candidate)))))
-    (cl-loop for p in helm-locate-project-list
+                  (error "Failed to create locatedb file `%s'" candidate))))
+         (projects (cl-loop for p in helm-locate-project-list
+                            when (file-directory-p p)
+                            collect p)))
+    (cl-loop for p in projects
              for db = (expand-file-name
                        helm-ff-locate-db-filename
                        (file-name-as-directory p))
