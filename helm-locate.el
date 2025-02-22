@@ -377,9 +377,7 @@ See also `helm-locate'."
 Sort is done on basename of CANDIDATES."
   (helm-fuzzy-matching-default-sort-fn-1 candidates nil t))
 
-(defclass helm-locate-override-inheritor (helm-type-file) ())
-
-(defclass helm-locate-source (helm-source-async helm-locate-override-inheritor)
+(defclass helm-locate-source (helm-source-async helm-type-file)
   ((init :initform 'helm-locate-initial-setup)
    (candidates-process :initform 'helm-locate-init)
    (requires-pattern :initform 3)
@@ -389,7 +387,7 @@ Sort is done on basename of CANDIDATES."
    (redisplay :initform (progn helm-locate-fuzzy-sort-fn))))
 
 ;; Override helm-type-file class keymap.
-(cl-defmethod helm--setup-source :after ((source helm-locate-override-inheritor))
+(cl-defmethod helm--setup-source :after ((source helm-locate-source))
   (setf (slot-value source 'keymap) helm-locate-map)
   (setf (slot-value source 'group) 'helm-locate))
 
