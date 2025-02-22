@@ -496,7 +496,7 @@ With a prefix arg refresh the database in each project."
   (helm-locate-set-command)
   (cl-assert (and (string-match-p "\\`locate" helm-locate-command)
                   (executable-find "updatedb"))
-             nil "Unsupported locate version")
+             nil "Unsupported locate program")
   (let ((dbs (helm-locate-find-dbs-in-projects update)))
     (if dbs
         (helm-locate-with-db dbs)
