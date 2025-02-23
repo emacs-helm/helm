@@ -42,6 +42,9 @@
 (declare-function helm-quit-and-find-file "helm-utils.el")
 (declare-function linum-mode "linum.el")
 (declare-function minibuffer-depth-setup "mb-depth.el")
+(declare-function transient--delete-window "ext:transient" ())
+(declare-function transient--preserve-window-p "ext:transient"
+                  (&optional nohide))
 
 (defvar helm-marked-buffer-name)
 (defvar display-buffer-function)
@@ -638,13 +641,13 @@ If t, then Helm does not pop-up a new window."
   :type 'string)
 
 (defcustom helm-save-configuration-functions
-  '(set-window-configuration . current-window-configuration)
+  '(set-window-configuration . helm-current-window-configuration)
   "Functions used to restore or save configurations for frames and windows.
 Specified as a pair of functions, where car is the restore
 function and cdr is the save function.
 
 To save and restore frame configuration, set this variable to
-\\='(set-frame-configuration . current-frame-configuration)
+\\='(set-frame-configuration . helm-current-frame-configuration)
 
 NOTE: This may not work properly with own-frame minibuffer
 settings.  Older versions saves/restores frame configuration, but
@@ -3372,6 +3375,14 @@ frame configuration as per `helm-save-configuration-functions'."
                          ;; side-effects, not for x-focus-frame.
                          ((symbol-function 'x-focus-frame) #'ignore))
                  (select-frame-set-input-focus frame))))))
+
+(defun helm-current-window-configuration ()
+  "Like `current-window-configuration' but deal with Transient incompatibility.
+See https://github.com/magit/transient/discussions/361 for details."
+  (when (and (window-live-p (bound-and-true-p transient--window))
+             (not (transient--preserve-window-p)))
+    (transient--delete-window))
+  (current-window-configuration))
 
 (defun helm-split-window-default-fn (window)
   "Default function to split windows before displaying `helm-buffer'.
