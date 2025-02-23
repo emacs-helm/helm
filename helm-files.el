@@ -6864,10 +6864,7 @@ Use FD as backend."
   "Run `helm-grep' AG from `helm-browse-project'."
   'helm-browse-project-ag)
 
-(defclass helm-browse-project-override-inheritor (helm-type-file) ())
-
-(defclass helm-browse-project-source (helm-source-in-buffer
-                                      helm-browse-project-override-inheritor)
+(defclass helm-browse-project-source (helm-source-in-buffer helm-type-file)
   ((root-dir :initarg :root-dir
              :initform nil
              :custom 'file)
@@ -6887,7 +6884,7 @@ Use FD as backend."
   "Class to define a source in `helm-browse-project' handling non
 VC handled directories.")
 
-(cl-defmethod helm--setup-source :after ((source helm-browse-project-override-inheritor))
+(cl-defmethod helm--setup-source :after ((source helm-browse-project-source))
   (let ((actions (slot-value source 'action)))
     (setf (slot-value source 'action)
           (helm-append-at-nth
