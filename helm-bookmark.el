@@ -581,11 +581,9 @@ If `browse-url-browser-function' is set to something else than
     (define-key map (kbd "C-x C-d") #'helm-bookmark-run-browse-project)
     map))
 
-;; Same as `helm-source-filtered-bookmarks' but override actions and keymap
-;; specifically for helm-find-files bookmarks.
-(defclass helm-bookmark-override-inheritor (helm-source) ())
+(defclass helm-bookmark-find-files-class (helm-source-filtered-bookmarks) ())
 
-(cl-defmethod helm--setup-source ((source helm-bookmark-override-inheritor))
+(cl-defmethod helm--setup-source ((source helm-bookmark-find-files-class))
   ;; Ensure `helm-source-in-buffer' method is called.
   (cl-call-next-method)
   (setf (slot-value source 'action)
@@ -598,10 +596,6 @@ If `browse-url-browser-function' is set to something else than
                   collect (cons name action))
          '(("Browse project" . helm-bookmark-browse-project)) 1))
   (setf (slot-value source 'keymap) helm-bookmark-find-files-map))
-
-(defclass helm-bookmark-find-files-class (helm-source-filtered-bookmarks
-                                          helm-bookmark-override-inheritor)
-  ())
 
 (defun helm-source-bookmark-helm-find-files-builder ()
   (helm-bookmark-build-source
