@@ -247,6 +247,11 @@ Colorize only symlinks, directories and files."
                                    helm-recentf--basename-flag)
                                (helm-basename candidate) candidate)))
    (fuzzy-match :initform t)
+   (popup-info :initform (lambda (candidate)
+                           (unless (helm-ff-dot-file-p candidate)
+                             (helm-file-attributes
+                              candidate
+                              :dired t :human-size t :octal nil))))
    (migemo :initform t)))
 
 (cl-defmethod helm--setup-source :after ((source helm-files-in-current-dir-source))
