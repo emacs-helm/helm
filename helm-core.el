@@ -4727,7 +4727,8 @@ useful when the order of the candidates is meaningful, e.g. with
          (host    (and file-comp (get-text-property
                                   (max 0 (1- (length display))) 'host display)))
          (regex   (helm--maybe-get-migemo-pattern pattern diacritics))
-         (mpart   (get-text-property 0 'match-part display))
+         ;; Match prop at end, because at 0 we might have an icon.
+         (mpart   (get-text-property (1- (length display)) 'match-part display))
          (mp      (cond ((and mpart (string= display mpart)) nil)
                         (mpart)
                         ;; FIXME: This may be wrong when match-on-real
