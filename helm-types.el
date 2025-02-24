@@ -34,7 +34,10 @@
 
 
 ;;  Files
-(defclass helm-type-file (helm-source) ()
+(defclass helm-type-file (helm-source)
+  ((completing-file-name
+    :initarg :completing-file-name :initform t
+    :documentation "Flag to notify we are completing filenames."))
   "A class to define helm type file.")
 
 (cl-defmethod helm-source-get-action-from-type ((object helm-type-file))
