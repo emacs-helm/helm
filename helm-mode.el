@@ -2901,7 +2901,7 @@ Be sure to know what you are doing when modifying this.")
                  (when (looking-back crm-separator (1- (point)))
                    (setq sep (match-string 0))))
              (setq sep nil))
-           (when (boundp 'crm-prompt) ; Emacs-30+.
+           (when (> emacs-major-version 29)
              (add-function :override (local 'completion-list-insert-choice-function)
                            #'helm--crm-insert-fn))
            (funcall completion-list-insert-choice-function
