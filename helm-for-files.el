@@ -250,8 +250,9 @@ Colorize only symlinks, directories and files."
    (migemo :initform t)))
 
 (cl-defmethod helm--setup-source :after ((source helm-files-in-current-dir-source))
-  (setf (slot-value source 'filtered-candidate-transformer)
-        '(helm-ff-sort-candidates helm-highlight-files)))
+  (helm-aif (slot-value source 'filtered-candidate-transformer)
+      (setf (slot-value source 'filtered-candidate-transformer)
+            (append '(helm-ff-sort-candidates) (helm-mklist it)))))
 
 (defvar helm-source-files-in-current-dir
   (helm-make-source "Files from Current Directory"
