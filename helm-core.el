@@ -5361,7 +5361,8 @@ specified as respectively `helm-cand-num' and `helm-cur-source'."
          start end
          `(mouse-face highlight
                       keymap ,map
-                      help-echo ,(helm-acase (get-text-property start 'help-echo)
+                      ;; At 0 we might have an icon, so match at end.
+                      help-echo ,(helm-acase (get-text-property (1- end) 'help-echo)
                                    ((guard* (stringp it))
                                     (concat it "\nmouse-1: select candidate\nmouse-3: menu actions"))
                                    (t "mouse-1: select candidate\nmouse-3: menu actions")))))
