@@ -943,7 +943,7 @@ Note that image files are always followed even if their extensions is
 present in this list."
   :type '(repeat string))
 
-(defcustom helm-ff-nohighlight-matches t
+(defcustom helm-ff-nohighlight-matches nil
   "Highlight matches in `helm-find-files' when nil."
   :type 'boolean
   :initialize 'custom-initialize-changed
