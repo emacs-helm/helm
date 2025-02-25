@@ -2,6 +2,10 @@
 
 * NEWS
 ** Version 4.0.2
+*** Fix Emacs bug with CRM when using org-set-tags
+*** Improve helm-source-files-in-current-dir
+*** Fix some compatibility problems with EIEIO in various Emacs
+*** Improve helm-projects-history
 *** Fix bug in recentf
 Properties may corrupt recentf data, prevent this.
 *** Fix bug with *-window-side-state no more working
