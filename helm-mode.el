@@ -2467,6 +2467,87 @@ When AFUN, AFIX are nil and CATEGORY is not file return COMPS unmodified."
                  comps))
         (t comps)))
 
+(defun helm-dynamic-completion (collection predicate &optional point metadata nomode styles)
+  "Build a completion function for `helm-pattern' in COLLECTION.
+
+Only the elements of COLLECTION that satisfy PREDICATE are considered.
+
+Argument POINT is the same as in `completion-all-completions' and
+is meaningful only when using some kind of `completion-at-point'.
+
+The return value is a list of completions that may be sorted by
+the sort function provided by the completion-style in
+use (emacs-27 only), otherwise (emacs-26) the sort function has
+to be provided if needed either with an FCT function in source or
+by passing the sort function with METADATA
+E.g.: \\='((metadata (display-sort-function . foo))).
+Candidates can be modified by passing an affixation-function in METADATA.
+
+If you don't want the sort fn provided by style to kick
+in (emacs-27) you can use as metadata value the symbol `nosort'.
+
+Example:
+
+    (helm :sources (helm-build-sync-source \"test\"
+                     :candidates (helm-dynamic-completion
+                                  \\='(foo bar baz foab)
+                                  \\='symbolp)
+                     :match-dynamic t)
+          :buffer \"*helm test*\")
+
+When argument NOMODE is non nil don't use `completion-styles' as
+specified in `helm-completion-styles-alist' for specific modes.
+
+When STYLES is specified use these `completion-styles', see
+`helm--prepare-completion-styles'.
+
+Also `helm-completion-style' settings have no effect here,
+`emacs' being used inconditionally as value."
+  (lambda ()
+    (let* (;; Force usage of emacs style otherwise
+           ;; helm--prepare-completion-styles will reset
+           ;; completion-styles to default value i.e. (basic partial
+           ;; emacs22).
+           (helm-completion-style 'emacs)
+           (completion-styles
+            (with-helm-current-buffer
+              (helm--prepare-completion-styles nomode styles)))
+           (completion-flex-nospace t)
+           (nosort (eq metadata 'nosort))
+           (compsfn (lambda (str pred _action)
+                      (let* ((completion-ignore-case (helm-set-case-fold-search))
+                             ;; Use a copy of metadata to avoid accumulation of
+                             ;; adjustment in metadata (This is not needed in
+                             ;; emacs-31+, it has been fixed in emacsbug
+                             ;; #74718). This also avoid the flex adjustment fn
+                             ;; reusing the previous sort fn.
+                             (md (copy-sequence metadata))
+                             (comps (completion-all-completions
+                                     str
+                                     (if (functionp collection)
+                                         (funcall collection str pred t)
+                                       collection)
+                                     pred
+                                     (or point 0)
+                                     (or (and (consp md) md)
+                                         (setq metadata '(metadata)))))
+                             (last-data (last comps))
+                             (sort-fn (unless nosort
+                                        (completion-metadata-get
+                                         md 'display-sort-function)))
+                             (affix (completion-metadata-get
+                                     md 'affixation-function))
+                             all)
+                        (when (cdr last-data) (setcdr last-data nil))
+                        (setq all (if (and sort-fn (> (length str) 0))
+                                      (funcall sort-fn comps)
+                                    comps))
+                        (if affix
+                            (helm-completion--decorate all nil affix nil)
+                          all)))))
+      ;; Ensure circular objects are removed.
+      (complete-with-action t compsfn helm-pattern predicate))))
+
 ;; Helm multi matching style
 
 (defun helm-completion-try-completion (string table pred point)
