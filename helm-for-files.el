@@ -166,25 +166,32 @@ small.")
                    :fuzzy-match val)))))
 
 
-;;; Files in current dir
+;;; Transformer for helm-type-file
 ;;
 ;;
+(defvar helm-sources-for-files-no-basename '("Recentf" "File Cache"))
+
 ;; Function `helm-highlight-files' is used in type `helm-type-file'. Ensure that
 ;; the definition is available for clients, should they need it.
 ;; See https://github.com/bbatsov/helm-projectile/issues/184.
 ;;;###autoload
-(defun helm-highlight-files (files _source)
+(defun helm-highlight-files (files source)
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
   (cl-loop with mp-fn = (or (assoc-default
                              'match-part (helm-get-current-source))
                             'identity)
+           with sname = (helm-get-attr 'name source)
            for i in files
-           for disp = (if (and helm-ff-transformer-show-only-basename
-                               (not (helm-ff-dot-file-p i))
-                               (not (and helm--url-regexp
-                                         (string-match helm--url-regexp i)))
-                               (not (string-match helm-ff-url-regexp i)))
+           for disp = (if (or (and (not helm-ff-show-dot-file-path)
+                                   (helm-ff-dot-file-p i))
+                              (and helm-ff-transformer-show-only-basename
+                                   (not (member sname
+                                                helm-sources-for-files-no-basename))
+                                   (not (helm-ff-dot-file-p i))
+                                   (not (and helm--url-regexp
+                                             (string-match helm--url-regexp i)))
+                                   (not (string-match helm-ff-url-regexp i))))
                           (helm-basename i) (abbreviate-file-name i))
            for isremote = (or (file-remote-p i)
                               (helm-file-on-mounted-network-p i))
@@ -235,6 +242,10 @@ Colorize only symlinks, directories and files."
                          'helm-ff-file-extension t disp)))
                   (cons (helm-ff-prefix-filename disp i) i)))))
 
+
+;;; Files in current dir
+;;
+;;
 (defclass helm-files-in-current-dir-source (helm-source-sync helm-type-file)
   ((candidates :initform (lambda ()
                            (with-helm-current-buffer
@@ -261,7 +272,10 @@ Colorize only symlinks, directories and files."
 
 (defvar helm-source-files-in-current-dir
   (helm-make-source "Files from Current Directory"
-      'helm-files-in-current-dir-source))
+      'helm-files-in-current-dir-source
+    :header-name (lambda (_name)
+                   (format "Files from `%s'"
+                           (abbreviate-file-name (helm-default-directory))))))
 
 ;;;###autoload
 (defun helm-for-files ()
@@ -273,7 +287,6 @@ Run all sources defined in `helm-for-files-preferred-list'."
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (helm :sources helm-for-files-preferred-list
-        :ff-transformer-show-only-basename nil
         :buffer "*helm for files*"
         :truncate-lines helm-buffers-truncate-lines))
 
@@ -330,7 +343,6 @@ searching for is already found."
         'helm-multi-files-toggle-to-locate))
     (unwind-protect
          (helm :sources sources
-               :ff-transformer-show-only-basename nil
                :buffer "*helm multi files*"
                :truncate-lines helm-buffers-truncate-lines)
       (define-key helm-map (kbd helm-multi-files-toggle-locate-binding)
