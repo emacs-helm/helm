@@ -2763,7 +2763,9 @@ Can be used for `completion-in-region-function' by advicing it with an
                  (crm (eq current-command 'crm-complete))
                  (str-command (helm-symbol-name current-command))
                  (buf-name (format "*helm-mode-%s*" str-command))
-                 (require-match minibuffer-completion-confirm)
+                 ;; If we have a minibuffer use `minibuffer-completion-confirm'
+                 ;; otherwise assume we use `completion-at-point' and use `t'.
+                 (require-match (if crm minibuffer-completion-confirm t))
                  (metadata (completion-metadata input collection predicate))
                  ;; `completion-extra-properties' is let-bounded in `completion-at-point'.
                  ;; `afun' is a closure to call against each string in `data'.
