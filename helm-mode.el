@@ -2911,8 +2911,10 @@ Be sure to know what you are doing when modifying this.")
 (defun helm--crm-insert-fn (_start _end choice)
   ;; Fix Emacs bug~76461.
   (let* ((beg (save-excursion
-                (if (re-search-backward crm-separator nil t)
-                    (if (field-at-pos (point)) (field-end) (1+ (point)))
+                (if (and (re-search-backward crm-separator nil t)
+                         ;; Matches end of prompt (:) when sep is ":".
+                         (not (field-at-pos (point))))
+                    (1+ (point))
                   (minibuffer-prompt-end))))
          (end (save-excursion
                 (if (re-search-forward crm-separator nil t)
