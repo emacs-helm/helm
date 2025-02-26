@@ -5291,7 +5291,6 @@ Special commands:
   (when helm-ff--show-thumbnails
     (message "Loading thumbnails...")
     (with-helm-after-update-hook
-      (sit-for 1)
       (message "Loading thumbnails done")))
   (when (and (null helm-ff--show-thumbnails)
              (member helm-ff-default-directory
