@@ -277,7 +277,7 @@ Arg PACKAGES is a list of strings."
 (defun helm-finder--list-matches (key)
   (let* ((id (intern key))
          (built-in (gethash id finder-keywords-hash))
-	 (exts (cl-loop for p in package-archive-contents
+    (exts (cl-loop for p in package-archive-contents
                         for sym = (car p)
                         when (package--has-keyword-p
                               (package-get-descriptor sym)

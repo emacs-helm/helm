@@ -461,7 +461,7 @@ Sort is done on basename of CANDIDATES."
                 (guard* (string-match-p "\\`es" it))
                 (format it (replace-regexp-in-string
                             "/" "\\\\\\\\" (helm-get-attr 'basedir))
-	                (helm-get-attr 'subdir)))
+                     (helm-get-attr 'subdir)))
                (;; Locate
                 (guard* (string-match-p "\\`locate" it))
                 ;; Try to use a locale DB if some.

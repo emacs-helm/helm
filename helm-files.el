@@ -388,7 +388,7 @@ and \"..\" are still displayed as full path when
   "Show full path of dotted directories when non nil."
   :type 'boolean
   :set (lambda (var val)
-	 (set-default var val)
+       (set-default var val)
          (clrhash helm-ff--list-directory-cache)))
 
 (defcustom helm-ff-signal-error-on-dot-files t
@@ -905,8 +905,8 @@ If your system have no file notification package available turn this
 to nil to avoid error messages when using `helm-find-files'."
   :type 'boolean
   :set (lambda (var val)
-	 (set-default var val)
-	 (unless (symbol-value var)
+       (set-default var val)
+       (unless (symbol-value var)
            (cl-loop for dir being the hash-keys of helm-ff--file-notify-watchers
                     do (remhash dir helm-ff--list-directory-cache)))))
 
@@ -1979,7 +1979,7 @@ this working."
       ;; we can just stick the new command at the end of the current
       ;; one, and everything will happen as it should
       (setcdr (last (cdr eshell-current-command))
-	      (list `(let ((here (and (eobp) (point))))
+           (list `(let ((here (and (eobp) (point))))
                        ,(and input
                              `(insert-and-inherit ,(concat input "\n")))
                        (if here
@@ -1991,7 +1991,7 @@ this working."
            (insert "command: \"" input "\"\n")))
     (setq eshell-current-command command)
     (let* ((delim (catch 'eshell-incomplete
-		    (eshell-resume-eval)))
+                 (eshell-resume-eval)))
            (val (car-safe delim)))
       ;; If the return value of `eshell-resume-eval' is wrapped in a
       ;; list, it indicates that the command was run asynchronously.
@@ -3085,7 +3085,7 @@ when `helm-pattern' is equal to \"~/\"."
                ;; Try to shut up persistent tramp error with adb method when
                ;; adding tilde to path.
                (tramp-tolerate-tilde (equal (file-remote-p pat 'method)
-		                            tramp-adb-method))
+                                         tramp-adb-method))
                (completed-p (helm-aand (expand-file-name
                                         (substitute-in-file-name pat))
                                        (string= (file-name-as-directory it)
@@ -6121,10 +6121,10 @@ Return the \"files\" subdirectory of trash directory.
 When `helm-trash-default-directory' is set use it as trash directory."
   (let* ((xdg-data-dir
           (or helm-trash-default-directory
-	      (directory-file-name
-	       (expand-file-name "Trash"
-			         (or (getenv "XDG_DATA_HOME")
-				     "~/.local/share")))))
+           (directory-file-name
+            (expand-file-name "Trash"
+                              (or (getenv "XDG_DATA_HOME")
+                                  "~/.local/share")))))
          (trash-files-dir (expand-file-name "files" xdg-data-dir)))
     ;; Just return nil if the Trash directory is not yet created. It will be
     ;; created later by `delete-directory'.

@@ -1319,17 +1319,17 @@ is used."
 
 (defun helm--get-theme-doc-1 (sym)
   (let ((fn (locate-file (concat (symbol-name sym) "-theme.el")
-			 (custom-theme--load-path)
-			 '("" "c")))
+                       (custom-theme--load-path)
+                       '("" "c")))
         doc)
     ;; Avoid loading theme as much as possible.
     (when fn
       (with-temp-buffer
         (insert-file-contents fn)
         (helm-awhile (let ((read-circle nil))
-		       (condition-case nil
-			   (read (current-buffer))
-		         (end-of-file nil)))
+                     (condition-case nil
+                         (read (current-buffer))
+                       (end-of-file nil)))
           (when (eq (car-safe it) 'deftheme)
             (cl-return (setq doc (car (split-string (nth 2 it) "\n"))))))
         (unless doc
@@ -1445,11 +1445,11 @@ is used."
                     (cl-loop for buffer in (buffer-list) thereis
                              (with-current-buffer buffer
                                (when (and (derived-mode-p 'Info-mode)
-		                          (stringp Info-current-file)
-		                          (string-match
+                                        (stringp Info-current-file)
+                                        (string-match
                                            manual-re Info-current-file))
                                  (setq prefix "*")
-	                         Info-current-file))))
+                               Info-current-file))))
                   (assoc-default comp helm-info--files-cache)
                   (helm-aif (Info-find-file comp t)
                       (prog1 it (push (cons comp it) helm-info--files-cache)))))

@@ -799,11 +799,11 @@ RESET non-nil means rewind to the first match.
 This is the `next-error-function' for `helm-occur-mode'."
   (interactive "p")
   (goto-char (cond (reset (point-min))
-		   ((and (< argp 0) helm-current-error)
+                 ((and (< argp 0) helm-current-error)
                     (line-beginning-position))
-		   ((and (> argp 0) helm-current-error)
+                 ((and (> argp 0) helm-current-error)
                     (line-end-position))
-		   ((point))))
+                 ((point))))
   (let ((fun (if (> argp 0)
                  #'next-single-property-change
                #'previous-single-property-change)))

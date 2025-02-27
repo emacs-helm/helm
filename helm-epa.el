@@ -178,7 +178,7 @@
         (keys (helm-marked-candidates)))
     (message "Deleting gpg keys..")
     (condition-case error
-	(epg-delete-keys context keys)
+        (epg-delete-keys context keys)
       (error
        (epa-display-error context)
        (signal (car error) (cdr error))))
@@ -201,7 +201,7 @@
     (with-no-warnings
       (setf (epg-context-armor context) t))
     (condition-case error
-	(kill-new (epg-export-keys-to-string context keys))
+        (kill-new (epg-export-keys-to-string context keys))
       (error
        (epa-display-error context)
        (signal (car error) (cdr error))))))
@@ -214,16 +214,16 @@
     (save-excursion
       (goto-char (point-min))
       (if (search-forward mail-header-separator nil t)
-	  (forward-line))
+          (forward-line))
       (setq epa-last-coding-system-specified
-	    (or coding-system-for-write
-	        (select-safe-coding-system (point) (point-max))))
+            (or coding-system-for-write
+                (select-safe-coding-system (point) (point-max))))
       (let ((verbose current-prefix-arg))
         (setq start (point)
               end (point-max)
               mode (if verbose
-		       (epa--read-signature-type)
-	             'clear))))
+                       (epa--read-signature-type)
+                     'clear))))
     ;; TODO Make non-interactive functions to replace epa-sign-region
     ;; and epa-encrypt-region and inline them.
     (with-no-warnings
@@ -237,12 +237,12 @@
     (save-excursion
       (goto-char (point-min))
       (when (search-forward mail-header-separator nil t)
-	(forward-line))
+        (forward-line))
       (setq start (point)
             end (point-max))
       (setq epa-last-coding-system-specified
-	    (or coding-system-for-write
-		(select-safe-coding-system start end))))
+            (or coding-system-for-write
+                (select-safe-coding-system start end))))
     ;; Don't let some read-only text stop us from encrypting.
     (let ((inhibit-read-only t)
           (keys (helm-epa-collect-keys-from-candidates cands))

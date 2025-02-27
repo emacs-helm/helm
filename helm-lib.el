@@ -399,10 +399,10 @@ This is done recursively."
         object
       (let ((vec (string-to-vector object)))
         (unless (multibyte-string-p object)
-	  (dotimes (i (length vec))
-	    (let ((k (aref vec i)))
-	      (when (> k 127)
-	        (setf (aref vec i) (+ k ?\M-\C-@ -128))))))
+          (dotimes (i (length vec))
+            (let ((k (aref vec i)))
+              (when (> k 127)
+                (setf (aref vec i) (+ k ?\M-\C-@ -128))))))
         vec))))
 
 (defun helm-proper-list-p (obj)
