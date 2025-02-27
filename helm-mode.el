@@ -99,7 +99,7 @@ Special symbol \\='default' means use the default helm handler for either
 e.g. (write-region . (default helm-read-file-name-handler-1))
 means helm will use `helm-completing-read-default-handler' when
 `write-region' calls `completing-read' and
-`helm-read-file-name-handler-1' when it calls `read-file-name'.  
+`helm-read-file-name-handler-1' when it calls `read-file-name'.
 
 Each key is an Emacs command that use originaly `completing-read'
 or/and `read-file-name'.
@@ -603,7 +603,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                        cands))
               ;; Some functions like debug-on-entry use (symbol-name sym)
               ;; without checking if sym is non nil, so the return value become
-              ;; "nil". 
+              ;; "nil".
               ((and (not (member default '("" "nil")))
                     (string= helm-pattern ""))
                (cons default (delete (helm-stringify default)
@@ -761,7 +761,7 @@ Keys description:
 
 - GET-LINE: Specify the :get-line slot of `helm-source-in-buffer', has no effect
   when CANDIDATES-IN-BUFFER is nil.
- 
+
 - MATCH-PART: Allow matching only one part of candidate.
   See match-part documentation in `helm-source'.
 
@@ -776,7 +776,7 @@ Keys description:
 - COERCE: See coerce in `helm-source'.
 
 - RAW-CANDIDATE: Do not unquote the unknown candidate coming from helm-pattern
-  when non nil. 
+  when non nil.
 
 - GROUP: See group in `helm-source'.
 
@@ -789,7 +789,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
   ;;
   ;; Should show helm with one source at first run and save result on
   ;; exit, should show the history source along candidates source on
-  ;; next run as soon as `test-hist' value is feeded. 
+  ;; next run as soon as `test-hist' value is feeded.
   ;;     (setq test-hist nil)
   ;;     (helm-comp-read "test: " '(a b c d e)
   ;;                     :history 'test-hist)
@@ -1805,7 +1805,7 @@ Don't use it directly."
   ;; to `read-buffer' through `minibuffer-setup-hook' which is too
   ;; late to be known by `read-buffer-function', in our case
   ;; `helm--generic-read-buffer'.  It should let bind it to allow us
-  ;; using it. 
+  ;; using it.
   (let ((minibuffer-completion-table (internal-complete-buffer-except)))
     (read-buffer prompt (other-buffer (current-buffer))
                  (confirm-nonexistent-file-or-buffer))))

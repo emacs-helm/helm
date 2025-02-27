@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2015 ~ 2020  Thierry Volpiatto
 
-;; Author: Thierry Volpiatto 
+;; Author: Thierry Volpiatto
 ;; URL: http://github.com/emacs-helm/helm
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -323,7 +323,7 @@ the leading `-' char."
         (unless package--initialized (package-initialize 'no-activate))
         (or (cadr (assq pkg-name package-alist))
             (cadr (assq pkg-name package-archive-contents))))
-      
+
       (defun package-upgrade (name)
         "Upgrade package NAME if a newer version exists."
         (let* ((package (if (symbolp name)

@@ -1,4 +1,4 @@
-;;; helm-packages.el --- helm interface to manage packages  -*- lexical-binding: t; -*- 
+;;; helm-packages.el --- helm interface to manage packages  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012 ~ 2025 Thierry Volpiatto
 
@@ -322,7 +322,7 @@ Arg PACKAGES is a list of strings."
                                    when (not (assq sym package-alist))
                                    nconc (list (list sym (package--from-builtin
                                                           (cons sym vec))))))
-                package-alist))) 
+                package-alist)))
     (cl-loop for (sym desc) in pkgs
              for pkg = (assq sym package-archive-contents)
              for cversion = (and pkg (package-desc-version desc))

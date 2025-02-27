@@ -285,14 +285,14 @@ Arg OTHER-SUBKEYS should be an alist composed of (command . short-key) where
 command is another command than COMMAND bound to short-key.
 
 A PROMPT can be used to describe bindings of COMMAND and OTHER-SUBKEYS.
- 
+
 Return an anonymous interactive command to use with
 `helm-define-key-with-subkeys'."
   (lambda ()
     (interactive)
     (let (timer)
       (call-interactively command)
-      (unless (or defining-kbd-macro executing-kbd-macro) 
+      (unless (or defining-kbd-macro executing-kbd-macro)
         (unwind-protect
              (progn
                (when delay
@@ -1702,7 +1702,7 @@ and creating a new one at each session, see `helm-display-buffer-reuse-frame'.
 Normally you don't have to use this, it have been made to workaround
 slow frame popup in Emacs-26, to workaround this slowness in Emacs-26 use instead
 
-#+begin_src elisp 
+#+begin_src elisp
     (when (= emacs-major-version 26)
       (setq x-wait-for-event-timeout nil))
 #+end_src
@@ -3031,7 +3031,7 @@ HISTORY args see `helm'."
               ;; When non-nil (the default) the current active
               ;; minibuffer is used in new frame, which is not what we
               ;; want in helm when starting from an active minibuffer,
-              ;; either a helm minibuffer or something line M-:. 
+              ;; either a helm minibuffer or something line M-:.
               (and ori--minibuffer-follows-selected-frame
                    (setq minibuffer-follows-selected-frame
                          (unless (or helm--nested
@@ -4739,7 +4739,7 @@ useful when the order of the candidates is meaningful, e.g. with
          (count   0)
          beg-str end-str)
     ;; Happens when matching empty lines (^$), in this case there is nothing to
-    ;; highlight. 
+    ;; highlight.
     (if (string= mpart "")
         candidate
       (when host (setq pattern (cadr (split-string pattern ":"))))
@@ -4803,7 +4803,7 @@ to the matching method in use.  When DIACRITICS is specified, ignore
 diacritics, see `char-fold-to-regexp' for more infos."
   (if (string= pattern "")
       ;; Empty pattern, do nothing.  This is needed when this function
-      ;; is used outside of helm-fuzzy-highlight-matches like in *buffers-list. 
+      ;; is used outside of helm-fuzzy-highlight-matches like in *buffers-list.
       candidate
     ;; Else start highlighting.
     (helm-fuzzy-default-highlight-match-1 candidate pattern diacritics file-comp)))
@@ -4840,7 +4840,7 @@ REGEXP should be generated from a pattern which is a list like
 Such pattern may be build with
 `helm-completion--flex-transform-pattern' function, and the regexp
 with `completion-pcm--pattern->regex'.  For commodity,
-`helm--fuzzy-flex-pattern-to-regexp' is used to build such regexp. 
+`helm--fuzzy-flex-pattern-to-regexp' is used to build such regexp.
 
 Function extracted from `completion-pcm--hilit-commonality' in
 emacs-27 to provide such scoring in emacs<27."
@@ -5697,11 +5697,11 @@ If action buffer is selected, back to the Helm buffer."
                            ;; If `helm-show-action-window-other-window' is non nil
                            ;; we should have now two windows displaying
                            ;; helm-buffer, delete the one that was handling
-                           ;; previously action buffer. 
+                           ;; previously action buffer.
                            (when (helm--show-action-window-other-window-p)
                              (delete-window it))
                            ;; Resize window on horizontal split, though for some
-                           ;; reasons only 'above' needs to be resized. 
+                           ;; reasons only 'above' needs to be resized.
                            (when (memq helm-show-action-window-other-window '(below above))
                              (window-resize (get-buffer-window helm-buffer) delta))
                            (kill-buffer helm-action-buffer)
@@ -7153,7 +7153,7 @@ unless FORCE-LONGEST is non nil."
       buf)))
 
 (defun helm--get-longest-len-in-buffer ()
-  "Return length of the longest line in buffer." 
+  "Return length of the longest line in buffer."
   (save-excursion
     (goto-char (point-min))
     (let ((max 0)

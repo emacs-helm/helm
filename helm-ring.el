@@ -546,7 +546,7 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
                                  (cons (kmacro-ring-head)
                                        kmacro-ring)
                                  :test 'equal)))
-            
+
             :multiline t
             :candidate-transformer
             (lambda (candidates)

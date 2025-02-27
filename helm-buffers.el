@@ -101,7 +101,7 @@ of this source is accessible and properly loaded."
 
 (defcustom helm-buffers-end-truncated-string
   ;; `truncate-string-ellipsis', the function is not available in 27.1
-  ;; See issue#2673. 
+  ;; See issue#2673.
   (if (char-displayable-p ?…) "…" "...")
   "The string to display at end of truncated buffer names."
   :type 'string)

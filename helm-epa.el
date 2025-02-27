@@ -183,7 +183,7 @@
        (epa-display-error context)
        (signal (car error) (cdr error))))
     (message "Deleting gpg keys done")))
-  
+
 (defun helm-epa-encrypt-file (_candidate)
   "Select a file to encrypt with key CANDIDATE."
   (let* ((file (helm-read-file-name "Encrypt file: "))

@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2015 ~ 2020  Thierry Volpiatto
 
-;; Author: Thierry Volpiatto 
+;; Author: Thierry Volpiatto
 ;; URL: http://github.com/emacs-helm/helm
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -500,7 +500,7 @@
   sources built with child class `helm-source-in-buffer' the SEARCH slot.
   This also add a `filtered-candidate-transformer' function to sort candidates
   (see `helm-fuzzy-sort-fn') according to the score of each candidate which is
-  computed with `helm-fuzzy-default-score-fn'. 
+  computed with `helm-fuzzy-default-score-fn'.
   This is an easy way of enabling fuzzy matching, but you can use the MATCH
   or SEARCH slots yourself if you want something more elaborated, mixing
   different type of match (See `helm-source-buffers' class for example), you
@@ -615,7 +615,7 @@
     :documentation
     "  Enable `helm-follow-mode' for this source only.
   With a value of 1 enable, a value of -1 or nil disable the mode, value set to
-  \\='never prevent using `helm-follow-mode' in this source. 
+  \\='never prevent using `helm-follow-mode' in this source.
   See `helm-follow-mode' for more infos.")
 
    (follow-delay
@@ -674,7 +674,7 @@
     :documentation
     "  A local hook that run at end of initilization of this source.
   i.e After the creation of `helm-buffer'.
-  
+
   Should be a variable (a symbol) bound to a list of
   functions or a single function (see `run-hooks' documentation).
   Even better is to use `add-hook' to feed this variable.
@@ -777,7 +777,7 @@
   The :candidates function in this case is in charge of fetching
   candidates dynamically according to `helm-pattern'.
   If you want to make your :candidates function working with `completion-styles'
-  use the function `helm-dynamic-completion'. 
+  use the function `helm-dynamic-completion'.
   Note that :volatile is automatically enabled when using this, so no
   need to specify it."))
 
@@ -796,7 +796,7 @@ Matching is done basically with `string-match' against each candidate.")
   The function called with no arguments must return a process
   i.e. `processp', it use typically `start-process' or `make-process',
   see (info \"(elisp) Asynchronous Processes\").
-  
+
 
   NOTE:
   When building the source at runtime you can give directly a process
@@ -852,7 +852,7 @@ inherit from `helm-source'.")
 
    (match
     :initform '(identity))
-   
+
    (get-line
     :initarg :get-line
     :initform 'buffer-substring-no-properties

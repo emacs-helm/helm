@@ -238,7 +238,7 @@ Should not be used among other sources.")
     (define-key map (kbd "C-c C-a")       'helm-ff-run-mail-attach-files)
     (define-key map (kbd "C-c p")         'helm-ff-run-print-file)
     (define-key map (kbd "C-c /")         'helm-ff-run-find-sh-command)
-    (define-key map (kbd "C-/")           'helm-ff-run-fd) 
+    (define-key map (kbd "C-/")           'helm-ff-run-fd)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")           'helm-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")           'helm-ff-rotate-right-persistent)
@@ -1915,7 +1915,7 @@ this working."
                 (setq cmd-line (format command mapfiles)) ; See [1]
               (setq cmd-line (format "%s %s" command mapfiles)))
             (eshell-command cmd-line))
-        
+
         ;; Run eshell-command sequencially on EACH marked files.
         ;; To work with tramp handler we have to call
         ;; COMMAND on basename of each file, using
@@ -2194,7 +2194,7 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
                when (file-directory-p r)
                ;; We can use this as long as this filtering function
                ;; is called after `helm-ff-fct' otherwise candidates
-               ;; may not be cons cell at first call [1]. 
+               ;; may not be cons cell at first call [1].
                collect (cons d r))
     candidates))
 
@@ -3623,7 +3623,7 @@ debugging purpose."
           ;; Check here if directory is accessible (not working on Windows).
           ((and (file-directory-p path) (not (file-readable-p path)))
            ;; Prefix error message with @@@@ for safety
-           ;; (some files may match file-error See bug#2400) 
+           ;; (some files may match file-error See bug#2400)
            (list (cons (format "@@@@file-error: Opening directory permission denied `%s'" path)
                        path)))
           ;; A fast expansion of PATH is made only if `helm-ff-auto-update-flag'
@@ -3778,7 +3778,7 @@ later in the transformer."
 ;; bug#2542.
 ;; Store here associations of (truename . symlink) when opening a
 ;; symlinked directory, then add the watch to the truename; When the
-;; watcher ring on the truename remove the symlinked directory from cache.  
+;; watcher ring on the truename remove the symlinked directory from cache.
 (defvar helm-ff--list-directory-links nil)
 
 (defun helm-ff-directory-files (directory &optional force-update)
@@ -3812,7 +3812,7 @@ in cache."
                        (file-error
                         (prog1
                             ;; Prefix error message with @@@@ for safety
-                            ;; (some files may match file-error See bug#2400) 
+                            ;; (some files may match file-error See bug#2400)
                             (list (format "@@@@%s:%s"
                                           (car err)
                                           (mapconcat 'identity (cdr err) " ")))
@@ -3888,7 +3888,7 @@ Remove as well all related file-notify watchers.
 
 This is meant to run in `tramp-cleanup-connection-hook'."
   (cl-loop for key being the hash-keys in helm-ff--list-directory-cache
-           when (equal (file-remote-p key 'method) (cadr vec)) 
+           when (equal (file-remote-p key 'method) (cadr vec))
            do (remhash key helm-ff--list-directory-cache))
   (cl-loop for key being the hash-keys in helm-ff--file-notify-watchers
            when (equal (file-remote-p key 'method) (cadr vec))
@@ -4344,7 +4344,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                        (file-error
                         ;; Possible error not happening during listing
                         ;; but when calling file-attributes see error
-                        ;; with sshfs bug#2405 
+                        ;; with sshfs bug#2405
                         (message "%s:%s" (car err) (cdr err)) nil)))
                (type (car attr))
                x-bit)
@@ -4673,7 +4673,7 @@ with `helm-ff-trash-list'."
 (cl-defun helm-ff-trash-list (&optional (trash-dir nil strash-dir))
   "Return an alist of trashed files basename and dest name.
 Assume the trash system in use is freedesktop compatible, see
-<http://freedesktop.org/wiki/Specifications/trash-spec> 
+<http://freedesktop.org/wiki/Specifications/trash-spec>
 This function is intended to be used from a trash directory i.e. it
 use `helm-ff-default-directory', but it may be used elsewhere by
 specifying the trash directory with TRASH-DIR arg."
@@ -4882,7 +4882,7 @@ This affects directly file CANDIDATE."
         (ext   (file-name-extension candidate)))
     (and file
          (or image (not (member ext helm-ff-follow-blacklist-file-exts))))))
-    
+
 (cl-defun helm-find-files-persistent-action-if (candidate)
   "Open subtree CANDIDATE without quitting helm.
 If CANDIDATE is not a directory expand CANDIDATE filename.
@@ -5251,7 +5251,7 @@ Special commands:
                      (cons disp img))
                    else collect (cons disp img))
         ;; Ensure this is done AFTER previous clause otherwise thumb files will
-        ;; never be created if they don't already exist. 
+        ;; never be created if they don't already exist.
         (cl-pushnew helm-ff-default-directory
                     helm-ff--thumbnailed-directories :test 'equal))
     candidates))
@@ -6129,7 +6129,7 @@ When `helm-trash-default-directory' is set use it as trash directory."
     ;; Just return nil if the Trash directory is not yet created. It will be
     ;; created later by `delete-directory'.
     (and (file-exists-p trash-files-dir) trash-files-dir)))
-      
+
 (cl-defun helm-ff-file-already-trashed (file &optional (trash-alist nil strash-alist))
   "Return FILE when it is already in trash.
 
@@ -6626,7 +6626,7 @@ be existing directories."
                         (dired-async--modeline-mode -1))
                       (run-with-idle-timer
                        0.1 nil
-                       (lambda ()                    
+                       (lambda ()
                          (dired-async-mode-line-message
                           "Mcp done, %s %s of %s done, %s files skipped"
                           'dired-async-message

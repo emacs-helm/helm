@@ -116,7 +116,7 @@ Any other non--nil value update after confirmation."
 
 Use this to display lines with their text properties in helm-occur
 buffer. Can be one of `buffer-substring' or `buffer-substring-no-properties'.
-See `helm-occur-buffer-substring-default-mode' to setup this globally. 
+See `helm-occur-buffer-substring-default-mode' to setup this globally.
 
 Note that when using `buffer-substring' initialization will be slower."
   :type '(alist :key-type (symbol :tag "Mode")

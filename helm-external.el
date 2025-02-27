@@ -253,7 +253,7 @@ commands with `helm-external-commands-list'."
                        :data (helm-external-commands-list-1 'sort)))
         :buffer "*helm externals commands*"
         :prompt "RunProgram: ")
-  ;; Remove from history no more valid executables. 
+  ;; Remove from history no more valid executables.
   (setq helm-external-command-history
         (cl-loop for i in helm-external-command-history
                  when (executable-find i) collect i)))

@@ -72,7 +72,7 @@ The last option must be the one preceding pattern i.e \"-r\" or
 The option \"-N\" may not be available on old locate versions, it is needed on
 latest systems as locate send quoted filenames, it is BTW enabled by default, if
 this option is not recognized on your system, remove it.
- 
+
 You will be able to pass other options such as \"-b\" or \"l\"
 during Helm invocation after entering pattern only when multi
 matching, not when fuzzy matching.
