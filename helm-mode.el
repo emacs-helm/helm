@@ -2467,6 +2467,7 @@ When AFUN, AFIX are nil and CATEGORY is not file return COMPS unmodified."
                  comps))
         (t comps)))
 
+;;;###autoload
 (defun helm-dynamic-completion (collection predicate &optional point metadata nomode styles)
   "Build a completion function for `helm-pattern' in COLLECTION.
 
