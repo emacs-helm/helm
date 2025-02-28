@@ -3406,33 +3406,6 @@ debugging purpose."
       ;; Tramp methods completion.
       (string-match helm-ff-tramp-method-regexp pattern)))
 
-(defun helm-ff--tramp-postfixed-p (str)
-  "Return non nil when tramp path STR is complete."
-  ;; E.g.:
-  ;; (helm-ff--tramp-postfixed-p "/ssh:foo")
-  ;; => nil
-  ;; (helm-ff--tramp-postfixed-p "/ssh:foo:")
-  ;; => 10
-  ;; (helm-ff--tramp-postfixed-p "/ssh:foo|sudo:")
-  ;; => nil
-  ;; (helm-ff--tramp-postfixed-p "/ssh:foo|sudo::")
-  ;; => 16
-  (let ((methods (helm-ff--get-tramp-methods))
-        result)
-    (save-match-data
-      (with-temp-buffer
-        (save-excursion (insert str))
-        (helm-awhile (search-forward ":" nil t)
-          (if (save-excursion
-                (forward-char -1)
-                (or (looking-back "[/|]" (1- (point)))
-                    (looking-back
-                     (mapconcat (lambda (m) (format "[/|]%s" m)) methods "\\|")
-                     (pos-bol))))
-              (setq result nil)
-            (setq result it)))))
-    result))
-
 (defun helm-ff--tramp-multihops-p (name)
   (cl-loop for m in (helm-ff--get-tramp-methods)
            thereis (string-match (format "\\`\\(/%s:.*[|]\\).*" m) name)))
@@ -3471,7 +3444,7 @@ debugging purpose."
   "Handle tramp filenames in `helm-pattern'."
   (let* ((methods (helm-ff--get-tramp-methods))
          ;; Returns the position of last ":" entered.
-         (postfixed (helm-ff--tramp-postfixed-p pattern))
+         (postfixed (file-remote-p pattern))
          (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
          cur-method tramp-name)
     (when (string-match "\\`/\\(-\\):" pattern)
@@ -3550,8 +3523,7 @@ debugging purpose."
              (string= path "@@TRAMP@@")
              ;; An empty pattern
              (string= path "")
-             (and (string-match-p ":\\'" path)
-                  (helm-ff--tramp-postfixed-p path))
+             (file-remote-p path)
              ;; Check if base directory of PATH is valid.
              (helm-aif (file-name-directory path)
                  ;; If PATH is a valid directory IT=PATH,
