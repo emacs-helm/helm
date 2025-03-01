@@ -1137,12 +1137,13 @@ this will prevent splitting the name and create multiple files.
 
 *** Change mode on files (chmod)
 
-When running `\\<helm-find-files-map>\\[helm-ff-run-chmod]' on
-marked files, you can enter the new mode in prompt but you can
-also use the first marked file as model to use it as default.
-For example you can mark a file with mode 777 and mark other
-files with mode 664, press 'RET' and answer 'y', all marked files
-will be changed to 777.
+When running `\\<helm-find-files-map>\\[helm-ff-run-chmod]' on marked
+files, you can enter the new mode in prompt but you can also use the
+first marked file as model to use it as default.  For example you can
+mark a file with mode 777 and mark other files with mode 664, press
+'RET' and answer 'y', all marked files will be changed to 777.  To see
+the default mode and eventually edit it use 'M-n'.  You can use numeric
+mode or letters, see 'chmod' man page for more infos.
 
 NOTE: Another way to change modes on files in helm-find-files is
 running `\\<helm-find-files-map>\\[helm-ff-run-switch-to-shell]' and use 'chmod' directly.
@@ -2039,8 +2040,21 @@ leaving Helm.
 (defvar helm-bookmark-help-message
   "* Helm bookmark name
 
-When `helm-bookmark-use-icon' is non nil and `all-the-icons'
-package is installed icons before candidates will be displayed.
+** Tips
+
+*** Display bookmarks with Icons
+
+When `helm-bookmark-use-icon' is non nil and you have a
+`helm-x-icons-provider' either `all-the-icons' or `nerd-icons' package
+is installed icons before candidates will be displayed.
+
+*** Reset bookmark position
+
+When using `helm-filtered-bookmarks' you can modify your bookmark
+position by resetting it, to do this, jump to your bookmark, move point
+to the new location, then call again `helm-filtered-bookmarks' and find
+your current bookmark, yank its name in minibuffer with `\\<helm-map>\\[helm-yank-selection]'
+switch to the \"Set bookmark\" source and hit RET.
 
 ** Commands
 \\<helm-bookmark-map>
