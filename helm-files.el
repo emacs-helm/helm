@@ -5600,6 +5600,12 @@ Use it for non-interactive calls of `helm-find-files'."
   "Meant to be used in `helm-resume-after-hook'.
 When NOHOOK is non-nil run inconditionally, otherwise only when
 source is `helm-source-find-files'."
+  ;; When using the action `helm-find-files-load-files' on helm-files.el,
+  ;; `helm-source-find-files' is reseted to nil hence error when calling
+  ;; `helm-set-attr' outside helm => "no buffer named *helm*".
+  (unless helm-source-find-files
+      (setq helm-source-find-files (helm-make-source
+                                    "Find Files" 'helm-source-ffiles)))
   (when (or nohook (string= "Find Files"
                             (assoc-default 'name (car sources))))
     (helm-set-attr 'resume `(lambda ()
