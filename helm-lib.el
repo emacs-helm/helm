@@ -351,17 +351,7 @@ object."
           (dolist (elc (directory-files-recursively
                         (package-desc-dir pkg-desc) "\\.elc\\'"))
             (delete-file elc))
-          (package--compile pkg-desc)))
-
-      (defun package--dependencies (pkg)
-        "Return a list of all dependencies PKG has.
-This is done recursively."
-        ;; Can we have circular dependencies?  Assume "nope".
-        (let* ((desc (cadr (assq pkg package-archive-contents)))
-               (deps (and desc (mapcar #'car (package-desc-reqs desc)))))
-          (when deps
-            (delete-dups
-             (apply #'nconc deps (mapcar #'package--dependencies deps)))))))))
+          (package--compile pkg-desc))))))
 
 ;;; Provide `help--symbol-class' not available in emacs-27
 ;;

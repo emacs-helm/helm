@@ -163,13 +163,22 @@ as dependencies."
             (async-package-do-action 'install mkd error-file)
           (helm-packages-install--sync mkd))))))
 
+(defun helm-packages--get-deps (pkg)
+  "Recursively find PKG dependencies."
+  (let ((desc (cadr (assq pkg package-archive-contents))))
+    (when desc
+      (cl-loop for req in (package-desc-reqs desc) ; (foo (1 2 3))
+               for sym = (car req)
+               nconc (cons sym (helm-packages--get-deps sym)) into pkgs
+               finally return (helm-fast-remove-dups pkgs)))))
+
 (defun helm-packages-isolate-1 (packages &optional _ignore)
     "Start an Emacs with only PACKAGES loaded.
 Arg PACKAGES is a list of strings."
     (let* ((name (concat "package-isolate-" (mapconcat #'identity packages "_")))
            (deps (cl-loop for p in packages
                           for sym = (intern p)
-                          nconc (package--dependencies sym))))
+                          nconc (helm-packages--get-deps sym))))
       (apply #'start-process name nil
              (list (expand-file-name invocation-name invocation-directory)
                    "-Q" "--debug-init"
