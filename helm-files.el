@@ -4543,6 +4543,11 @@ Arg FILE is the real part of candidate, a filename with no props."
     (when (file-regular-p candidate)
       (setq actions (helm-append-at-nth
                      actions '(("Checksum File" . helm-ff-checksum)) 4)))
+    (when (file-exists-p (expand-file-name
+                          (format "#%s#" (helm-basename candidate))
+                          (helm-basedir candidate)))
+      (setq actions (helm-append-at-nth
+                     actions '(("Recover file" . recover-file)) 4)))
     (cond ((and (file-exists-p candidate)
                 (string-match helm-ff--trash-directory-regexp
                               (helm-basedir (expand-file-name candidate)))
