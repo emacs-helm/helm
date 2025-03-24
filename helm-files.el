@@ -95,6 +95,7 @@
 (declare-function helm-epa-success-message            "helm-epa")
 (declare-function helm-epa-collect-id-from-candidates "helm-epa")
 (declare-function helm-epa-collect-keys-from-candidates "helm-epa")
+(declare-function async-byte-compile-file "async-bytecomp.el")
 
 (defvar term-char-mode-point-at-process-mark)
 (defvar term-char-mode-buffer-read-only)
@@ -4574,6 +4575,10 @@ Arg FILE is the real part of candidate, a filename with no props."
             actions
             '(("Byte compile lisp file(s) `M-B, C-u to load'"
                . helm-find-files-byte-compile)
+              ("Byte compile file(s) async"
+               . (lambda (_candidate)
+                   (cl-loop for file in (helm-marked-candidates)
+                            do (async-byte-compile-file file))))
               ("Load File(s) `M-L'" . helm-find-files-load-files))
             2))
           ((string-match (concat (regexp-opt load-suffixes) "\\'") candidate)
