@@ -92,6 +92,9 @@
 (declare-function wfnames-setup-buffer "ext:wfnames.el")
 (declare-function svg-lib-progress-bar "ext:svg-lib")
 (declare-function svg-lib-tag "ext:svg-lib")
+(declare-function helm-epa-success-message            "helm-epa")
+(declare-function helm-epa-collect-id-from-candidates "helm-epa")
+(declare-function helm-epa-collect-keys-from-candidates "helm-epa")
 
 (defvar term-char-mode-point-at-process-mark)
 (defvar term-char-mode-buffer-read-only)
@@ -839,6 +842,7 @@ want to use it, helm is still providing
                           " async" "")))
    'helm-ff-delete-files
    "Touch File(s) `M-T'" 'helm-ff-touch-files
+   "Encrypt file(s)" 'helm-ff-encrypt-files
    "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
    (lambda ()
      (and (executable-find "rsync")
@@ -2125,6 +2129,27 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
       (message "Failed to touch *%s files:\n%s"
                (length failures)
                (mapconcat (lambda (f) (format "- %s\n" f)) failures "")))))
+
+(defun helm-ff-encrypt-files (_candidate)
+  "Encrypt marked files."
+  (require 'epg) (require 'epa) (require 'helm-epa)
+  (let* ((mkds (helm-marked-candidates :with-wildcard t))
+         (recipients (helm :sources (helm-build-sync-source
+                                        "Select recipient for encryption: "
+                                      :persistent-action 'ignore
+                                      :candidates 'helm-epa-get-key-list
+                                      :action (lambda (_candidate)
+                                                (helm-marked-candidates))
+                                      :must-match t)
+                           :buffer "*helm-ff epg keys*"))
+         (keys (and recipients (helm-epa-collect-keys-from-candidates recipients)))
+         (ids  (and recipients (helm-epa-collect-id-from-candidates recipients))))
+    (when recipients ; may be aborted by quit.
+      (cl-loop for f in mkds
+               do (epa-encrypt-file f recipients))
+      (helm-epa-success-message (concat (format "%s File(s) encrypted" (length mkds))
+                                        " with key(s):\n %s")
+                                keys ids))))
 
 (helm-make-command-from-action helm-ff-run-touch-files
   "Used to interactively run touch file action from keyboard."
