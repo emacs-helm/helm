@@ -4534,9 +4534,15 @@ Arg FILE is the real part of candidate, a filename with no props."
           ((string-match (image-file-name-regexp) candidate)
            (helm-append-at-nth
             actions
-            '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
-              ("Rotate image left `M-l'" . helm-ff-rotate-image-left)
-              ("Start slideshow with marked" . helm-ff-start-slideshow-on-marked))
+            (helm-make-actions
+             "Rotate image right `M-r'" 'helm-ff-rotate-image-right
+              "Rotate image left `M-l'" 'helm-ff-rotate-image-left
+              "Start slideshow with marked" 'helm-ff-start-slideshow-on-marked
+              (lambda ()
+                (and (fboundp 'image-dired-wallpaper-set)
+                     (display-graphic-p)
+                     "Change wall paper"))
+              'image-dired-wallpaper-set)
             3))
           ((string-match "\\.el\\'" candidate)
            (helm-append-at-nth
