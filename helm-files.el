@@ -266,24 +266,6 @@ Should not be used among other sources.")
     map)
   "Keymap for `helm-find-files'.")
 
-(defvar helm-find-files-dummy-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-T")           'helm-ff-run-touch-files)
-    (define-key map (kbd "C-c r")         'helm-ff-run-find-file-as-root)
-    (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
-    (define-key map (kbd "C-_")           'helm-ff-undo)
-    (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
-    (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
-    (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
-    (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
-                                  '((C-backspace . helm-ff-run-toggle-auto-update)
-                                    ([C-c DEL] . helm-ff-run-toggle-auto-update))
-                                  nil 'helm-ff-delete-char-backward--exit-fn)
-    map)
-  "The map used for `helm-find-files-dummy-source'.
-It is the source handling new file or directory in `helm-find-files'.")
-
 (defvar helm-read-file-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
