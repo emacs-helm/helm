@@ -5594,7 +5594,27 @@ Use it for non-interactive calls of `helm-find-files'."
         (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))
     :all-marked t
     :keymap 'helm-find-files-map
-    :action 'helm-find-files-actions))
+    :action 'helm-find-files-actions
+    :action-transformer 'helm-find-files-dummy-action-transformer))
+
+(defun helm-find-files-dummy-action-transformer (actions candidate)
+  "Action transformer for `helm-find-files-dummy-source'."
+  (let (cand-no-linum linum)
+    (cond ((and helm--url-regexp
+                (not (string-match-p helm--url-regexp candidate))
+                (string-match "\\(:[[:digit:]]+:?\\)\\'" candidate)
+                (file-exists-p
+                 (setq cand-no-linum (replace-match "" t t candidate 1))))
+           (setq linum (replace-regexp-in-string
+                        ":" "" (match-string 1 candidate)))
+           (helm-append-at-nth
+            actions
+            `(("Find file to line number"
+               . (lambda (_candidate)
+                   (find-file ,cand-no-linum)
+                   (helm-goto-line (string-to-number ,linum) t))))
+            1))
+          (t actions))))
 
 (defun helm-ff--update-resume-after-hook (sources &optional nohook)
   "Meant to be used in `helm-resume-after-hook'.
