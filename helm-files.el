@@ -4579,12 +4579,12 @@ Arg FILE is the real part of candidate, a filename with no props."
           ((string-match "\\.el\\'" candidate)
            (helm-append-at-nth
             actions
-            '(("Byte compile lisp file(s) `M-B, C-u to load'"
+            `(("Byte compile lisp file(s) `M-B, C-u to load'"
                . helm-find-files-byte-compile)
               ("Byte compile file(s) async"
-               . (lambda (_candidate)
-                   (cl-loop for file in (helm-marked-candidates)
-                            do (async-byte-compile-file file))))
+               . ,(lambda (_candidate)
+                    (cl-loop for file in (helm-marked-candidates)
+                             do (async-byte-compile-file file))))
               ("Byte recompile directory async"
                . (lambda (_)
                    (async-byte-recompile-directory
@@ -5412,14 +5412,14 @@ image file in `helm-ff-image-dired-thumbnails-cache'."
                        (shell-quote-argument directory))
             :subdir (shell-quote-argument input)
             :candidate-transformer
-            `((lambda (candidates)
-                (cl-loop for c in candidates
-                         when (and (file-directory-p c)
-                                   (null (helm-boring-directory-p
-                                          c helm-boring-file-regexp-list))
-                                   (string-match-p ,(regexp-quote input)
-                                                   (helm-basename c)))
-                         collect (propertize c 'face 'helm-ff-dirs)))
+            `(,(lambda (candidates)
+                 (cl-loop for c in candidates
+                          when (and (file-directory-p c)
+                                    (null (helm-boring-directory-p
+                                           c helm-boring-file-regexp-list))
+                                    (string-match-p (regexp-quote input)
+                                                    (helm-basename c)))
+                          collect (propertize c 'face 'helm-ff-dirs)))
               helm-w32-pathname-transformer
               (lambda (candidates)
                 (helm-ff-sort-candidates-1 candidates ,input)))
@@ -6628,11 +6628,11 @@ list."
   (helm-aif (slot-value source 'candidate-transformer)
       (setf (slot-value source 'candidate-transformer)
             (append (helm-mklist it)
-                    (list (lambda (candidates)
-                            (cl-loop for c in candidates
-                                     when (and (not (string= c ""))
-                                               (file-exists-p c))
-                                     collect c)))))))
+                    `(,(lambda (candidates)
+                         (cl-loop for c in candidates
+                                  when (and (not (string= c ""))
+                                            (file-exists-p c))
+                                  collect c)))))))
 
 (defun helm-find-files-in-file-build-source (file)
   (helm-make-source
