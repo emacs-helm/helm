@@ -4450,6 +4450,64 @@ Arg FILE is the real part of candidate, a filename with no props."
       (message "No suitable Icons package found")))
   (clrhash helm-ff--list-directory-cache))
 
+;;; Action transformer
+;;
+(defun helm-ff--in-backup-directory ()
+  (when backup-directory-alist
+    (cl-loop for (_p . f) in backup-directory-alist
+             thereis (file-equal-p f helm-ff-default-directory))))
+
+(defun helm-ff-restore-backups (_candidate)
+  (let ((mkd (helm-marked-candidates))
+        (copied 0)
+        ovw)
+    (cl-dolist (file mkd)
+      (let (dest)
+        (when (string-match "\\(?:\\`\\([!]\\)[^!]*\\1.*\\)\\|\\(?:~\\'\\)"
+                            (helm-basename file))
+          (setq dest (helm-aand (replace-regexp-in-string
+                                 "\\.~[[:digit:]]*~?"
+                                 "" (helm-basename file))
+                                (helm-ff--normalize-backup-name it)
+                                (if (string-match "\\`/" it)
+                                    it
+                                  ;; If basename doesn't contain now
+                                  ;; "/", that's mean it was a backup file
+                                  ;; stored in current directory, just
+                                  ;; expand it to this directory.
+                                  (expand-file-name it helm-ff-default-directory))))
+          (if (and (file-exists-p dest) (null ovw))
+              (helm-acase (helm-read-answer
+                           (format "Overwrite `%s' (answer [y,n,!,q])? " dest)
+                           '("y" "n" "!" "q"))
+                ("y" (cl-incf copied) (copy-file file dest t t t t))
+                ("n" (ignore))
+                ("!" (setq ovw t) (cl-incf copied) (copy-file file dest t t t t))
+                ("q" (setq copied nil) (cl-return (message "Abort restoring files"))))
+            (cl-incf copied)
+            (copy-file file dest t t t t)))))
+    (when (numberp copied)
+      (message "(%s/%s) files copied" copied (length mkd)))))
+
+(defun helm-ff--normalize-backup-name (fname)
+  "Normalize backup FNAME to its original name."
+  ;; When Emacs build a backup filename for the backup directory it
+  ;; replace "/" by "!" in the basedir of file and double the "!" in
+  ;; the basename, this is done by `make-backup-file-name-1'.  We want
+  ;; to replace only the "!" in the basedir part of FNAME.
+  (with-temp-buffer
+    (insert fname)
+    (goto-char (point-min))
+    (save-excursion
+      (when (looking-at "!") (replace-match "/"))
+      (while (re-search-forward "[^!]\\([!]\\)[^!]" nil t)
+        (replace-match "/" nil nil nil 1)))
+    (let ((count 0) rep)
+      (while (re-search-forward "!" nil t)
+        (cl-incf count))
+      (setq rep (make-string (/ count 2) ?!))
+      (replace-regexp-in-string "[!]+" rep (buffer-string)))))
+
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
   (let ((str-at-point (with-helm-current-buffer
@@ -4496,6 +4554,12 @@ Arg FILE is the real part of candidate, a filename with no props."
                 (file-exists-p candidate))
            (helm-append-at-nth
             actions '(("Browse url file" . browse-url-of-file)) 2))
+          ((and (helm-ff--in-backup-directory)
+                (cl-loop for file in (helm-marked-candidates)
+                         always (string-match "\\(?:\\`\\([!]\\)[^!]*\\1.*\\)\\|\\(?:~\\'\\)"
+                                              (helm-basename file))))
+           (helm-append-at-nth
+            actions '(("Restore backup file(s)" . helm-ff-restore-backups)) 1))
           (t actions))))
 
 ;;; Trashing files
