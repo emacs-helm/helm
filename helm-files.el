@@ -4586,9 +4586,9 @@ Arg FILE is the real part of candidate, a filename with no props."
                     (cl-loop for file in (helm-marked-candidates)
                              do (async-byte-compile-file file))))
               ("Byte recompile directory async"
-               . (lambda (_)
-                   (async-byte-recompile-directory
-                    helm-ff-default-directory)))
+               . ,(lambda (_)
+                    (async-byte-recompile-directory
+                     helm-ff-default-directory)))
               ("Load File(s) `M-L'" . helm-find-files-load-files))
             2))
           ((string-match (concat (regexp-opt load-suffixes) "\\'") candidate)
@@ -5421,8 +5421,8 @@ image file in `helm-ff-image-dired-thumbnails-cache'."
                                                     (helm-basename c)))
                           collect (propertize c 'face 'helm-ff-dirs)))
               helm-w32-pathname-transformer
-              (lambda (candidates)
-                (helm-ff-sort-candidates-1 candidates ,input)))
+              ,(lambda (candidates)
+                 (helm-ff-sort-candidates-1 candidates input)))
             :persistent-action 'ignore
             :action (lambda (c)
                       (helm-set-pattern
