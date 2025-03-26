@@ -113,6 +113,7 @@
 (defvar helm-fd-executable)
 (defvar wfnames-buffer)
 (defvar Info-current-file)
+(defvar generated-autoload-file)
 
 ;;; Internal vars
 ;;
@@ -4535,6 +4536,20 @@ Arg FILE is the real part of candidate, a filename with no props."
       (setq rep (make-string (/ count 2) ?!))
       (replace-regexp-in-string "[!]+" rep (buffer-string)))))
 
+(defun helm-ff-update-directory-autoloads (_candidate)
+  "Action to update or create autoloads file in current directory."
+  (let ((default-directory helm-ff-default-directory)
+        (file
+         (read-file-name "Write autoload definitions to file: "
+                         helm-ff-default-directory
+                         nil nil nil
+                         (lambda (f)
+                           (string-match "autoloads\\|loaddefs" f)))))
+    (if (fboundp 'loaddefs-generate)
+        (loaddefs-generate default-directory file)
+      (let ((generated-autoload-file file))
+        (update-directory-autoloads default-directory)))))
+
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
   (let ((str-at-point (with-helm-current-buffer
@@ -4589,7 +4604,8 @@ Arg FILE is the real part of candidate, a filename with no props."
                . ,(lambda (_)
                     (async-byte-recompile-directory
                      helm-ff-default-directory)))
-              ("Load File(s) `M-L'" . helm-find-files-load-files))
+              ("Load File(s) `M-L'" . helm-find-files-load-files)
+              ("Update directory autoloads" . helm-ff-update-directory-autoloads))
             2))
           ((string-match (concat (regexp-opt load-suffixes) "\\'") candidate)
            (helm-append-at-nth
