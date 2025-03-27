@@ -143,6 +143,7 @@
    "Bookmark edit annotation" 'bookmark-edit-annotation
    "Delete marked bookmark(s)" 'helm-delete-marked-bookmarks
    "Edit Bookmark" 'helm-bookmark-edit-bookmark
+   "Reset Bookmark to current pos" 'bookmark-set
    "Rename marked bookmark(s)" 'helm-bookmark-rename-marked
    "Relocate bookmark" 'bookmark-relocate)
   "Default actions for type bookmarks."
