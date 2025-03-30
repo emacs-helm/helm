@@ -287,6 +287,7 @@ Run all sources defined in `helm-for-files-preferred-list'."
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (helm :sources helm-for-files-preferred-list
+        :ff-transformer-show-only-basename nil
         :buffer "*helm for files*"
         :truncate-lines helm-buffers-truncate-lines))
 
@@ -327,7 +328,8 @@ searching for is already found."
                                    (when (and helm-locate-fuzzy-match
                                               (not (string-match-p
                                                     "\\s-" helm-pattern)))
-                                     (helm-redisplay-buffer)))))
+                                     (helm-redisplay-buffer))))
+                           'helm-ff-transformer-show-only-basename nil)
   (let ((sources (remove 'helm-source-locate helm-for-files-preferred-list))
         (helm-locate-command
          (if helm-locate-fuzzy-match
