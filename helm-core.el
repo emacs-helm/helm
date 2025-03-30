@@ -1146,7 +1146,11 @@ then doesn't use `while-no-input', because `while-no-input' throws on
   :group 'helm)
 
 (defface helm-source-header
-  `((((background dark))
+  `((((type tty pc))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :background "blue"
+     :foreground "white")
+    (((background dark))
      ,@(and (>= emacs-major-version 27) '(:extend t))
      :background "#22083397778B"
      :foreground "white"
@@ -1202,7 +1206,11 @@ then doesn't use `while-no-input', because `while-no-input' throws on
   :group 'helm-faces)
 
 (defface helm-selection
-  `((((background dark))
+  `((((type tty pc))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :background "Brightred"
+     :distant-foreground "black")
+    (((background dark))
      ,@(and (>= emacs-major-version 27) '(:extend t))
      :background "ForestGreen"
      :distant-foreground "black")
