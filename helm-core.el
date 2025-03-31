@@ -1208,8 +1208,7 @@ then doesn't use `while-no-input', because `while-no-input' throws on
 (defface helm-selection
   `((((type tty pc))
      ,@(and (>= emacs-major-version 27) '(:extend t))
-     :background "Brightred"
-     :distant-foreground "black")
+     :inherit highlight)
     (((background dark))
      ,@(and (>= emacs-major-version 27) '(:extend t))
      :background "ForestGreen"
