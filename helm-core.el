@@ -5226,7 +5226,7 @@ Argument OVERLAY is a ref-cell."
       (error nil))
     (helm-follow-execute-persistent-action-maybe)))
 
-(cl-defun helm-force-update (&optional preselect (recenter t))
+(cl-defun helm-force-update (&optional (preselect nil spreselect) (recenter t))
   "Force recalculation and update of candidates.
 
 Unlike `helm-update', this function re-evaluates `init' and
@@ -5245,7 +5245,7 @@ passed as argument to `recenter'."
                           (regexp-quote it))))
       (setq helm--force-updating-p t)
       (mapc 'helm-force-update--reinit helm-sources)
-      (helm-update (or preselect selection) source)
+      (helm-update (if spreselect preselect selection) source)
       (when (and (helm-window) recenter)
         (with-helm-window
           (recenter (and (numberp recenter) recenter)))))))
@@ -5737,7 +5737,7 @@ If action buffer is selected, back to the Helm buffer."
                              ;; was itself force updating, now do it explicitely
                              ;; from here.
                              (helm-set-pattern "" t)
-                             (helm-force-update)
+                             (helm-force-update nil)
                              ;; Unhide minibuffer to make visible action prompt [1].
                              (with-selected-window (minibuffer-window)
                                (remove-overlays) (setq cursor-type t))
