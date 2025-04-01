@@ -1021,7 +1021,8 @@ present in this list."
 (defface helm-ff-nofile
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :inherit helm-ff-file))
-  "Face used for file names in `helm-find-files'."
+  "Face used for non-files file names in `helm-find-files'.
+Used when showing tramp host completions."
   :group 'helm-files-faces)
 
 (defface helm-ff-truename
