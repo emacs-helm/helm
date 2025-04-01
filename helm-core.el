@@ -1281,6 +1281,11 @@ Allow specifying the height of this line."
   `((t :inherit default))
   "Face for string `helm-visible-mark-prefix'."
   :group 'helm-faces)
+
+(defface helm-dim-prompt
+  `((t :inherit shadow))
+  "Face used for shadowing prompt while updating."
+  :group 'helm-faces)
 
 ;;; Variables.
 ;;
@@ -5185,7 +5190,7 @@ Argument OVERLAY is a ref-cell."
              (consp overlay)) ;; Ensure OVERLAY is a ref-cell.
     (with-selected-window (minibuffer-window)
       (setcar overlay (make-overlay (minibuffer-prompt-end) (point-max)))
-      (overlay-put (car overlay) 'face '(:foreground "DimGray"))
+      (overlay-put (car overlay) 'face 'helm-dim-prompt)
       (redisplay))))
 
 (defun helm-update-source-p (source)
