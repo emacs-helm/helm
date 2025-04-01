@@ -1208,7 +1208,7 @@ then doesn't use `while-no-input', because `while-no-input' throws on
 (defface helm-selection
   `((((type tty pc))
      ,@(and (>= emacs-major-version 27) '(:extend t))
-     :inherit highlight)
+     :inherit isearch)
     (((background dark))
      ,@(and (>= emacs-major-version 27) '(:extend t))
      :background "ForestGreen"
