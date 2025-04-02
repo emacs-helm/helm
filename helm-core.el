@@ -1192,7 +1192,7 @@ then doesn't use `while-no-input', because `while-no-input' throws on
 (defface helm-candidate-number
   `((((background dark))
      ,@(and (>= emacs-major-version 27) '(:extend t))
-     :background "Yellow" :foreground "black")
+     :background "yellow" :foreground "black")
     (((background light))
      ,@(and (>= emacs-major-version 27) '(:extend t))
      :background "#faffb5" :foreground "black"))
