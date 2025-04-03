@@ -983,8 +983,13 @@ present in this list."
   :group 'helm-files-faces)
 
 (defface helm-ff-dotted-directory
-  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "black" :background "DimGray"))
+  `((((class color) (min-colors 88) (background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "black" :background "DimGray")
+    (((class color) (min-colors 88) (background light))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "black" :background "LightGray")
+    (t :inherit default))
   "Face used for dotted directories in `helm-find-files'."
   :group 'helm-files-faces)
 
