@@ -5240,7 +5240,8 @@ not reinitialized, meaning candidates are not recomputed unless
 pattern has changed.
 
 Selection is preserved to current candidate if it still exists after
-update or moved to PRESELECT, if specified.
+update or moved to PRESELECT, if specified.  If PRESELECT is specified with a
+nil value no preselection at all is done.
 The helm-window is re-centered at the end when RECENTER is t which
 is the default.  RECENTER can be also a number in this case it is
 passed as argument to `recenter'."
