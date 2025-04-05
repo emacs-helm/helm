@@ -43,8 +43,8 @@
   :type 'string)
 
 (defcustom helm-timezone-actions
-  '(("Set timezone env (TZ)" . (lambda (candidate)
-                                 (setenv "TZ" candidate))))
+  `(("Set timezone env (TZ)" . ,(lambda (candidate)
+                                  (setenv "TZ" candidate))))
   "Actions for helm-timezone."
   :group 'helm-misc
   :type '(alist :key-type string :value-type function))

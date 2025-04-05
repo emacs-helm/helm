@@ -117,27 +117,28 @@ This is a format string, don't forget the `%s'."
   :group 'helm-net)
 
 (defcustom helm-google-suggest-actions
-  '(("Google Search" . helm-google-suggest-action)
-    ("Wikipedia" . (lambda (candidate)
-                     (helm-search-suggest-perform-additional-action
-                      helm-search-suggest-action-wikipedia-url
-                      candidate)))
-    ("Youtube" . (lambda (candidate)
+  (helm-make-actions
+   "Google Search" 'helm-google-suggest-action
+   "Wikipedia" (lambda (candidate)
+                 (helm-search-suggest-perform-additional-action
+                  helm-search-suggest-action-wikipedia-url
+                  candidate))
+   "Youtube" (lambda (candidate)
+               (helm-search-suggest-perform-additional-action
+                helm-search-suggest-action-youtube-url
+                candidate))
+   "IMDb" (lambda (candidate)
+            (helm-search-suggest-perform-additional-action
+             helm-search-suggest-action-imdb-url
+             candidate))
+   "Google Maps" (lambda (candidate)
                    (helm-search-suggest-perform-additional-action
-                    helm-search-suggest-action-youtube-url
+                    helm-search-suggest-action-google-maps-url
+                    candidate))
+   "Google News" (lambda (candidate)
+                   (helm-search-suggest-perform-additional-action
+                    helm-search-suggest-action-google-news-url
                     candidate)))
-    ("IMDb" . (lambda (candidate)
-                (helm-search-suggest-perform-additional-action
-                 helm-search-suggest-action-imdb-url
-                 candidate)))
-    ("Google Maps" . (lambda (candidate)
-                       (helm-search-suggest-perform-additional-action
-                        helm-search-suggest-action-google-maps-url
-                        candidate)))
-    ("Google News" . (lambda (candidate)
-                       (helm-search-suggest-perform-additional-action
-                        helm-search-suggest-action-google-news-url
-                        candidate))))
   "List of actions for google suggest sources."
   :group 'helm-net
   :type '(alist :key-type string :value-type function))

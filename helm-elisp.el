@@ -632,9 +632,9 @@ is only used to test DEFAULT."
                    . ,(lambda (candidate)
                         (let ((sym (helm-symbolify candidate)))
                           (set sym standard-value)))))))
-            '(("Customize variable" .
-               (lambda (candidate)
-                 (customize-option (helm-symbolify candidate)))))))
+            `(("Customize variable"
+               . ,(lambda (candidate)
+                    (customize-option (helm-symbolify candidate)))))))
           ((and val (with-helm-current-buffer (ring-p (symbol-value sym))))
            (append actions
                    '(("Clean ring" . helm-apropos-clean-ring))))

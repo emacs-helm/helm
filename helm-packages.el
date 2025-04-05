@@ -37,9 +37,9 @@
    (find-file-target :initform #'helm-packages-quit-an-find-file)
    (filtered-candidate-transformer
     :initform
-    '(helm-packages-transformer
-      (lambda (candidates _source)
-        (sort candidates #'helm-generic-sort-fn))))
+    `(helm-packages-transformer
+      ,(lambda (candidates _source)
+         (sort candidates #'helm-generic-sort-fn))))
    (update :initform #'helm-packages--refresh-contents))
   "A class to define `helm-packages' sources.")
 
@@ -307,9 +307,9 @@ Arg PACKAGES is a list of strings."
                         'global (helm-fast-remove-dups
                                  (helm-finder--list-matches candidate))))
             :filtered-candidate-transformer
-            (list #'helm-packages-transformer
-                  (lambda (candidates _source)
-                    (sort candidates #'helm-generic-sort-fn)))
+            `(helm-packages-transformer
+              ,(lambda (candidates _source)
+                 (sort candidates #'helm-generic-sort-fn)))
             :action-transformer
             (lambda (actions candidate)
               (if (package-installed-p candidate)

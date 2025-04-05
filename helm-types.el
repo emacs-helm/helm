@@ -300,18 +300,18 @@
   "A class to define helm type timers.")
 
 (defcustom helm-type-timers-actions
-  '(("Cancel Timer" . (lambda (_timer)
-                        (let ((mkd (helm-marked-candidates)))
-                          (cl-loop for timer in mkd
-                                   do (cancel-timer timer)))))
-    ("Describe Function" . (lambda (tm)
-                             (describe-function (timer--function tm))))
-    ("Find Function" . (lambda (tm)
-                         (helm-aif (timer--function tm)
-                             (if (or (byte-code-function-p it)
-                                     (helm-subr-native-elisp-p it))
-                                 (message "Can't find anonymous function `%s'" it)
-                                 (find-function it))))))
+  `(("Cancel Timer" . ,(lambda (_timer)
+                         (let ((mkd (helm-marked-candidates)))
+                           (cl-loop for timer in mkd
+                                    do (cancel-timer timer)))))
+    ("Describe Function" . ,(lambda (tm)
+                              (describe-function (timer--function tm))))
+    ("Find Function" . ,(lambda (tm)
+                          (helm-aif (timer--function tm)
+                              (if (or (byte-code-function-p it)
+                                      (helm-subr-native-elisp-p it))
+                                  (message "Can't find anonymous function `%s'" it)
+                                (find-function it))))))
   "Default actions for type timers."
   :group 'helm-elisp
   :type '(alist :key-type string :value-type function))

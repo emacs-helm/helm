@@ -49,12 +49,12 @@
                           (intern (car (split-string candidate)))
                           'helm-describe-face))
     :persistent-help "Describe face"
-    :action '(("Customize"
-               . (lambda (line)
-                   (customize-face (intern (car (split-string line))))))
+    :action `(("Customize"
+               . ,(lambda (line)
+                    (customize-face (intern (car (split-string line))))))
               ("Copy name"
-               . (lambda (line)
-                   (kill-new (car (split-string line " " t)))))))
+               . ,(lambda (line)
+                    (kill-new (car (split-string line " " t)))))))
   "See (info \"(emacs)Faces\")")
 
 ;;; Colors browser

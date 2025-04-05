@@ -78,12 +78,12 @@
             ;; Save current font so it can be restored in cleanup
             (setq helm-previous-font (cdr (assq 'font (frame-parameters)))))
     :candidates 'helm-xfonts-cache
-    :action '(("Copy font to kill ring" . (lambda (elm)
-                                            (kill-new elm)))
-              ("Set font" . (lambda (elm)
-                              (kill-new elm)
-                              (set-frame-font elm 'keep-size)
-                              (message "Font copied to kill ring"))))
+    :action `(("Copy font to kill ring" . ,(lambda (elm)
+                                             (kill-new elm)))
+              ("Set font" . ,(lambda (elm)
+                               (kill-new elm)
+                               (set-frame-font elm 'keep-size)
+                               (message "Font copied to kill ring"))))
     :cleanup (lambda ()
                ;; Restore previous font
                (set-frame-font helm-previous-font 'keep-size))

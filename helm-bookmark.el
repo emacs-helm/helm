@@ -237,10 +237,10 @@ will be honored."
       (list (or (and (not (string= helm-pattern ""))
                      helm-pattern)
                 "Enter a bookmark name to record")))
-    :action '(("Set bookmark" . (lambda (candidate)
-                                  (if (string= helm-pattern "")
-                                      (message "No bookmark name given for record")
-                                      (bookmark-set candidate))))))
+    :action `(("Set bookmark" . ,(lambda (candidate)
+                                   (if (string= helm-pattern "")
+                                       (message "No bookmark name given for record")
+                                     (bookmark-set candidate))))))
   "See (info \"(emacs)Bookmarks\").")
 
 

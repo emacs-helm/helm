@@ -819,10 +819,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
     ;; whatever (bug #2527).
     (setq must-match t))
   (let ((action-fn `(("Sole action (Identity)"
-                      . (lambda (candidate)
-                          (if ,marked-candidates
-                              (helm-marked-candidates)
-                              (identity candidate)))))))
+                      . ,(lambda (candidate)
+                           (if marked-candidates
+                               (helm-marked-candidates)
+                             (identity candidate)))))))
     (let* ((minibuffer-completion-predicate test)
            (minibuffer-completion-table
             (or minibuffer-completion-table collection))
@@ -2057,11 +2057,11 @@ Keys description:
         '(helm-ff-update-when-only-one-matched
           helm-ff-auto-expand-to-home-or-root))
   (let* ((action-fn `(("Sole action (Identity)"
-                       . (lambda (candidate)
-                           (if ,marked-candidates
-                               (helm-marked-candidates
-                                :with-wildcard t :all-sources ,all-marked)
-                             (identity candidate))))))
+                       . ,(lambda (candidate)
+                            (if marked-candidates
+                                (helm-marked-candidates
+                                 :with-wildcard t :all-sources all-marked)
+                              (identity candidate))))))
          ;; Be sure we don't erase the underlying minibuffer if some.
          (helm-ff-auto-update-initial-value
           (and helm-ff-auto-update-initial-value

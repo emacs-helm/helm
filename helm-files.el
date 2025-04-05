@@ -5724,9 +5724,9 @@ Use it for non-interactive calls of `helm-find-files'."
            (helm-append-at-nth
             actions
             `(("Find file to line number"
-               . (lambda (_candidate)
-                   (find-file ,cand-no-linum)
-                   (helm-goto-line (string-to-number ,linum) t))))
+               . ,(lambda (_candidate)
+                    (find-file cand-no-linum)
+                    (helm-goto-line (string-to-number linum) t))))
             1))
           (t actions))))
 

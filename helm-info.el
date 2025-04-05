@@ -360,10 +360,10 @@ a prefix arg."
   (helm-build-sync-source "Info Pages"
     :init #'helm-info-pages-init
     :candidates (lambda () helm-info--pages-cache)
-    :action '(("Show with Info" .
-               (lambda (node-str)
-                 (info (replace-regexp-in-string
-                        "^[^:]+: " "" node-str)))))
+    :action `(("Show with Info"
+               . ,(lambda (node-str)
+                    (info (replace-regexp-in-string
+                           "^[^:]+: " "" node-str)))))
     :requires-pattern 2)
   "Helm source for Info pages.")
 
