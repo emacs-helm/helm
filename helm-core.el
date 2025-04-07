@@ -2034,9 +2034,9 @@ The hook should takes one arg SOURCES.")
 
 (defvar helm-dim-prompt-on-update nil
   "Dim prompt when updating.
-Do not set this globaly.  Do not use this in async sources or in
+Do not set this globally.  Do not use this in async sources or in
 commands using an async source in their sources.
-Use this either let-bounded of helm buffer local.")
+Use this either let-bounded or helm buffer local.")
 
 ;; Utility: logging
 (defun helm-log (from format-string &rest args)
