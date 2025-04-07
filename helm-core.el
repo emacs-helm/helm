@@ -1283,7 +1283,9 @@ Allow specifying the height of this line."
   :group 'helm-faces)
 
 (defface helm-dim-prompt
-  `((t :inherit shadow))
+  `((((class color) (min-colors 88) (background dark))
+     :foreground "DimGray")
+    (t :inherit shadow))
   "Face used for shadowing prompt while updating."
   :group 'helm-faces)
 
