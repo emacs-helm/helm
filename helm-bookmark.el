@@ -592,7 +592,8 @@ If `browse-url-browser-function' is set to something else than
                   ;; We don't want those actions in helm-find-files bookmarks.
                   unless (memq action '(helm-bookmark-jump-other-frame
                                         helm-bookmark-jump-other-window
-                                        helm-bookmark-jump-other-tab))
+                                        helm-bookmark-jump-other-tab
+                                        bookmark-set))
                   collect (cons name action))
          '(("Browse project" . helm-bookmark-browse-project)) 1))
   (setf (slot-value source 'keymap) helm-bookmark-find-files-map))
