@@ -962,7 +962,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   'helm-grep-buffers)
 
 (helm-make-command-from-action helm-buffer-run-zgrep
-  "Run Grep action from `helm-source-buffers-list'."
+  "Run Zgrep action from `helm-source-buffers-list'."
   'helm-zgrep-buffers)
 
 (helm-make-command-from-action helm-buffer-run-query-replace-regexp

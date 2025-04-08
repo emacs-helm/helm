@@ -1706,7 +1706,9 @@ returns if available with current AG version."
 (defun helm-grep-ag-search-results (_candidate)
   "Launch a new helm session on the current results.
 Allow narrowing the grep ag results to a specific file or pattern without
-continuing calling grep ag."
+continuing calling grep ag, i.e. once called, what you type in minibuffer will be
+searched with helm match functions in all the candidates found previously by
+grep ag."
   (with-helm-buffer
     (let* ((src        (helm-get-current-source))
            (candidates (nthcdr 1 (split-string
