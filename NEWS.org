@@ -1,6 +1,11 @@
 #+STARTUP:showall
 
 * NEWS
+** Version 4.0.3
+*** Fix preselection after persistent killing buffers
+*** Improve colors in ttys
+*** Add new actions to helm-find-files
+*** Fix require-match in completion-in-region
 ** Version 4.0.2
 *** Fix Emacs bug with CRM when using org-set-tags
 *** Improve helm-source-files-in-current-dir
