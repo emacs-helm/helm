@@ -1042,7 +1042,10 @@ vertically."
 
 (defun helm-buffers--quote-truncated-buffer (buffer)
   (let ((bufname (and (bufferp buffer)
-                      (buffer-name buffer))))
+                      (buffer-name buffer)))
+        (maxlen (if helm-buffers-show-icons
+                    (- helm-buffer-max-length 2)
+                  helm-buffer-max-length)))
     (when (and bufname
                (file-remote-p (with-current-buffer bufname
                                 default-directory)))
@@ -1051,9 +1054,7 @@ vertically."
       (regexp-quote
        (if (and helm-buffer-max-length
                 helm-buffer-details-flag)
-           (helm-substring-by-width
-            bufname helm-buffer-max-length
-            "")
+           (helm-substring-by-width bufname maxlen "")
          bufname)))))
 
 (defun helm-buffers-persistent-kill (_buffer)
