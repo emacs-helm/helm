@@ -1041,6 +1041,9 @@ vertically."
       (helm-delete-current-selection))))
 
 (defun helm-buffers--quote-truncated-buffer (buffer)
+  "Quote the truncated buffer-name of BUFFER.
+buffer-name is truncated according to `helm-buffer-max-length' minus the length
+of icon if one."
   (let ((bufname (and (bufferp buffer)
                       (buffer-name buffer)))
         (maxlen (if helm-buffers-show-icons
