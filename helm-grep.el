@@ -830,6 +830,7 @@ If N is positive go forward otherwise go backward."
   (interactive)
   (with-helm-window
     (helm-goto-next-or-prec-file 1)))
+(put 'helm-goto-next-file 'helm-only t)
 
 (helm-make-command-from-action helm-grep-run-default-action
   "Run grep default action from `helm-do-grep-1'."
@@ -1040,10 +1041,12 @@ Special commands:
 (defun helm-gm-next-file ()
   (interactive)
   (helm-goto-next-or-prec-file 1))
+(put 'helm-gm-next-file 'helm-only t)
 
 (defun helm-gm-precedent-file ()
   (interactive)
   (helm-goto-next-or-prec-file -1))
+(put 'helm-gm-precedent-file 'helm-only t)
 
 (defun helm-grep-mode-jump ()
   (interactive)
