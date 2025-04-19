@@ -413,7 +413,8 @@ Save COMMAND to `extended-command-history'."
       (read-extended-command)))))
 
 (defun helm-M-x--mode-predicate (sym mj-mode lmm-modes)
-  "Check if symbol SYM is suitable for current mode CUR-MODE.
+  "Check if symbol SYM is suitable for current buffer.
+MJ-MODE is used to pass major-mode and LMM-MODES to pass local-minor-modes.
 This predicate honors commands defined with the `interactive' MODES argument."
   (let ((modes (command-modes sym)))
     (and (commandp sym)
