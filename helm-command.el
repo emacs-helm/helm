@@ -407,16 +407,16 @@ Save COMMAND to `extended-command-history'."
           (helm-mode 1))
       (read-extended-command)))))
 
-(defun helm-M-x--mode-predicate (sym cur-mode)
+(defun helm-M-x--mode-predicate (sym mj-mode lmm-modes)
   "Check if symbol SYM is suitable for current mode CUR-MODE.
 This predicate honors commands defined with the `interactive' MODES argument."
   (let ((modes (command-modes sym)))
     (and (commandp sym)
          (if modes
-             (or (memq cur-mode modes)
-                 (memq (car modes)
-                  (buffer-local-value 'local-minor-modes helm-current-buffer))
-                 (memq (car modes) global-minor-modes))
+             (or (memq mj-mode modes)
+                 (cl-loop for m in modes thereis
+                          (or (memq m lmm-modes)
+                              (memq m global-minor-modes))))
            t))))
 
 ;;;###autoload
@@ -438,11 +438,13 @@ You can get help on each command by persistent action."
      (list current-prefix-arg)))
   (if (or defining-kbd-macro executing-kbd-macro)
       (helm-M-x--vanilla-M-x)
-    (helm-M-x-read-extended-command
-     obarray (if (and (fboundp 'command-modes)
-                      helm-M-x-exclude-unusable-commands-in-mode)
-                 (lambda (sym) (helm-M-x--mode-predicate sym major-mode))
-               #'commandp))))
+    (let ((lmm-modes (buffer-local-value 'local-minor-modes (current-buffer)))
+          (mj-mode major-mode))
+      (helm-M-x-read-extended-command
+       obarray (if (and (fboundp 'command-modes)
+                        helm-M-x-exclude-unusable-commands-in-mode)
+                   (lambda (sym) (helm-M-x--mode-predicate sym mj-mode lmm-modes))
+                 #'commandp)))))
 (put 'helm-M-x 'interactive-only 'command-execute)
 
 (provide 'helm-command)
