@@ -408,7 +408,7 @@ Save COMMAND to `extended-command-history'."
       (read-extended-command)))))
 
 (defun helm-M-x--mode-predicate (sym cur-mode)
-  "Check is symbol SYM is suitable for current mode CUR-MODE.
+  "Check if symbol SYM is suitable for current mode CUR-MODE.
 This predicate honors commands defined with the `interactive' MODES argument."
   (let ((modes (command-modes sym)))
     (and (commandp sym)
