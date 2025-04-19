@@ -62,8 +62,13 @@ This value can be toggled with
 (defcustom helm-M-x-exclude-unusable-commands-in-mode nil
   "When non nil exclude commands not usable in current buffer.
 This will exclude only commands defined with `interactive' MODES argument, for
-other commands, they will be displayed even if unusable as lon as they satisfies
-`commandp'."
+other commands, they will be displayed even if unusable as long as they satisfies
+`commandp'.
+NOTE: As `interactive' MODES argument is relatively recent, not all commands are
+using it when they should, so do not expect ALL unuseful commands to be excluded
+in `helm-M-x'.  Also in Emacsen with a version of `interactive' not handling
+MODES, this will have no effect.  Regardless of this Helm commands unrelated to
+Helm will never appear in `helm-M-x' whatever the value of this var is."
   :type 'boolean)
 
 ;;; Faces
