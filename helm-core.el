@@ -2444,6 +2444,7 @@ This is a toggle command, when hit a second time reset to all sources."
                             :buffer "*helm sources*")))
               (helm-set-source-filter headers)))
         (helm-set-source-filter nil)))))
+(put 'helm-limit-to-sources 'helm-only t)
 
 ;;; Source infos fns.
 ;;
