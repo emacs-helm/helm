@@ -438,6 +438,7 @@ i.e. the loop is not entered after running COMMAND."
     (define-key map (kbd "M-a")        #'helm-mark-all)
     (define-key map (kbd "M-U")        #'helm-unmark-all)
     (define-key map (kbd "C-M-a")      #'helm-show-all-candidates-in-source)
+    (define-key map (kbd "C-M-f")      #'helm-limit-to-sources)
     (define-key map (kbd "C-M-e")      #'helm-display-all-sources)
     (define-key map (kbd "C-s")        #'undefined)
     (define-key map (kbd "M-s")        #'undefined)
@@ -2421,6 +2422,28 @@ show ARG number of candidates."
     (helm-set-source-filter nil)))
 (put 'helm-display-all-sources 'helm-only t)
 
+(defun helm-limit-to-sources ()
+  "Limit sources to display from current session.
+This is a toggle command, when hit a second time reset to all sources."
+  (interactive)
+  (with-helm-alive-p
+    (with-helm-buffer
+      (if (null helm-source-filter)
+          (when (cdr helm-sources)
+            (let ((headers (helm-comp-read
+                            "Limit to source(s): "
+                            (mapcar
+                             (lambda (s)
+                               (let* ((name (assoc-default 'name s))
+                                      (disp (helm-aif (assoc-default 'header-name s)
+                                                (funcall it name) name)))
+                                 (cons disp name)))
+                             helm-sources)
+                            :marked-candidates t
+                            :allow-nest t
+                            :buffer "*helm sources*")))
+              (helm-set-source-filter headers)))
+        (helm-set-source-filter nil)))))
 
 ;;; Source infos fns.
 ;;
