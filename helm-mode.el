@@ -1543,6 +1543,8 @@ dynamically otherwise use `helm-completing-read-default-2'."
           helm--mode-line-display-prefarg pref-arg)
     (when pref-arg
       (setq helm-M-x--timer (run-at-time 1 0.1 #'helm-M-x--notify-prefix-arg))
+      ;; Notify C-u entered before Hitting M-[xX].
+      (setq helm-M-x-prefix-argument current-prefix-arg)
       (setq current-prefix-arg nil)
       (advice-add 'command-execute :around #'helm--advice-command-execute)
       ;; Remove command-execute advice when execute-extended-command exit.
