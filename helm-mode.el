@@ -1330,8 +1330,9 @@ is used."
                      (condition-case nil
                          (read (current-buffer))
                        (end-of-file nil)))
-          (when (eq (car-safe it) 'deftheme)
-            (cl-return (setq doc (car (split-string (nth 2 it) "\n"))))))
+          (let ((docstring (nth 2 it)))
+            (when (and (eq (car-safe it) 'deftheme) docstring)
+              (cl-return (setq doc (car (split-string docstring "\n")))))))
         (unless doc
           (setq doc (helm--get-theme-doc-from-header)))))
     doc))
