@@ -37,6 +37,8 @@
 (defvar helm-info--files-cache)
 (defvar helm-info--files-doc-cache)
 (defvar Info-current-file)
+(defvar helm-M-x-prefix-argument)
+(defvar helm-M-x--timer)
 
 ;; No warnings in Emacs built --without-x
 (declare-function x-file-dialog "xfns.c")
@@ -56,6 +58,10 @@
 (declare-function find-library-name "find-func.el")
 (declare-function helm-info-file-doc "helm-info")
 (declare-function Info-find-file "info")
+(declare-function helm-M-x--notify-prefix-arg "helm-command")
+(declare-function helm-M-x--unwind-forms "helm-command")
+(declare-function helm-M-x--move-selection-after-hook "helm-command")
+(declare-function helm-M-x--before-action-hook "helm-command")
 
 (defgroup helm-mode nil
   "Enable helm completion."
@@ -1493,6 +1499,7 @@ handling properties, see `helm-comp-read'.
 
 This handler should be used when candidate list doesn't need to be rebuilt
 dynamically otherwise use `helm-completing-read-default-2'."
+  (require 'helm-command)
   (let* ((history (or (car-safe hist) hist))
          (initial-input (helm-acase init
                           ((guard* (stringp it)) it)
