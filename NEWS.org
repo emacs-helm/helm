@@ -2,6 +2,14 @@
 
 * NEWS
 ** Version 4.0.3
+*** Allow filtering sources in current session
+It is bound to C-M-e in helm-map.
+*** Change `helm-current-directory-alist` default value
+Now C-x C-f from a Gnus buffer brings to News directory.
+*** Exclude commands related to specific modes in helm-M-x
+This is available only in Emacs with an interactive version supporting
+MODES argument.  It is configurable with
+`helm-M-x-exclude-unusable-commands-in-mode`, default to t.
 *** Fix preselection after persistent killing buffers
 *** Improve colors in ttys
 *** Add new actions to helm-find-files
