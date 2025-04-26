@@ -331,8 +331,8 @@ Arg HISTORY default to `extended-command-history'."
                        :fuzzy-match helm-M-x-fuzzy-match)))
          (prompt (concat (helm-acase helm-M-x-prefix-argument
                            (- "-")
-                           ((guard* (and (consp it) (car it)))
-                            (if (eq guard 4) "C-u " (format "%d " guard)))
+                           ((dst* (l &rest args))
+                            (if (eq l 4) "C-u " (format "%d " l)))
                            ((guard* (integerp it)) (format "%d " it)))
                          "M-x ")))
     (setq helm-M-x--timer (run-at-time 1 0.1 #'helm-M-x--notify-prefix-arg))
