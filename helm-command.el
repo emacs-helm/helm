@@ -59,7 +59,7 @@ This value can be toggled with
   "When nil, do not sort helm-M-x's commands history."
   :type 'boolean)
 
-(defcustom helm-M-x-exclude-unusable-commands-in-mode nil
+(defcustom helm-M-x-exclude-unusable-commands-in-mode t
   "When non nil exclude commands not usable in current buffer.
 This will exclude only commands defined with `interactive' MODES argument, for
 other commands, they will be displayed even if unusable as long as they satisfies
