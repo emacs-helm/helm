@@ -2,6 +2,8 @@
 
 * NEWS
 ** Version 4.0.3
+*** Add a new completion metadata category command-help
+Handle helm-M-x prefix arg integration in this category.
 *** Allow filtering sources in current session
 It is bound to C-M-e in helm-map.
 *** Change `helm-current-directory-alist` default value
