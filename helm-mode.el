@@ -1530,6 +1530,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
           (setq metadata it)
           (setq afun (completion-metadata-get metadata 'annotation-function)
                 afix (completion-metadata-get metadata 'affixation-function)
+                ;; prefix-arg metadata is only in command-help category.
                 pref-arg (completion-metadata-get metadata 'prefix-arg)
                 popup-info (completion-metadata-get metadata 'popup-info-function)
                 flags (completion-metadata-get metadata 'flags))))
