@@ -1047,7 +1047,6 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                     (category . symbol-help)))
     (command-help . (metadata
                      (prefix-arg . t)
-                     (flags . (helm-M-x-prefix-argument))
                      (affixation-function . helm-symbol-completion-table-affixation)
                      (category . symbol-help)))
     (eww-help . (metadata ;; Emacs-30 only
@@ -1550,10 +1549,13 @@ dynamically otherwise use `helm-completing-read-default-2'."
           helm--mode-line-display-prefarg pref-arg)
     (when pref-arg
       (setq helm-M-x--timer (run-at-time 1 0.1 #'helm-M-x--notify-prefix-arg))
+      (add-hook 'helm-move-selection-after-hook
+                #'helm-M-x--move-selection-after-hook)
+      (add-hook 'helm-before-action-hook
+                #'helm-M-x--before-action-hook)
       ;; Notify C-u entered before Hitting M-[xX].
       (setq helm-M-x-prefix-argument current-prefix-arg)
       (setq current-prefix-arg nil)
-      (advice-add 'command-execute :around #'helm--advice-command-execute)
       ;; Remove command-execute advice when execute-extended-command exit.
       (advice-add 'execute-extended-command :around #'helm--advice-execute-extended-command))
     (unwind-protect
@@ -1602,13 +1604,20 @@ dynamically otherwise use `helm-completing-read-default-2'."
               ;; when init is added to history, it will be unquoted by
               ;; helm-comp-read.
               :initial-input initial-input)
-           (when pref-arg (setq current-prefix-arg helm-current-prefix-arg)))
-      (when (timerp helm-M-x--timer)
-        (cancel-timer helm-M-x--timer) (setq helm-M-x--timer nil))
+           (when pref-arg
+             (advice-add 'command-execute :around #'helm--advice-command-execute)))
+      (helm-M-x--unwind-forms)
       (dolist (f flags) (set f nil)))))
 
 (defun helm--advice-command-execute (old--fn &rest args)
-  (unless prefix-arg (setq prefix-arg current-prefix-arg))
+  (helm-M-x--unwind-forms 'done)
+  ;; `command-execute' is wrapped in a let with `prefix-arg' bound to the argument
+  ;; PREFIXARG of `execute-extended-command' so set this let-bounded `prefix-arg'
+  ;; to the value defined during helm completion.  We use
+  ;; helm-M-x-prefix-argument instead of initial PREFIXARG to allow changing the
+  ;; initial prefix arg during helm completion e.g. C-u M-X foo C-u 2 foo, in
+  ;; this case the initial C-u is replaced by C-u 2.
+  (setq prefix-arg (or helm-current-prefix-arg helm-M-x-prefix-argument))
   (apply old--fn args))
 
 (defun helm--advice-execute-extended-command (old--fn &rest args)
