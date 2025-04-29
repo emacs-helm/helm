@@ -62,6 +62,7 @@
 (declare-function helm-M-x--unwind-forms "helm-command")
 (declare-function helm-M-x--move-selection-after-hook "helm-command")
 (declare-function helm-M-x--before-action-hook "helm-command")
+(declare-function helm-M-x-persistent-action "helm-command")
 
 (defgroup helm-mode nil
   "Enable helm completion."
@@ -1571,6 +1572,8 @@ dynamically otherwise use `helm-completing-read-default-2'."
               :alistp alistp
               :diacritics helm-mode-ignore-diacritics
               :help-message #'helm-comp-read-help-message
+              :persistent-action (and pref-arg #'helm-M-x-persistent-action)
+              :persistent-help (if pref-arg "Toggle Describe command" "DoNothing")
               :name name
               :requires-pattern (if (and (stringp default)
                                          (string= default "")
