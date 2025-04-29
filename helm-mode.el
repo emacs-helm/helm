@@ -1606,7 +1606,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
               :initial-input initial-input)
            (when pref-arg
              (advice-add 'command-execute :around #'helm--advice-command-execute)))
-      (helm-M-x--unwind-forms)
+      (when pref-arg (helm-M-x--unwind-forms))
       (dolist (f flags) (set f nil)))))
 
 (defun helm--advice-command-execute (old--fn &rest args)
