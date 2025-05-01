@@ -992,7 +992,7 @@ the keyword :name in your source, NAME will be used instead.
 Argument CLASS is a symbol defining an eieio class object.
 Arguments ARGS are keyword value pairs as defined in CLASS."
   (declare (indent 2))
-  (let ((source (apply #'make-instance class name args)))
+  (let ((source (apply #'make-instance class :name name args)))
     (setf (slot-value source 'name) name)
     (helm--setup-source source)
     (helm-setup-user-source source)
