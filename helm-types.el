@@ -329,12 +329,13 @@
 ;; Builders.
 (defun helm-build-type-file ()
   (helm-make-type 'helm-type-file))
-
+(make-obsolete 'helm-build-type-file 'helm-make-source "4.0.3")
 (defun helm-build-type-function ()
   (helm-make-type 'helm-type-function))
-
+(make-obsolete 'helm-build-type-function 'helm-make-source "4.0.3")
 (defun helm-build-type-command ()
   (helm-make-type 'helm-type-command))
+(make-obsolete 'helm-build-type-command 'helm-make-source "4.0.3")
 
 (provide 'helm-types)
 

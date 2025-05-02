@@ -1002,6 +1002,7 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
     (setf (slot-value source 'name) nil)
     (helm--setup-source source)
     (helm--create-source source)))
+(make-obsolete 'helm-make-type 'helm-make-source "4.0.3")
 
 (defvar helm-mm-default-search-functions)
 (defvar helm-mm-default-match-functions)
