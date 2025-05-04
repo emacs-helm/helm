@@ -892,6 +892,9 @@ directories you can choose from, it is nil by default, customize it to
 your needs.  Tip: To trigger this from an Emacs full frame, drag to the
 border of the Emacs frame.
 
+By default Helm copy files when using drag-and-drop, you can customize
+`helm-ff-drag-mouse-1-default-action' to modify this.
+
 Drag-and-drop to external applications is not supported in Helm, to
 achieve this you will have to install external application [[https://github.com/mwh/dragon][Dragon]]
 and use it as follow:

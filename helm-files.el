@@ -963,6 +963,14 @@ You want generally to set this to your home desktop directory.")
 It is used when no suitable directory is found at drop place,
 generally when dropping outside of an emacs frame."
   :type '(repeat (choice string)))
+
+(defcustom helm-ff-drag-mouse-1-default-action 'copy
+  "Default action when dragging files.
+Possible values are `copy', `rsync' or `rename'."
+  :type '(choice
+          (const :tag "Copy" copy)
+          (const :tag "Rsync" rsync)
+          (const :tag "Move" rename)))
 
 ;;; Faces
 ;;
@@ -5594,10 +5602,6 @@ Show the first `helm-ff-history-max-length' elements of
                   :allow-nest t))
         helm-ff-history))))
 (put 'helm-find-files-history 'helm-only t)
-
-(defvar helm-ff-drag-mouse-1-default-action 'copy
-  "Default action when dragging files.
-Possible values are `copy', `rsync' or `rename'.")
 
 (defun helm-ff-drag-mouse-1-fn (event)
   "Drag-and-drop function for `helm-find-files'.
