@@ -881,6 +881,37 @@ automatically \"-e 'ssh -p 2222'\" to the rsync command line
 unless you have specified yourself the \"-e\" option by editing
 rsync command line with a prefix arg (see above).
 
+*** Drag and drop files from Helm
+
+When mouse support is enabled in Helm (which is the default, see
+`helm-allow-mouse') you can drag and drop files to `default-directory'
+of the buffer you drag-and-drop in.  When you drag and drop outside of
+an emacs frame, the target directory is defined by the variable
+`helm-ff-drag-and-drop-default-directories' which is a list of
+directories you can choose from, it is nil by default, customize it to
+your needs.  Tip: To trigger this from an Emacs full frame, drag to the
+border of the Emacs frame.
+
+Drag-and-drop to external applications is not supported in Helm, to
+achieve this you will have to install external application [[https://github.com/mwh/dragon][Dragon]]
+and use it as follow:
+
+#+begin_src elisp
+  (defun helm-ff-dragon (files)
+    \"Create a small window with FILES ready to drag and drop.
+Use this to drop files on externals applications or desktop.
+Dropping on emacs buffers with this is not supported.
+
+Needs `dragon' executable: https://github.com/mwh/dragon.\"
+    (interactive (list (helm-marked-candidates)))
+    (cl-assert (executable-find \"dragon\") nil \"Dragon executable not found\")
+    (apply #'call-process \"dragon\" nil nil nil \"--all\" \"--and-exit\" files))
+  (define-key helm-find-files-map (kbd \"C-c m\") 'helm-ff-dragon)
+#+end_src
+
+Tip: From the Dragon window, you can move your mouse to an other desktop
+where the external application you want to drag-and-drop is.
+
 *** Access files on Android phones from Helm
 
 Since Android doesn't provide anymore mass storage for USB, it is

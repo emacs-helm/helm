@@ -948,6 +948,21 @@ present in this list."
 (defcustom helm-ff-dim-prompt-on-update t
   "When non nil dim prompt while updating."
   :type 'boolean)
+
+(defvaralias 'helm-ff-drag-and-drop-default-directory 'helm-ff-drag-and-drop-default-directories
+  "Default directory where to drop files on a drag-and-drop action.
+It is used when no suitable directory is found at drop place,
+generally when dropping outside of an emacs frame.
+You want generally to set this to your home desktop directory.")
+(make-obsolete-variable 'helm-ff-drag-and-drop-default-directory
+                        'helm-ff-drag-and-drop-default-directories
+                        "4.0.3")
+
+(defcustom helm-ff-drag-and-drop-default-directories nil
+  "A list of directories where to drop files on a drag-and-drop action.
+It is used when no suitable directory is found at drop place,
+generally when dropping outside of an emacs frame."
+  :type '(repeat (choice string)))
 
 ;;; Faces
 ;;
@@ -5584,12 +5599,6 @@ Show the first `helm-ff-history-max-length' elements of
   "Default action when dragging files.
 Possible values are `copy', `rsync' or `rename'.")
 
-(defvar helm-ff-drag-and-drop-default-directory nil
-  "Default directory where to drop files on a drag-and-drop action.
-It is used when no suitable directory is found at drop place,
-generally when dropping outside of an emacs frame.
-You want generally to set this to your home desktop directory.")
-
 (defun helm-ff-drag-mouse-1-fn (event)
   "Drag-and-drop function for `helm-find-files'.
 Allows dropping marked files to another frame or window.
@@ -5597,7 +5606,7 @@ When dropping to another frame (i.e. not the selected one where helm
 is running), you are asked for which directory you want to drop to when frame
 displays more than one window.
 When no suitable place to drop is found ask to drop to
-`helm-ff-drag-and-drop-default-directory' if set."
+`helm-ff-drag-and-drop-default-directories' if set."
   (interactive "e")
   (cl-assert (memq helm-ff-drag-mouse-1-default-action
                    '(copy rsync rename)))
@@ -5624,11 +5633,17 @@ When no suitable place to drop is found ask to drop to
                                                  collect (cons  dir dir))))))
                         ((and (eql (window-buffer (car windows))
                                    helm-current-buffer)
-                              helm-ff-drag-and-drop-default-directory)
+                              (or helm-ff-drag-and-drop-default-directories
+                                  helm-ff-drag-and-drop-default-directory))
                          (x-popup-menu
                           t (list "Choose target"
                                   (cons ""
-                                        (list (cons it it))))))
+                                        (if (listp it)
+                                            (cl-loop for fname in it
+                                                     collect (cons fname fname))
+                                          ;; Handle obsolete
+                                          ;; helm-ff-drag-and-drop-default-directory.
+                                          (list (cons it it)))))))
                         ((car windows)
                          (with-selected-window it default-directory)))))
     (if (memq helm-ff-drag-mouse-1-default-action '(copy rsync))
