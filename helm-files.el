@@ -5610,6 +5610,8 @@ When no suitable place to drop is found ask to drop to
   (interactive "e")
   (cl-assert (memq helm-ff-drag-mouse-1-default-action
                    '(copy rsync rename)))
+  ;; Prevent marking when moving mouse.
+  (when mark-active (deactivate-mark))
   (let* ((win-or-frame (posn-window (event-end event)))
          (target-frame (when (framep win-or-frame)
                          (car (mouse-pixel-position))))
