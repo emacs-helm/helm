@@ -3722,21 +3722,22 @@ Add a `helm-ff-dir' property on each fname ending with \"/\"."
 This is used for tramp adb backend.
 
 Add a `helm-ff-dir' property on each fname ending with \"/\"."
-  (cl-loop with files = (helm-file-name-all-completions-internal directory)
-           for f in (sort files (or sort-method 'string-lessp))
-           for split = (split-string f "->" t)
-           for fname = (replace-regexp-in-string " $" "" (car split))
-           for truename = (cadr split)
-           collect (cond ((string-match "/\\'" fname)
-                          (propertize (helm--dir-file-name fname directory)
-                                      'helm-ff-dir t))
-                         (truename
-                          (propertize (expand-file-name
-                                       (substring fname 0 (1- (length fname)))
-                                       directory)
-                                      'helm-ff-sym truename))
-                         (t (propertize (expand-file-name fname directory)
-                                        'helm-ff-file t)))))
+  (let ((inhibit-message t))
+    (cl-loop with files = (helm-file-name-all-completions-internal directory)
+             for f in (sort files (or sort-method 'string-lessp))
+             for split = (split-string f "->" t)
+             for fname = (replace-regexp-in-string " $" "" (car split))
+             for truename = (cadr split)
+             collect (cond ((string-match "/\\'" fname)
+                            (propertize (helm--dir-file-name fname directory)
+                                        'helm-ff-dir t))
+                           (truename
+                            (propertize (expand-file-name
+                                         (substring fname 0 (1- (length fname)))
+                                         directory)
+                                        'helm-ff-sym truename))
+                           (t (propertize (expand-file-name fname directory)
+                                          'helm-ff-file t))))))
 
 (defun helm-list-dir-external (dir &optional sort-method)
   "List directory DIR with external shell command as backend.
