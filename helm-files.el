@@ -5667,8 +5667,12 @@ When no suitable place to drop is found ask to drop to
                         ((car windows)
                          (with-selected-window it default-directory)))))
     (if (memq helm-ff-drag-mouse-1-default-action '(copy rsync))
-        (helm-find-files-do-action
-         helm-ff-drag-mouse-1-default-action target)
+        (progn
+          (helm-find-files-do-action
+           helm-ff-drag-mouse-1-default-action target)
+          ;; Retrieve focus after dropping
+          (with-selected-frame helm-initial-frame
+            (select-window (minibuffer-window))))
       (helm-run-after-exit
        #'helm-find-files-do-action
        helm-ff-drag-mouse-1-default-action target))))
