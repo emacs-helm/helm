@@ -888,9 +888,11 @@ When mouse support is enabled in Helm (which is the default, see
 of the buffer you drag-and-drop in.  When you drag and drop outside of
 an emacs frame, the target directory is defined by the variable
 `helm-ff-drag-and-drop-default-directories' which is a list of
-directories you can choose from, it is nil by default, customize it to
-your needs.  Tip: To trigger this from an Emacs full frame, drag to the
-border of the Emacs frame.
+directories you can choose from or the first <n> elements of
+`helm-ff-history' you specify with a cons cell where the first element
+is the symbol =history= and the second an integer, it is '(history . 10)
+by default, customize it to your needs.  Tip: To trigger this from an
+Emacs full frame, drag to the border of the Emacs frame.
 
 By default Helm copy files when using drag-and-drop, you can customize
 `helm-ff-drag-mouse-1-default-action' to modify this.

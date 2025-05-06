@@ -958,11 +958,17 @@ You want generally to set this to your home desktop directory.")
                         'helm-ff-drag-and-drop-default-directories
                         "4.0.3")
 
-(defcustom helm-ff-drag-and-drop-default-directories nil
-  "A list of directories where to drop files on a drag-and-drop action.
+(defcustom helm-ff-drag-and-drop-default-directories '(history . 10)
+  "Directories where to drop files on a drag-and-drop action.
+Can be a list of directories, or a cons cell (history . <n>) where <n> is the
+first <n> directories of `helm-ff-history'.
 It is used when no suitable directory is found at drop place,
 generally when dropping outside of an emacs frame."
-  :type '(repeat (choice string)))
+  :type '(choice
+          (cons
+           (const :tag "History" history)
+           integer)
+          (repeat string)))
 
 (defcustom helm-ff-drag-mouse-1-default-action 'copy
   "Default action when dragging files.
@@ -5642,6 +5648,13 @@ When no suitable place to drop is found ask to drop to
                                    helm-current-buffer)
                               (or helm-ff-drag-and-drop-default-directories
                                   helm-ff-drag-and-drop-default-directory))
+                         (when (and (eq (car it) 'history)
+                                    (numberp (cdr it)))
+                           (setq it (helm-take
+                                     (remove helm-ff-default-directory
+                                             (helm-fast-remove-dups
+                                              helm-ff-history :test 'equal))
+                                     (cdr it))))
                          (x-popup-menu
                           t (list "Choose target"
                                   (cons ""
