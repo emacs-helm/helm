@@ -2,6 +2,10 @@
 
 * NEWS
 ** Version 4.0.3
+*** Remove drag-and-drop support in helm-find-files for emacs<29
+Use now dnd.el for the new drag-and-drop function.
+This allows drag-and-drop in external applications in addition to emacs
+frames.
 *** Add a new completion metadata category command-help
 Handle helm-M-x prefix arg integration in this category.
 *** Allow filtering sources in current session
