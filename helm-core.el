@@ -5427,7 +5427,7 @@ specified as respectively `helm-cand-num' and `helm-cur-source'."
   (let ((inhibit-read-only t)
         (map (get-text-property pos 'keymap)))
     (when map
-      (define-key map [drag-mouse-1] helm-drag-mouse-1-fn)
+      (define-key map [down-mouse-1] helm-drag-mouse-1-fn)
       (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
       (put-text-property
        helm-selection-point

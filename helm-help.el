@@ -885,21 +885,13 @@ rsync command line with a prefix arg (see above).
 
 When mouse support is enabled in Helm (which is the default, see
 `helm-allow-mouse') you can drag and drop files to `default-directory'
-of the buffer you drag-and-drop in.  When you drag and drop outside of
-an emacs frame, the target directory is defined by the variable
-`helm-ff-drag-and-drop-default-directories' which is a list of
-directories you can choose from or the first <n> elements of
-`helm-ff-history' you specify with a cons cell where the first element
-is the symbol =history= and the second an integer, it is '(history . 10)
-by default, customize it to your needs.  Tip: To trigger this from an
-Emacs full frame, drag to the border of the Emacs frame.
+of the buffer you drag-and-drop in or in an external application.
 
 By default Helm copy files when using drag-and-drop, you can customize
 `helm-ff-drag-mouse-1-default-action' to modify this.
 
-Drag-and-drop to external applications is not supported in Helm, to
-achieve this you will have to install external application [[https://github.com/mwh/dragon][Dragon]]
-and use it as follow:
+To drag-and-drop to external applications you can also use the
+external application [[https://github.com/mwh/dragon][Dragon]] and use it as follow:
 
 #+begin_src elisp
   (defun helm-ff-dragon (files)

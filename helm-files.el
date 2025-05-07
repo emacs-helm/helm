@@ -97,6 +97,7 @@
 (declare-function helm-epa-collect-keys-from-candidates "helm-epa")
 (declare-function async-byte-compile-file "async-bytecomp.el")
 (declare-function async-byte-recompile-directory "async-bytecomp.el")
+(declare-function dnd-begin-drag-files "dnd.el")
 
 (defvar term-char-mode-point-at-process-mark)
 (defvar term-char-mode-buffer-read-only)
@@ -949,34 +950,13 @@ present in this list."
   "When non nil dim prompt while updating."
   :type 'boolean)
 
-(defvaralias 'helm-ff-drag-and-drop-default-directory 'helm-ff-drag-and-drop-default-directories
-  "Default directory where to drop files on a drag-and-drop action.
-It is used when no suitable directory is found at drop place,
-generally when dropping outside of an emacs frame.
-You want generally to set this to your home desktop directory.")
-(make-obsolete-variable 'helm-ff-drag-and-drop-default-directory
-                        'helm-ff-drag-and-drop-default-directories
-                        "4.0.3")
-
-(defcustom helm-ff-drag-and-drop-default-directories '(history . 10)
-  "Directories where to drop files on a drag-and-drop action.
-Can be a list of directories, or a cons cell (history . <n>) where <n> is the
-first <n> directories of `helm-ff-history'.
-It is used when no suitable directory is found at drop place,
-generally when dropping outside of an emacs frame."
-  :type '(choice
-          (cons
-           (const :tag "History" history)
-           integer)
-          (repeat string)))
-
 (defcustom helm-ff-drag-mouse-1-default-action 'copy
   "Default action when dragging files.
-Possible values are `copy', `rsync' or `rename'."
+Possible values are `copy', `move' or `link'."
   :type '(choice
           (const :tag "Copy" copy)
-          (const :tag "Rsync" rsync)
-          (const :tag "Move" rename)))
+          (const :tag "Move" move)
+          (const :tag "Link" link)))
 
 ;;; Faces
 ;;
@@ -5610,73 +5590,23 @@ Show the first `helm-ff-history-max-length' elements of
         helm-ff-history))))
 (put 'helm-find-files-history 'helm-only t)
 
-(defun helm-ff-drag-mouse-1-fn (event)
-  "Drag-and-drop function for `helm-find-files'.
-Allows dropping marked files to another frame or window.
-When dropping to another frame (i.e. not the selected one where helm
-is running), you are asked for which directory you want to drop to when frame
-displays more than one window.
-When no suitable place to drop is found ask to drop to
-`helm-ff-drag-and-drop-default-directories' if set."
+;; The `helm-drag-mouse-1-fn' for helm-find-files, see
+;; `helm--bind-mouse-for-selection'. It react when dropping, not dragging so
+;; `helm-drag-mouse-1-fn' is bound to <down-mouse-1> and not <drag-mouse-1>.
+(defun helm-ff-mouse-drag (_event)
+  "The drag-an-drop function for helm-find-files.
+
+Drag-and-drop marked files."
   (interactive "e")
-  (cl-assert (memq helm-ff-drag-mouse-1-default-action
-                   '(copy rsync rename)))
-  ;; Prevent marking when moving mouse.
+  (require 'dnd)
   (when mark-active (deactivate-mark))
-  (let* ((win-or-frame (posn-window (event-end event)))
-         (target-frame (when (framep win-or-frame)
-                         (car (mouse-pixel-position))))
-         (target       (with-selected-window
-                           (if target-frame
-                               (frame-selected-window target-frame)
-                             win-or-frame)
-                         default-directory))
-         (windows      (and target-frame
-                            (remove (helm-window)
-                                    (window-list target-frame 1)))))
-    (when windows
-      (setq target
-            (helm-acond ((cdr windows)
-                         (x-popup-menu
-                          t (list "Choose target"
-                                  (cons ""
-                                        (cl-loop for win in windows
-                                                 for dir = (with-selected-window
-                                                               win default-directory)
-                                                 collect (cons  dir dir))))))
-                        ((and (eql (window-buffer (car windows))
-                                   helm-current-buffer)
-                              (or helm-ff-drag-and-drop-default-directories
-                                  helm-ff-drag-and-drop-default-directory))
-                         (when (and (eq (car it) 'history)
-                                    (numberp (cdr it)))
-                           (setq it (helm-take
-                                     (remove helm-ff-default-directory
-                                             (helm-fast-remove-dups
-                                              helm-ff-history :test 'equal))
-                                     (cdr it))))
-                         (x-popup-menu
-                          t (list "Choose target"
-                                  (cons ""
-                                        (if (listp it)
-                                            (cl-loop for fname in it
-                                                     collect (cons fname fname))
-                                          ;; Handle obsolete
-                                          ;; helm-ff-drag-and-drop-default-directory.
-                                          (list (cons it it)))))))
-                        ((car windows)
-                         (with-selected-window it default-directory)))))
-    (if (memq helm-ff-drag-mouse-1-default-action '(copy rsync))
-        (unwind-protect
-             (helm-find-files-do-action
-              helm-ff-drag-mouse-1-default-action target)
-          ;; Retrieve focus after dropping
-          (with-selected-frame helm-initial-frame
-            (select-window (minibuffer-window))
-            (force-mode-line-update t)))
-      (helm-run-after-exit
-       #'helm-find-files-do-action
-       helm-ff-drag-mouse-1-default-action target))))
+  (let ((action helm-ff-drag-mouse-1-default-action))
+    (with-helm-window
+      (condition-case err
+          (let ((files (helm-marked-candidates)))
+            (dnd-begin-drag-files files nil action t))
+        (error (user-error (cadr err)))))))
+(put 'helm-ff-mouse-drag 'helm-only t)
 
 (defun helm-find-files-1 (fname &optional preselect)
   "Find FNAME filename with PRESELECT filename preselected.
@@ -5704,8 +5634,9 @@ Use it for non-interactive calls of `helm-find-files'."
          ;; Ensure not being prompted for password each time we
          ;; navigate to a directory.
          (password-cache t))
-    (helm-set-local-variable 'helm-follow-mode-persistent nil
-                             'helm-drag-mouse-1-fn 'helm-ff-drag-mouse-1-fn)
+    (helm-set-local-variable 'helm-follow-mode-persistent nil)
+    (when (fboundp 'dnd-begin-drag-files)
+      (helm-set-local-variable 'helm-drag-mouse-1-fn 'helm-ff-mouse-drag))
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
