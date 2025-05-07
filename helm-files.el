@@ -5672,7 +5672,8 @@ When no suitable place to drop is found ask to drop to
               helm-ff-drag-mouse-1-default-action target)
           ;; Retrieve focus after dropping
           (with-selected-frame helm-initial-frame
-            (select-window (minibuffer-window))))
+            (select-window (minibuffer-window))
+            (force-mode-line-update t)))
       (helm-run-after-exit
        #'helm-find-files-do-action
        helm-ff-drag-mouse-1-default-action target))))
