@@ -952,7 +952,9 @@ present in this list."
 
 (defcustom helm-ff-drag-mouse-1-default-action 'copy
   "Default action when dragging files.
-Possible values are `copy', `move' or `link'."
+Possible values are `copy', `move' or `link'.
+Currently supported value is `copy' when dropping to a dired buffer, `move' is
+working only when dropping on an external application (only thunar tested)."
   :type '(choice
           (const :tag "Copy" copy)
           (const :tag "Move" move)
@@ -5593,6 +5595,10 @@ Show the first `helm-ff-history-max-length' elements of
 ;; The `helm-drag-mouse-1-fn' for helm-find-files, see
 ;; `helm--bind-mouse-for-selection'. It react when dropping, not dragging so
 ;; `helm-drag-mouse-1-fn' is bound to <down-mouse-1> and not <drag-mouse-1>.
+;; NOTES: It seems XdndActionMove is not working when dropping in dired buffers,
+;; however it is working when dropping in a thunar window, don't know if it is a
+;; missing property in dired buffer or it is just not supported by x-begin-drag.
+;; See https://freedesktop.org/wiki/Specifications/XDND/ for more infos.
 (defun helm-ff-mouse-drag (_event)
   "The drag-an-drop function for helm-find-files.
 
