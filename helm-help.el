@@ -888,7 +888,12 @@ When mouse support is enabled in Helm (which is the default, see
 of the buffer you drag-and-drop in or in an external application.
 
 By default Helm copy files when using drag-and-drop, you can customize
-`helm-ff-drag-mouse-1-default-action' to modify this.
+`helm-ff-drag-mouse-1-default-action' to modify this, however note that
+other actions than `copy' are not supported when dropping in dired buffers
+as of now, it works when dropping in external apps like Thunar though.
+
+Also drag-and-drop is not working when trying to drop in a window that
+is in another desktop, in this case use the following solution.
 
 To drag-and-drop to external applications you can also use the
 external application [[https://github.com/mwh/dragon][Dragon]] and use it as follow:
