@@ -5664,6 +5664,7 @@ and release the mouse in this same buffer.")
 
 Use it for non-interactive calls of `helm-find-files'."
   (require 'tramp)
+  (require 'dnd)
   ;; Resolve FNAME now outside of helm.
   ;; [FIXME] When `helm-find-files-1' is used directly from lisp
   ;; and FNAME is an abbreviated path, for some reasons
