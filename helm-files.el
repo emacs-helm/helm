@@ -5644,6 +5644,21 @@ It is the drag-an-drop function of dired adapted for helm-find-files."
                        (user-error (cadr error)))))))))))
 (put 'helm-ff-mouse-drag 'helm-only t)
 
+(defvar helm-dnd-protocol-alist
+  '(("^file:///" . helm-dnd-handle-local-file)
+    ("^file://"  . helm-dnd-handle-file)
+    ("^file:"    . helm-dnd-handle-local-file))
+  "The functions to call when dropping to helm-buffer.
+Prevent dropping to helm buffer when user starts a drag-and-drop action
+and release the mouse in this same buffer.")
+
+(defun helm-dnd-handle-local-file (_uri _action)
+  "Prevent dropping files to helm buffer."
+  (user-error "Can't drop files in helm buffer"))
+(defun helm-dnd-handle-file (_uri _action)
+  "Prevent dropping files to helm buffer."
+  (user-error "Can't drop files in helm buffer"))
+
 (defun helm-find-files-1 (fname &optional preselect)
   "Find FNAME filename with PRESELECT filename preselected.
 
@@ -5672,7 +5687,9 @@ Use it for non-interactive calls of `helm-find-files'."
          (password-cache t))
     (helm-set-local-variable 'helm-follow-mode-persistent nil)
     (when (fboundp 'dnd-begin-drag-files)
-      (helm-set-local-variable 'helm-drag-mouse-1-fn 'helm-ff-mouse-drag))
+      (helm-set-local-variable 'helm-drag-mouse-1-fn 'helm-ff-mouse-drag
+                               'dnd-protocol-alist
+                               (append helm-dnd-protocol-alist dnd-protocol-alist)))
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
