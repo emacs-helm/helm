@@ -5455,6 +5455,8 @@ specified as respectively `helm-cand-num' and `helm-cur-source'."
                              (helm-get-previous-header-pos)))
               (forward-line 1)))
           (helm-mark-current-line)
+          (when helm-popup-tip-mode
+            (helm-maybe-show-help-echo))
           (helm-follow-execute-persistent-action-maybe))
       (select-window (minibuffer-window))
       (set-buffer (window-buffer window)))))
