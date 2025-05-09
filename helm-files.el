@@ -5597,21 +5597,51 @@ Show the first `helm-ff-history-max-length' elements of
 ;; `helm-drag-mouse-1-fn' is bound to <down-mouse-1> and not <drag-mouse-1>.
 ;; NOTES: It seems XdndActionMove is not working when dropping in dired buffers,
 ;; however it is working when dropping in a thunar window, don't know if it is a
-;; missing property in dired buffer or it is just not supported by x-begin-drag.
+;; missing property in dired buffer or it is just not supported by `x-begin-drag'.
 ;; See https://freedesktop.org/wiki/Specifications/XDND/ for more infos.
-(defun helm-ff-mouse-drag (_event)
-  "The drag-an-drop function for helm-find-files.
+(defun helm-ff-mouse-drag (event)
+  "Drag-and-drop marked files at EVENT.
 
-Drag-and-drop marked files."
-  (interactive "e")
-  (require 'dnd)
+It is the drag-an-drop function of dired adapted for helm-find-files."
+  (interactive "e" dired-mode)
   (when mark-active (deactivate-mark))
   (let ((action helm-ff-drag-mouse-1-default-action))
-    (with-helm-window
-      (condition-case err
-          (let ((files (helm-marked-candidates)))
-            (dnd-begin-drag-files files nil action t))
-        (error (user-error (cadr err)))))))
+    (save-excursion
+      (with-selected-window (posn-window (event-end event))
+        (goto-char (posn-point (event-end event))))
+      ;; FIXME: Is this really needed as long as I prevent dropping in
+      ;; helm-buffer by setting locally dnd-protocol-alist?
+      (track-mouse
+        (let ((beginning-position (mouse-pixel-position))
+              new-event)
+          (catch 'track-again
+            (setq new-event (read-event))
+            (if (not (eq (event-basic-type new-event) 'mouse-movement))
+                (when (eq (event-basic-type new-event) 'mouse-1)
+                  (push new-event unread-command-events))
+              (let ((current-position (mouse-pixel-position)))
+                ;; If the mouse didn't move far enough, don't
+                ;; inadvertently trigger a drag.
+                (when (and (eq (car current-position) (car beginning-position))
+                           (ignore-errors
+                             (and (> 3 (abs (- (cadr beginning-position)
+                                               (cadr current-position))))
+                                  (> 3 (abs (- (caddr beginning-position)
+                                               (caddr current-position)))))))
+                  (throw 'track-again nil)))
+              ;; We can get an error if there's by some chance no file
+              ;; name at point.
+              (condition-case error
+                  (let ((files (helm-marked-candidates)))
+                    (dnd-begin-drag-files files nil action t))
+                (error (when (eq (event-basic-type new-event) 'mouse-1)
+                         (push new-event unread-command-events))
+                       ;; Errors from `dnd-begin-drag-files' should be
+                       ;; treated as user errors, since they should
+                       ;; only occur when the user performs an invalid
+                       ;; action, such as trying to create a link to
+                       ;; a remote file.
+                       (user-error (cadr error)))))))))))
 (put 'helm-ff-mouse-drag 'helm-only t)
 
 (defun helm-find-files-1 (fname &optional preselect)
