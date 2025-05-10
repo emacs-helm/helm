@@ -5595,10 +5595,14 @@ Show the first `helm-ff-history-max-length' elements of
 ;; The `helm-drag-mouse-1-fn' for helm-find-files, see
 ;; `helm--bind-mouse-for-selection'. It react when dropping, not dragging so
 ;; `helm-drag-mouse-1-fn' is bound to <down-mouse-1> and not <drag-mouse-1>.
-;; NOTES: It seems XdndActionMove is not working when dropping in dired buffers,
-;; however it is working when dropping in a thunar window, don't know if it is a
-;; missing property in dired buffer or it is just not supported by `x-begin-drag'.
 ;; See https://freedesktop.org/wiki/Specifications/XDND/ for more infos.
+;; FIXME: Don't loose the focus in helm-window when dropping to a dired buffer.
+;; When drag&dropping from a dired buffer to a dired buffer, the focus is kept
+;; when the target is a frame, but not a window, at least this would be
+;; acceptable because when dropping to a frame the minibuffer is transfered to
+;; this frame which is annoying (need to click in the helm-window to gain focus
+;; again). OTOH, when dropping to a thunar window or firefox the focus stays in
+;; helm.
 (defun helm-ff-mouse-drag (event)
   "Drag-and-drop marked files at EVENT.
 
@@ -5609,8 +5613,6 @@ It is the drag-an-drop function of dired adapted for helm-find-files."
     (save-excursion
       (with-selected-window (posn-window (event-end event))
         (goto-char (posn-point (event-end event))))
-      ;; FIXME: Is this really needed as long as I prevent dropping in
-      ;; helm-buffer by setting locally dnd-protocol-alist?
       (track-mouse
         (let ((beginning-position (mouse-pixel-position))
               new-event)
