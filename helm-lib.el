@@ -2024,9 +2024,11 @@ Directories expansion is not supported."
       (goto-char (point-min))
       (when (re-search-forward "^;;;?\\(.*\\) ---? \\(.*\\)" (pos-eol) t)
         (setq desc (match-string-no-properties 2)))
-      (if (or (null desc) (string= "" desc))
-          "Not documented"
-        (car (split-string desc "-\\*-" nil "[ \t\n\r-]+"))))))
+      (if-let ((_ (and desc (length> desc 0)))
+               (summary (car (split-string desc "-\\*-" nil)))
+               (_ (length> summary 0)))
+          (string-trim summary "[ \t\n\r-]+" "[ \t\n\r-]+")
+        "Not documented"))))
 
 (defun helm-local-directory-files (directory &rest args)
   "Run `directory-files' without tramp file name handlers.
