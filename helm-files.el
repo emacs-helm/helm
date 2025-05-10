@@ -5603,7 +5603,7 @@ Show the first `helm-ff-history-max-length' elements of
   "Drag-and-drop marked files at EVENT.
 
 It is the drag-an-drop function of dired adapted for helm-find-files."
-  (interactive "e" dired-mode)
+  (interactive "e")
   (when mark-active (deactivate-mark))
   (let ((action helm-ff-drag-mouse-1-default-action))
     (save-excursion
