@@ -5634,7 +5634,7 @@ It is the drag-an-drop function of dired adapted for helm-find-files."
               ;; We can get an error if there's by some chance no file
               ;; name at point.
               (condition-case error
-                  (let ((files (helm-marked-candidates)))
+                  (let ((files (with-helm-window (helm-marked-candidates))))
                     (dnd-begin-drag-files files nil action t))
                 (error (when (eq (event-basic-type new-event) 'mouse-1)
                          (push new-event unread-command-events))
