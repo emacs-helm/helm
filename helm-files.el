@@ -5592,17 +5592,11 @@ Show the first `helm-ff-history-max-length' elements of
         helm-ff-history))))
 (put 'helm-find-files-history 'helm-only t)
 
-;; The `helm-drag-mouse-1-fn' for helm-find-files, see
-;; `helm--bind-mouse-for-selection'. It react when dropping, not dragging so
-;; `helm-drag-mouse-1-fn' is bound to <down-mouse-1> and not <drag-mouse-1>.
-;; See https://freedesktop.org/wiki/Specifications/XDND/ for more infos.
-;; FIXME: Don't loose the focus in helm-window when dropping to a dired buffer.
-;; When drag&dropping from a dired buffer to a dired buffer, the focus is kept
-;; when the target is a frame, but not a window, at least this would be
-;; acceptable because when dropping to a frame the minibuffer is transfered to
-;; this frame which is annoying (need to click in the helm-window to gain focus
-;; again). OTOH, when dropping to a thunar window or firefox the focus stays in
-;; helm.
+;; The `helm-drag-mouse-1-fn' for helm-find-files, it is bound to <down-mouse-1>
+;; in `helm--bind-mouse-for-selection'.
+;; See https://freedesktop.org/wiki/Specifications/XDND/
+;; and (info "(elisp) Drag and Drop") for more infos.
+;; FIXME: Don't lose the focus in helm-window when dropping to a dired buffer.
 (defun helm-ff-mouse-drag (event)
   "Drag-and-drop marked files at EVENT.
 
