@@ -914,6 +914,8 @@ Needs `dragon' executable: https://github.com/mwh/dragon.\"
 Tip: From the Dragon window, you can move your mouse to an other desktop
 where the external application you want to drag-and-drop is.
 
+NOTE: Drag-and-dropping from elsewhere to Helm is forbidden.
+
 *** Access files on Android phones from Helm
 
 Since Android doesn't provide anymore mass storage for USB, it is
