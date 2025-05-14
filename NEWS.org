@@ -2,12 +2,14 @@
 
 * NEWS
 ** Version 4.0.3
-*** Remove drag-and-drop support in helm-find-files for emacs<29
+*** New drag-and-drop support for helm-find-files (only Emacs-29+)
 Use now dnd.el for the new drag-and-drop function.
 This allows drag-and-drop in external applications in addition to emacs
-frames.
+dired frames and windows. See helm-find-files documentation.
+*** Remove old drag-and-drop support for helm-find-files
 *** Add a new completion metadata category command-help
-Handle helm-M-x prefix arg integration in this category.
+Handle helm-M-x prefix arg integration in this category.  That's mean
+you can have helm-M-x prefix arg in M-X.
 *** Allow filtering sources in current session
 It is bound to C-M-e in helm-map.
 *** Change `helm-current-directory-alist` default value
