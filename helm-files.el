@@ -5655,6 +5655,13 @@ and release the mouse in this same buffer.")
   "Prevent dropping files to helm buffer."
   (user-error "Can't drop files in helm buffer"))
 
+;; This is used to advice `x-dnd-handle-drag-n-drop-event'.
+(defun helm-ff--restore-frame (&rest _args)
+  (let ((hframe (window-frame (helm-window))))
+    (if (eql (selected-frame) hframe)
+        (select-window (active-minibuffer-window))
+      (select-frame hframe))))
+
 (defun helm-find-files-1 (fname &optional preselect)
   "Find FNAME filename with PRESELECT filename preselected.
 
@@ -5686,7 +5693,8 @@ Use it for non-interactive calls of `helm-find-files'."
     (when (fboundp 'dnd-begin-drag-files)
       (helm-set-local-variable 'helm-drag-mouse-1-fn 'helm-ff-mouse-drag
                                'dnd-protocol-alist
-                               (append helm-dnd-protocol-alist dnd-protocol-alist)))
+                               (append helm-dnd-protocol-alist dnd-protocol-alist))
+      (advice-add 'x-dnd-handle-drag-n-drop-event :after #'helm-ff--restore-frame))
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
@@ -5719,7 +5727,8 @@ Use it for non-interactive calls of `helm-find-files'."
                :prompt "Find files or url: "
                :buffer "*helm find files*")
       (helm-ff--update-resume-after-hook nil t)
-      (setq helm-ff-default-directory nil))))
+      (setq helm-ff-default-directory nil)
+      (advice-remove 'x-dnd-handle-drag-n-drop-event 'helm-ff--restore-frame))))
 
 (defvar helm-find-files-dummy-source
   (helm-build-dummy-source "New file or directory"
