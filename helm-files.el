@@ -5596,7 +5596,6 @@ Show the first `helm-ff-history-max-length' elements of
 ;; in `helm--bind-mouse-for-selection'.
 ;; See https://freedesktop.org/wiki/Specifications/XDND/
 ;; and (info "(elisp) Drag and Drop") for more infos.
-;; FIXME: Don't lose the focus in helm-window when dropping to a dired buffer.
 (defun helm-ff-mouse-drag (event)
   "Drag-and-drop marked files at EVENT.
 
