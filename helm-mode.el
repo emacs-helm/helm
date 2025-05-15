@@ -266,10 +266,11 @@ This is mainly needed to prevent \"*Completions*\" buffers to popup.")
                                                  (describe-theme . t))
   "Allow overriding REQUIRE-MATCH completing-read arg for a specific function.")
 
-(defcustom helm-completions-detailed (and (boundp 'completions-detailed)
-                                          completions-detailed)
-  "Allow providing `completions-detailed' for Emacs < 28.
-Not guaranteed to work with Emacs < 27."
+(defcustom helm-completions-detailed t
+  "Provide detailed completion in several places.
+See `helm-completing-read-extra-metadata' and
+`helm-completing-read-command-categories'.
+Setting `completions-detailed' when available have the same effect."
   :type 'boolean
   :group 'helm-mode)
 
