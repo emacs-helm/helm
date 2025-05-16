@@ -2024,7 +2024,10 @@ Directories expansion is not supported."
       (goto-char (point-min))
       (when (re-search-forward "^;;;?\\(.*\\) ---? \\(.*\\)" (pos-eol) t)
         (setq desc (match-string-no-properties 2)))
-      (if (or (null desc) (string= "" desc) (string-match "\\`-\\*-" desc))
+      (if (or (null desc) (string= "" desc)
+              ;; Fix issue#2716 with an header line like
+              ;; ";; foo --- -*-[...]" i.e. desc is not provided.
+              (string-match "\\`-\\*-" desc))
           "Not documented"
         (car (split-string desc "-\\*-" nil "[ \t\n\r-]+"))))))
 
