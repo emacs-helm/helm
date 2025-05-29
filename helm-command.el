@@ -445,7 +445,8 @@ You can get help on each command by persistent action."
      (list current-prefix-arg)))
   (if (or defining-kbd-macro executing-kbd-macro)
       (helm-M-x--vanilla-M-x)
-    (let ((lmm-modes (buffer-local-value 'local-minor-modes (current-buffer)))
+    (let ((lmm-modes (and (boundp 'local-minor-modes) ; Only 28+ (issue#2719)
+                          (buffer-local-value 'local-minor-modes (current-buffer))))
           (mj-mode major-mode))
       (helm-M-x-read-extended-command
        obarray (if (and (fboundp 'command-modes)
