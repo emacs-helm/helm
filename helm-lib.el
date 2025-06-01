@@ -2274,6 +2274,7 @@ flex or helm-flex completion style if present."
 (add-hook 'helm-cleanup-hook 'helm-reset-yank-point)
 (add-hook 'helm-after-initialize-hook 'helm-reset-yank-point)
 
+
 ;;; Ansi
 ;;
 ;;
