@@ -172,6 +172,9 @@ This happen only in `helm-source-occur' which is always related to
               (string-equal helm-pattern ""))
     (with-helm-window
       (let ((lst '())
+            ;; `helm-source-occur' name is "Helm occur" when using `helm-occur'
+            ;; command (searching and starting from current-buffer), whereas it
+            ;; has the name of current-buffer when using `helm-multi-occur-1'.
             (name (helm-get-attr 'name helm-source-occur))
             closest beg end)
         (while-no-input
