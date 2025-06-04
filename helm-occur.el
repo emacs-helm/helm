@@ -414,7 +414,7 @@ helm-occur will start immediately with DEFAULT as INPUT.
 Always prefer using DEFAULT instead of INPUT, they have the same effect but
 DEFAULT keep the minibuffer empty, allowing the user to write immediately
 without having to delete its contents before."
-  (let* ((curbuf (get-buffer helm-current-buffer))
+  (let* ((curbuf (get-buffer (or helm-current-buffer (current-buffer))))
          (bufs (if (or helm-occur-always-search-in-current
                        (memql curbuf buffers))
                    (cons curbuf (remove curbuf buffers))
