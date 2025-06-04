@@ -7653,13 +7653,15 @@ If ARG is negative toggle backward."
                                 helm-left-margin-width)))))))
 (put 'helm-toggle-visible-mark 'helm-only t)
 
-(defun helm-toggle-visible-mark-forward ()
-  (interactive)
-  (helm-toggle-visible-mark 1))
+(defun helm-toggle-visible-mark-forward (&optional arg)
+  "Toggle visible mark forward ARG times."
+  (interactive "p")
+  (helm-toggle-visible-mark arg))
 
-(defun helm-toggle-visible-mark-backward ()
-  (interactive)
-  (helm-toggle-visible-mark -1))
+(defun helm-toggle-visible-mark-backward (&optional arg)
+  "Toggle visible mark backward ARG times."
+  (interactive "p")
+  (helm-toggle-visible-mark (- arg)))
 
 (defun helm-file-completion-source-p (&optional source)
   "Return non-nil if current source is a file completion source."
