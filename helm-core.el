@@ -540,7 +540,7 @@ Default to Helm group when group is not defined in source."
   (set var val)
   (helm--action-at-nth-set-fn-1 val))
 
-(defcustom helm-action-at-nth-negative-prefix-key "C-x %d"
+(defcustom helm-action-at-nth-negative-prefix-key "M-%d"
   "The prefix key to execute default action on nth <-n> candidate.
 
 This is a format spec where %d will be replaced by the candidate
@@ -554,7 +554,7 @@ customize for immediate effect."
   :type 'string
   :set #'helm--action-at-nth-set-fn-)
 
-(defcustom helm-action-at-nth-positive-prefix-key "C-c %d"
+(defcustom helm-action-at-nth-positive-prefix-key "C-%d"
   "The prefix key to execute default action on nth <+n> candidate.
 
 This is a format spec where %d will be replaced by the candidate
