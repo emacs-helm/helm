@@ -22,6 +22,8 @@
 (require 'helm-help)
 (require 'helm-utils)
 
+(declare-function helm-comp-read "helm-mode")
+
 
 (defgroup helm-sys nil
   "System related helm library."

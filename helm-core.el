@@ -45,6 +45,7 @@
 (declare-function transient--delete-window "ext:transient" ())
 (declare-function transient--preserve-window-p "ext:transient"
                   (&optional nohide))
+(declare-function helm-maybe-show-help-echo "helm-utils")
 
 (defvar helm-marked-buffer-name)
 (defvar display-buffer-function)

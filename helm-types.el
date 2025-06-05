@@ -31,7 +31,7 @@
 (declare-function helm-make-actions "helm-lib")
 (declare-function helm-ediff-marked-buffers "helm-buffers")
 (declare-function helm-make-type "helm-source")
-
+(declare-function helm-marked-candidates "helm-core")
 
 ;;  Files
 (defclass helm-type-file (helm-source)
