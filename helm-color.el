@@ -28,17 +28,16 @@
 ;;
 (defun helm-custom-faces-init ()
   "Initialize buffer for `helm-source-customize-face'."
-  (unless (helm-candidate-buffer)
-    (save-selected-window
-      (list-faces-display)
-      (message nil))
-    (helm-init-candidates-in-buffer
-        'global
-      (with-current-buffer (get-buffer "*Faces*")
-        (buffer-substring
-         (next-single-char-property-change (point-min) 'category)
-         (point-max))))
-    (kill-buffer "*Faces*")))
+  (save-selected-window
+    (list-faces-display)
+    (message nil))
+  (helm-init-candidates-in-buffer
+      'global
+    (with-current-buffer (get-buffer "*Faces*")
+      (buffer-substring
+       (next-single-char-property-change (point-min) 'category)
+       (point-max))))
+  (kill-buffer "*Faces*"))
 
 (defvar helm-source-customize-face
   (helm-build-in-buffer-source "Customize Face"
