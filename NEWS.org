@@ -1,6 +1,14 @@
 #+STARTUP:showall
 
 * NEWS
+** Version 4.0.4
+*** Rewrite the helm async process filter
+*** We can now mark the <n> next candidates with a numeric prefix arg
+Same for previous.
+*** Change default prefix binding to reach nth candidates
+Now you can reach next nth candidate with C-<n> and previous nth
+candidate with M-<n>, it is easier to remember.
+*** helm-completions-detailed is now enabled by default
 ** Version 4.0.3
 *** New drag-and-drop support for helm-find-files (only Emacs-29+)
 Use now dnd.el for the new drag-and-drop function.
