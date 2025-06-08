@@ -5565,7 +5565,7 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
         (setq candidate
               (helm--maybe-process-filter-one-by-one-candidate candidate source))
         (when ml
-          (if separate
+          (if separate ; No separator on first candidate below source header.
               (helm-insert-candidate-separator)
             (setq separate t)))
         (helm-insert-match candidate 'insert-before-markers
