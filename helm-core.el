@@ -1299,8 +1299,7 @@ Allow specifying the height of this line."
 
 (defvar helm-async-processes nil
   "List of informations about asynchronous processes managed by Helm.
-Each element of the list is of form:
-(<process> . (append source ((item-count . 0)))).")
+Each element of the list is cons cell of the form: (PROCESS . SOURCE).")
 
 (defvar helm-before-initialize-hook nil
   "Runs before Helm initialization.
@@ -4394,10 +4393,7 @@ Cache the candidates if there is no cached value yet."
                 "No cached candidates, calculate candidates")
       (let ((candidates (helm-get-candidates source)))
         (cond ((processp candidates)
-               (push (cons candidates
-                           (append source
-                                   (list (cons 'item-count 0))))
-                     helm-async-processes)
+               (push (cons candidates source) helm-async-processes)
                (set-process-filter candidates 'helm-output-filter)
                (setq candidates nil))
               ((not (assq 'volatile source))
@@ -5562,24 +5558,23 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
                          (split-string output
                                        helm-process-output-split-string-separator t)
                          source t))
-    (setq candidate
-          (helm--maybe-process-filter-one-by-one-candidate candidate source))
-    (if (assq 'multiline source)
-        (let ((start (point)))
-          (helm-insert-candidate-separator)
-          (helm-insert-match candidate 'insert-before-markers
-                             (1+ (cdr (assq 'item-count source)))
-                             source)
-          (put-text-property start (point) 'helm-multiline t))
-      (helm-insert-match candidate 'insert-before-markers
-                         (1+ (cdr (assq 'item-count source)))
-                         source))
-    (cl-incf (cdr (assq 'item-count source)))
-    (when (>= (assoc-default 'item-count source) limit)
-      (helm-kill-async-process process)
-      (helm-log-run-hook "helm-output-filter--process-source"
-                         'helm-async-outer-limit-hook)
-      (cl-return))))
+    (let ((count 0))
+      (setq candidate
+            (helm--maybe-process-filter-one-by-one-candidate candidate source))
+      (if (assq 'multiline source)
+          (let ((start (point)))
+            (helm-insert-candidate-separator)
+            (helm-insert-match candidate 'insert-before-markers
+                               (1+ count) source)
+            (put-text-property start (point) 'helm-multiline t))
+        (helm-insert-match candidate 'insert-before-markers
+                           (1+ count) source))
+      (cl-incf count)
+      (when (>= count limit)
+        (helm-kill-async-process process)
+        (helm-log-run-hook "helm-output-filter--process-source"
+                           'helm-async-outer-limit-hook)
+        (cl-return)))))
 
 (defun helm-output-filter--post-process ()
   (helm-aif (get-buffer-window helm-buffer 'visible)
