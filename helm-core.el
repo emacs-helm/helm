@@ -5539,12 +5539,11 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
     (let ((source (cdr process-assoc))
           (proc (car process-assoc)))
       (save-excursion
-        (helm-aif (assoc-default 'insertion-marker source)
+        (helm-aif (process-get proc 'insertion-marker)
             (goto-char it)
           (goto-char (point-max))
           (helm-insert-header-from-source source)
-          (setcdr process-assoc
-                  (append source `((insertion-marker . ,(point-marker))))))
+          (process-put proc 'insertion-marker (point-marker)))
         ;; This method for handling incomplete lines should fix as well Bug#1187.
         (setq output (concat (process-get proc 'incomplete-line) output))
         (let ((end (string-match ".*\\'" output)))
