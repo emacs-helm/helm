@@ -5558,17 +5558,15 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
                          (split-string output
                                        helm-process-output-split-string-separator t)
                          source t))
-    (let ((count 0))
+    (let ((count 0)
+          (ml    (assq 'multiline source))
+          (start (point)))
       (setq candidate
             (helm--maybe-process-filter-one-by-one-candidate candidate source))
-      (if (assq 'multiline source)
-          (let ((start (point)))
-            (helm-insert-candidate-separator)
-            (helm-insert-match candidate 'insert-before-markers
-                               (1+ count) source)
-            (put-text-property start (point) 'helm-multiline t))
-        (helm-insert-match candidate 'insert-before-markers
-                           (1+ count) source))
+      (and ml (helm-insert-candidate-separator))
+      (helm-insert-match candidate 'insert-before-markers
+                         (1+ count) source)
+      (and ml (put-text-property start (point) 'helm-multiline t))
       (cl-incf count)
       (when (>= count limit)
         (helm-kill-async-process process)
