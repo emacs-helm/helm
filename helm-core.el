@@ -5556,14 +5556,16 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
 (defun helm-output-filter--process-source (process output source limit)
   (let (separate)
     (cl-dolist (candidate (helm-transform-candidates
-                           (split-string output
-                                         helm-process-output-split-string-separator t)
+                           (split-string
+                            output
+                            helm-process-output-split-string-separator t)
                            source t))
       (let ((count 0)
             (ml    (assq 'multiline source))
             (start (point)))
         (setq candidate
-              (helm--maybe-process-filter-one-by-one-candidate candidate source))
+              (helm--maybe-process-filter-one-by-one-candidate
+               candidate source))
         (when ml
           (if separate ; No separator on first candidate below source header.
               (helm-insert-candidate-separator)
