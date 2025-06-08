@@ -5554,25 +5554,29 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
     (helm-output-filter--post-process)))
 
 (defun helm-output-filter--process-source (process output source limit)
-  (cl-dolist (candidate (helm-transform-candidates
-                         (split-string output
-                                       helm-process-output-split-string-separator t)
-                         source t))
-    (let ((count 0)
-          (ml    (assq 'multiline source))
-          (start (point)))
-      (setq candidate
-            (helm--maybe-process-filter-one-by-one-candidate candidate source))
-      (and ml (helm-insert-candidate-separator))
-      (helm-insert-match candidate 'insert-before-markers
-                         (1+ count) source)
-      (and ml (put-text-property start (point) 'helm-multiline t))
-      (cl-incf count)
-      (when (>= count limit)
-        (helm-kill-async-process process)
-        (helm-log-run-hook "helm-output-filter--process-source"
-                           'helm-async-outer-limit-hook)
-        (cl-return)))))
+  (let (separate)
+    (cl-dolist (candidate (helm-transform-candidates
+                           (split-string output
+                                         helm-process-output-split-string-separator t)
+                           source t))
+      (let ((count 0)
+            (ml    (assq 'multiline source))
+            (start (point)))
+        (setq candidate
+              (helm--maybe-process-filter-one-by-one-candidate candidate source))
+        (when ml
+          (if separate
+              (helm-insert-candidate-separator)
+            (setq separate t)))
+        (helm-insert-match candidate 'insert-before-markers
+                           (1+ count) source)
+        (and ml (put-text-property start (point) 'helm-multiline t))
+        (cl-incf count)
+        (when (>= count limit)
+          (helm-kill-async-process process)
+          (helm-log-run-hook "helm-output-filter--process-source"
+                             'helm-async-outer-limit-hook)
+          (cl-return))))))
 
 (defun helm-output-filter--post-process ()
   (helm-aif (get-buffer-window helm-buffer 'visible)
