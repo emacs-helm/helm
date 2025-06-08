@@ -1298,7 +1298,10 @@ Allow specifying the height of this line."
   "Overlay used to highlight the currently selected item.")
 
 (defvar helm-async-processes nil
-  "List of information about asynchronous processes managed by Helm.")
+  "List of informations about asynchronous processes managed by Helm.
+Each element of the list is of form:
+(<process> . (append source ((incomplete-line . \"\") (item-count . 0)))).
+Where incomplete-line and item-count are elements used by the process filter.")
 
 (defvar helm-before-initialize-hook nil
   "Runs before Helm initialization.
