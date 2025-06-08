@@ -297,10 +297,10 @@ See also `helm-locate'."
             (:eval (format "L%s" (helm-candidate-number-at-point))) " "
             (:eval (propertize
                     (format "[%s process finished - (%s results)]"
+                            ,process-name
                             (max (1- (count-lines
                                       (point-min) (point-max)))
-                                 0)
-                            ,process-name)
+                                 0))
                     'face 'helm-locate-finish))))
     (force-mode-line-update)))
 
