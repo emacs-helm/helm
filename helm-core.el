@@ -5545,12 +5545,12 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
         (let ((end (string-match ".*\\'" output)))
           (process-put proc 'incomplete-line (substring output end))
           ;; output should now have only wholelines.
-          (setq output (substring output 0 end))
-          ;; Now run the transformers (if some) on candidates and insert them in
-          ;; helm-buffer.
-          (helm-output-filter--process-source
-           (car process-assoc) output source
-           (helm-candidate-number-limit source)))))
+          (setq output (substring output 0 end)))
+        ;; Now run the transformers (if some) on candidates and insert them in
+        ;; helm-buffer.
+        (helm-output-filter--process-source
+         (car process-assoc) output source
+         (helm-candidate-number-limit source))))
     (helm-output-filter--post-process)))
 
 (defun helm-output-filter--process-source (process output source limit)
