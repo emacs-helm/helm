@@ -4393,7 +4393,10 @@ Cache the candidates if there is no cached value yet."
                 "No cached candidates, calculate candidates")
       (let ((candidates (helm-get-candidates source)))
         (cond ((processp candidates)
-               (push (cons candidates source) helm-async-processes)
+               (push (cons candidates
+                           (append source
+                                   (list (cons 'item-count 0))))
+                     helm-async-processes)
                (set-process-filter candidates 'helm-output-filter)
                (setq candidates nil))
               ((not (assq 'volatile source))
@@ -5564,8 +5567,7 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
                             output
                             helm-process-output-split-string-separator t)
                            source t))
-      (let ((count 0)
-            (ml    (assq 'multiline source))
+      (let ((ml    (assq 'multiline source))
             (start (point)))
         (setq candidate
               (helm--maybe-process-filter-one-by-one-candidate
@@ -5575,10 +5577,10 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
               (helm-insert-candidate-separator)
             (setq separate t)))
         (helm-insert-match candidate 'insert-before-markers
-                           (1+ count) source)
+                           (1+ (cdr (assq 'item-count source))) source)
         (and ml (put-text-property start (point) 'helm-multiline t))
-        (cl-incf count)
-        (when (>= count limit)
+        (cl-incf (cdr (assq 'item-count source)))
+        (when (>= (cdr (assq 'item-count source)) limit)
           (helm-kill-async-process process)
           (helm-log-run-hook "helm-output-filter--process-source"
                              'helm-async-outer-limit-hook)
