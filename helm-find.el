@@ -134,7 +134,8 @@ separator."
        (lambda (process event)
            (helm-process-deferred-sentinel-hook
             process event (helm-default-directory))
-           (if (string= event "finished\n")
+           (if (or (string= event "finished\n")
+                   (process-get process 'reach-limit))
                (helm-locate-update-mode-line "Find")
              (helm-log "helm-find-shell-command-fn sentinel" "Error: Find %s"
                        (replace-regexp-in-string "\n" "" event))))))))

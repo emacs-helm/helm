@@ -363,7 +363,8 @@ See also `helm-locate'."
                       (insert (concat "* Exit with code 1, no result found,"
                                       " command line was:\n\n "
                                       cmd)))))
-                 ((string= event "finished\n")
+                 ((or (string= event "finished\n")
+                      (process-get process 'reach-limit))
                   (when (and helm-locate-fuzzy-match
                              (not (string-match-p "\\s-" helm-pattern)))
                     (helm-redisplay-buffer))

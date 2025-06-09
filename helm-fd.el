@@ -100,8 +100,9 @@
     (prog1
         proc
       (set-process-sentinel
-       proc (lambda (_process event)
-              (if (string= event "finished\n")
+       proc (lambda (process event)
+              (if (or (string= event "finished\n")
+                      (process-get process 'reach-limit))
                   (with-helm-window
                     (when helm-fd-mode-line-function
                       (funcall helm-fd-mode-line-function start-time fd-version)

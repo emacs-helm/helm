@@ -659,6 +659,7 @@ Have no effect when grep backend use \"--color=\"."
                                        ,proc-name)
                                       'face 'helm-grep-finish))))))
                    ((or (string= event "finished\n")
+                        (process-get process 'reach-limit)
                         (and noresult
                              ;; This is a workaround for zgrep
                              ;; that exit with code 1
@@ -1525,8 +1526,9 @@ non-file buffers."
       (message nil)
       (set-process-sentinel
        (get-buffer-process helm-buffer)
-       (lambda (_process event)
-           (if (string= event "finished\n")
+       (lambda (process event)
+           (if (or (string= event "finished\n")
+                   (process-get process 'reach-limit))
                (with-helm-window
                  (setq mode-line-format
                        '(" " mode-line-buffer-identification " "
@@ -1680,7 +1682,8 @@ returns if available with current AG version."
                                      "[%s process finished - (no results)] "
                                      ,(upcase proc-name))
                                     'face 'helm-grep-finish))))))
-                 ((string= event "finished\n")
+                 ((or (string= event "finished\n")
+                      (process-get process 'reach-limit))
                   (helm-log "helm-grep-ag-init" "%s process finished with %s results in %fs"
                               proc-name
                               (helm-get-candidate-number)
