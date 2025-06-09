@@ -5540,9 +5540,13 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
           (goto-char (point-max))
           (helm-insert-header-from-source source)
           (process-put proc 'insertion-marker (point-marker)))
-        ;; This method for handling incomplete lines should fix as well Bug#1187.
+        ;; This method for handling incomplete lines should fix as well
+        ;; Bug#1187.  When previous output was e.g. "foo\nba" incomplete-line is
+        ;; "ba", now when next output comes with r\nzo we complete the
+        ;; incomplete line by concating the saved text: (concat "ba" "r\nzo") =>
+        ;; "bar\nzo" and so on...
         (setq output (concat (process-get proc 'incomplete-line) output))
-        (let ((end (string-match ".*\\'" output)))
+        (let ((end (string-match ".*\\'" output))) ; Match up to \n.
           (process-put proc 'incomplete-line (substring output end))
           ;; output should now have only wholelines.
           (setq output (substring output 0 end)))
