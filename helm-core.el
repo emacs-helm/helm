@@ -5569,7 +5569,8 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
                          source))
     (cl-incf (cdr (assq 'item-count source)))
     (when (>= (assoc-default 'item-count source) limit)
-      (helm-kill-async-process process)
+      (process-put process 'reach-limit t)
+      (helm-kill-async-process process 'kill-process)
       (helm-log-run-hook "helm-output-filter--process-source"
                          'helm-async-outer-limit-hook)
       (cl-return))))
@@ -5648,10 +5649,10 @@ function."
     (helm-kill-async-process (caar helm-async-processes))
     (setq helm-async-processes (cdr helm-async-processes))))
 
-(defun helm-kill-async-process (process)
+(cl-defun helm-kill-async-process (process &optional (kill-fn 'delete-process))
   "Stop output from `helm-output-filter' and kill associated PROCESS."
-  (set-process-filter process nil)
-  (delete-process process))
+  (set-process-filter process t)
+  (funcall kill-fn process))
 
 
 ;;; Actions
