@@ -53,8 +53,9 @@ MacPorts to install id-utils, it should be `gid32'."
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd)
     (prog1 proc
       (set-process-sentinel
-       proc (lambda (_process event)
-              (when (string= event "finished\n")
+       proc (lambda (process event)
+              (when (or (string= event "finished\n")
+                        (process-get process 'reach-limit))
                 (helm-maybe-show-help-echo)
                 (with-helm-window
                   (setq mode-line-format
