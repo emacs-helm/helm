@@ -5589,9 +5589,9 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
 
 (defun helm-kill-async-processes ()
   "Kill all asynchronous processes registered in `helm-async-processes'."
-  (while helm-async-processes
-    (helm-kill-async-process (caar helm-async-processes))
-    (setq helm-async-processes (cdr helm-async-processes))))
+  (cl-loop for (proc . _src) in helm-async-processes
+           do (helm-kill-async-process proc)
+           finally (setq helm-async-processes nil)))
 
 (defun helm-kill-async-process (process &optional kill-fn)
   "Stop output from `helm-output-filter' and kill associated PROCESS."
