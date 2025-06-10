@@ -5527,81 +5527,54 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
 
 ;;; Async process
 ;;
-(defun helm-output-filter (process output-string)
+(defun helm-output-filter (process output)
   "The `process-filter' function for Helm async sources."
   (with-local-quit
-    (helm-output-filter-1 (assoc process helm-async-processes) output-string)))
-
-(defun helm-output-filter-1 (process-assoc output-string)
-  (helm-log "helm-output-filter-1" "output-string = %S" output-string)
-  (with-current-buffer helm-buffer
-    (let ((source (cdr process-assoc)))
-      (save-excursion
-        (helm-aif (assoc-default 'insertion-marker source)
-            (goto-char it)
-          (goto-char (point-max))
-          (helm-insert-header-from-source source)
-          (setcdr process-assoc
-                  (append source `((insertion-marker . ,(point-marker))))))
-        (helm-output-filter--process-source
-         (car process-assoc) output-string source
-         (helm-candidate-number-limit source))))
-    (helm-output-filter--post-process)))
-
-(defun helm-output-filter--process-source (process output-string source limit)
-  (cl-dolist (candidate (helm-transform-candidates
-                         (helm-output-filter--collect-candidates
-                          (split-string output-string
-                                        helm-process-output-split-string-separator)
-                          (assq 'incomplete-line source))
-                         source t))
-    (setq candidate
-          (helm--maybe-process-filter-one-by-one-candidate candidate source))
-    (if (assq 'multiline source)
-        (let ((start (point)))
-          (unless (zerop (cdr (assq 'item-count source)))
-            (helm-insert-candidate-separator))
-          (helm-insert-match candidate 'insert-before-markers
-                             (1+ (cdr (assq 'item-count source)))
-                             source)
-          (put-text-property start (point) 'helm-multiline t))
-      (helm-insert-match candidate 'insert-before-markers
-                         (1+ (cdr (assq 'item-count source)))
-                         source))
-    (cl-incf (cdr (assq 'item-count source)))
-    (when (>= (assoc-default 'item-count source) limit)
-      (process-put process 'reach-limit t)
-      (helm-kill-async-process process 'kill-process)
-      (helm-log-run-hook "helm-output-filter--process-source"
-                         'helm-async-outer-limit-hook)
-      (cl-return))))
-
-(defun helm-output-filter--collect-candidates (lines incomplete-line-info)
-  "Collect LINES maybe completing the truncated first and last lines."
-  ;; The output of process may come in chunks of any size, so the last
-  ;; line of LINES could be truncated, this truncated line is stored
-  ;; in INCOMPLETE-LINE-INFO to be concatenated with the first
-  ;; incomplete line of the next arriving chunk. INCOMPLETE-LINE-INFO
-  ;; is an attribute of source; it is created with an empty string
-  ;; when the source is computed => (incomplete-line . "")
-  (helm-log "helm-output-filter--collect-candidates"
-            "incomplete-line-info = %S" (cdr incomplete-line-info))
-  (butlast
-   (cl-loop for line in lines
-            ;; On start `incomplete-line-info' value is empty string.
-            for newline = (helm-aif (cdr incomplete-line-info)
-                              (prog1
-                                  (concat it line)
-                                (setcdr incomplete-line-info nil))
-                            line)
-            collect newline
-            ;; Store last incomplete line (last chunk truncated) until
-            ;; new output arrives. Previously storing 'line' in
-            ;; incomplete-line-info assumed output was truncated in
-            ;; only two chunks. But output could be large and
-            ;; truncated in more than two chunks. Therefore store
-            ;; 'newline' to contain the previous chunks (Bug#1187).
-            finally do (setcdr incomplete-line-info newline))))
+    (let* ((process-assoc        (assoc process helm-async-processes))
+           (source               (cdr process-assoc))
+           (insertion-marker     (assoc-default 'insertion-marker source))
+           (incomplete-line-info (assq 'incomplete-line source))
+           (item-count-info      (assq 'item-count source)))
+      (with-helm-buffer
+        (save-excursion
+          (if insertion-marker
+              (goto-char insertion-marker)
+            (goto-char (point-max))
+            (helm-insert-header-from-source source)
+            (setcdr process-assoc
+                    (append source `((insertion-marker . ,(point-marker))))))
+          (let ((lines (split-string output "\n"))
+                candidates)
+            (while lines
+              (if (not (cdr lines))
+                  ;; store last incomplete line until new output arrives
+                  (setcdr incomplete-line-info (car lines))
+                (if (cdr incomplete-line-info)
+                    (progn
+                      (push (concat (cdr incomplete-line-info) (car lines))
+                            candidates)
+                      (setcdr incomplete-line-info nil))
+                  (push (car lines) candidates)))
+              (pop lines))
+            (setq candidates (nreverse candidates))
+            (cl-dolist (candidate (helm-transform-candidates candidates source t))
+              (if (assq 'multiline source)
+                  (let ((start (point)))
+                    (unless (zerop (cdr (assq 'item-count source)))
+                      (helm-insert-candidate-separator))
+                    (helm-insert-match candidate 'insert-before-markers
+                                       (1+ (cdr (assq 'item-count source)))
+                                       source)
+                    (put-text-property start (point) 'helm-multiline t))
+                (helm-insert-match candidate 'insert-before-markers
+                                   (1+ (cdr (assq 'item-count source)))
+                                   source))
+              (cl-incf (cdr item-count-info))
+              (when (>= (cdr item-count-info) (helm-candidate-number-limit source))
+                (process-put process 'reach-limit t)
+                (helm-kill-async-process process #'kill-process)
+                (cl-return)))))))
+      (helm-output-filter--post-process)))
 
 (defun helm-output-filter--post-process ()
   (helm-aif (get-buffer-window helm-buffer 'visible)
