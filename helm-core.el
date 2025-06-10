@@ -5615,6 +5615,17 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
                            'helm-after-update-hook)
         (helm--reset-update-flag))))
 
+(defun helm-kill-async-processes ()
+  "Kill all asynchronous processes registered in `helm-async-processes'."
+  (while helm-async-processes
+    (helm-kill-async-process (caar helm-async-processes))
+    (setq helm-async-processes (cdr helm-async-processes))))
+
+(cl-defun helm-kill-async-process (process &optional (kill-fn 'delete-process))
+  "Stop output from `helm-output-filter' and kill associated PROCESS."
+  (set-process-filter process t)
+  (funcall kill-fn process))
+
 (defun helm-process-deferred-sentinel-hook (process event file)
   "Defer remote processes in sentinels.
 Meant to be called at the beginning of a sentinel process
@@ -5643,18 +5654,6 @@ function."
                        (when helm-alive-p ; Don't run timer fn after quit.
                          (setq helm-suspend-update-flag nil)
                          (helm-check-minibuffer-input))))))
-
-(defun helm-kill-async-processes ()
-  "Kill all asynchronous processes registered in `helm-async-processes'."
-  (while helm-async-processes
-    (helm-kill-async-process (caar helm-async-processes))
-    (setq helm-async-processes (cdr helm-async-processes))))
-
-(cl-defun helm-kill-async-process (process &optional (kill-fn 'delete-process))
-  "Stop output from `helm-output-filter' and kill associated PROCESS."
-  (set-process-filter process t)
-  (funcall kill-fn process))
-
 
 ;;; Actions
 ;;
