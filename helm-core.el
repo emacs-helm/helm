@@ -5559,7 +5559,8 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
           (helm--maybe-process-filter-one-by-one-candidate candidate source))
     (if (assq 'multiline source)
         (let ((start (point)))
-          (helm-insert-candidate-separator)
+          (unless (zerop (cdr (assq 'item-count source)))
+            (helm-insert-candidate-separator))
           (helm-insert-match candidate 'insert-before-markers
                              (1+ (cdr (assq 'item-count source)))
                              source)
