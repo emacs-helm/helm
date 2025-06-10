@@ -5534,7 +5534,8 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
            (source               (cdr process-assoc))
            (insertion-marker     (assoc-default 'insertion-marker source))
            (incomplete-line-info (assq 'incomplete-line source))
-           (item-count-info      (assq 'item-count source)))
+           (item-count-info      (assq 'item-count source))
+           (multiline            (assq 'multiline source)))
       (with-helm-buffer
         (save-excursion
           (if insertion-marker
@@ -5558,17 +5559,15 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
               (pop lines))
             (setq candidates (nreverse candidates))
             (cl-dolist (candidate (helm-transform-candidates candidates source t))
-              (if (assq 'multiline source)
-                  (let ((start (point)))
-                    (unless (zerop (cdr (assq 'item-count source)))
-                      (helm-insert-candidate-separator))
-                    (helm-insert-match candidate 'insert-before-markers
-                                       (1+ (cdr (assq 'item-count source)))
-                                       source)
-                    (put-text-property start (point) 'helm-multiline t))
+              (let ((start (point)))
+                (unless (or (not multiline)
+                            (zerop (cdr (assq 'item-count source))))
+                  (helm-insert-candidate-separator))
                 (helm-insert-match candidate 'insert-before-markers
                                    (1+ (cdr (assq 'item-count source)))
-                                   source))
+                                   source)
+                (when multiline
+                  (put-text-property start (point) 'helm-multiline t)))
               (cl-incf (cdr item-count-info))
               (when (>= (cdr item-count-info) (helm-candidate-number-limit source))
                 (process-put process 'reach-limit t)
