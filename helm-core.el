@@ -5621,10 +5621,10 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
     (helm-kill-async-process (caar helm-async-processes))
     (setq helm-async-processes (cdr helm-async-processes))))
 
-(cl-defun helm-kill-async-process (process &optional (kill-fn 'delete-process))
+(defun helm-kill-async-process (process &optional kill-fn)
   "Stop output from `helm-output-filter' and kill associated PROCESS."
   (set-process-filter process t)
-  (funcall kill-fn process))
+  (funcall (or kill-fn #'delete-process) process))
 
 (defun helm-process-deferred-sentinel-hook (process event file)
   "Defer remote processes in sentinels.
