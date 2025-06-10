@@ -1298,8 +1298,7 @@ Allow specifying the height of this line."
   "Overlay used to highlight the currently selected item.")
 
 (defvar helm-async-processes nil
-  "List of informations about asynchronous processes managed by Helm.
-Each element of the list is cons cell of the form: (PROCESS . SOURCE).")
+  "List of information about asynchronous processes managed by Helm.")
 
 (defvar helm-before-initialize-hook nil
   "Runs before Helm initialization.
@@ -4395,7 +4394,8 @@ Cache the candidates if there is no cached value yet."
         (cond ((processp candidates)
                (push (cons candidates
                            (append source
-                                   (list (cons 'item-count 0))))
+                                   (list (cons 'item-count 0)
+                                         (cons 'incomplete-line ""))))
                      helm-async-processes)
                (set-process-filter candidates 'helm-output-filter)
                (setq candidates nil))
@@ -5532,60 +5532,74 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
   (with-local-quit
     (helm-output-filter-1 (assoc process helm-async-processes) output-string)))
 
-(defun helm-output-filter-1 (process-assoc output)
-  (helm-log "helm-output-filter-1" "output-string = %S" output)
+(defun helm-output-filter-1 (process-assoc output-string)
+  (helm-log "helm-output-filter-1" "output-string = %S" output-string)
   (with-current-buffer helm-buffer
-    (let ((source (cdr process-assoc))
-          (proc (car process-assoc)))
+    (let ((source (cdr process-assoc)))
       (save-excursion
-        (helm-aif (process-get proc 'insertion-marker)
+        (helm-aif (assoc-default 'insertion-marker source)
             (goto-char it)
           (goto-char (point-max))
           (helm-insert-header-from-source source)
-          (process-put proc 'insertion-marker (point-marker)))
-        ;; This method for handling incomplete lines should fix as well
-        ;; Bug#1187.  When previous output was e.g. "foo\nba" incomplete-line is
-        ;; "ba", now when next output comes with r\nzo we complete the
-        ;; incomplete line by concating the saved text: (concat "ba" "r\nzo") =>
-        ;; "bar\nzo" and so on...
-        (setq output (concat (process-get proc 'incomplete-line) output))
-        (let ((end (string-match ".*\\'" output))) ; Match up to \n.
-          (process-put proc 'incomplete-line (substring output end))
-          ;; output should now have only wholelines.
-          (setq output (substring output 0 end)))
-        ;; Now run the transformers (if some) on candidates and insert them in
-        ;; helm-buffer.
+          (setcdr process-assoc
+                  (append source `((insertion-marker . ,(point-marker))))))
         (helm-output-filter--process-source
-         (car process-assoc) output source
+         (car process-assoc) output-string source
          (helm-candidate-number-limit source))))
     (helm-output-filter--post-process)))
 
-(defun helm-output-filter--process-source (process output source limit)
-  (let (separate)
-    (cl-dolist (candidate (helm-transform-candidates
-                           (split-string
-                            output
-                            helm-process-output-split-string-separator t)
-                           source t))
-      (let ((ml    (assq 'multiline source))
-            (start (point)))
-        (setq candidate
-              (helm--maybe-process-filter-one-by-one-candidate
-               candidate source))
-        (when ml
-          (if separate ; No separator on first candidate below source header.
-              (helm-insert-candidate-separator)
-            (setq separate t)))
-        (helm-insert-match candidate 'insert-before-markers
-                           (1+ (cdr (assq 'item-count source))) source)
-        (and ml (put-text-property start (point) 'helm-multiline t))
-        (cl-incf (cdr (assq 'item-count source)))
-        (when (>= (cdr (assq 'item-count source)) limit)
-          (process-put process 'reach-limit t)
-          (helm-kill-async-process process 'kill-process)
-          (helm-log-run-hook "helm-output-filter--process-source"
-                             'helm-async-outer-limit-hook)
-          (cl-return))))))
+(defun helm-output-filter--process-source (process output-string source limit)
+  (cl-dolist (candidate (helm-transform-candidates
+                         (helm-output-filter--collect-candidates
+                          (split-string output-string
+                                        helm-process-output-split-string-separator)
+                          (assq 'incomplete-line source))
+                         source t))
+    (setq candidate
+          (helm--maybe-process-filter-one-by-one-candidate candidate source))
+    (if (assq 'multiline source)
+        (let ((start (point)))
+          (helm-insert-candidate-separator)
+          (helm-insert-match candidate 'insert-before-markers
+                             (1+ (cdr (assq 'item-count source)))
+                             source)
+          (put-text-property start (point) 'helm-multiline t))
+      (helm-insert-match candidate 'insert-before-markers
+                         (1+ (cdr (assq 'item-count source)))
+                         source))
+    (cl-incf (cdr (assq 'item-count source)))
+    (when (>= (assoc-default 'item-count source) limit)
+      (helm-kill-async-process process)
+      (helm-log-run-hook "helm-output-filter--process-source"
+                         'helm-async-outer-limit-hook)
+      (cl-return))))
+
+(defun helm-output-filter--collect-candidates (lines incomplete-line-info)
+  "Collect LINES maybe completing the truncated first and last lines."
+  ;; The output of process may come in chunks of any size, so the last
+  ;; line of LINES could be truncated, this truncated line is stored
+  ;; in INCOMPLETE-LINE-INFO to be concatenated with the first
+  ;; incomplete line of the next arriving chunk. INCOMPLETE-LINE-INFO
+  ;; is an attribute of source; it is created with an empty string
+  ;; when the source is computed => (incomplete-line . "")
+  (helm-log "helm-output-filter--collect-candidates"
+            "incomplete-line-info = %S" (cdr incomplete-line-info))
+  (butlast
+   (cl-loop for line in lines
+            ;; On start `incomplete-line-info' value is empty string.
+            for newline = (helm-aif (cdr incomplete-line-info)
+                              (prog1
+                                  (concat it line)
+                                (setcdr incomplete-line-info nil))
+                            line)
+            collect newline
+            ;; Store last incomplete line (last chunk truncated) until
+            ;; new output arrives. Previously storing 'line' in
+            ;; incomplete-line-info assumed output was truncated in
+            ;; only two chunks. But output could be large and
+            ;; truncated in more than two chunks. Therefore store
+            ;; 'newline' to contain the previous chunks (Bug#1187).
+            finally do (setcdr incomplete-line-info newline))))
 
 (defun helm-output-filter--post-process ()
   (helm-aif (get-buffer-window helm-buffer 'visible)
@@ -5634,10 +5648,10 @@ function."
     (helm-kill-async-process (caar helm-async-processes))
     (setq helm-async-processes (cdr helm-async-processes))))
 
-(cl-defun helm-kill-async-process (process &optional (kill-fn 'delete-process))
+(defun helm-kill-async-process (process)
   "Stop output from `helm-output-filter' and kill associated PROCESS."
-  (set-process-filter process t)
-  (funcall kill-fn process))
+  (set-process-filter process nil)
+  (delete-process process))
 
 
 ;;; Actions
