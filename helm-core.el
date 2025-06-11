@@ -5550,16 +5550,15 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
             (while lines
               (if (not (cdr lines))
                   ;; store last incomplete line until new output arrives
-                  (setcdr incomplete-line-info (car lines))
+                  (setcdr incomplete-line-info (pop lines))
                 (helm-aif (cdr incomplete-line-info)
                     (progn
-                      (push (concat it (car lines)) candidates)
+                      (push (concat it (pop lines)) candidates)
                       ;; Previously we were setting incomplete-line-info to line
                       ;; and latter to (concat incomplete-line-info line) to fix
                       ;; Bug#1187, it seems both were wrong.
                       (setcdr incomplete-line-info nil))
-                  (push (car lines) candidates)))
-              (pop lines))
+                  (push (pop lines) candidates))))
             ;; Transform candidates.
             (setq candidates (helm-transform-candidates
                               (nreverse candidates) source t))
