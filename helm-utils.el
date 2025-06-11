@@ -909,7 +909,7 @@ Inlined here for compatibility."
 (defvar helm-match-line-overlay nil)
 (defvar helm--match-item-overlays nil)
 
-(cl-defun helm-highlight-current-line (&optional start end buf face)
+(defun helm-highlight-current-line (&optional start end buf face)
   "Highlight current line and all matching items around it.
 
 The number of lines around matched line where the matching items are
@@ -918,83 +918,84 @@ When the variable `helm-highlight-only-all-matches' is non nil only
 the lines containing all matches (in case of multi match) are highlighted.
 
 Optional arguments START, END and FACE are only here for debugging purpose."
-  (let* ((start (or start (line-beginning-position)))
-         (end (or end (1+ (line-end-position))))
-         start-match end-match
-         (args (list start end buf))
-         (case-fold-search (if helm-alive-p
-                               (helm-set-case-fold-search)
-                             case-fold-search)))
-    ;; Highlight the current line.
-    (if (not helm-match-line-overlay)
-        (setq helm-match-line-overlay (apply 'make-overlay args))
-      (apply 'move-overlay helm-match-line-overlay args))
-    (overlay-put helm-match-line-overlay
-                 'face (or face 'helm-selection-line))
-    ;; Now highlight matches only if we are in helm session, we are
-    ;; maybe coming from helm-grep-mode or helm-moccur-mode buffers.
-    (when helm-alive-p
-      (helm-acase helm-highlight-matches-around-point-max-lines
-        ;; Next 2 clauses must precede others otherwise
-        ;; `helm-highlight-matches-around-point-max-lines' is
-        ;; compared as a number by other clauses and return an error.
-        (never (cl-return-from helm-highlight-current-line))
-        ((dst* (x . y))
-         (setq start-match (save-excursion (forward-line (- x)) (pos-bol))
-               end-match   (save-excursion (forward-line y) (pos-bol))))
-        ((guard* (or (null it) (zerop it)))
-         (setq start-match start
-               end-match   end))
-        ((guard* (< it 0))
-         (setq start-match (save-excursion (forward-line it) (pos-bol))
-               end-match   start))
-        ((guard* (> it 0))
-         (setq start-match start
-               end-match   (save-excursion (forward-line it) (pos-bol)))))
-      (catch 'empty-line
-        (let* ((regex-list (helm-remove-if-match
-                            "\\`!" (helm-mm-split-pattern
-                                    (if (with-helm-buffer
-                                          ;; Needed for highlighting AG matches.
-                                          (assq 'pcre (helm-get-current-source)))
-                                        (helm--translate-pcre-to-elisp helm-input)
-                                      helm-input))))
-               (num-regex (length regex-list)))
-          (save-excursion
-            (goto-char start-match)
-            (while (< (point) end-match)
-              (let* ((start-line (line-beginning-position))
-                     (end-line   (line-end-position))
-                     all-matches)
-                (dolist (r regex-list)
-                  (let ((match-list '()))
-                    (save-excursion
-                      (goto-char start-line)
-                      (while (condition-case _err
-                                 (and (not (= start-line end-line))
-                                      (if helm-migemo-mode
-                                          (helm-mm-migemo-forward r end-line t)
-                                        (re-search-forward r end-line t)))
-                               (invalid-regexp nil))
-                        (let ((s (match-beginning 0))
-                              (e (match-end 0)))
-                          (if (= s e)
-                              (throw 'empty-line nil)
-                            (push (cons s e) match-list)))))
-                    (when match-list
-                      (push match-list all-matches))))
-                (when (and all-matches
-                           (or (not helm-highlight-only-all-matches)
-                               (eql (length all-matches) num-regex)))
-                  (cl-loop for ml in all-matches
-                           do (cl-loop for (s . e) in ml
-                                       for ov = (make-overlay s e)
-                                       do (progn
-                                            (push ov helm--match-item-overlays)
-                                            (overlay-put ov 'face 'helm-match-item)
-                                            (overlay-put ov 'priority 1))))))
-              (forward-line 1))))))
-    (recenter)))
+  (catch 'never
+    (let* ((start (or start (line-beginning-position)))
+           (end (or end (1+ (line-end-position))))
+           start-match end-match
+           (args (list start end buf))
+           (case-fold-search (if helm-alive-p
+                                 (helm-set-case-fold-search)
+                               case-fold-search)))
+      ;; Highlight the current line.
+      (if (not helm-match-line-overlay)
+          (setq helm-match-line-overlay (apply 'make-overlay args))
+        (apply 'move-overlay helm-match-line-overlay args))
+      (overlay-put helm-match-line-overlay
+                   'face (or face 'helm-selection-line))
+      ;; Now highlight matches only if we are in helm session, we are
+      ;; maybe coming from helm-grep-mode or helm-moccur-mode buffers.
+      (when helm-alive-p
+        (helm-acase helm-highlight-matches-around-point-max-lines
+          ;; Next 2 clauses must precede others otherwise
+          ;; `helm-highlight-matches-around-point-max-lines' is
+          ;; compared as a number by other clauses and return an error.
+          (never (throw 'never nil))
+          ((dst* (x . y))
+           (setq start-match (save-excursion (forward-line (- x)) (pos-bol))
+                 end-match   (save-excursion (forward-line y) (pos-bol))))
+          ((guard* (or (null it) (zerop it)))
+           (setq start-match start
+                 end-match   end))
+          ((guard* (< it 0))
+           (setq start-match (save-excursion (forward-line it) (pos-bol))
+                 end-match   start))
+          ((guard* (> it 0))
+           (setq start-match start
+                 end-match   (save-excursion (forward-line it) (pos-bol)))))
+        (catch 'empty-line
+          (let* ((regex-list (helm-remove-if-match
+                              "\\`!" (helm-mm-split-pattern
+                                      (if (with-helm-buffer
+                                            ;; Needed for highlighting AG matches.
+                                            (assq 'pcre (helm-get-current-source)))
+                                          (helm--translate-pcre-to-elisp helm-input)
+                                        helm-input))))
+                 (num-regex (length regex-list)))
+            (save-excursion
+              (goto-char start-match)
+              (while (< (point) end-match)
+                (let* ((start-line (line-beginning-position))
+                       (end-line   (line-end-position))
+                       all-matches)
+                  (dolist (r regex-list)
+                    (let ((match-list '()))
+                      (save-excursion
+                        (goto-char start-line)
+                        (while (condition-case _err
+                                   (and (not (= start-line end-line))
+                                        (if helm-migemo-mode
+                                            (helm-mm-migemo-forward r end-line t)
+                                          (re-search-forward r end-line t)))
+                                 (invalid-regexp nil))
+                          (let ((s (match-beginning 0))
+                                (e (match-end 0)))
+                            (if (= s e)
+                                (throw 'empty-line nil)
+                              (push (cons s e) match-list)))))
+                      (when match-list
+                        (push match-list all-matches))))
+                  (when (and all-matches
+                             (or (not helm-highlight-only-all-matches)
+                                 (eql (length all-matches) num-regex)))
+                    (cl-loop for ml in all-matches
+                             do (cl-loop for (s . e) in ml
+                                         for ov = (make-overlay s e)
+                                         do (progn
+                                              (push ov helm--match-item-overlays)
+                                              (overlay-put ov 'face 'helm-match-item)
+                                              (overlay-put ov 'priority 1))))))
+                (forward-line 1))))))
+      (recenter))))
 
 (defun helm--translate-pcre-to-elisp (regexp)
   "Should translate pcre REGEXP to elisp regexp.
