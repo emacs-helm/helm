@@ -283,7 +283,7 @@ Can be \"--new-tab\" (default), \"--new-window\" or \"--private-window\"."
     ("emacs" . eww-browse-url))
   "Alist of (browse_url_variable . function) to try to find a suitable url browser.")
 
-(cl-defun helm-generic-browser (url cmd-name &rest args)
+(defun helm-generic-browser (url cmd-name &rest args)
   "Browse URL with NAME browser."
   (let ((proc (concat cmd-name " " url)))
     (message "Starting %s..." cmd-name)

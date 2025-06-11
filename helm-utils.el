@@ -700,11 +700,12 @@ that is sorting is done against real value of candidate."
            (< (length str1) (length str2)))
           (t (> sc3 sc4)))))
 
-(cl-defun helm-file-human-size (size &optional (kbsize helm-default-kbsize))
+(defun helm-file-human-size (size &optional kbsize)
   "Return a string showing SIZE of a file in human readable form.
 SIZE can be an integer or a float depending on it's value.
 `file-attributes' will take care of that to avoid overflow error.
 KBSIZE is a floating point number, defaulting to `helm-default-kbsize'."
+  (unless kbsize (setq kbsize helm-default-kbsize))
   (cl-loop with result = (cons "B" size)
            for i in '("k" "M" "G" "T" "P" "E" "Z" "Y")
            while (>= (cdr result) kbsize)

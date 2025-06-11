@@ -437,8 +437,9 @@ See `helm-eshell-prompts-list'."
 (defun helm-eshell-prompts-all-transformer (candidates)
   (helm-eshell-prompts-transformer candidates t))
 
-(cl-defun helm-eshell-prompts-goto (candidate &optional (action 'switch-to-buffer))
+(defun helm-eshell-prompts-goto (candidate &optional action)
   ;; Candidate format: ("ls" 162 "*eshell*" 3)
+  (unless action (setq action #'switch-to-buffer))
   (let ((buf (nth 2 candidate)))
     (unless (and (string= (buffer-name) buf)
                  (eq action 'switch-to-buffer))

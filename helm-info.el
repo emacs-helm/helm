@@ -59,10 +59,11 @@ files with `helm-info-at-point'."
 
 ;;; Build info-index sources with `helm-info-source' class.
 
-(cl-defun helm-info-init (&optional (file (helm-get-attr 'info-file)))
+(defun helm-info-init (&optional file)
   "Initialize candidates for info FILE.
 If FILE have nodes, loop through all nodes and accumulate candidates
 found in each node, otherwise scan only the current info buffer."
+  (unless file (setq file (helm-get-attr 'info-file)))
   ;; Allow reinit candidate buffer when using edebug.
   (helm-aif (and debug-on-error
                  (helm-candidate-buffer))

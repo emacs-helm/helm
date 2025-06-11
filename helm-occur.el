@@ -458,11 +458,11 @@ without having to delete its contents before."
 
 ;;; Actions
 ;;
-(cl-defun helm-occur-action (lineno
-                                  &optional (method (quote buffer)))
+(defun helm-occur-action (lineno &optional method)
   "Jump to line number LINENO with METHOD.
 METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (require 'helm-grep)
+  (unless method (setq method 'buffer))
   (let ((buf (if (eq major-mode 'helm-occur-mode)
                  (get-text-property (point) 'buffer-name)
                (helm-get-attr 'buffer-name)))

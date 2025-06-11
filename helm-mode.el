@@ -468,9 +468,8 @@ to use a list as return value when `helm-mode' is enabled, e.g.
   (let ((debug-on-quit nil))
     (signal 'quit nil)))
 
-(cl-defun helm-comp-read-get-candidates (collection &optional
-                                                    test sort-fn alistp
-                                                    (input helm-pattern))
+(defun helm-comp-read-get-candidates (collection
+                                      &optional test sort-fn alistp input)
   "Convert COLLECTION to list removing elements that don't match TEST.
 See `helm-comp-read' about supported COLLECTION arguments.
 
@@ -510,6 +509,7 @@ with an empty string as value for `helm-pattern' because
 data would not be fully collected at init time.
 
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
+  (unless input (setq input helm-pattern))
   ;; Ensure COLLECTION is computed from `helm-current-buffer'
   ;; because some functions used as COLLECTION work
   ;; only in the context of current-buffer (Bug#1030) .
@@ -572,7 +572,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  (t (all-completions input collection test)))))
       (if sort-fn (sort cands sort-fn) cands))))
 
-(cl-defun helm-cr--pattern-in-candidates-p (candidates &optional (pattern helm-pattern))
+(defun helm-cr--pattern-in-candidates-p (candidates &optional pattern)
+  (unless pattern (setq pattern helm-pattern))
   (or (assoc pattern candidates)
       (assoc (concat " " pattern) candidates)
       (assq (intern pattern) candidates)

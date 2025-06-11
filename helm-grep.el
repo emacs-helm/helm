@@ -1227,8 +1227,8 @@ of grep."
       (setf (slot-value source 'follow)
             (assoc-default 'follow it))))
 
-(cl-defun helm-do-grep-1 (targets &optional recurse backend exts
-                                  default-input input (source 'helm-source-grep))
+(defun helm-do-grep-1 (targets &optional recurse backend exts
+                                  default-input input source)
   "Launch helm using backend BACKEND on a list of TARGETS files.
 
 When RECURSE is given and BACKEND is \\='grep' use -r option of
@@ -1252,6 +1252,7 @@ It is used currently to specify \\='zgrep' or \\='git'.
 When BACKEND \\='zgrep' is used don't prompt for a choice in
 recurse, and ignore EXTS, search being made recursively on files
 matching `helm-zgrep-file-extension-regexp' only."
+  (unless source (setq source 'helm-source-grep))
   (let* (non-essential
          (ack-rec-p (helm-grep-use-ack-p :where 'recursive))
          (exts (and recurse

@@ -2246,9 +2246,7 @@ ATTRIBUTE-NAME."
 (defalias 'helm-attr 'helm-get-attr)
 (make-obsolete 'helm-attr 'helm-get-attr "3.7.0")
 
-(cl-defun helm-set-attr (attribute-name value
-                                       &optional
-                                       (src (helm-get-current-source)))
+(defun helm-set-attr (attribute-name value &optional src)
   "Set the value of ATTRIBUTE-NAME of source SRC to VALUE.
 
 If ATTRIBUTE-NAME doesn't exists in source it is created with
@@ -2256,6 +2254,7 @@ value VALUE.  If SRC is omitted, use current source.  If operation
 succeed, return value, otherwise nil.
 
 Using this function is same as using `setf' on `helm-get-attr'."
+  (unless src (setq src (helm-get-current-source)))
   (setf (helm-get-attr attribute-name src) value))
 
 (defalias 'helm-attrset 'helm-set-attr)
@@ -2290,8 +2289,7 @@ function associated to name."
                        (assoc action-or-name actions))))
     (helm-set-attr 'action (delete del-action actions) source)))
 
-(cl-defun helm-add-action-to-source-if (name fn source predicate
-                                             &optional (index 4) test-only)
+(defun helm-add-action-to-source-if (name fn source predicate &optional index test-only)
   "Add new action NAME linked to function FN to SOURCE.
 Action NAME will be available when the current candidate matches
 PREDICATE.
@@ -2316,6 +2314,7 @@ when predicate helm-ff-candidates-lisp-p returns non-nil:
                               \\='async-byte-compile-file
                               helm-source-find-files
                               \\='helm-ff-candidates-lisp-p)."
+  (unless index (setq index 4))
   (let* ((actions     (helm-get-attr 'action source 'ignorefn))
          (action-transformers (helm-get-attr 'action-transformer source))
          (new-action  (list (cons name fn)))
@@ -2679,9 +2678,10 @@ IOW Don't use VALUE of previous VAR to set the VALUE of next VAR.
 
 
 ;; API helper
-(cl-defun helm-empty-buffer-p (&optional (buffer helm-buffer))
+(defun helm-empty-buffer-p (&optional buffer)
   "Check if BUFFER have candidates.
 Default value for BUFFER is `helm-buffer'."
+  (unless buffer (setq buffer helm-buffer))
   (zerop (buffer-size (and buffer (get-buffer buffer)))))
 
 (defun helm-empty-source-p ()
@@ -4836,12 +4836,12 @@ useful when the order of the candidates is meaningful, e.g. with
         (setq display (if mp (concat beg-str (buffer-string) end-str) (buffer-string))))
       (if real (cons display real) display))))
 
-(cl-defun helm-fuzzy-default-highlight-match (candidate
-                                              &optional (pattern helm-pattern) diacritics file-comp)
+(defun helm-fuzzy-default-highlight-match (candidate &optional pattern diacritics file-comp)
   "The default function to highlight matches in fuzzy matching.
 Highlight elements in CANDIDATE matching PATTERN according
 to the matching method in use.  When DIACRITICS is specified, ignore
 diacritics, see `char-fold-to-regexp' for more infos."
+  (unless pattern (setq pattern helm-pattern))
   (if (string= pattern "")
       ;; Empty pattern, do nothing.  This is needed when this function
       ;; is used outside of helm-fuzzy-highlight-matches like in *buffers-list.
@@ -5107,10 +5107,11 @@ candidates in display."
 ;;; Case fold search
 ;;
 ;;
-(cl-defun helm-set-case-fold-search (&optional (pattern helm-pattern))
+(defun helm-set-case-fold-search (&optional pattern)
   "Used to set the value of `case-fold-search' in Helm.
 Return t or nil depending on the value of `helm-case-fold-search'
 and `helm-pattern'."
+  (unless pattern (setq pattern helm-pattern))
   (if helm-alive-p
       (let ((helm-case-fold-search
              (helm-aif (assq 'case-fold-search (helm-get-current-source))
