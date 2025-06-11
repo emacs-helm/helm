@@ -5559,6 +5559,8 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
               (pop lines))
             (setq candidates (nreverse candidates))
             (cl-dolist (candidate (helm-transform-candidates candidates source t))
+              (setq candidate (helm--maybe-process-filter-one-by-one-candidate
+                               candidate source))
               (let ((start (point)))
                 (unless (or (not multiline)
                             (zerop (cdr (assq 'item-count source))))
