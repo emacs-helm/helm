@@ -48,6 +48,7 @@ MacPorts to install id-utils, it should be `gid32'."
                                    concat (format " | grep --color=always %s"
                                                   (shell-quote-argument p))))
                 default-com))
+         (start-time (float-time))
          (proc (start-process-shell-command
                 "gid" helm-buffer cmd)))
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd)
@@ -59,13 +60,13 @@ MacPorts to install id-utils, it should be `gid32'."
                 (helm-maybe-show-help-echo)
                 (with-helm-window
                   (setq mode-line-format
-                        '(" " mode-line-buffer-identification " "
+                        `(" " mode-line-buffer-identification " "
                           (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                           (:eval (propertize
-                                  (format "[Helm Gid process finished - (%s results)]"
-                                          (max (1- (count-lines
-                                                    (point-min) (point-max)))
-                                               0))
+                                  (format "[%s process finished in %.2fs - (%s results)] "
+                                          ,(upcase (process-name process))
+                                          ,(- (float-time) start-time)
+                                          (helm-get-candidate-number))
                                   'face 'helm-locate-finish))))
                   (force-mode-line-update))
                 (helm-log "helm-gid-candidates-process" "Error: Gid %s"
