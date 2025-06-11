@@ -3187,38 +3187,31 @@ when `helm-pattern' is equal to \"~/\"."
             (run-at-time helm-input-idle-delay nil #'undo-boundary)
             (helm-check-minibuffer-input)))))))
 
-(cl-defun helm-ff-auto-expand-to-home-or-root (&optional (pattern helm-pattern spattern))
-  "Allow expanding to $HOME or \"/\" or text yanked after pattern.
-
-Argument PATTERN default to `helm-pattern' and should _not_ be used for
-other purpose than debugging the second cond clause of this function.
-When PATTERN is specified, specific helm functions are not called to
-avoid errors when called outside helm for debugging purpose."
-  (when (or spattern
-            (and (helm-file-completion-source-p)
-                 (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
-                 (not (string-match helm-ff-url-regexp pattern))))
-    (cond ((and (not (file-remote-p pattern))
-                (null (file-exists-p pattern))
+(defun helm-ff-auto-expand-to-home-or-root ()
+  "Allow expanding to $HOME or \"/\" or text yanked after minibuffer input."
+  (when (and (helm-file-completion-source-p)
+             (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
+             (not (string-match helm-ff-url-regexp helm-pattern)))
+    (cond ((and (not (file-remote-p helm-pattern))
+                (null (file-exists-p helm-pattern))
                 (string-match-p
                  "\\`\\([.]\\)\\{2\\}[^/]+"
-                 (helm-basename pattern))
-                (string-match-p "/\\'" pattern)
-                (null spattern))
-           (helm-ff-recursive-dirs pattern)
+                 (helm-basename helm-pattern))
+                (string-match-p "/\\'" helm-pattern))
+           (helm-ff-recursive-dirs helm-pattern)
            (helm-ff--maybe-set-pattern-and-update))
           ((string-match
             "\\(?:\\`~/\\)\\|/?\\$.*/\\|/\\./\\|/\\.\\./\\|/~.*/\\|//\\|\\(/[[:alpha:]]:/\\)"
-            pattern)
-           (let* ((match (match-string 0 pattern))
+            helm-pattern)
+           (let* ((match (match-string 0 helm-pattern))
                   (input (cond ((string= match "/./")
                                 (expand-file-name default-directory))
-                               ((string= pattern "/../") "/")
+                               ((string= helm-pattern "/../") "/")
                                ((string-match-p "\\`/\\$" match)
                                 (let ((sub (substitute-in-file-name match)))
                                   (if (file-directory-p sub)
                                       sub (replace-regexp-in-string "/\\'" "" sub))))
-                               (t (helm-ff--expand-substitued-pattern pattern)))))
+                               (t (helm-ff--expand-substitued-pattern helm-pattern)))))
              ;; `file-directory-p' returns t on "/home/me/." (Bug#1844).
              (if (and (file-directory-p input)
                       (not (string-match-p "[^.]\\.\\'" input)))
@@ -3229,10 +3222,10 @@ avoid errors when called outside helm for debugging purpose."
                    (helm-ff-after-persistent-show-all))
                  (setq helm-ff-default-directory (file-name-as-directory
                                                   (file-name-directory input))))
-             (if spattern input (helm-ff--maybe-set-pattern-and-update input))))
-          ((and (string-match "\\`/\\(-\\):.*" pattern) (null spattern))
+             (helm-ff--maybe-set-pattern-and-update input)))
+          ((string-match "\\`/\\(-\\):.*" helm-pattern)
            (helm-ff--maybe-set-pattern-and-update
-            (replace-match tramp-default-method t t pattern 1))))))
+            (replace-match tramp-default-method t t helm-pattern 1))))))
 
 (defun helm-ff--maybe-set-pattern-and-update (&optional str)
   (with-helm-window
