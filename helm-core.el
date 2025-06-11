@@ -1137,6 +1137,8 @@ instrumented by `edebug' for stepping. `helm--maybe-use-while-no-input'
 then doesn't use `while-no-input', because `while-no-input' throws on
 `edebug' command key input.")
 
+(defvar helm-default-output-filter #'helm-output-filter
+  "The `process-filter' function for Helm async sources.")
 
 ;;; Faces
 ;;
@@ -4397,7 +4399,7 @@ Cache the candidates if there is no cached value yet."
                                    (list (cons 'item-count 0)
                                          (cons 'incomplete-line ""))))
                      helm-async-processes)
-               (set-process-filter candidates 'helm-output-filter)
+               (set-process-filter candidates helm-default-output-filter)
                (setq candidates nil))
               ((not (assq 'volatile source))
                (puthash name candidates helm-candidate-cache)))
