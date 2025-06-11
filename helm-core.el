@@ -5532,7 +5532,7 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
   (with-local-quit
     (let* ((process-assoc        (assoc process helm-async-processes))
            (source               (cdr process-assoc))
-           (insertion-marker     (assoc-default 'insertion-marker source))
+           (insertion-marker     (cdr (assq 'insertion-marker source)))
            (incomplete-line-info (assq 'incomplete-line source))
            (item-count-info      (assq 'item-count source))
            (multiline            (assq 'multiline source)))
@@ -5544,21 +5544,27 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
             (helm-insert-header-from-source source)
             (setcdr process-assoc
                     (append source `((insertion-marker . ,(point-marker))))))
+          ;; Split output and treat incomplete lines one by one.
           (let ((lines (split-string output "\n"))
                 candidates)
             (while lines
               (if (not (cdr lines))
                   ;; store last incomplete line until new output arrives
                   (setcdr incomplete-line-info (car lines))
-                (if (cdr incomplete-line-info)
+                (helm-aif (cdr incomplete-line-info)
                     (progn
-                      (push (concat (cdr incomplete-line-info) (car lines))
-                            candidates)
+                      (push (concat it (car lines)) candidates)
+                      ;; Previously we were setting incomplete-line-info to line
+                      ;; and latter to (concat incomplete-line-info line) to fix
+                      ;; Bug#1187, it seems both were wrong.
                       (setcdr incomplete-line-info nil))
                   (push (car lines) candidates)))
               (pop lines))
-            (setq candidates (nreverse candidates))
-            (cl-dolist (candidate (helm-transform-candidates candidates source t))
+            ;; Transform candidates.
+            (setq candidates (helm-transform-candidates
+                              (nreverse candidates) source t))
+            ;; Now insert each candidate in helm buffer.
+            (cl-dolist (candidate candidates)
               (setq candidate (helm--maybe-process-filter-one-by-one-candidate
                                candidate source))
               (let ((start (point)))
@@ -5571,11 +5577,12 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
                 (when multiline
                   (put-text-property start (point) 'helm-multiline t)))
               (cl-incf (cdr item-count-info))
+              ;; Exit when we reach candidate-number-limit.
               (when (>= (cdr item-count-info) (helm-candidate-number-limit source))
                 (process-put process 'reach-limit t)
                 (helm-kill-async-process process #'kill-process)
                 (cl-return)))))))
-      (helm-output-filter--post-process)))
+    (helm-output-filter--post-process)))
 
 (defun helm-output-filter--post-process ()
   (helm-aif (get-buffer-window helm-buffer 'visible)
