@@ -5555,8 +5555,12 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
                   ;; store last incomplete line until new output arrives
                   (setcdr incomplete-line-info (pop lines))
                 (helm-aif (cdr incomplete-line-info)
-                    (progn
-                      (push (concat it (pop lines)) candidates)
+                    (let ((head (pop lines)))
+                      (helm-log "helm-output-filter"
+                                "incomplete-line-info(1) = %S" it)
+                      (helm-log "helm-output-filter"
+                                "incomplete-line-info (2) = %S" head)
+                      (push (concat it head) candidates)
                       ;; Previously we were setting incomplete-line-info to line
                       ;; and latter to (concat incomplete-line-info line) to fix
                       ;; Bug#1187, it seems both were wrong.
@@ -5583,6 +5587,8 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
               (when (>= (cdr item-count-info) (helm-candidate-number-limit source))
                 (process-put process 'reach-limit t)
                 (helm-kill-async-process process #'kill-process)
+                (helm-log-run-hook "helm-output-filter"
+                                   'helm-async-outer-limit-hook)
                 (cl-return)))))))
     (helm-output-filter--post-process)))
 
