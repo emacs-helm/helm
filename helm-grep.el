@@ -1306,6 +1306,12 @@ matching `helm-zgrep-file-extension-regexp' only."
      'default-directory helm-ff-default-directory) ;; [1]
     ;; Setup the source.
     (set source (helm-make-source src-name 'helm-grep-class
+                  :header-name (and (eq backend 'git)
+                                    (lambda (name)
+                                      (format "%s [%s]"
+                                              name
+                                              (abbreviate-file-name
+                                               helm-ff-default-directory))))
                   :backend backend
                   :pcre (string-match-p "\\`ack" com)))
     (helm
