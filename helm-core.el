@@ -5543,8 +5543,9 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
         (save-excursion
           (if insertion-marker
               (prog1
-                  ;; Marker is alive, its position is constantly modified while
-                  ;; text is inserted.
+                  ;; Marker position is constantly updated while
+                  ;; text is inserted by `insert-before-markers' which ignore
+                  ;; its type.
                   (goto-char insertion-marker)
                 (helm-log "helm-output-filter"
                           "Goto insertion marker at %S" insertion-marker))
