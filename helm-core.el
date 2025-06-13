@@ -5542,9 +5542,16 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
       (with-helm-buffer
         (save-excursion
           (if insertion-marker
-              (goto-char insertion-marker)
+              (prog1
+                  ;; Marker is alive, its position is constantly modified while
+                  ;; text is inserted.
+                  (goto-char insertion-marker)
+                (helm-log "helm-output-filter"
+                          "Goto insertion marker at %S" insertion-marker))
             (goto-char (point-max))
             (helm-insert-header-from-source source)
+            (helm-log "helm-output-filter"
+                      "Inserting source header name = %S" (assq 'name source))
             (setcdr process-assoc
                     (append source `((insertion-marker . ,(point-marker))))))
           ;; Split output and treat incomplete lines one by one.
