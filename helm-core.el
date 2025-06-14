@@ -3319,8 +3319,10 @@ Don't use this directly, use instead `helm' with the keyword
            helm-last-frame-or-window-configuration)
           (orig-one-window-p helm-onewindow-p)
           (helm--nested (if helm--buffer-in-new-frame-p 'share t)))
-      ;; FIXME Using helm-full-frame here allow showing the new
-      ;; helm-buffer in the same window as old helm-buffer, why?
+      ;; Using helm-full-frame here allow showing the new
+      ;; helm-buffer in the same window as old helm-buffer by forcing the usage
+      ;; of switch-to-buffer in `helm-default-display-buffer', using the flag
+      ;; `helm--nested' would have the same effect and be more explicit.
       (helm-set-local-variable 'helm-full-frame t)
       (unwind-protect
           (let (helm-current-position
@@ -5531,7 +5533,8 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
 ;;; Async process
 ;;
 (defun helm-output-filter (process output)
-  "The `process-filter' function for Helm async sources."
+  "The default `process-filter' function for Helm async sources.
+See `helm-default-output-filter'."
   (with-local-quit
     (let* ((process-assoc        (assoc process helm-async-processes))
            (source               (cdr process-assoc))
@@ -5567,10 +5570,10 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
                       (helm-log "helm-output-filter"
                                 "incomplete-line-info(1) = %S" it)
                       (helm-log "helm-output-filter"
-                                "incomplete-line-info (2) = %S" head)
+                                "incomplete-line-info(2) = %S" head)
                       (push (concat it head) candidates)
                       ;; Previously we were setting incomplete-line-info to line
-                      ;; and latter to (concat incomplete-line-info line) to fix
+                      ;; and later to (concat incomplete-line-info line) to fix
                       ;; Bug#1187, it seems both were wrong.
                       (setcdr incomplete-line-info nil))
                   (push (pop lines) candidates))))
