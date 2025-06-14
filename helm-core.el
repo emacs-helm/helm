@@ -5578,26 +5578,27 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
             (setq candidates (helm-transform-candidates
                               (nreverse candidates) source t))
             ;; Now insert each candidate in helm buffer.
-            (cl-dolist (candidate candidates)
-              (setq candidate (helm--maybe-process-filter-one-by-one-candidate
-                               candidate source))
-              (let ((start (point)))
-                (unless (or (not multiline)
-                            (zerop (cdr (assq 'item-count source))))
-                  (helm-insert-candidate-separator))
-                (helm-insert-match candidate 'insert-before-markers
-                                   (1+ (cdr (assq 'item-count source)))
-                                   source)
-                (when multiline
-                  (put-text-property start (point) 'helm-multiline t)))
-              (cl-incf (cdr item-count-info))
-              ;; Exit when we reach candidate-number-limit.
-              (when (>= (cdr item-count-info) (helm-candidate-number-limit source))
-                (process-put process 'reach-limit t)
-                (helm-kill-async-process process #'kill-process)
-                (helm-log-run-hook "helm-output-filter"
-                                   'helm-async-outer-limit-hook)
-                (cl-return)))))))
+            (catch 'reach-limit
+              (dolist (candidate candidates)
+                (setq candidate (helm--maybe-process-filter-one-by-one-candidate
+                                 candidate source))
+                (let ((start (point)))
+                  (unless (or (not multiline)
+                              (zerop (cdr (assq 'item-count source))))
+                    (helm-insert-candidate-separator))
+                  (helm-insert-match candidate 'insert-before-markers
+                                     (1+ (cdr (assq 'item-count source)))
+                                     source)
+                  (when multiline
+                    (put-text-property start (point) 'helm-multiline t)))
+                (cl-incf (cdr item-count-info))
+                ;; Exit when we reach candidate-number-limit.
+                (when (>= (cdr item-count-info) (helm-candidate-number-limit source))
+                  (process-put process 'reach-limit t)
+                  (helm-kill-async-process process #'kill-process)
+                  (helm-log-run-hook "helm-output-filter"
+                                     'helm-async-outer-limit-hook)
+                  (throw 'reach-limit nil))))))))
     (helm-output-filter--post-process)))
 
 (defun helm-output-filter--post-process ()
