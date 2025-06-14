@@ -6080,9 +6080,10 @@ is \"Candidate(s)\" by default."
                    'helm-candidate-number-suspended
                  'helm-candidate-number))))))
 
-(cl-defun helm-move-selection-common (&key where direction (follow t))
-  "Move the selection marker to a new position.
+(defun helm-move-selection-common (&rest args)
+    "Move the selection marker to a new position.
 Position is determined by WHERE and DIRECTION.
+When FOLLOW is specified execute `helm-follow-execute-persistent-action-maybe'.
 Key arg WHERE can be one of:
  - line
  - page
@@ -6091,7 +6092,16 @@ Key arg WHERE can be one of:
 Key arg DIRECTION can be one of:
  - previous
  - next
- - A source or a source name when used with :WHERE \\='source."
+ - A source or a source name when used with :WHERE \\='source.
+
+\(fn &key WHERE DIRECTION FOLLOW)"
+    (apply #'helm-move-selection-common-1
+           (mapcar (lambda (kw)
+                     (plist-get args kw))
+                   '(:where :direction :follow))))
+
+(defun helm-move-selection-common-1 (where direction follow)
+  (unless follow (setq follow t))
   (let ((move-func (cl-case where
                      (line (cl-ecase direction
                              (previous 'helm-move--previous-line-fn)
