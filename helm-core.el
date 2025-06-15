@@ -5570,12 +5570,14 @@ See `helm-default-output-filter'."
                       "Inserting source header name = %S" (assq 'name source))
             (setcdr process-assoc
                     (append source `((insertion-marker . ,(point-marker))))))
-          ;; Split output and treat incomplete lines one by one.
+          ;; Split output and treat incomplete lines one by one.  We don't use
+          ;; OMIT-NULLS deliberately to have ("output" "") when splitting
+          ;; "output\n".
           (let ((lines (split-string output "\n"))
                 candidates)
             (while lines
-              (if (not (cdr lines))
-                  ;; store last incomplete line until new output arrives
+              (if (not (cdr lines)) ; An incomplete line.
+                  ;; store it until new output arrives.
                   (setcdr incomplete-line-info (pop lines))
                 (helm-aif (cdr incomplete-line-info)
                     (let ((head (pop lines)))
