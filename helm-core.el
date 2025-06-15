@@ -570,6 +570,7 @@ customize for immediate effect."
   :set #'helm--action-at-nth-set-fn+)
 
 
+;;; User variables
 (defgroup helm nil
   "Open Helm."
   :prefix "helm-" :group 'convenience)
@@ -1129,6 +1130,14 @@ You can toggle later `truncate-lines' with
 Set this to an empty string if you don't want prefix in margin when marking."
   :group 'helm
   :type 'string)
+
+(defcustom helm-kill-real-or-display-selection 'display
+  "What to kill with `\\<helm-map>\\[helm-kill-selection-and-quit]'.
+A prefix arg reverse the behavior of this variable."
+  :group 'helm
+  :type '(choice
+          (const :tag "Kill display" display)
+          (const :tag "Kill real"    real)))
 
 (defvar helm-update-edebug nil
   "Development feature.
@@ -7972,9 +7981,9 @@ With a prefix arg set to real value of current selection."
 
 (defun helm-kill-selection-and-quit (arg)
   "Store display value of current selection to kill ring.
-With a prefix arg use real value of current selection.
-Display value is shown in `helm-buffer' and real value is used to
-perform actions."
+Kill \\='display or \\='real value of candidate according to the value of
+`helm-kill-real-or-display-selection'.  A prefix arg reverse the behavior of
+this variable."
   (interactive "P")
   (with-helm-alive-p
     (helm-run-after-exit
@@ -7984,7 +7993,10 @@ perform actions."
        ;; in `helm-comp-read' otherwise the value "Saved to kill-ring: foo"
        ;; is used as exit value for `helm-comp-read'.
        (prog1 nil (message "Saved to kill-ring: %s" sel) (sit-for 1)))
-     (format "%s" (helm-get-selection nil (not arg))))))
+     (format "%s" (helm-get-selection
+                   nil (helm-acase helm-kill-real-or-display-selection
+                         (real arg)
+                         (display (not arg))))))))
 (put 'helm-kill-selection-and-quit 'helm-only t)
 
 (defun helm-insert-or-copy (&optional arg)
