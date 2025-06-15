@@ -3318,7 +3318,10 @@ Don't use this directly, use instead `helm' with the keyword
           (orig-helm-last-frame-or-window-configuration
            helm-last-frame-or-window-configuration)
           (orig-one-window-p helm-onewindow-p)
-          (helm--nested (if helm--buffer-in-new-frame-p 'share t)))
+          (helm--nested (if helm--buffer-in-new-frame-p 'share t))
+          ;; Prevent reusing the underlying value of
+          ;; `helm-execute-action-at-once-if-one' particularly if it is a function.
+          helm-execute-action-at-once-if-one)
       ;; Using helm-full-frame here allow showing the new
       ;; helm-buffer in the same window as old helm-buffer by forcing the usage
       ;; of switch-to-buffer in `helm-default-display-buffer', using the flag
