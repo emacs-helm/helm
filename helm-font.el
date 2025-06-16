@@ -60,7 +60,7 @@
 (defface helm-ucs-char
   `((((class color) (background dark))
      ,@(and (>= emacs-major-version 27) '(:extend t))
-     :foreground "Gold"))
+     :foreground "gold"))
   "Face used to display ucs characters."
   :group 'helm-font)
 
