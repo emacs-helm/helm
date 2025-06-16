@@ -119,19 +119,19 @@ will be honored."
 
 (defface helm-bookmark-man
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "Orange4"))
+       :foreground "orange4"))
   "Face used for Woman/man bookmarks."
   :group 'helm-bookmark-faces)
 
 (defface helm-bookmark-file
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "Deepskyblue2"))
+       :foreground "DeepSkyBlue2"))
   "Face used for file bookmarks."
   :group 'helm-bookmark-faces)
 
 (defface helm-bookmark-file-not-found
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "Slategray4"))
+       :foreground "SlateGray4"))
   "Face used for file bookmarks."
   :group 'helm-bookmark-faces)
 

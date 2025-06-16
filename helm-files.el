@@ -1085,7 +1085,7 @@ Used when showing tramp host completions."
 
 (defface helm-history-remote
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "Indianred1"))
+       :foreground "IndianRed1"))
   "Face used for remote files in `file-name-history'."
   :group 'helm-files-faces)
 

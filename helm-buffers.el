@@ -198,7 +198,7 @@ Don't use `setq' to set this."
 
 (defface helm-buffer-not-saved
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "Indianred2"))
+       :foreground "IndianRed2"))
   "Face used for buffer files not already saved on disk."
   :group 'helm-buffers-faces)
 
@@ -231,7 +231,7 @@ Don't use `setq' to set this."
 
 (defface helm-buffer-process
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "Sienna3"))
+       :foreground "sienna3"))
   "Face used for process status in buffer."
   :group 'helm-buffers-faces)
 
@@ -249,7 +249,7 @@ Don't use `setq' to set this."
 
 (defface helm-buffer-archive
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "Gold"))
+       :foreground "gold"))
   "Face for archive file names in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 

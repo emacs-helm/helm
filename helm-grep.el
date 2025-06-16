@@ -427,13 +427,13 @@ Have no effect when grep backend use \"--color=\"."
 
 (defface helm-grep-lineno
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "Darkorange1"))
+       :foreground "DarkOrange1"))
   "Face used to highlight grep number lines."
   :group 'helm-grep-faces)
 
 (defface helm-grep-finish
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "Green"))
+       :foreground "green"))
   "Face used in mode line when grep is finish."
   :group 'helm-grep-faces)
 

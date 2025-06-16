@@ -1057,7 +1057,7 @@ Assume regexp is a pcre based regexp."
 (defface helm-tooltip
   '((((type tty pc))
      :background "yellow" :foreground "black")
-    (t :background "Goldenrod" :foreground "black"))
+    (t :background "goldenrod" :foreground "black"))
   "Face used by `helm-tooltip-show'."
   :group 'helm-grep-faces)
 

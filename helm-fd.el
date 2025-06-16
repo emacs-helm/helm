@@ -38,7 +38,7 @@
 
 (defface helm-fd-finish
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "Green"))
+       :foreground "green"))
   "Face used in mode line when fd process ends."
   :group 'helm-grep-faces)
 
