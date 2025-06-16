@@ -1204,7 +1204,6 @@ of grep."
   It is currently used only as an internal flag
   and doesn't set the backend by itself.
   You probably don't want to modify this.")
-   (candidate-number-limit :initform 9999)
    (help-message :initform 'helm-grep-help-message)
    (history :initform 'helm-grep-history)
    (action :initform 'helm-grep-actions)
@@ -1565,7 +1564,6 @@ non-file buffers."
                 :nohighlight t
                 :nomark t
                 :filter-one-by-one #'helm-grep-filter-one-by-one
-                :candidate-number-limit 9999
                 :history 'helm-grep-history
                 :keymap helm-pdfgrep-map
                 :help-message 'helm-pdfgrep-help-message
@@ -1756,7 +1754,6 @@ grep ag."
    (popup-info :initform #'helm-grep-popup-info-fn)
    (persistent-action :initform 'helm-grep-persistent-action)
    (persistent-help :initform "Jump to line (`C-u' Record in mark ring)")
-   (candidate-number-limit :initform 99999)
    (directory :initarg :directory :initform nil
               :documentation
               "  Directory currently searched.")
