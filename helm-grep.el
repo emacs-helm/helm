@@ -1218,15 +1218,6 @@ of grep."
 
 (defvar helm-source-grep nil)
 
-(cl-defmethod helm--setup-source ((source helm-grep-class))
-  (cl-call-next-method)
-  (helm-aif (and helm-follow-mode-persistent
-                 (if (eq (slot-value source 'backend) 'git)
-                     helm-source-grep-git
-                     helm-source-grep))
-      (setf (slot-value source 'follow)
-            (assoc-default 'follow it))))
-
 (defun helm-do-grep-1 (targets &optional recurse backend exts
                                   default-input input source)
   "Launch helm using backend BACKEND on a list of TARGETS files.
@@ -1776,13 +1767,6 @@ grep ag."
    (group :initform 'helm-grep)))
 
 (defvar helm-source-grep-ag nil)
-
-(cl-defmethod helm--setup-source ((source helm-grep-ag-class))
-  (cl-call-next-method)
-  (helm-aif (and helm-follow-mode-persistent
-                 helm-source-grep-ag
-                 (assoc-default 'follow helm-source-grep-ag))
-      (setf (slot-value source 'follow) it)))
 
 (defun helm-grep-ag-1 (directory &optional type input)
   "Start helm ag in DIRECTORY maybe searching in files of type TYPE.
