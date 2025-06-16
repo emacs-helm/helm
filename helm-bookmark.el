@@ -585,7 +585,6 @@ If `browse-url-browser-function' is set to something else than
 
 (cl-defmethod helm--setup-source ((source helm-bookmark-find-files-class))
   ;; Ensure `helm-source-in-buffer' method is called.
-  (cl-call-next-method)
   (setf (slot-value source 'action)
         (helm-append-at-nth
          (cl-loop for (name . action) in helm-type-bookmark-actions
