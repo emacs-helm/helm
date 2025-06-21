@@ -6776,18 +6776,15 @@ Used generally to modify current selection."
 (defun helm-delete-minibuffer-contents (&optional arg)
   "Delete minibuffer contents.
 When `helm-delete-minibuffer-contents-from-point' is non-nil, delete
-minibuffer contents from point instead of deleting all.  With a prefix
-ARG reverse this behaviour.  When at the end of minibuffer, delete all
-but if a prefix ARG were given also preselect current selection when
-updating if possible (selection may be beyond candidate-number-limit)."
+minibuffer contents from point instead of deleting all.  When at the end
+of minibuffer, delete all but if a prefix ARG were given also preselect
+current selection when updating if possible (selection may be beyond
+candidate-number-limit, or display may have completely changed e.g. HFF)."
   (interactive "P")
   (with-helm-alive-p
-    (let ((str (if helm-delete-minibuffer-contents-from-point
-                   (if (or arg (eobp))
-                       "" (helm-minibuffer-completion-contents))
-                 (if (and arg (not (eobp)))
-                     (helm-minibuffer-completion-contents) "")))
-          (presel (and arg (eobp)
+    (let ((str (if (or (eobp) (not helm-delete-minibuffer-contents-from-point))
+                   "" (helm-minibuffer-completion-contents)))
+          (presel (and arg
                        (concat "^" (regexp-quote (helm-get-selection nil t)) "$"))))
       (helm--delete-minibuffer-contents-from str presel))))
 (put 'helm-delete-minibuffer-contents 'no-helm-mx t)
