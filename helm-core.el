@@ -6768,8 +6768,9 @@ Used generally to modify current selection."
     (helm-reset-yank-point)
     (unless (zerop (length input))
       ;; minibuffer is not empty, delete contents from end
-      ;; of FROM-STR and update.
+      ;; or FROM-STR and update.
       (helm-set-pattern from-str t)
+      (setq helm-input from-str) ; Needed by helm-fuzzy-matching-highlight-fn.
       (helm-update presel src))))
 
 (defun helm-delete-minibuffer-contents (&optional arg)
