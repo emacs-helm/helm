@@ -86,9 +86,14 @@ Helm will never appear in `helm-M-x' whatever the value of this var is."
   "Face used in helm-M-x to show keybinding."
   :group 'helm-command-faces)
 
-(defface helm-command-active-mode
+(defface helm-command-major-active-mode
   '((t :inherit font-lock-builtin-face))
-  "Face used by `helm-M-x' for activated modes."
+  "Face used by `helm-M-x' for activated major modes."
+  :group 'helm-command-faces)
+
+(defface helm-command-minor-active-mode
+  '((t :inherit font-lock-type-face))
+  "Face used by `helm-M-x' for activated minor modes."
   :group 'helm-command-faces)
 
 (defface helm-M-x-short-doc
@@ -156,13 +161,14 @@ algorithm."
              for sym = (intern (if (consp cand) (car cand) cand))
              for doc = (when helm-M-x-show-short-doc
                          (helm-get-first-line-documentation (intern-soft cand)))
-             for disp = (if (or (eq sym major-mode)
-                                (and (memq sym minor-mode-list)
-                                     (boundp sym)
-                                     (buffer-local-value
-                                      sym helm-current-buffer)))
-                            (propertize cand 'face 'helm-command-active-mode)
-                          cand)
+             for disp = (cond ((eq sym major-mode)
+                               (propertize cand 'face 'helm-command-major-active-mode))
+                              ((and (memq sym minor-mode-list)
+                                    (boundp sym)
+                                    (buffer-local-value
+                                     sym helm-current-buffer))
+                               (propertize cand 'face 'helm-command-minor-active-mode))
+                              (t cand))
              unless (and (null ignore-props)
                          (or (get sym 'helm-only) (get sym 'no-helm-mx)
                              (eq sym 'helm-M-x)))
