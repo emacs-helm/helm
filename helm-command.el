@@ -96,6 +96,11 @@ Helm will never appear in `helm-M-x' whatever the value of this var is."
   "Face used by `helm-M-x' for activated minor modes."
   :group 'helm-command-faces)
 
+(defface helm-command-debug-active
+  '((t :inherit font-lock-warning-face))
+  "Face used by `helm-M-x' for activated toggle-debug-on-* commands."
+  :group 'helm-command-faces)
+
 (defface helm-M-x-short-doc
     '((t :box (:line-width -1) :foreground "DimGray"))
     "Face used by `helm-M-x' for short docstring."
@@ -168,6 +173,11 @@ algorithm."
                                     (buffer-local-value
                                      sym helm-current-buffer))
                                (propertize cand 'face 'helm-command-minor-active-mode))
+                              ((or (and (eq sym 'toggle-debug-on-error)
+                                        debug-on-error)
+                                   (and (eq sym 'toggle-debug-on-quit)
+                                        debug-on-quit))
+                               (propertize cand 'face 'helm-command-debug-active))
                               (t cand))
              unless (and (null ignore-props)
                          (or (get sym 'helm-only) (get sym 'no-helm-mx)
