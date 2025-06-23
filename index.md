@@ -39,7 +39,13 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 
 ***
 
+Support via Github Sponsor
+
+
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/emacs-helm)
+
+
+Or
 
 
 [Support via Patreon](https://www.patreon.com/user?u=86324343)
@@ -140,21 +146,21 @@ Helm requires Emacs-25.1 or later versions.
 Helm installs [async](https://github.com/jwiegley/emacs-async) and [wfnames](https://github.com/thierryvolpiatto/wfnames) package as dependencies
 when Helm is installed using [MELPA](https://melpa.org/).
 
-It is recommended to install [all-the-icons](https://github.com/domtronn/all-the-icons.el) to have icons in several places (files, buffers etc..) even if it is not mandatory.
+It is recommended to install [all-the-icons](https://github.com/domtronn/all-the-icons.el) or [nerd-icons](https://github.com/rainstormstudio/nerd-icons.el) to have icons in several places (files, buffers etc..) even if it is not mandatory.
 
 # Getting Started
 
-## Install from Straight
+## Install from Emacs packaging system
 
-See [Install from straight package manager](https://github.com/emacs-helm/helm/wiki#from-straight-package-manager)
+See [Install Helm from Melpa](https://github.com/emacs-helm/helm/wiki#from-melpa)
 
 ## Quick install from git
 
 See [Install Helm from Git](https://github.com/emacs-helm/helm/wiki#from-source)
 
-## Install from Emacs packaging system
+## Install from Straight
 
-See [Install Helm from Melpa](https://github.com/emacs-helm/helm/wiki#from-melpa)
+See [Install from straight package manager](https://github.com/emacs-helm/helm/wiki#from-straight-package-manager)
 
 ## Installing just the helm-core package
 
@@ -168,11 +174,6 @@ Requiring helm builds and runs helm code necessary for multiple regexp
 and fuzzy matching. See
 [helm wiki](https://github.com/emacs-helm/helm/wiki#developpingusinghelmframework)
 for details.
-
-## Warning about alternate installation methods
-
-Installation methods that circumvent `helm-config` are known to fail
-if the careful safeguards are not implemented in the hacks.
 
 ## Configuration
 
@@ -300,11 +301,12 @@ Each pattern can be a regexp.
 
 In addition helm support [fuzzy matching](https://github.com/emacs-helm/helm/wiki/Fuzzy-matching).
 
-### Display icons with all-the-icons package
+### Display icons with all-the-icons or nerd-icons package
 
-You can have icons in many places, see the corresponding variables or modes where you can have them.
+Customize the variable `helm-x-icons-provider` to choose you icons provider.
+Then you can have icons in many places, see the corresponding variables or modes where you can have them.
 For example you can have icons in `helm-find-files` with M-x `helm-ff-icon-mode`
-once you have properly installed and configured `all-the-icons` package.
+once you have properly installed and configured your icons provider package.
 
 ### Have brief infos on the selected candidate
 
