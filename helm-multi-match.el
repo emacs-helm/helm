@@ -402,12 +402,17 @@ patterns must always match CANDIDATE prefix.
 E.g. \"bar foo baz\" will match \"barfoobaz\" or \"barbazfoo\" but not
 \"foobarbaz\" whereas `helm-mm-3-match' would match all."
   (let* ((pat (helm-mm-3-get-patterns (or pattern helm-pattern)))
-         (first (car pat)))
-    (and (funcall (car first) (helm-mm-prefix-match candidate (cdr first)))
+         (first (car pat))
+         end)
+    (and (funcall (car first)
+                  (prog1 (helm-mm-prefix-match candidate (cdr first))
+                    (setq end (match-end 0))))
+         ;; Avoid searching again in common part by searching from end of prefix
+         ;; match.
          (cl-loop for (predicate . regexp) in (cdr pat)
                   always (funcall predicate
                                   (condition-case _err
-                                      (string-match regexp candidate)
+                                      (string-match regexp candidate end)
                                     (invalid-regexp nil)))))))
 
 (defun helm-mm-3p-search (pattern &rest _ignore)
