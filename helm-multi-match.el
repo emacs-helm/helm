@@ -38,6 +38,7 @@ Here are the possible value of this symbol and their meaning:
 - multi1: Respect order, prefix of pattern must match.
 - multi2: Same but with partial match.
 - multi3: The best, multiple regexp match, allow negation.
+- multi3f: Same as multi3 but for files (HFF and friends).
 - multi3p: Same but prefix must match.
 
 Default is multi3, you should keep this for a better experience.
@@ -49,6 +50,7 @@ when these options are used."
            (const :tag "Multiple regexp 1 ordered with prefix match"         multi1)
            (const :tag "Multiple regexp 2 ordered with partial match"        multi2)
            (const :tag "Multiple regexp 3 matching no order, partial, best." multi3)
+           (const :tag "Multiple regexp 3 matching no order, for files."     multi3f)
            (const :tag "Multiple regexp 3p matching with prefix match"       multi3p))
   :group 'helm-multi-match)
 
@@ -236,6 +238,32 @@ I.e. (identity (string-match \"foo\" \"foo bar\")) => t."
                                  (string-match re candidate)
                                (invalid-regexp nil))))))
 
+(defun helm-mm-3f-match (candidate &optional pattern)
+  "Same as `helm-mm-3-match' but for files.
+Once the first pattern is matched, the subsequent patterns match on the part of
+CANDIDATE starting at end of first match."
+  ;; When matching a filename like "/home/you/github/foo-bar.txt" there is no
+  ;; problems with `helm-mm-3-match' as long as one of the patterns doesn't
+  ;; match the basedir of filename but as soon as you try to match a file with a
+  ;; name matching basedir we would match all the file of directory instead of
+  ;; just the files we want e.g. with a pattern like "/home/you/github/ foo git"
+  ;; you would match all files of directory instead of matching only
+  ;; "/home/you/github/foo-git.el" because "git" will always match "github".
+  (unless pattern (setq pattern helm-pattern))
+  (let ((pat (helm-mm-3-get-patterns pattern)))
+    (cl-loop with end = 0
+             for (predicate . regexp) in pat
+             for re = (if (and helm-mm--match-on-diacritics
+                               (not (helm-mm-regexp-p regexp)))
+                          (char-fold-to-regexp regexp)
+                        regexp)
+             always (funcall predicate
+                             (prog1 (condition-case _err
+                                        (string-match re candidate end)
+                                      (invalid-regexp nil))
+                               (when (zerop end)
+                                 (setq end (match-end 0))))))))
+
 (defun helm-mm-3-search-base (pattern searchfn1 searchfn2)
   "Try to find PATTERN in `helm-buffer' with SEARCHFN1 and SEARCHFN2.
 This is the search function for `candidates-in-buffer' enabled sources.
@@ -393,6 +421,7 @@ E.g. \"bar foo baz\" will match \"barfoobaz\" or \"barbazfoo\" but not
                (multi1 #'helm-mm-1-match)
                (multi2 #'helm-mm-2-match)
                (multi3 #'helm-mm-3-match)
+               (multi3f #'helm-mm-3f-match)
                (multi3p #'helm-mm-3p-match))))
     (funcall fun candidate pattern)))
 

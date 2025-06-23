@@ -5680,7 +5680,8 @@ Use it for non-interactive calls of `helm-find-files'."
                            (expand-file-name tap))))
          ;; Ensure not being prompted for password each time we
          ;; navigate to a directory.
-         (password-cache t))
+         (password-cache t)
+         (helm-mm-matching-method 'multi3f))
     (helm-set-local-variable 'helm-follow-mode-persistent nil)
     (when (fboundp 'dnd-begin-drag-files)
       (helm-set-local-variable 'helm-drag-mouse-1-fn 'helm-ff-mouse-drag

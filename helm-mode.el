@@ -2242,7 +2242,8 @@ Keys description:
                   :default default
                   :buffer buffer
                   :full-frame nil
-                  :preselect preselect)))
+                  :preselect preselect))
+         (helm-mm-matching-method 'multi3f))
     (or
      (cond ((and result (stringp result)
                  (string= result "") ""))
