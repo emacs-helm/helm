@@ -287,7 +287,7 @@ Here helm started from emacs-helm.sh script and displaying its candidates in a s
 
 To use frames to display helm candidates see the variable `helm-display-function`.  Even better, use the variable `helm-commands-using-frame`, e.g.
 
-    `(add-to-list 'helm-commands-using-frame 'helm-M-x)`
+    (add-to-list 'helm-commands-using-frame 'helm-M-x)
 
 According to the position in the current buffer you started Helm from, the minibuffer will be displayed on top or bottom of the frame.
 
