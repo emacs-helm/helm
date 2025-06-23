@@ -127,13 +127,11 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
   helm-mm--prefix-pattern-real)
 
 (defun helm-mm-prefix-match (candidate &optional pattern)
-  ;; In filename completion basename and basedir may be
-  ;; quoted, unquote them for string comparison (Bug#1283).
-  (setq pattern (replace-regexp-in-string
-                 "\\\\" "" (or pattern helm-pattern)))
-  (let ((len (length pattern)))
-    (and (<= len (length candidate))
-         (string= (substring candidate 0 len) pattern ))))
+  ;; Previously we were using equality on pattern and the leading common part of
+  ;; candidate and pattern, also we had to maybe unquote pattern to handle
+  ;; (Bug#1283), matching unconditionally if pattern match at start of candidate
+  ;; seems simpler.
+  (string-match (concat "\\`" pattern) candidate))
 
 (defun helm-mm-prefix-search (pattern &rest _ignore)
   (search-forward (helm-mm-prefix-get-pattern pattern) nil t))
