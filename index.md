@@ -285,7 +285,11 @@ Here helm started from emacs-helm.sh script and displaying its candidates in a s
 
 ![Helm displayed in frame](images/helm-displayed-in-a-separate-frame.gif)
 
-To use frames to display helm candidates see the variable `helm-display-function`.
+To use frames to display helm candidates see the variable `helm-display-function`.  Even better, use the variable `helm-commands-using-frame`, e.g.
+
+    `(add-to-list 'helm-commands-using-frame 'helm-M-x)`
+
+According to the position in the current buffer you started Helm from, the minibuffer will be displayed on top or bottom of the frame.
 
 _NOTE_: A Helm package called `helm-posframe` exists which use itself the `posframe` package,
 please DO NOT use this to display helm completions in frame, it uses child frames internally
@@ -293,7 +297,7 @@ which is the wrong approach for Helm.
 
 ### Matching methods
 
-Helm support by default multi pattern matching, it is the standard way
+Helm supports by default multi pattern matching, it is the standard way
 of matching in helm.
 E.g You can use a pattern like "foo bar" to match a line containing "foo" and "bar"
 or "bar" and "foo".
@@ -424,6 +428,7 @@ extensions e.g. helm-swoop which is badly written and unmaintained vs helm-occur
 
 - [Emacs-wgrep](https://github.com/mhayashi1120/Emacs-wgrep)
 - [all-the-icons](https://github.com/domtronn/all-the-icons.el)
+- [nerd-icons](https://github.com/rainstormstudio/nerd-icons.el)
 - [svg-lib](https://github.com/rougier/svg-lib)
 
 svg-lib allows using a svg progress-bar for Rsync in helm-find-files, see the variable `helm-rsync-progress-bar-function`.
