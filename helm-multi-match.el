@@ -405,7 +405,10 @@ E.g. \"bar foo baz\" will match \"barfoobaz\" or \"barbazfoo\" but not
          (first (car pat)))
     (and (funcall (car first) (helm-mm-prefix-match candidate (cdr first)))
          (cl-loop for (predicate . regexp) in (cdr pat)
-               always (funcall predicate (string-match regexp candidate))))))
+                  always (funcall predicate
+                                  (condition-case _err
+                                      (string-match regexp candidate)
+                                    (invalid-regexp nil)))))))
 
 (defun helm-mm-3p-search (pattern &rest _ignore)
   (helm-mm-3-search-base
