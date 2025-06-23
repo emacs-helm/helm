@@ -251,7 +251,7 @@ CANDIDATE starting at end of first match."
   ;; "/home/you/github/foo-git.el" because "git" will always match "github".
   (unless pattern (setq pattern helm-pattern))
   (let ((pat (helm-mm-3-get-patterns pattern)))
-    (cl-loop with end = 0
+    (cl-loop with end = nil
              for (predicate . regexp) in pat
              for re = (if (and helm-mm--match-on-diacritics
                                (not (helm-mm-regexp-p regexp)))
@@ -261,7 +261,7 @@ CANDIDATE starting at end of first match."
                              (prog1 (condition-case _err
                                         (string-match re candidate end)
                                       (invalid-regexp nil))
-                               (when (zerop end)
+                               (unless end
                                  (setq end (match-end 0))))))))
 
 (defun helm-mm-3-search-base (pattern searchfn1 searchfn2)
