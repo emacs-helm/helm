@@ -80,17 +80,18 @@
   "Helm action for describing package CANDIDATE."
   (describe-package candidate))
 
+(defun helm-packages-get-homepage-url (candidate)
+  "Get package CANDIDATE home page url."
+  (let* ((id     (package-get-descriptor candidate))
+         (extras (package-desc-extras id)))
+    (and (listp extras) (cdr-safe (assoc :url extras)))))
+
 (defun helm-packages-visit-homepage (candidate)
   "Helm action for visiting package CANDIDATE home page."
-  (let* ((id (package-get-descriptor candidate))
-         (name (package-desc-name id))
-         (extras (package-desc-extras id))
-         (url (and (listp extras) (cdr-safe (assoc :url extras)))))
+  (let ((url (helm-packages-get-homepage-url candidate)))
     (if (stringp url)
         (browse-url url)
-      (message "Package %s has no homepage"
-               (propertize (symbol-name name)
-                           'face 'font-lock-keyword-face)))))
+      (message "Package `%s' has no homepage" candidate))))
 
 (defun helm-packages-package-reinstall (_candidate)
   "Helm action for reinstalling marked packages."
