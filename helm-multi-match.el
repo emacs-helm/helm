@@ -254,16 +254,19 @@ i.e (identity (re-search-forward \"foo\" (pos-eol) t)) => t."
                                   (not (helm-mm-regexp-p regex)))
                              (char-fold-to-regexp regex)
                            regex)
+           ;; First pattern is a negation.
            when (eq (caar pat) 'not) return
            ;; Pass the job to `helm-search-match-part'.
-           ;; We now forward-line from helm-search-from-candidate-buffer, see
+           ;; We now forward-line from `helm-search-from-candidate-buffer', see
            ;; comments about bug#2650 there.
            (list (pos-bol) (pos-eol))
+           ;; Start searching the first pattern [1].
            while (condition-case _err
                      (funcall searchfn1 (or regex1 "") nil t)
                    (invalid-regexp nil))
            for bol = (pos-bol)
            for eol = (pos-eol)
+           ;; Now search subsequent patterns on this line.
            if (cl-loop for (pred . str) in (cdr pat)
                        for regexp = (if (and helm-mm--match-on-diacritics
                                              (not (helm-mm-regexp-p str)))
@@ -274,7 +277,10 @@ i.e (identity (re-search-forward \"foo\" (pos-eol) t)) => t."
                               (funcall pred (condition-case _err
                                                 (funcall searchfn2 regexp eol t)
                                               (invalid-regexp nil)))))
+           ;; When all patterns match on line move at eol or next line and exit
+           ;; with t.
            do (helm-mm-3--search-move-forward bol eol) and return t
+           ;; if no matches continue [1] until the next matching line and so on.
            else do (helm-mm-3--search-move-forward bol eol)
            finally return nil))
 

@@ -6968,7 +6968,7 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
                                          (not (consp pos-lst)))
                                     ;; If match-part attr is present, or if SEARCHER fn
                                     ;; returns a cons cell, collect PATTERN only if it
-                                    ;; match the part of CAND specified by
+                                    ;; matches the part of CAND specified by
                                     ;; the match-part func.
                                     (helm-search-match-part cand pattern diacritics)))
                          do (progn
@@ -6993,14 +6993,17 @@ computed by match-part-fn and stored in the match-part property."
                        (t 'string-match))))
     (condition-case _err
         (if (string-match " " pattern)
+            ;; FIXME use helm-mm-3-match here.
             (cl-loop for i in (helm-mm-split-pattern pattern) always
                      (if (string-match "\\`!" i)
                          (not (funcall matchfn (substring i 1) part))
                        (funcall matchfn i part)))
+          ;; A pattern with no spaces that starts with "!".
           (if (string-match "\\`!" pattern)
               (if helm--in-fuzzy
                   ;; Fuzzy regexp have already been
-                  ;; computed with substring 1.
+                  ;; computed with substring 1 i.e. the leading "!" has been
+                  ;; removed.
                   (not (string-match fuzzy-regexp part))
                 (not (funcall matchfn (substring pattern 1) part)))
             (funcall matchfn (if helm--in-fuzzy fuzzy-regexp pattern) part)))
