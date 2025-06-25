@@ -299,6 +299,12 @@ Where FUNCTION is a function suitable for `helm-quit-and-find-file'.")
     '((t :inherit font-lock-property-name-face))
   "Face used to highlight annotations in completion."
   :group 'helm-mode)
+
+(defface helm-completions-key-binding
+  '((t :inherit font-lock-constant-face))
+  "Face used to highlight key binding in completion."
+  :group 'helm-mode)
+
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -1295,7 +1301,7 @@ is used."
     (let* ((key     (and (commandp sym) (where-is-internal sym nil 'first-only)))
            (binding (and key (key-description key))))
       (when binding
-        (propertize (format " (%s)" binding) 'face 'shadow)))))
+        (propertize (format " (%s)" binding) 'face 'helm-completions-key-binding)))))
 
 (defun helm-completion-package-affixation (_completions)
   (lambda (comp)
