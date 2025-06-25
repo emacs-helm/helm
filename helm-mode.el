@@ -1295,7 +1295,7 @@ is used."
     (let* ((key     (and (commandp sym) (where-is-internal sym nil 'first-only)))
            (binding (and key (key-description key))))
       (when binding
-        (propertize (format " (%s)" binding) 'face 'shadow)))))
+        (propertize (format " (%s)" binding) 'face 'help-key-binding)))))
 
 (defun helm-completion-package-affixation (_completions)
   (lambda (comp)
