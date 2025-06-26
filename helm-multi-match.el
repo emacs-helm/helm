@@ -289,8 +289,11 @@ Forward line on empty lines, otherwise goto eol."
 ;;; mm-3f (match on filenames)
 ;;
 ;;
+;; When this is called by HFF, the pattern is transformed like this:
+;; "/home/you/foo/foo bar" => "/home/you/foo/ foo bar" so the prefix is always
+;; the basedir.
 (defun helm-mm-3f-match (candidate &optional pattern)
-  "Same as `helm-mm-3-match' but for files.
+  "Same as `helm-mm-3-match' but for files or prefix matching.
 Once the first pattern is matched, the subsequent patterns match on the part of
 CANDIDATE starting at end of first match."
   ;; When matching a filename like "/home/you/github/foo-bar.txt" there is no
