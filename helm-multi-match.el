@@ -233,7 +233,7 @@ i.e (identity (re-search-forward \"foo\" (pos-eol) t)) => t."
                    (invalid-regexp nil))
            for bol = (pos-bol)
            for eol = (pos-eol)
-           for end = (and prefix-search (match-end 0)) ; End of prefix.
+           for end = (and prefix-search (+ bol (match-end 0))) ; End of prefix.
            ;; Now search subsequent patterns on this line.
            if (cl-loop for (pred . str) in (cdr pat)
                        for regexp = (if (and helm-mm--match-on-diacritics
