@@ -43,12 +43,10 @@ Here are the possible value of this symbol and their meaning:
 
 Default is multi3, you should keep this for a better experience.
 
-Note that multi1 and multi3p are incompatible with fuzzy matching
-in file completion and by the way fuzzy matching will be disabled there
-when these options are used. Also the multi3f method is meant to be used within
-helm-find-files or at least when matching on a list of files or strings with a
-leading common part like the basedir of an absolute filename from the same
-directory but never globally."
+The multi3f method is meant to be used within helm-find-files or at
+least when matching on a list of files or strings with a leading common
+part like the basedir of an absolute filename from the same directory
+but never globally."
   :type  '(radio :tag "Matching methods for helm"
            (const :tag "Multiple regexp 1 ordered with prefix match"         multi1)
            (const :tag "Multiple regexp 2 ordered with partial match"        multi2)

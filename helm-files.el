@@ -3898,9 +3898,9 @@ This is meant to run in `tramp-cleanup-connection-hook'."
         if (assq i bad) concat (cdr it)
         else concat (string i)))
 
-(defun helm-ff-fuzzy-matching-p ()
-  (and helm-ff-fuzzy-matching
-       (not (memq helm-mm-matching-method '(multi1 multi3p)))))
+;; Keep it like this i.e. a function for evaluation in source definition.
+(defun helm-ff--fuzzy-matching-p ()
+  helm-ff-fuzzy-matching)
 
 (defun helm-ff--transform-pattern-for-completion (pattern)
   "Maybe return PATTERN with it's basename modified as a regexp.
@@ -3936,7 +3936,7 @@ If PATTERN is a valid directory name, return PATTERN unchanged."
       ;; This allow showing all files/dirs matching BN (Bug#518).
       ;; FIXME: some multi-match methods may not work here.
       (dir-p (concat (regexp-quote bd) " " (regexp-quote bn)))
-      ((or (not (helm-ff-fuzzy-matching-p))
+      ((or (not (helm-ff--fuzzy-matching-p))
            (string-match "[ !]" bn))    ; Fall back to multi-match.
        (concat (regexp-quote bd) " " bn))
       ((or (string-match "[*][.]?.*" bn) ; Allow entering wildcard.
@@ -5570,7 +5570,7 @@ Show the first `helm-ff-history-max-length' elements of
       (if comp-read
           (let ((src (helm-build-sync-source "Helm Find Files History"
                        :candidates helm-ff-history
-                       :fuzzy-match (helm-ff-fuzzy-matching-p)
+                       :fuzzy-match (helm-ff--fuzzy-matching-p)
                        :persistent-action 'ignore
                        :migemo t
                        :action (lambda (candidate)
