@@ -307,6 +307,7 @@ CANDIDATE starting at end of first match."
                                (not (helm-mm-regexp-p regexp)))
                           (char-fold-to-regexp regexp)
                         regexp)
+             for pref-re = (if end re (concat "\\`" re))
              always (funcall predicate
                              (prog1 (condition-case _err
                                         (string-match re candidate end)
