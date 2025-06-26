@@ -7062,6 +7062,7 @@ by git or hg, otherwise it has no effect."
   (helm :sources
         (helm-build-sync-source "Project history"
           :candidates helm-browse-project-history
+          :filtered-candidate-transformer 'helm-adaptive-sort
           :action (helm-make-actions
                    "Browse project"
                    (lambda (candidate)
