@@ -116,25 +116,11 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
 ;;; Prefix match
 ;;
 ;;
-;; Internal
-(defvar helm-mm--prefix-pattern-str nil)
-(defvar helm-mm--prefix-pattern-real nil)
-
-(defun helm-mm-prefix-get-pattern (pattern)
-  (unless (equal pattern helm-mm--prefix-pattern-str)
-    (setq helm-mm--prefix-pattern-str pattern
-          helm-mm--prefix-pattern-real (concat "\n" pattern)))
-  helm-mm--prefix-pattern-real)
-
-(defun helm-mm-prefix-match (candidate &optional pattern)
-  ;; Previously we were using equality on pattern and the leading common part of
-  ;; candidate and pattern, also we had to maybe unquote pattern to handle
-  ;; (Bug#1283), matching unconditionally if pattern match at start of candidate
-  ;; seems simpler.
-  (string-match (concat "\\`" pattern) candidate))
-
+;; This is just a wrapper around helm-re-search-forward but we need it in
+;; helm-mm-3-search-base to decide if we use prefix search or not by comparing
+;; symbols.
 (defun helm-mm-prefix-search (pattern &rest _ignore)
-  (search-forward (helm-mm-prefix-get-pattern pattern) nil t))
+  (helm-re-search-forward pattern nil t))
 
 
 ;;; Multiple regexp patterns 1 (order is preserved / prefix).
@@ -254,6 +240,7 @@ i.e (identity (re-search-forward \"foo\" (pos-eol) t)) => t."
                                   (not (helm-mm-regexp-p regex)))
                              (char-fold-to-regexp regex)
                            regex)
+           with prefix-search = (eq searchfn1 'helm-mm-prefix-search)
            ;; First pattern is a negation.
            when (eq (caar pat) 'not) return
            ;; Pass the job to `helm-search-match-part'.
@@ -266,6 +253,7 @@ i.e (identity (re-search-forward \"foo\" (pos-eol) t)) => t."
                    (invalid-regexp nil))
            for bol = (pos-bol)
            for eol = (pos-eol)
+           for end = (and prefix-search (match-end 0)) ; End of prefix.
            ;; Now search subsequent patterns on this line.
            if (cl-loop for (pred . str) in (cdr pat)
                        for regexp = (if (and helm-mm--match-on-diacritics
@@ -273,7 +261,8 @@ i.e (identity (re-search-forward \"foo\" (pos-eol) t)) => t."
                                         (char-fold-to-regexp str)
                                       str)
                        always
-                       (progn (goto-char bol)
+                       ;; Search from end of initial match (prefix) or from bol.
+                       (progn (goto-char (or end bol))
                               (funcall pred (condition-case _err
                                                 (funcall searchfn2 regexp eol t)
                                               (invalid-regexp nil)))))
@@ -327,7 +316,7 @@ CANDIDATE starting at end of first match."
                                (unless end
                                  (setq end (match-end 0))))))))
 
-;;; mm-3p- (multiple regexp pattern 3 with prefix search)
+;;; multiple regexp pattern 3 with prefix search
 ;;
 ;;
 (defun helm-mm-3p-match (candidate &optional pattern)
@@ -340,7 +329,7 @@ E.g. \"bar foo baz\" will match \"barfoobaz\" or \"barbazfoo\" but not
          (first (car pat))
          end)
     (and (funcall (car first)
-                  (prog1 (helm-mm-prefix-match candidate (cdr first))
+                  (prog1 (string-match (concat "\\`" (cdr first)) candidate)
                     (setq end (match-end 0))))
          ;; Avoid searching again in common part by searching from end of prefix
          ;; match.
@@ -352,7 +341,7 @@ E.g. \"bar foo baz\" will match \"barfoobaz\" or \"barbazfoo\" but not
 
 (defun helm-mm-3p-search (pattern &rest _ignore)
   (helm-mm-3-search-base
-   pattern 'helm-mm-prefix-search 're-search-forward))
+   pattern 'helm-mm-prefix-search 'helm-re-search-forward))
 
 ;;; mm-3 with migemo
 ;;  Needs https://github.com/emacs-jp/migemo
