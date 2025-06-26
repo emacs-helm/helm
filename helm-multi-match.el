@@ -310,7 +310,7 @@ CANDIDATE starting at end of first match."
              for pref-re = (if end re (concat "\\`" re))
              always (funcall predicate
                              (prog1 (condition-case _err
-                                        (string-match re candidate end)
+                                        (string-match pref-re candidate end)
                                       (invalid-regexp nil))
                                (unless end
                                  (setq end (match-end 0))))))))
@@ -318,25 +318,12 @@ CANDIDATE starting at end of first match."
 ;;; multiple regexp pattern 3 with prefix search
 ;;
 ;;
-(defun helm-mm-3p-match (candidate &optional pattern)
+(defalias 'helm-mm-3p-match #'helm-mm-3f-match
   "Check if PATTERN match CANDIDATE.
 Same as `helm-mm-3-match' but only for the cdr of patterns, the car of
 patterns must always match CANDIDATE prefix.
 E.g. \"bar foo baz\" will match \"barfoobaz\" or \"barbazfoo\" but not
-\"foobarbaz\" whereas `helm-mm-3-match' would match all."
-  (let* ((pat (helm-mm-3-get-patterns (or pattern helm-pattern)))
-         (first (car pat))
-         end)
-    (and (funcall (car first)
-                  (prog1 (string-match (concat "\\`" (cdr first)) candidate)
-                    (setq end (match-end 0))))
-         ;; Avoid searching again in common part by searching from end of prefix
-         ;; match.
-         (cl-loop for (predicate . regexp) in (cdr pat)
-                  always (funcall predicate
-                                  (condition-case _err
-                                      (string-match regexp candidate end)
-                                    (invalid-regexp nil)))))))
+\"foobarbaz\" whereas `helm-mm-3-match' would match all.")
 
 (defun helm-mm-3p-search (pattern &rest _ignore)
   (helm-mm-3-search-base
