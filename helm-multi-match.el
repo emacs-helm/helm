@@ -31,7 +31,7 @@
   "Helm multi match."
   :group 'helm)
 
-(defcustom helm-mm-matching-method 'multi3
+(defvar helm-mm-matching-method 'multi3
   "Matching method for helm match plugin.
 You can set here different methods to match candidates in helm.
 Here are the possible value of this symbol and their meaning:
@@ -43,17 +43,10 @@ Here are the possible value of this symbol and their meaning:
 
 Default is multi3, you should keep this for a better experience.
 
-The multi3f method is meant to be used within helm-find-files or at
+The multi3f method is meant to be used within `helm-find-files' or at
 least when matching on a list of files or strings with a leading common
 part like the basedir of an absolute filename from the same directory
-but never globally."
-  :type  '(radio :tag "Matching methods for helm"
-           (const :tag "Multiple regexp 1 ordered with prefix match"         multi1)
-           (const :tag "Multiple regexp 2 ordered with partial match"        multi2)
-           (const :tag "Multiple regexp 3 matching no order, partial, best." multi3)
-           (const :tag "Multiple regexp 3 matching no order, for files."     multi3f)
-           (const :tag "Multiple regexp 3p matching with prefix match"       multi3p))
-  :group 'helm-multi-match)
+but never globally.")
 
 
 ;; Internal
