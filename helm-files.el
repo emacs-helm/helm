@@ -7107,6 +7107,7 @@ and
                                      (fboundp 'helm-ls-git-root-dir)
                                      (helm-ls-git-root-dir))
                           (expand-file-name it)))
+         ;; handle nested projects (Hg inside Git or vice versa) issue#2723.
          (hg-project (helm-aif (and (require 'helm-ls-hg nil t)
                                     (fboundp 'helm-hg-root)
                                     (helm-hg-root))
