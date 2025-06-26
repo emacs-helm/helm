@@ -113,19 +113,9 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
   (helm-re-search-forward (helm-mm-exact-get-pattern pattern) nil t))
 
 
-;;; Prefix match
-;;
-;;
-;; This is just a wrapper around helm-re-search-forward but we need it in
-;; helm-mm-3-search-base to decide if we use prefix search or not by comparing
-;; symbols.
-(defun helm-mm-prefix-search (pattern &rest _ignore)
-  (helm-re-search-forward pattern nil t))
-
-
 ;;; Multiple regexp patterns 1 (order is preserved / prefix).
 ;;
-;;
+;; Same as "^foo.*bar.*baz"
 ;; Internal
 (defvar helm-mm--1-pattern-str nil)
 (defvar helm-mm--1-pattern-real nil)
@@ -147,7 +137,7 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
 
 ;;; Multiple regexp patterns 2 (order is preserved / partial).
 ;;
-;;
+;; Same as "^.*foo.*bar.*baz"
 ;; Internal
 (defvar helm-mm--2-pattern-str nil)
 (defvar helm-mm--2-pattern-real nil)
@@ -327,6 +317,12 @@ Same as `helm-mm-3-match' but only for the cdr of patterns, the car of
 patterns must always match CANDIDATE prefix.
 E.g. \"bar foo baz\" will match \"barfoobaz\" or \"barbazfoo\" but not
 \"foobarbaz\" whereas `helm-mm-3-match' would match all.")
+
+;; This is just a wrapper around helm-re-search-forward but we need it in
+;; helm-mm-3-search-base to decide if we use prefix search or not by comparing
+;; symbols.
+(defun helm-mm-prefix-search (pattern &rest _ignore)
+  (helm-re-search-forward pattern nil t))
 
 (defun helm-mm-3p-search (pattern &rest _ignore)
   (helm-mm-3-search-base
