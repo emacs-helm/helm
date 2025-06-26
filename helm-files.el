@@ -7098,22 +7098,31 @@ and
 <https://github.com/emacs-helm/helm-ls-hg>."
   (interactive "P")
   (require 'helm-x-files)
-  (let ((helm-type-buffer-actions
-         (remove (assoc "Browse project from buffer"
-                        helm-type-buffer-actions)
-                 helm-type-buffer-actions))
-        (helm-buffers-in-project-p t))
+  (let* ((helm-type-buffer-actions
+          (remove (assoc "Browse project from buffer"
+                         helm-type-buffer-actions)
+                  helm-type-buffer-actions))
+         (helm-buffers-in-project-p t)
+         (git-project (helm-aif (and (require 'helm-ls-git nil t)
+                                     (fboundp 'helm-ls-git-root-dir)
+                                     (helm-ls-git-root-dir))
+                          (expand-file-name it)))
+         (hg-project (helm-aif (and (require 'helm-ls-hg nil t)
+                                    (fboundp 'helm-hg-root)
+                                    (helm-hg-root))
+                         (expand-file-name it)))
+         (project-type (cond ((and git-project (not hg-project)) 'Git)
+                             ((and hg-project (not git-project)) 'Hg)
+                             ((and hg-project git-project)
+                              (if (string-prefix-p git-project hg-project) 'Hg 'Git))
+                             (t nil))))
     (cl-flet ((push-to-hist (root)
                 (setq helm-browse-project-history
                       (cons root (delete root helm-browse-project-history)))))
-      (helm-acond ((and (require 'helm-ls-git nil t)
-                        (fboundp 'helm-ls-git-root-dir)
-                        (helm-ls-git-root-dir))
+      (helm-acond ((equal project-type 'Git)
                    (push-to-hist it)
                    (helm-ls-git))
-                  ((and (require 'helm-ls-hg nil t)
-                        (fboundp 'helm-hg-root)
-                        (helm-hg-root))
+                  ((equal project-type 'Hg)
                    (push-to-hist it)
                    (helm-hg-find-files-in-project))
                   ((helm-browse-project-get--root-dir (helm-current-directory))
@@ -7121,8 +7130,8 @@ and
                        (progn
                          (push-to-hist it)
                          (helm-browse-project-find-files it (equal arg '(16))))
-                       (helm :sources (helm-browse-project-build-buffers-source it)
-                             :buffer "*helm browse project*")))))))
+                     (helm :sources (helm-browse-project-build-buffers-source it)
+                           :buffer "*helm browse project*")))))))
 
 (defun helm-browse-project-get--root-dir (directory)
   (cl-loop with dname = (file-name-as-directory directory)
