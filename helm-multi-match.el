@@ -210,8 +210,7 @@ E.g., \"foo bar\"=>((identity . \"foo\") (identity . \"bar\")).
 Then each predicate of cons cell(s) is called with the regexp of
 the same cons cell against CANDIDATE.
 I.e. (identity (string-match \"foo\" \"foo bar\")) => t."
-  (unless pattern (setq pattern helm-pattern))
-  (let ((pat (helm-mm-3-get-patterns pattern)))
+  (let ((pat (helm-mm-3-get-patterns (or pattern helm-pattern))))
     (cl-loop for (predicate . regexp) in pat
              for re = (if (and helm-mm--match-on-diacritics
                                (not (helm-mm-regexp-p regexp)))
@@ -301,8 +300,7 @@ CANDIDATE starting at end of first match."
   ;; just the files we want e.g. with a pattern like "/home/you/github/ foo git"
   ;; you would match all files of directory instead of matching only
   ;; "/home/you/github/foo-git.el" because "git" will always match "github".
-  (unless pattern (setq pattern helm-pattern))
-  (let ((pat (helm-mm-3-get-patterns pattern)))
+  (let ((pat (helm-mm-3-get-patterns (or pattern helm-pattern))))
     (cl-loop with end = nil
              for (predicate . regexp) in pat
              for re = (if (and helm-mm--match-on-diacritics
