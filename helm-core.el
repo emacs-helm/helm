@@ -3042,7 +3042,6 @@ HISTORY args see `helm'."
   (helm-log "helm-internal" "prompt = %S" prompt)
   (helm-log "helm-internal" "preselect = %S" preselect)
   (helm-log "helm-internal" "buffer = %S" buffer)
-  (helm-log "helm-internal" "keymap = %S" keymap)
   (helm-log "helm-internal" "default = %S" default)
   (helm-log "helm-internal" "history = %S" history)
   (setq helm--prompt (or prompt "pattern: "))
@@ -5190,8 +5189,7 @@ without recomputing them, it should be a list of lists."
              ;; Compute matches without rendering the sources.
              ;; This prevent the helm-buffer flickering when constantly
              ;; updating.
-             (helm-log "helm-update" "Matches: %S"
-                       (setq matches (or candidates (helm--collect-matches sources))))
+             (setq matches (or candidates (helm--collect-matches sources)))
              ;; If computing matches finished and is not interrupted
              ;; erase the helm-buffer and render results (Fix #1157).
              (when matches ;; nil only when interrupted by while-no-input.
