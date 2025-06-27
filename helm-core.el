@@ -5047,25 +5047,21 @@ emacs-27 to provide such scoring in emacs<27."
 
 (defun helm-render-source (source matches)
   "Display MATCHES from SOURCE according to its settings."
-  (helm-log "helm-render-source" "Source = %S" (remove (assq 'keymap source) source))
   (when matches
     (helm-insert-header-from-source source)
-    (cl-loop with separate = nil
-             with start = (point)
-             with singleline = (null (assq 'multiline source))
-             for m in matches
-             for count from 1
-             if singleline
-             do (helm-insert-match m 'insert count source)
-             else
-             do (progn
-                  (if separate
-                      (helm-insert-candidate-separator)
-                    (setq separate t))
-                  (helm-insert-match m 'insert count source))
-             finally (and (null singleline)
-                          (put-text-property start (point)
-                                             'helm-multiline t)))))
+    (let ((start (point))
+          (multiline (assq 'multiline source))
+          (count 1)
+          separate)
+      (dolist (m matches)
+        (when multiline
+          (if separate
+              (helm-insert-candidate-separator)
+            (setq separate t)))
+        (helm-insert-match m 'insert count source)
+        (cl-incf count))
+      (when multiline
+        (put-text-property start (point) 'helm-multiline t)))))
 
 (defmacro helm-while-no-input (&rest body)
   "Same as `while-no-input' but returns either BODY or nil.
