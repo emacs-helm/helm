@@ -1,6 +1,29 @@
 #+STARTUP:showall
 
 * NEWS
+** Version 4.0.5
+*** Diacritics can now be ignored in helm-find-files
+and read-file-name with the variable `helm-find-files-ignore-diacritics`.
+*** Allow using a function as diacritics slot value
+*** Now project history use adaptive match
+That's mean that the recentest projects popup on top.
+*** helm-mm-matching-method is no more a user var
+*** Fix bugs and inconsistencies in helm-multi-match.el
+*** Add a specialized match fn for files
+This fix matching a basename which match itself a part of basedir,
+e.g. "/home/you/foo/ you foo" previously was matching the whole
+directory instead of matching only e.g. "youfoo.el", now only the
+files matching "you foo" are displayed.
+
+*** Change color of toggle-debug-on-error/quit in helm-M-x
+when the commands are activated.
+*** Differenciate minor and major mode in helm-M-x
+*** Change behavior of helm-delete-minibuffer-contents-from-pos
+Now the prefix arg specify only whether we preselect the candidate or
+not. That's means you can now narrow down your candidates to "foo",
+and then do C-u C-k on "foo" to retrieve the whole list of candidate
+with the preselection on the last occurence of "foo".
+
 ** Version 4.0.4
 *** Rewrite the helm async process filter
 *** We can now mark the <n> next candidates with a numeric prefix arg
