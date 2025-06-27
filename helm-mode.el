@@ -2220,6 +2220,7 @@ Keys description:
                        (remhash helm-ff-default-directory
                                 helm-ff--list-directory-cache))
              :match-on-real t
+             :diacritics helm-find-files-ignore-diacritics
              :filtered-candidate-transformer '(helm-ff-fct
                                                helm-ff-maybe-show-thumbnails
                                                helm-ff-sort-candidates)

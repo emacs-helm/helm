@@ -959,6 +959,19 @@ working only when dropping on an external application (only thunar tested)."
           (const :tag "Copy" copy)
           (const :tag "Move" move)
           (const :tag "Link" link)))
+
+(defcustom helm-find-files-ignore-diacritics nil
+  "Ignore diacritics on basename of files when non nil.
+Note that this happens only when switching to multimatch, i.e. adding spaces in
+pattern, this may slowdown a little matching of candidates when non nil.
+Setting this with `setq' may have no effect on this variable, use
+`customize-set-variable'.  This variable affects as well `read-file-name'."
+  :type 'boolean
+  :set (lambda (var val)
+         (set var val)
+         ;; Force rebuilding the source to pass diacritics fn to diacritics
+         ;; slot.
+         (setq helm-source-find-files nil)))
 
 ;;; Faces
 ;;
@@ -1147,6 +1160,8 @@ Used when showing tramp host completions."
                        (remhash helm-ff-default-directory
                                 helm-ff--list-directory-cache)))
    (match-on-real :initform t)
+   (diacritics :initform (and helm-find-files-ignore-diacritics
+                              'helm-mm-3f-match-on-diacritics))
    (filtered-candidate-transformer
     :initform '(helm-ff-fct
                 helm-ff-maybe-show-thumbnails
