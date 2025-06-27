@@ -173,7 +173,7 @@ Returns nil if `helm-adaptive-history-file' doesn't exist."
   (when helm-adaptive-history-file
     (with-temp-buffer
       (insert
-       ";; -*- mode: emacs-lisp -*-\n"
+       ";; -*- mode: emacs-lisp; lexical-binding: t -*-\n"
        ";; History entries used for helm adaptive display.\n")
       (let (print-length print-level)
         (prin1 `(setq helm-adaptive-history ',helm-adaptive-history)
