@@ -276,7 +276,8 @@ Forward line on empty lines, otherwise goto eol."
 (defun helm-mm-3f-match (candidate &optional pattern)
   "Same as `helm-mm-3-match' but for files or prefix matching.
 Once the first pattern is matched, the subsequent patterns match on the part of
-CANDIDATE starting at end of first match."
+CANDIDATE starting at end of first match.
+Diacritics regexp is never used on the first pattern, the basedir."
   ;; When matching a filename like "/home/you/github/foo-bar.txt" there is no
   ;; problems with `helm-mm-3-match' as long as one of the patterns doesn't
   ;; match the basedir of filename but as soon as you try to match a file with a
@@ -291,13 +292,21 @@ CANDIDATE starting at end of first match."
                                (not (helm-mm-regexp-p regexp)))
                           (char-fold-to-regexp regexp)
                         regexp)
-             for pref-re = (if end re (concat "\\`" re))
+             ;; Use `char-fold-to-regexp' on subsequent patterns only.
+             for pref-re = (if end re (concat "\\`" regexp))
              always (funcall predicate
                              (prog1 (condition-case _err
                                         (string-match pref-re candidate end)
                                       (invalid-regexp nil))
                                (unless end
                                  (setq end (match-end 0))))))))
+
+(defun helm-mm-3f-match-on-diacritics (candidate &optional pattern)
+  "Ignore diacritics in basename of files.
+This happens as soon as you enter multi matching i.e. you add space(s) after
+basedir."
+  (let ((helm-mm--match-on-diacritics t))
+    (helm-mm-3f-match candidate (or pattern helm-pattern))))
 
 ;;; multiple regexp pattern 3 with prefix search
 ;;
