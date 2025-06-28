@@ -5191,7 +5191,7 @@ without recomputing them, it should be a list of lists."
              ;; updating.
              (setq matches (or candidates (helm--collect-matches sources)))
              ;; If computing matches finished and is not interrupted
-             ;; erase the helm-buffer and render results (Fix #1157).
+             ;; erase the helm-buffer and render results (Fix bug#1157).
              (when matches ;; nil only when interrupted by while-no-input.
                (erase-buffer)
                (cl-loop for src in sources
