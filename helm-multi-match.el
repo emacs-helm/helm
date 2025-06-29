@@ -429,7 +429,7 @@ sources."
                (multi1 #'helm-mm-1-search)
                (multi2 #'helm-mm-2-search)
                (multi3 #'helm-mm-3-search)
-               (multi3p #'helm-mm-3p-search))))
+               ((multi3p multi3f) #'helm-mm-3p-search))))
     (funcall fun pattern)))
 
 
