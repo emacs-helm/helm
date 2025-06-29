@@ -10,11 +10,12 @@ That's mean that the recentest projects popup on top.
 *** helm-mm-matching-method is no more a user var
 *** Fix bugs and inconsistencies in helm-multi-match.el
 *** Add a specialized match fn for files
-This fix matching a basename which match itself a part of basedir,
-e.g. "/home/you/foo/ you foo" previously was matching the whole
-directory instead of matching only e.g. "youfoo.el", now only the
-files matching "you foo" are displayed.
-
+Once the first pattern is matched on the whole candidate, the
+subsequent patterns match only in basename whereas they were
+matching again the whole candidate previously.
+e.g. =/home/you/github/repo/ foo git= previously was matching most of
+the files in directory instead of matching only e.g. =foogit.el=, now
+only the files matching =foo git= are displayed.
 *** Change color of toggle-debug-on-error/quit in helm-M-x
 when the commands are activated.
 *** Differenciate minor and major mode in helm-M-x
