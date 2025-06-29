@@ -1032,7 +1032,26 @@ or `search'."
          (defsearch-strict (helm-aif (and (eq method 'search-strict)
                                           (slot-value source 'search-strict))
                                (helm-mklist it)))
-         (migemo           (slot-value source 'migemo)))
+         (migemo           (slot-value source 'migemo))
+         ;; Ensure helm-mm-match/search is not used when one of the helm-mm-*
+         ;; fns is specified directly in source.
+         (helm-mm-default-match-functions
+          (if (cl-loop for fn in defmatch
+                       thereis (memq fn '(helm-mm-3f-match
+                                          helm-mm-3p-match
+                                          helm-mm-3-match
+                                          helm-mm-2-match
+                                          helm-mm-1-match)))
+              (remove 'helm-mm-match helm-mm-default-match-functions)
+            helm-mm-default-match-functions))
+         (helm-mm-default-search-functions
+          (if (cl-loop for fn in defmatch
+                       thereis (memq fn '(helm-mm-3p-search
+                                          helm-mm-3-search
+                                          helm-mm-2-search
+                                          helm-mm-1-search)))
+              (remove 'helm-mm-search helm-mm-default-search-functions)
+            helm-mm-default-search-functions)))
     (cl-case method
       (match (cond (defmatch-strict)
                    ((and migemo diacritics)
