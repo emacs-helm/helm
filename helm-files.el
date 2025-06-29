@@ -1160,6 +1160,14 @@ Used when showing tramp host completions."
                        (remhash helm-ff-default-directory
                                 helm-ff--list-directory-cache)))
    (match-on-real :initform t)
+   ;; We don't want to have here matchfns loaded uselessly.
+   ;; By using diacritics :match should expand to:
+   ;; '(helm-mm-exact-match helm-mm-3f-match-on-diacritics helm-mm-3-migemo-match)
+   ;; If helm-find-files-ignore-diacritics is nil we should fallback to:
+   ;; '(helm-mm-exact-match helm-mm-3f-match helm-mm-3-migemo-match)
+   ;; See `helm-source-mm-get-search-or-match-fns'.
+   (match :initform (unless helm-find-files-ignore-diacritics
+                      'helm-mm-3f-match))
    (diacritics :initform (and helm-find-files-ignore-diacritics
                               'helm-mm-3f-match-on-diacritics))
    (filtered-candidate-transformer
@@ -5695,8 +5703,7 @@ Use it for non-interactive calls of `helm-find-files'."
                            (expand-file-name tap))))
          ;; Ensure not being prompted for password each time we
          ;; navigate to a directory.
-         (password-cache t)
-         (helm-mm-matching-method 'multi3f))
+         (password-cache t))
     (helm-set-local-variable 'helm-follow-mode-persistent nil)
     (when (fboundp 'dnd-begin-drag-files)
       (helm-set-local-variable 'helm-drag-mouse-1-fn 'helm-ff-mouse-drag
