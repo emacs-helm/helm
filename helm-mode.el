@@ -2188,7 +2188,6 @@ Keys description:
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
              :keymap helm-read-file-map
-             :must-match must-match
              :nomark nomark
              :action action-fn)
            ;; List files source.
@@ -2232,7 +2231,6 @@ Keys description:
              :persistent-help persistent-help
              :volatile t
              :keymap helm-read-file-map
-             :must-match must-match
              :cleanup 'helm-find-files-cleanup
              :nomark nomark
              :action action-fn)))
