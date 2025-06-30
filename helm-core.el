@@ -6615,7 +6615,7 @@ If action buffer is displayed, kill it."
   "Collect sources of helm current session without their keymap.
 This is the default function for `helm-debug-function'."
   (cl-loop for source in (with-helm-buffer helm-sources)
-           collect (remove (assq 'keymap source) source)))
+           collect source))
 
 (defun helm-debug-output-function ()
   (let ((local-vars (buffer-local-variables (get-buffer helm-buffer)))
