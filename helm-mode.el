@@ -963,7 +963,8 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
         (setq src-list (cl-loop for src in src-list
                              collect (cons '(nomark) src))))
       (when reverse-history (setq src-list (nreverse src-list)))
-      (setq src-list (append src-list (list dummy-src)))
+      (unless (eq must-match t)
+        (setq src-list (append src-list (list dummy-src))))
       (when raw-candidate
         (cl-loop for src in src-list
                  do (helm-set-attr 'raw-candidate t src)))
@@ -2160,17 +2161,19 @@ Keys description:
                                     "helm-confirm-and-exit-minibuffer"
                                     helm-read-file-name-mode-line-string))
          (dummy-src
-          (helm-build-dummy-source "New file or directory"
-            :keymap 'helm-read-file-map
-            :must-match must-match
-            :all-marked all-marked
-            :nomark nomark
-            :filtered-candidate-transformer
-            (lambda (_candidates _source)
-              (unless (file-exists-p helm-pattern)
-                (list (helm-ff-filter-candidate-one-by-one
-                       helm-pattern nil t))))
-            :action action-fn))
+          (unless (eq must-match t)
+            ;; Non existing file or dir source.
+            (helm-build-dummy-source "New file or directory"
+              :keymap 'helm-read-file-map
+              :must-match must-match
+              :all-marked all-marked
+              :nomark nomark
+              :filtered-candidate-transformer
+              (lambda (_candidates _source)
+                (unless (file-exists-p helm-pattern)
+                  (list (helm-ff-filter-candidate-one-by-one
+                         helm-pattern nil t))))
+              :action action-fn)))
          (src-list
           (list
            ;; History source.
