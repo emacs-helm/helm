@@ -6504,14 +6504,19 @@ message \\='no match'."
 
 (defun helm--set-minibuffer-completion-confirm (src)
   "Return the value of a REQUIRE-MATCH arg in a `completing-read'."
-  ;; Set `minibuffer-completion-confirm' to 'noexit or
-  ;; 'exit, according to MUST-MATCH value (possibly a function).
+  ;; Set `minibuffer-completion-confirm' to 'noexit,'exit or 'confirm  according
+  ;; to MUST-MATCH value (possibly a function).
   (with-helm-buffer
     (setq minibuffer-completion-confirm
           (helm-acase (helm-get-attr 'must-match src)
             ((guard* (and (functionp it)
-                         (helm-get-selection nil nil src)))
-             (if (funcall it guard) 'exit 'noexit))
+                          (helm-get-selection nil nil src)))
+             (helm-acase (funcall it guard)
+               ;; Alow using 'confirm as the output of a REQUIRE-MATCH fn even
+               ;; if this feature is not available in Emacs.
+               ((confirm confirm-after-completion) it)
+               ((guard* (eq nil it)) 'noexit)
+               (t 'exit)))
             (t it)))))
 
 (defun helm-read-string (prompt &optional initial-input history
