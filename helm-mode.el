@@ -2165,7 +2165,7 @@ Keys description:
             ;; Non existing file or dir source.
             (helm-build-dummy-source "New file or directory"
               :keymap 'helm-read-file-map
-              :must-match must-match
+              :must-match must-match ; Merge must-match-map and helm-read-file-map.
               :all-marked all-marked
               :nomark nomark
               :filtered-candidate-transformer
@@ -2230,6 +2230,11 @@ Keys description:
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
              :volatile t
+             ;; Because we don't use :must-match in this source,
+             ;; helm-read-file-map is NOT merged with must-match map, this to
+             ;; not override helm-ff-RET, so MUST-MATCH == t is handled by
+             ;; helm-ff-RET, otherwise the dummy source enter in action and
+             ;; handle the other possible values of MUST-MATCH.
              :keymap helm-read-file-map
              :cleanup 'helm-find-files-cleanup
              :nomark nomark
