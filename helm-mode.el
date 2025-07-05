@@ -2164,7 +2164,7 @@ Keys description:
           (unless (eq must-match t)
             ;; Non existing file or dir source.
             (helm-build-dummy-source "New file or directory"
-              :keymap 'helm-read-file-map
+              :keymap helm-read-file-map
               :must-match must-match ; Merge must-match-map and helm-read-file-map.
               :all-marked all-marked
               :nomark nomark
