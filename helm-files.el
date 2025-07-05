@@ -2611,29 +2611,30 @@ at end of pattern using \\<helm-map>\\[backward-char] and
   (setq helm-ff--deleting-char-backward nil))
 
 (defvar helm-ff--RET-disabled nil)
-(defun helm-ff-RET-1 (&optional must-match)
-  "Used for RET action in `helm-find-files'.
-See `helm-ff-RET' for details.
-If MUST-MATCH is specified exit with
-`helm-confirm-and-exit-minibuffer' which handle must-match mechanism."
-  (let ((sel   (helm-get-selection))
-        ;; Ensure `file-directory-p' works on remote files.
-        non-essential)
-    (cl-assert sel nil "Trying to exit with no candidates")
-    (if (and (or (file-directory-p sel)
-                 (helm-ff--invalid-tramp-name-p sel))
-             ;; Allows exiting with default action when a prefix arg
-             ;; is specified.
-             (null current-prefix-arg)
-             (null helm-ff--RET-disabled)
-             (or (and (file-remote-p sel)
-                      (string= "." (helm-basename sel))
-                      (string-match-p "\\`[/].*:.*:\\'"
-                                      helm-pattern))
-                 (not (string= "." (helm-basename sel)))))
-        (helm-execute-persistent-action)
-      (if must-match
-          (helm-confirm-and-exit-minibuffer)
+(defun helm-ff-RET-1 ()
+  "Used for RET action in `helm-find-files' and `helm-read-file-name'.
+See `helm-ff-RET' for details."
+  (catch 'must-match
+    (let ((sel (helm-get-selection))
+          ;; Ensure `file-directory-p' works on remote files.
+          non-essential)
+      ;; `helm--minibuffer-completing-file-name' is non nil that's mean we are
+      ;; in `helm-read-file-name'.
+      (if (and helm--minibuffer-completing-file-name (null sel))
+          (throw 'must-match (minibuffer-message "[No match]"))
+        (cl-assert sel nil "Trying to exit with no candidates"))
+      (if (and (or (file-directory-p sel)
+                   (helm-ff--invalid-tramp-name-p sel))
+               ;; Allows exiting with default action when a prefix arg
+               ;; is specified.
+               (null current-prefix-arg)
+               (null helm-ff--RET-disabled)
+               (or (and (file-remote-p sel)
+                        (string= "." (helm-basename sel))
+                        (string-match-p "\\`[/].*:.*:\\'"
+                                        helm-pattern))
+                   (not (string= "." (helm-basename sel)))))
+          (helm-execute-persistent-action)
         (helm-maybe-exit-minibuffer)))))
 
 (defun helm-ff-RET ()
@@ -2670,11 +2671,6 @@ Called with a prefix arg open menu unconditionally."
   (interactive "P")
   (helm-ff-TAB-1 arg))
 (put 'helm-ff-TAB 'helm-only t)
-
-(defun helm-ff-RET-must-match ()
-  "Same as `helm-ff-RET' but used in must-match map."
-  (interactive)
-  (helm-ff-RET-1 t))
 
 (helm-make-command-from-action helm-ff-run-grep
     "Run Grep action from `helm-source-find-files'."
