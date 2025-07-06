@@ -52,9 +52,10 @@ The returned alist is computed according to `helm-x-icons-provider'."
                       (regexp "regexp-icon-alist")
                       (dir "dir-icon-alist")
                       (url "url-alist")
-                      (mode "mode-icon-alist"))))
-    (symbol-value
-     (intern-soft (concat provider-name "-" alist-name)))))
+                      (mode "mode-icon-alist")))
+         (sym (intern-soft (concat provider-name "-" alist-name))))
+    (when (boundp sym)
+      (symbol-value sym))))
 
 (defun helm-x-icons-icon-for-file (&rest args)
   "Compatibility function for `*-icon-for-file'."
