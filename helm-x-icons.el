@@ -31,7 +31,7 @@ Do not use setq to set this variable but customize."
           (const :tag "Use `all-the-icons' package" all-the-icons)
           (const :tag "Use `nerd-icons' package" nerd-icons))
   :set (lambda (var val)
-         (when val (require val nil t))
+         (when val (setq val (require val nil t)))
          (set var val)))
 
 (defun helm-x-icons-match-to-alist (file type)
