@@ -110,9 +110,7 @@ Don't use `setq' to set this."
   :group 'helm-imenu
   :type 'boolean
   :set (lambda (var val)
-         (if (require helm-x-icons-provider nil t)
-             (set var val)
-           (set var nil))))
+         (set var (and (require helm-x-icons-provider nil t) val))))
 
 (defcustom helm-imenu-icon-type-alist
   '(("Array"           . (helm-x-icons-generic "crop" :face font-lock-builtin-face))

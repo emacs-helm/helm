@@ -176,9 +176,7 @@ you want to keep the recentest order when narrowing candidates."
 Don't use `setq' to set this."
   :type 'boolean
   :set (lambda (var val)
-         (if (require helm-x-icons-provider nil t)
-             (set var val)
-           (set var nil))))
+         (set var (and (require helm-x-icons-provider nil t) val))))
 
 
 ;;; Faces
