@@ -379,6 +379,7 @@ Default action change TZ environment variable locally to emacs."
 (defun helm-outline (&optional arg)
   "Basic helm navigation tool for outline buffers."
   (interactive "P")
+  (require 'outline)
   (let ((outline-regexp (if arg (read-regexp "Outline regexp") outline-regexp)))
     (helm :sources (helm-build-sync-source "helm outline"
                      :candidates
