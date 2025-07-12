@@ -5084,10 +5084,15 @@ Unlike `while-no-input' this macro ensure to not returns `t'."
 (defmacro helm--maybe-use-while-no-input (&rest body)
   "Wrap BODY in `helm-while-no-input' unless initializing a remote connection."
   `(progn
+     ;; Tramp would ask for passwd, so don't use `helm-while-no-input' until
+     ;; connected to remote.
      (if (or (and (file-remote-p helm-pattern)
                   (not (file-remote-p helm-pattern nil t)))
-             helm-update-edebug)
-         ;; Tramp will ask for passwd, don't use `helm-while-no-input'.
+             helm-update-edebug
+             ;; Don't use while-no-input on initial helm-update before minibuffer
+             ;; is not ready (Issue #2729), this happen in
+             ;; `helm-read-from-minibuffer'.
+             (not (helm-active-minibuffer-window)))
          ,@body
        (helm-log "helm--maybe-use-while-no-input"
                  "Using here `helm-while-no-input'")
@@ -5099,6 +5104,10 @@ Unlike `while-no-input' this macro ensure to not returns `t'."
               (and (boundp 'while-no-input-ignore-events)
                    (cons 'dbus-event while-no-input-ignore-events))))
          (helm-while-no-input ,@body)))))
+
+(defun helm-active-minibuffer-window ()
+  "Check if helm-window has an active minibuffer."
+  (helm-aand (helm-window) (minibuffer-window-active-p it)))
 
 (defun helm--collect-matches (src-list)
   "Return a list of matches for each source in SRC-LIST.
