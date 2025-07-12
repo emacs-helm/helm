@@ -1069,7 +1069,7 @@ or `search'."
                     ((and migemo diacritics)
                      (append '(helm-mm-exact-search)
                              defsearch
-                             `(helm-mm-3-migemo-search diacritics-fn)))
+                             `(helm-mm-3-migemo-search ,diacritics-fn)))
                     (migemo
                      (append helm-mm-default-search-functions
                              defsearch '(helm-mm-3-migemo-search)))
