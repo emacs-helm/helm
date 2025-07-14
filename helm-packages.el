@@ -28,6 +28,18 @@
 (declare-function dired-async-mode-line-message "ext:dired-async.el")
 
 
+(defvar helm-packages-melpa-url-recipes
+  "https://raw.githubusercontent.com/melpa/melpa/refs/heads/master/recipes/%s")
+
+(defvar helm-packages-fetchers-alist
+  '((sourcehut . "https://git.sr.ht/~%s")
+    (codeberg . "https://codeberg.org/%s")
+    (gitlab . "https://gitlab.com/%s")
+    (github . "https://github.com/%s")))
+
+(defvar helm-packages--melpa-recipes-cache nil)
+
+
 (defgroup helm-packages nil
   "Helm interface for package.el."
   :group 'helm)
@@ -58,6 +70,10 @@
   "The function to isolate package.
 `package-isolate' is available only in emacs-30+."
   :type 'function)
+
+(defcustom helm-packages-default-clone-directory nil
+  "Default directory where to clone packages."
+  :type 'string)
 
 ;;; Actions
 ;;
@@ -203,6 +219,51 @@ Arg PACKAGES is a list of strings."
       pkg-names
       (when (y-or-n-p "Start a new Emacs with only package(s)? ")
         (funcall helm-packages-isolate-fn pkg-names helm-current-prefix-arg)))))
+
+(defun helm-packages-get-url-from-melpa (package)
+  "Extract url from PACKAGE recipe on Melpa."
+  (cl-assert (string= "melpa" (package-desc-archive (package-get-descriptor package)))
+               nil "Only Melpa packages can be cloned")
+  (let* ((recipe  (or (assoc package helm-packages--melpa-recipes-cache)
+                      (helm-aif (with-current-buffer
+                                    (url-retrieve-synchronously
+                                     (format helm-packages-melpa-url-recipes package) t)
+                                  (goto-char (point-min))
+                                  (when (re-search-forward "^(" nil t)
+                                    (forward-line -1)
+                                    (read (current-buffer))))
+                          (prog1 it (push it helm-packages--melpa-recipes-cache)))))
+         (fetcher (plist-get (cdr recipe) :fetcher))
+         (repo    (plist-get (cdr recipe) :repo)))
+    (helm-aif (and fetcher repo
+                   (assq fetcher helm-packages-fetchers-alist))
+        (format (cdr it) repo))))
+
+(defun helm-packages-clone-package (package)
+  "Git clone PACKAGE."
+  (let ((directory (read-directory-name
+                    "Clone in directory: " helm-packages-default-clone-directory nil t)))
+    (cl-assert (not (file-directory-p (expand-file-name (symbol-name package) directory)))
+               nil (format "Package already exists in %s" directory))
+    (with-helm-default-directory directory
+      (let* ((url (helm-packages-get-url-from-melpa package))
+             process-connection-type
+             (proc (start-process
+                    "git" "*helm packages clone"
+                    "git" "clone" (concat url ".git"))))
+        (save-selected-window
+          (display-buffer (process-buffer proc) '(display-buffer-below-selected
+                                                  (window-height . fit-window-to-buffer)
+                                                  (preserve-size . (nil . t)))))
+        (set-process-sentinel
+         proc (lambda (proc event)
+                (let ((status (process-exit-status proc)))
+                  (if (string= event "finished\n")
+                      (message "Cloning package %s done" package)
+                    (message "Cloning package %s failed" package))
+                  (when (= status 0)
+                    (quit-window t (get-buffer-window (process-buffer proc)))))))
+        (message "Cloning package %s..." package)))))
 
 (defun helm-packages-quit-an-find-file (source)
   "`find-file-target' function for `helm-packages'."
@@ -395,8 +456,15 @@ to avoid errors with outdated packages no more availables."
                                      nconc (list (car p)))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
-                                ("Install packages(s)"
-                                 . helm-packages-install)))
+                                ("Install packages(s)" . helm-packages-install))
+                      :action-transformer
+                      (lambda (actions candidate)
+                        (if (string= (package-desc-archive
+                                      (package-get-descriptor candidate))
+                                     "melpa")
+                            (append actions
+                                    '(("Clone package" . helm-packages-clone-package)))
+                          actions)))
                     (helm-make-source "Available built-in packages" 'helm-packages-class
                       :data (cl-loop for p in package--builtins
                                      ;; Show only builtins that are available as
@@ -407,8 +475,7 @@ to avoid errors with outdated packages no more availables."
                                      collect (car p))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
-                                ("Install packages(s)"
-                                 . helm-packages-install))))
+                                ("Install packages(s)" . helm-packages-install))))
           :buffer "*helm packages*")))
 
 ;;;###autoload
