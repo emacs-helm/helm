@@ -22,6 +22,7 @@
 (require 'helm)
 (require 'helm-help)
 (require 'helm-regexp)
+(require 'project)
 
 ;;; load wgrep proxy if it's available
 (require 'wgrep-helm nil t)
@@ -1847,6 +1848,19 @@ version."
   (interactive "P")
   (require 'helm-files)
   (helm-grep-ag (expand-file-name default-directory) arg))
+
+;;;###autoload
+(defun helm-do-grep-ag-project (arg)
+  "Preconfigured `helm' for grepping with AG from the current project root.
+With prefix arg prompt for type if available with your AG version."
+  (interactive "P")
+  (require 'helm-files)
+  (require 'project)
+  (helm-aif (project-current)
+      (let* ((project-root (expand-file-name (car (last it))))
+             (default-directory project-root))
+        (helm-grep-ag project-root arg))
+    (message "Not in any project!")))
 
 ;;;###autoload
 (defun helm-grep-do-git-grep (arg)
