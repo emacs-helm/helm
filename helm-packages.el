@@ -225,13 +225,11 @@ Arg PACKAGES is a list of strings."
   (cl-assert (string= "melpa" (package-desc-archive (package-get-descriptor package)))
                nil "Only Melpa packages can be cloned")
   (let* ((recipe  (or (assoc package helm-packages--melpa-recipes-cache)
-                      (helm-aif (with-current-buffer
-                                    (url-retrieve-synchronously
-                                     (format helm-packages-melpa-url-recipes package) t)
+                      (helm-aif (with-temp-buffer
+                                  (url-insert-file-contents
+                                   (format helm-packages-melpa-url-recipes package))
                                   (goto-char (point-min))
-                                  (when (re-search-forward "^(" nil t)
-                                    (forward-line -1)
-                                    (read (current-buffer))))
+                                  (read (current-buffer)))
                           (prog1 it (push it helm-packages--melpa-recipes-cache)))))
          (fetcher (plist-get (cdr recipe) :fetcher))
          (repo    (plist-get (cdr recipe) :repo)))
