@@ -441,7 +441,8 @@ to avoid errors with outdated packages no more availables."
                                  . helm-packages-package-reinstall)
                                 ("Recompile package(s)" . helm-packages-recompile)
                                 ("Uninstall package(s)" . helm-packages-uninstall)
-                                ("Isolate package(s)" . helm-packages-isolate)))
+                                ("Isolate package(s)" . helm-packages-isolate))
+                      :action-transformer #'helm-packages-action-transformer)
                     (helm-make-source "Available external packages" 'helm-packages-class
                       :data (cl-loop for p in package-archive-contents
                                      for sym = (car p)
@@ -455,14 +456,7 @@ to avoid errors with outdated packages no more availables."
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
                                 ("Install packages(s)" . helm-packages-install))
-                      :action-transformer
-                      (lambda (actions candidate)
-                        (if (string= (package-desc-archive
-                                      (package-get-descriptor candidate))
-                                     "melpa")
-                            (append actions
-                                    '(("Clone package" . helm-packages-clone-package)))
-                          actions)))
+                      :action-transformer #'helm-packages-action-transformer)
                     (helm-make-source "Available built-in packages" 'helm-packages-class
                       :data (cl-loop for p in package--builtins
                                      ;; Show only builtins that are available as
@@ -475,6 +469,14 @@ to avoid errors with outdated packages no more availables."
                                 ("Visit homepage" . helm-packages-visit-homepage)
                                 ("Install packages(s)" . helm-packages-install))))
           :buffer "*helm packages*")))
+
+(defun helm-packages-action-transformer (actions candidate)
+  (if (string= (package-desc-archive
+                (package-get-descriptor candidate))
+               "melpa")
+      (append actions
+              '(("Clone package" . helm-packages-clone-package)))
+    actions))
 
 ;;;###autoload
 (defun helm-finder (&optional arg)
