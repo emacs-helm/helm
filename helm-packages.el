@@ -226,6 +226,14 @@ Arg PACKAGES is a list of strings."
       (when (y-or-n-p "Start a new Emacs with only package(s)? ")
         (funcall helm-packages-isolate-fn pkg-names helm-current-prefix-arg)))))
 
+(defun helm-packages-quit-an-find-file (source)
+  "`find-file-target' function for `helm-packages'."
+  (let* ((sel (helm-get-selection nil nil source))
+         (pkg (package-get-descriptor (intern sel))))
+    (if (and pkg (package-installed-p pkg))
+        (expand-file-name (package-desc-dir pkg))
+      package-user-dir)))
+
 ;;; Cloning packages
 ;;
 
@@ -305,13 +313,6 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                     (quit-window t (get-buffer-window (process-buffer proc)))))))
         (message "Cloning package %s..." package)))))
 
-(defun helm-packages-quit-an-find-file (source)
-  "`find-file-target' function for `helm-packages'."
-  (let* ((sel (helm-get-selection nil nil source))
-         (pkg (package-get-descriptor (intern sel))))
-    (if (and pkg (package-installed-p pkg))
-        (expand-file-name (package-desc-dir pkg))
-      package-user-dir)))
 
 ;;; Transformers
 ;;
