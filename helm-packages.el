@@ -83,6 +83,10 @@
 (defcustom helm-packages-default-clone-directory nil
   "Default directory where to clone packages."
   :type 'string)
+
+(defvar helm-packages-clone-after-hook nil
+  "Hook that run after cloning a package.
+It is called with two args respectively PACKAGE as a string and DIRECTORY.")
 
 ;;; Actions
 ;;
@@ -315,7 +319,10 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                       (message "Cloning package %s done" package)
                     (message "Cloning package %s failed" package))
                   (when (= status 0)
-                    (quit-window t (get-buffer-window (process-buffer proc)))))))
+                    (quit-window t (get-buffer-window (process-buffer proc)))
+                    (run-hook-with-args
+                     'helm-packages-clone-after-hook
+                     (symbol-name package) directory)))))
         (message "Cloning package %s..." package)))))
 
 
