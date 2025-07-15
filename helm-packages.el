@@ -250,7 +250,7 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
     (plist-get (cdr package-recipe) :url)))
 
 (defun helm-packages-get-provider (package)
-  (let ((desc     (assq package package-archive-contents)))
+  (let ((desc (assq package package-archive-contents)))
     (package-desc-archive (cadr desc))))
 
 ;; Melpa
