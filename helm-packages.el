@@ -246,12 +246,8 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                              (url-insert-file-contents address)
                              (goto-char (point-min))
                              (read (current-buffer))))))
-         (package-recipe (assq package recipe))
-         (url (plist-get (cdr package-recipe) :url)))
-    (when url
-      (if (string-match "\\.git\\'" url)
-          url
-        (concat url ".git")))))
+         (package-recipe (assq package recipe)))
+    (plist-get (cdr package-recipe) :url)))
 
 (defun helm-packages-get-provider (package)
   (let ((desc     (assq package package-archive-contents)))
@@ -292,7 +288,9 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
              process-connection-type
              (proc (start-process
                     "git" "*helm packages clone"
-                    "git" "clone" (concat url ".git"))))
+                    "git" "clone" (if (string-match "\\.git\\'" url)
+                                      url
+                                    (concat url ".git")))))
         (save-selected-window
           (display-buffer (process-buffer proc) '(display-buffer-below-selected
                                                   (window-height . fit-window-to-buffer)
