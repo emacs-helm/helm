@@ -7075,7 +7075,7 @@ by git or hg, otherwise it has no effect."
   (interactive "P")
   (setq helm-browse-project-history
         (cl-loop for p in helm-browse-project-history
-                 when (file-directory-p p)
+                 when (and (stringp p) (file-directory-p p))
                  collect p))
   (helm :sources
         (helm-build-sync-source "Project history"
