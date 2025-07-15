@@ -471,12 +471,12 @@ to avoid errors with outdated packages no more availables."
           :buffer "*helm packages*")))
 
 (defun helm-packages-action-transformer (actions candidate)
-  (if (string= (package-desc-archive
-                (package-get-descriptor candidate))
-               "melpa")
-      (append actions
-              '(("Clone package" . helm-packages-clone-package)))
-    actions))
+  (let* ((desc     (assq candidate package-archive-contents))
+         (provider (package-desc-archive (cadr desc))))
+    (if (string= provider "melpa")
+        (append actions
+                '(("Clone package" . helm-packages-clone-package)))
+      actions)))
 
 ;;;###autoload
 (defun helm-finder (&optional arg)
