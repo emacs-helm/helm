@@ -1857,9 +1857,15 @@ With prefix arg prompt for type if available with your AG version."
   (require 'helm-files)
   (require 'project)
   (helm-aif (project-current)
-      (let* ((project-root (expand-file-name (car (last it))))
-             (default-directory project-root))
-        (helm-grep-ag project-root arg))
+      (let* ((project-type (car it))
+             (project-root (cond ((equal project-type 'vc)
+                                  (car (last it)))
+                                 ((equal project-type 'projectile)
+                                  (cdr it))
+                                 (t default-directory)))
+             (project-root-abs (expand-file-name project-root))
+             (default-directory project-root-abs))
+        (helm-grep-ag project-root-abs arg))
     (message "Not in any project!")))
 
 ;;;###autoload
