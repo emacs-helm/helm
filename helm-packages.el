@@ -220,9 +220,13 @@ Arg PACKAGES is a list of strings."
       (when (y-or-n-p "Start a new Emacs with only package(s)? ")
         (funcall helm-packages-isolate-fn pkg-names helm-current-prefix-arg)))))
 
+(defun helm-packages-get-provider (package)
+  (let ((desc     (assq package package-archive-contents)))
+    (package-desc-archive (cadr desc))))
+
 (defun helm-packages-get-url-from-melpa (package)
   "Extract url from PACKAGE recipe on Melpa."
-  (cl-assert (string= "melpa" (package-desc-archive (package-get-descriptor package)))
+  (cl-assert (string= "melpa" (helm-packages-get-provider package))
                nil "Only Melpa packages can be cloned")
   (let* ((recipe  (or (assoc package helm-packages--melpa-recipes-cache)
                       (helm-aif (with-temp-buffer
