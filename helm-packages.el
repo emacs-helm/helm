@@ -45,6 +45,9 @@
 (defvar helm-packages--gnu-elpa-recipes-cache nil)
 (defvar helm-packages--nongnu-elpa-recipes-cache nil)
 
+;; EmacsMirror
+(defvar helm-packages-fallback-url-for-cloning "https://github.com/emacsmirror/%s")
+
 
 (defgroup helm-packages nil
   "Helm interface for package.el."
@@ -292,7 +295,9 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
     (cl-assert (not (file-directory-p (expand-file-name (symbol-name package) directory)))
                nil (format "Package already exists in %s" directory))
     (with-helm-default-directory directory
-      (let* ((url (helm-packages-get-url-for-cloning package))
+      (let* ((url (or (helm-packages-get-url-for-cloning package)
+                      ;; Fallback to emacsmirror if no url found.
+                      (format helm-packages-fallback-url-for-cloning package)))
              process-connection-type
              (proc (start-process
                     "git" "*helm packages clone"
