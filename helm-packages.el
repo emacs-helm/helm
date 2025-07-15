@@ -233,13 +233,13 @@ Arg PACKAGES is a list of strings."
 
 (defun helm-packages-get-url-from-elpa (package provider)
   "Get PACKAGE url from PROVIDER's recipe.
-PROVIDER can be one of elpa or nongnu-elpa."
+PROVIDER can be one of \"gnu\" or \"nongnu\"."
   (let* ((address (helm-acase provider
-                    (elpa helm-packages-gnu-elpa-url-recipes)
-                    (nongnu-elpa helm-packages-nongnu-elpa-url-recipes)))
+                    ("gnu" helm-packages-gnu-elpa-url-recipes)
+                    ("nongnu" helm-packages-nongnu-elpa-url-recipes)))
          (cache (helm-acase provider
-                  (elpa        'helm-packages--gnu-elpa-recipes-cache)
-                  (nongnu-elpa 'helm-packages--nongnu-elpa-recipes-cache)))
+                  ("gnu"        'helm-packages--gnu-elpa-recipes-cache)
+                  ("nongnu" 'helm-packages--nongnu-elpa-recipes-cache)))
          (recipe  (or (symbol-value cache)
                       (set cache
                            (with-temp-buffer
@@ -278,8 +278,8 @@ PROVIDER can be one of elpa or nongnu-elpa."
 (defun helm-packages-get-url-for-cloning (package)
   (let ((provider (helm-packages-get-provider package)))
     (helm-acase provider
-      ((gnu nongnu) (helm-packages-get-url-from-elpa package provider))
-      (melpa (helm-packages-get-url-from-melpa package)))))
+      (("gnu" "nongnu") (helm-packages-get-url-from-elpa package provider))
+      ("melpa" (helm-packages-get-url-from-melpa package)))))
 
 (defun helm-packages-clone-package (package)
   "Git clone PACKAGE."
@@ -485,8 +485,8 @@ to avoid errors with outdated packages no more availables."
                                  . helm-packages-package-reinstall)
                                 ("Recompile package(s)" . helm-packages-recompile)
                                 ("Uninstall package(s)" . helm-packages-uninstall)
-                                ("Isolate package(s)" . helm-packages-isolate))
-                      :action-transformer #'helm-packages-action-transformer)
+                                ("Isolate package(s)" . helm-packages-isolate)
+                                ("Clone package" . helm-packages-clone-package)))
                     (helm-make-source "Available external packages" 'helm-packages-class
                       :data (cl-loop for p in package-archive-contents
                                      for sym = (car p)
@@ -499,8 +499,8 @@ to avoid errors with outdated packages no more availables."
                                      nconc (list (car p)))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
-                                ("Install packages(s)" . helm-packages-install))
-                      :action-transformer #'helm-packages-action-transformer)
+                                ("Install packages(s)" . helm-packages-install)
+                                ("Clone package" . helm-packages-clone-package)))
                     (helm-make-source "Available built-in packages" 'helm-packages-class
                       :data (cl-loop for p in package--builtins
                                      ;; Show only builtins that are available as
@@ -513,14 +513,6 @@ to avoid errors with outdated packages no more availables."
                                 ("Visit homepage" . helm-packages-visit-homepage)
                                 ("Install packages(s)" . helm-packages-install))))
           :buffer "*helm packages*")))
-
-(defun helm-packages-action-transformer (actions candidate)
-  (let* ((desc     (assq candidate package-archive-contents))
-         (provider (package-desc-archive (cadr desc))))
-    (if (string= provider "melpa")
-        (append actions
-                '(("Clone package" . helm-packages-clone-package)))
-      actions)))
 
 ;;;###autoload
 (defun helm-finder (&optional arg)
