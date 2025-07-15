@@ -28,16 +28,22 @@
 (declare-function dired-async-mode-line-message "ext:dired-async.el")
 
 
-(defvar helm-packages-melpa-url-recipes
-  "https://raw.githubusercontent.com/melpa/melpa/refs/heads/master/recipes/%s")
-
 (defvar helm-packages-fetchers-alist
   '((sourcehut . "https://git.sr.ht/~%s")
     (codeberg . "https://codeberg.org/%s")
     (gitlab . "https://gitlab.com/%s")
     (github . "https://github.com/%s")))
 
+;; Melpa
+(defvar helm-packages-melpa-url-recipes
+  "https://raw.githubusercontent.com/melpa/melpa/refs/heads/master/recipes/%s")
 (defvar helm-packages--melpa-recipes-cache nil)
+
+;; Elpa/NonGnu-elpa
+(defvar helm-packages-gnu-elpa-url-recipes "https://raw.githubusercontent.com/emacsmirror/gnu_elpa/refs/heads/main/elpa-packages")
+(defvar helm-packages-nongnu-elpa-url-recipes "https://raw.githubusercontent.com/emacsmirror/nongnu_elpa/refs/heads/main/elpa-packages")
+(defvar helm-packages--gnu-elpa-recipes-cache nil)
+(defvar helm-packages--nongnu-elpa-recipes-cache nil)
 
 
 (defgroup helm-packages nil
@@ -220,10 +226,38 @@ Arg PACKAGES is a list of strings."
       (when (y-or-n-p "Start a new Emacs with only package(s)? ")
         (funcall helm-packages-isolate-fn pkg-names helm-current-prefix-arg)))))
 
+;;; Cloning packages
+;;
+
+;; Elpa/NonGnu-elpa
+
+(defun helm-packages-get-url-from-elpa (package provider)
+  "Get PACKAGE url from PROVIDER's recipe.
+PROVIDER can be one of elpa or nongnu-elpa."
+  (let* ((address (helm-acase provider
+                    (elpa helm-packages-gnu-elpa-url-recipes)
+                    (nongnu-elpa helm-packages-nongnu-elpa-url-recipes)))
+         (cache (helm-acase provider
+                  (elpa        'helm-packages--gnu-elpa-recipes-cache)
+                  (nongnu-elpa 'helm-packages--nongnu-elpa-recipes-cache)))
+         (recipe  (or (symbol-value cache)
+                      (set cache
+                           (with-temp-buffer
+                             (url-insert-file-contents address)
+                             (goto-char (point-min))
+                             (read (current-buffer))))))
+         (package-recipe (assq package recipe))
+         (url (plist-get (cdr package-recipe) :url)))
+    (when url
+      (if (string-match "\\.git\\'" url)
+          url
+        (concat url ".git")))))
+
 (defun helm-packages-get-provider (package)
   (let ((desc     (assq package package-archive-contents)))
     (package-desc-archive (cadr desc))))
 
+;; Melpa
 (defun helm-packages-get-url-from-melpa (package)
   "Extract url from PACKAGE recipe on Melpa."
   (cl-assert (string= "melpa" (helm-packages-get-provider package))
@@ -241,6 +275,12 @@ Arg PACKAGES is a list of strings."
                    (assq fetcher helm-packages-fetchers-alist))
         (format (cdr it) repo))))
 
+(defun helm-packages-get-url-for-cloning (package)
+  (let ((provider (helm-packages-get-provider package)))
+    (helm-acase provider
+      ((gnu nongnu) (helm-packages-get-url-from-elpa package provider))
+      (melpa (helm-packages-get-url-from-melpa package)))))
+
 (defun helm-packages-clone-package (package)
   "Git clone PACKAGE."
   (let ((directory (read-directory-name
@@ -248,7 +288,7 @@ Arg PACKAGES is a list of strings."
     (cl-assert (not (file-directory-p (expand-file-name (symbol-name package) directory)))
                nil (format "Package already exists in %s" directory))
     (with-helm-default-directory directory
-      (let* ((url (helm-packages-get-url-from-melpa package))
+      (let* ((url (helm-packages-get-url-for-cloning package))
              process-connection-type
              (proc (start-process
                     "git" "*helm packages clone"
