@@ -272,7 +272,7 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
 (defun helm-packages-get-url-from-melpa (package)
   "Extract url from PACKAGE recipe on Melpa."
   (cl-assert (string= "melpa" (helm-packages-get-provider package))
-               nil "Only Melpa packages can be cloned")
+             nil (format "%s is not a Melpa package" package))
   (let* ((recipe  (or (assoc package helm-packages--melpa-recipes-cache)
                       (helm-aif (with-temp-buffer
                                   (url-insert-file-contents
