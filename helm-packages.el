@@ -317,7 +317,8 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                     "git" "*helm packages clone"
                     "git" "clone" (if (string-match "\\.git\\'" url)
                                       url
-                                    (concat url ".git")))))
+                                    (concat url ".git"))
+                    (symbol-name package))))
         (save-selected-window
           (display-buffer (process-buffer proc) '(display-buffer-below-selected
                                                   (window-height . fit-window-to-buffer)
