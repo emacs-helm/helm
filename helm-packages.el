@@ -257,9 +257,11 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
          (recipe  (or (symbol-value cache)
                       (set cache
                            (with-temp-buffer
-                             (url-insert-file-contents address)
-                             (goto-char (point-min))
-                             (read (current-buffer))))))
+                             (let (data)
+                               (url-insert-file-contents address)
+                               (goto-char (point-min))
+                               (setq data (read (current-buffer)))
+                               (car data))))))
          (package-recipe (assq package recipe))
          (url (plist-get (cdr package-recipe) :url)))
     (if (stringp url)
