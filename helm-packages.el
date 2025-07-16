@@ -264,8 +264,15 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                              (url-insert-file-contents address)
                              (goto-char (point-min))
                              (read (current-buffer))))))
-         (package-recipe (assq package recipe)))
-    (plist-get (cdr package-recipe) :url)))
+         (package-recipe (assq package recipe))
+         (url (plist-get (cdr package-recipe) :url)))
+    (if (stringp url)
+        url
+      ;; Sometimes the recipe for a package refers to the same url as another
+      ;; package by setting :url to the name of this package (symbol) e.g.
+      ;; In nongnu recipe, we have:
+      ;; (helm :url "https://...") and (helm-core :url helm)
+      (plist-get (cdr (assq url recipe)) :url))))
 
 (defun helm-packages-get-provider (package)
   (let ((desc (assq package package-archive-contents)))
