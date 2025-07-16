@@ -253,9 +253,9 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                     ("gnu" helm-packages-gnu-elpa-url-recipes)
                     ("nongnu" helm-packages-nongnu-elpa-url-recipes)))
          (cache (helm-acase provider
-                  ("gnu"        'helm-packages--gnu-elpa-recipes-cache)
-                  ("nongnu" 'helm-packages--nongnu-elpa-recipes-cache)))
-         (recipe  (or (symbol-value cache)
+                  ("gnu"    helm-packages--gnu-elpa-recipes-cache)
+                  ("nongnu" helm-packages--nongnu-elpa-recipes-cache)))
+         (recipe  (or cache
                       (set cache
                            (with-temp-buffer
                              (url-insert-file-contents address)
