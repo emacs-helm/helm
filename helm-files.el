@@ -98,6 +98,7 @@
 (declare-function async-byte-compile-file "async-bytecomp.el")
 (declare-function async-byte-recompile-directory "async-bytecomp.el")
 (declare-function dnd-begin-drag-files "dnd.el")
+(declare-function vc-deduce-backend "vc")
 
 (defvar term-char-mode-point-at-process-mark)
 (defvar term-char-mode-buffer-read-only)
@@ -7116,6 +7117,7 @@ and
 <https://github.com/emacs-helm/helm-ls-hg>."
   (interactive "P")
   (require 'helm-x-files)
+  (require 'vc)
   (let* ((helm-type-buffer-actions
           (remove (assoc "Browse project from buffer"
                          helm-type-buffer-actions)
@@ -7130,22 +7132,15 @@ and
                                     (fboundp 'helm-hg-root)
                                     (helm-hg-root))
                          it))
-         (project-type (cond ((and git-project (not hg-project)) 'Git)
-                             ((and hg-project (not git-project)) 'Hg)
-                             ((and hg-project git-project)
-                              (if (string-prefix-p
-                                   (expand-file-name git-project)
-                                   (expand-file-name hg-project))
-                                  'Hg 'Git))
-                             (t nil))))
+         (project-type (vc-deduce-backend)))
     (cl-flet ((push-to-hist (root)
                 (setq helm-browse-project-history
                       (cons root (delete root helm-browse-project-history)))))
-      (helm-acond ((equal project-type 'Git)
-                   (push-to-hist git-project)
+      (helm-acond ((and (equal project-type 'Git) git-project)
+                   (push-to-hist it)
                    (helm-ls-git))
-                  ((equal project-type 'Hg)
-                   (push-to-hist hg-project)
+                  ((and (equal project-type 'Hg) hg-project)
+                   (push-to-hist it)
                    (helm-hg-find-files-in-project))
                   ((helm-browse-project-get--root-dir (helm-current-directory))
                    (if (or arg (gethash it helm--browse-project-cache))
