@@ -282,9 +282,11 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
 
 (defun helm-packages-clone-package (package)
   "Git clone PACKAGE."
-  (let ((directory (read-directory-name
-                    "Clone in directory: " helm-packages-default-clone-directory nil t)))
-    (cl-assert (not (file-directory-p (expand-file-name (symbol-name package) directory)))
+  (let* ((name      (symbol-name package))
+         (directory (read-directory-name
+                     "Clone in directory: "
+                     helm-packages-default-clone-directory nil t)))
+    (cl-assert (not (file-directory-p (expand-file-name name directory)))
                nil (format "Package already exists in %s" directory))
     (with-helm-default-directory directory
       (let* ((url (or (helm-packages-get-url-for-cloning package)
@@ -296,11 +298,12 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                     "git" "clone" (if (string-match "\\.git\\'" url)
                                       url
                                     (concat url ".git"))
-                    (symbol-name package))))
+                    name)))
         (save-selected-window
-          (display-buffer (process-buffer proc) '(display-buffer-below-selected
-                                                  (window-height . fit-window-to-buffer)
-                                                  (preserve-size . (nil . t)))))
+          (display-buffer (process-buffer proc)
+                          '(display-buffer-below-selected
+                            (window-height . fit-window-to-buffer)
+                            (preserve-size . (nil . t)))))
         (set-process-sentinel
          proc (lambda (proc event)
                 (let ((status (process-exit-status proc)))
