@@ -35,16 +35,12 @@
     (github . "https://github.com/%s")))
 
 ;; Melpa
-(defvar helm-packages-melpa-url-recipes
-  "https://raw.githubusercontent.com/melpa/melpa/refs/heads/master/recipes/%s")
+(defvar helm-packages-melpa-url-recipes "https://melpa.org/packages/elpa-packages.eld")
 (defvar helm-packages--melpa-recipes-cache nil)
 
 ;; Elpa/NonGnu-elpa
-;; We prefer emacsmirror here but the savannah urls can be used instead:
-;; "https://git.savannah.gnu.org/cgit/emacs/elpa.git/plain/elpa-packages"
-;; "https://git.savannah.gnu.org/cgit/emacs/nongnu.git/plain/elpa-packages"
-(defvar helm-packages-gnu-elpa-url-recipes "https://raw.githubusercontent.com/emacsmirror/gnu_elpa/refs/heads/main/elpa-packages")
-(defvar helm-packages-nongnu-elpa-url-recipes "https://raw.githubusercontent.com/emacsmirror/nongnu_elpa/refs/heads/main/elpa-packages")
+(defvar helm-packages-gnu-elpa-url-recipes "https://elpa.gnu.org/packages/elpa-packages.eld")
+(defvar helm-packages-nongnu-elpa-url-recipes "https://elpa.nongnu.org/nongnu/elpa-packages.eld")
 (defvar helm-packages--gnu-elpa-recipes-cache nil)
 (defvar helm-packages--nongnu-elpa-recipes-cache nil)
 
@@ -247,17 +243,17 @@ Arg PACKAGES is a list of strings."
 ;;; Cloning packages
 ;;
 
-;; Elpa/NonGnu-elpa
-
 (defun helm-packages-get-url-from-elpa (package provider)
   "Get PACKAGE url from PROVIDER's recipe.
 PROVIDER can be one of \"gnu\" or \"nongnu\"."
   (let* ((address (helm-acase provider
-                    ("gnu" helm-packages-gnu-elpa-url-recipes)
-                    ("nongnu" helm-packages-nongnu-elpa-url-recipes)))
+                    ("gnu"    helm-packages-gnu-elpa-url-recipes)
+                    ("nongnu" helm-packages-nongnu-elpa-url-recipes)
+                    ("melpa"  helm-packages-melpa-url-recipes)))
          (cache (helm-acase provider
-                  ("gnu"        'helm-packages--gnu-elpa-recipes-cache)
-                  ("nongnu" 'helm-packages--nongnu-elpa-recipes-cache)))
+                  ("gnu"    'helm-packages--gnu-elpa-recipes-cache)
+                  ("nongnu" 'helm-packages--nongnu-elpa-recipes-cache)
+                  ("melpa"  'helm-packages--melpa-recipes-cache)))
          (recipe  (or (symbol-value cache)
                       (set cache
                            (with-temp-buffer
@@ -278,29 +274,9 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
   (let ((desc (assq package package-archive-contents)))
     (package-desc-archive (cadr desc))))
 
-;; Melpa
-(defun helm-packages-get-url-from-melpa (package)
-  "Extract url from PACKAGE recipe on Melpa."
-  (cl-assert (string= "melpa" (helm-packages-get-provider package))
-             nil (format "%s is not a Melpa package" package))
-  (let* ((recipe  (or (assoc package helm-packages--melpa-recipes-cache)
-                      (helm-aif (with-temp-buffer
-                                  (url-insert-file-contents
-                                   (format helm-packages-melpa-url-recipes package))
-                                  (goto-char (point-min))
-                                  (read (current-buffer)))
-                          (prog1 it (push it helm-packages--melpa-recipes-cache)))))
-         (fetcher (plist-get (cdr recipe) :fetcher))
-         (repo    (plist-get (cdr recipe) :repo)))
-    (helm-aif (and fetcher repo
-                   (assq fetcher helm-packages-fetchers-alist))
-        (format (cdr it) repo))))
-
 (defun helm-packages-get-url-for-cloning (package)
   (let ((provider (helm-packages-get-provider package)))
-    (helm-acase provider
-      (("gnu" "nongnu") (helm-packages-get-url-from-elpa package provider))
-      ("melpa" (helm-packages-get-url-from-melpa package)))))
+    (helm-packages-get-url-from-elpa package provider)))
 
 (defun helm-packages-clone-package (package)
   "Git clone PACKAGE."
@@ -406,7 +382,11 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
 
 (defvar helm-packages--updated nil)
 (defun helm-packages--refresh-contents ()
-  (unless helm-packages--updated (package-refresh-contents))
+  (unless helm-packages--updated
+    (setq helm-packages--gnu-elpa-recipes-cache nil
+          helm-packages--nongnu-elpa-recipes-cache nil
+          helm-packages--melpa-recipes-cache nil)
+    (package-refresh-contents))
   (helm-set-local-variable 'helm-packages--updated t))
 
 (defun helm-finder--list-matches (key)
