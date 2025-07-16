@@ -40,6 +40,9 @@
 (defvar helm-packages--melpa-recipes-cache nil)
 
 ;; Elpa/NonGnu-elpa
+;; We prefer emacsmirror here but the savannah urls can be used instead:
+;; "https://git.savannah.gnu.org/cgit/emacs/elpa.git/plain/elpa-packages"
+;; "https://git.savannah.gnu.org/cgit/emacs/nongnu.git/plain/elpa-packages"
 (defvar helm-packages-gnu-elpa-url-recipes "https://raw.githubusercontent.com/emacsmirror/gnu_elpa/refs/heads/main/elpa-packages")
 (defvar helm-packages-nongnu-elpa-url-recipes "https://raw.githubusercontent.com/emacsmirror/nongnu_elpa/refs/heads/main/elpa-packages")
 (defvar helm-packages--gnu-elpa-recipes-cache nil)
