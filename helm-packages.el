@@ -28,12 +28,6 @@
 (declare-function dired-async-mode-line-message "ext:dired-async.el")
 
 
-(defvar helm-packages-fetchers-alist
-  '((sourcehut . "https://git.sr.ht/~%s")
-    (codeberg . "https://codeberg.org/%s")
-    (gitlab . "https://gitlab.com/%s")
-    (github . "https://github.com/%s")))
-
 ;; Urls for cloning.
 (defvar helm-packages-recipes-alist '(("melpa" . "https://melpa.org/packages/elpa-packages.eld")
                                       ("gnu"   . "https://elpa.gnu.org/packages/elpa-packages.eld")
