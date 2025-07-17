@@ -274,7 +274,7 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
     (cl-assert (null core) nil
                (format "Package '%s' already provided in Emacs at '%s'"
                        package core))
-    ;; In gnu archive all orphaned packages are pointing to
+    ;; In gnu archive all packages maintained on Elpa are pointing to
     ;; "https://git.sv.gnu.org/git/emacs/elpa.git" instead of nil which create a
     ;; redirection to a savannah url and finally make git clone fails as the url
     ;; is unrelated to package.
