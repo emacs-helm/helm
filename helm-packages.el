@@ -263,7 +263,16 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                            (with-temp-buffer
                              (url-insert-file-contents address)
                              (goto-char (point-min))
-                             (car (read (current-buffer)))))))
+                             (let ((data (read (current-buffer))))
+                               ;; Recipes not have the same form depending from
+                               ;; where we fetch them, they may be like
+                               ;; ((foo :url "somewhere")
+                               ;;  (bar :url "somewhere"))
+                               ;; or
+                               ;; (((foo :url "somewhere")
+                               ;;   (bar :url "somewhere"))
+                               ;;  :version "1" :else "")
+                               (if (keywordp (cadr data)) (car data) data))))))
          (package-recipe (assq package recipe))
          (url (plist-get (cdr package-recipe) :url)))
     ;; In gnu archive all orphaned packages are pointing to
