@@ -40,11 +40,12 @@
                                       ("nongnu" . "https://elpa.nongnu.org/nongnu/elpa-packages.eld")
                                       ("emacsmirror" . "https://github.com/emacsmirror/%s"))
   "Adresses where to find recipes or urls for packages.
-For melpa, gnu and nongnu entries we fetch a full alist in which we extract
-urls.  Orphaned packages in these recipes have :url pointing to nil, in this case
-we fallback to an emacsmirror url for such package
-    e.g. \"https://github.com/emacsmirror/foo\"
-for this reason the emacsmirror entry is a string to format.")
+For melpa, gnu and nongnu entries we fetch a full alist in which we
+extract urls.  Orphaned packages in these recipes have :url pointing to
+nil, or to an unrelated address (probably when they are developed in
+Elpa directly), in this case we fallback to an emacsmirror url for such
+package e.g. \"https://github.com/emacsmirror/foo\" for this reason the
+emacsmirror entry is a string to format.")
 
 ;; Caches for recipes (elpa-packages.eld contents).
 (defvar helm-packages--gnu-elpa-recipes-cache nil)
