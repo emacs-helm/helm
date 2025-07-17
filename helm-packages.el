@@ -274,7 +274,11 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                                ;;  :version "1" :else "")
                                (if (keywordp (cadr data)) (car data) data))))))
          (package-recipe (assq package recipe))
+         (core (plist-get (cdr package-recipe) :core))
          (url (plist-get (cdr package-recipe) :url)))
+    (cl-assert (null core) nil
+               (format "Package '%s' already provided in Emacs at '%s'"
+                       package core))
     ;; In gnu archive all orphaned packages are pointing to
     ;; "https://git.sv.gnu.org/git/emacs/elpa.git" instead of nil which create a
     ;; redirection to a savannah url and finally make git clone fails as the url
