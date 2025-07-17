@@ -266,13 +266,19 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                              (car (read (current-buffer)))))))
          (package-recipe (assq package recipe))
          (url (plist-get (cdr package-recipe) :url)))
+    ;; In gnu archive all orphaned packages are pointing to
+    ;; "https://git.sv.gnu.org/git/emacs/elpa.git" instead of nil which create a
+    ;; redirection to a savannah url and finally make git clone fails as the url
+    ;; is unrelated to package.
+    (when (string-match "\\`http[s]?://git.sv.gnu.org" url)
+      (setq url nil))
     (if (stringp url)
         url
       ;; Sometimes the recipe for a package refers to the same url as another
       ;; package by setting :url to the name of this package (symbol) e.g.
       ;; In nongnu recipe, we have:
       ;; (helm :url "https://...") and (helm-core :url helm)
-      (plist-get (cdr (assq url recipe)) :url))))
+      (and url (plist-get (cdr (assq url recipe)) :url)))))
 
 (defun helm-packages-get-provider (package)
   (let ((desc (assq package package-archive-contents)))
