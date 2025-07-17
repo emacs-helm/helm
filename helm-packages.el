@@ -270,7 +270,7 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
     ;; "https://git.sv.gnu.org/git/emacs/elpa.git" instead of nil which create a
     ;; redirection to a savannah url and finally make git clone fails as the url
     ;; is unrelated to package.
-    (when (string-match "\\`http[s]?://git.sv.gnu.org" url)
+    (when (and url (string-match "\\`http[s]?://git.sv.gnu.org" url))
       (setq url nil))
     (if (stringp url)
         url
