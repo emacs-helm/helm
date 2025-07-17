@@ -7122,7 +7122,8 @@ and
                          helm-type-buffer-actions)
                   helm-type-buffer-actions))
          (helm-buffers-in-project-p t)
-         (project-vc-backend (vc-deduce-backend)))
+         (project-vc-backend (or (vc-deduce-backend)
+                                 (vc-responsible-backend default-directory))))
     (cl-flet ((push-to-hist (root)
                 (setq helm-browse-project-history
                       (cons root (delete root helm-browse-project-history)))))
