@@ -34,15 +34,22 @@
     (gitlab . "https://gitlab.com/%s")
     (github . "https://github.com/%s")))
 
-;; Melpa
-(defvar helm-packages-melpa-url-recipes "https://melpa.org/packages/elpa-packages.eld")
-(defvar helm-packages--melpa-recipes-cache nil)
+;; Urls for cloning.
+(defvar helm-packages-recipes-alist '(("melpa" . "https://melpa.org/packages/elpa-packages.eld")
+                                      ("gnu"   . "https://elpa.gnu.org/packages/elpa-packages.eld")
+                                      ("nongnu" . "https://elpa.nongnu.org/nongnu/elpa-packages.eld")
+                                      ("emacsmirror" . "https://github.com/emacsmirror/%s"))
+  "Adresses where to find recipes or urls for packages.
+For melpa, gnu and nongnu entries we fetch a full alist in which we extract
+urls.  Orphaned packages in these recipes have :url pointing to nil, in this case
+we fallback to an emacsmirror url for such package
+    e.g. \"https://github.com/emacsmirror/foo\"
+for this reason the emacsmirror entry is a string to format.")
 
-;; Elpa/NonGnu-elpa
-(defvar helm-packages-gnu-elpa-url-recipes "https://elpa.gnu.org/packages/elpa-packages.eld")
-(defvar helm-packages-nongnu-elpa-url-recipes "https://elpa.nongnu.org/nongnu/elpa-packages.eld")
+;; Caches for recipes (elpa-packages.eld contents).
 (defvar helm-packages--gnu-elpa-recipes-cache nil)
 (defvar helm-packages--nongnu-elpa-recipes-cache nil)
+(defvar helm-packages--melpa-recipes-cache nil)
 
 ;; EmacsMirror
 (defvar helm-packages-fallback-url-for-cloning "https://github.com/emacsmirror/%s")
@@ -246,10 +253,7 @@ Arg PACKAGES is a list of strings."
 (defun helm-packages-get-url-from-elpa (package provider)
   "Get PACKAGE url from PROVIDER's recipe.
 PROVIDER can be one of \"gnu\" or \"nongnu\"."
-  (let* ((address (helm-acase provider
-                    ("gnu"    helm-packages-gnu-elpa-url-recipes)
-                    ("nongnu" helm-packages-nongnu-elpa-url-recipes)
-                    ("melpa"  helm-packages-melpa-url-recipes)))
+  (let* ((address (assoc-default provider helm-packages-recipes-alist))
          (cache (helm-acase provider
                   ("gnu"    'helm-packages--gnu-elpa-recipes-cache)
                   ("nongnu" 'helm-packages--nongnu-elpa-recipes-cache)
@@ -289,7 +293,8 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
     (with-helm-default-directory directory
       (let* ((url (or (helm-packages-get-url-for-cloning package)
                       ;; Fallback to emacsmirror if no url found.
-                      (format helm-packages-fallback-url-for-cloning package)))
+                      (format (assoc-default "emacsmirror" helm-packages-recipes-alist)
+                              package)))
              process-connection-type
              (proc (start-process
                     "git" "*helm packages clone"
