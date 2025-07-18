@@ -36,8 +36,8 @@
   "Adresses where to find recipes or urls for packages.
 For melpa, gnu and nongnu entries we fetch a full alist in which we
 extract urls.  Orphaned packages in these recipes have :url pointing to
-nil, or to an unrelated address (probably when they are developed in
-Elpa directly), in this case we fallback to an emacsmirror url for such
+nil, or to the Elpa repo address when they are developed in
+Elpa directly, in this case we fallback to an emacsmirror url for such
 package e.g. \"https://github.com/emacsmirror/foo\" for this reason the
 emacsmirror entry is a string to format.")
 
@@ -259,7 +259,7 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                              (url-insert-file-contents address)
                              (goto-char (point-min))
                              (let ((data (read (current-buffer))))
-                               ;; Recipes not have the same form depending from
+                               ;; Recipes do not have the same form depending from
                                ;; where we fetch them, they may be like
                                ;; ((foo :url "somewhere")
                                ;;  (bar :url "somewhere"))
@@ -276,8 +276,9 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                        package core))
     ;; In gnu archive all packages maintained on Elpa are pointing to
     ;; "https://git.sv.gnu.org/git/emacs/elpa.git" instead of nil which create a
-    ;; redirection to a savannah url and finally make git clone fails as the url
-    ;; is unrelated to package.
+    ;; redirection to a savannah url and finally make git cloning the whole
+    ;; elpa repo, in such cases we set url to nil to fallback later to the
+    ;; emacsmirror address hooping the package is available there.
     (when (and url (string-match "\\`http[s]?://git.sv.gnu.org" url))
       (setq url nil))
     (if (stringp url)
