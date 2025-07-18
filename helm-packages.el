@@ -447,7 +447,8 @@ PROVIDER can be one of \"gnu\" or \"nongnu\"."
                         '(("Install packages(s)"
                            . helm-packages-install)))))
             :action '(("Describe package" . helm-packages-describe)
-                      ("Visit homepage" . helm-packages-visit-homepage)))
+                      ("Visit homepage" . helm-packages-visit-homepage)
+                      ("Clone package" . helm-packages-clone-package)))
           :buffer "*helm finder results*")))
 
 (defun helm-package--upgradeable-packages (&optional include-builtins)
