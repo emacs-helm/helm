@@ -312,7 +312,7 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
                               package)))
              process-connection-type
              (proc (start-process
-                    "git" "*helm packages clone"
+                    "git" "*helm packages clone*"
                     "git" "clone" (if (or (string-match "\\.git\\'" url)
                                           ;; For git-remote-hg.
                                           (string-match "\\`hg" url))
