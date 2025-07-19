@@ -2,6 +2,7 @@
 
 * NEWS
 ** Version 4.0.5
+*** New action in helm-packages to clone packages
 *** Diacritics can now be ignored in helm-find-files
 and read-file-name with the variable `helm-find-files-ignore-diacritics`.
 *** Allow using a function as diacritics slot value
