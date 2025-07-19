@@ -31,15 +31,8 @@
 ;; Urls for cloning.
 (defvar helm-packages-recipes-alist '(("melpa" . "https://melpa.org/packages/elpa-packages.eld")
                                       ("gnu"   . "https://elpa.gnu.org/packages/elpa-packages.eld")
-                                      ("nongnu" . "https://elpa.nongnu.org/nongnu/elpa-packages.eld")
-                                      ("emacsmirror" . "https://github.com/emacsmirror/%s"))
-  "Adresses where to find recipes or urls for packages.
-For melpa, gnu and nongnu entries we fetch a full alist in which we
-extract urls.  Orphaned packages in these recipes have :url pointing to
-nil, or to the Elpa repo address when they are developed in
-Elpa directly, in this case we fallback to an emacsmirror url for such
-package e.g. \"https://github.com/emacsmirror/foo\" for this reason the
-emacsmirror entry is a string to format.")
+                                      ("nongnu" . "https://elpa.nongnu.org/nongnu/elpa-packages.eld"))
+  "Adresses where to find recipes or urls for packages.")
 
 ;; Caches for recipes (elpa-packages.eld contents).
 (defvar helm-packages--gnu-elpa-recipes-cache nil)
@@ -274,13 +267,6 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
     (cl-assert (null core) nil
                (format "Package '%s' already provided in Emacs at '%s'"
                        package core))
-    ;; In gnu archive all packages maintained on Elpa are pointing to
-    ;; "https://git.sv.gnu.org/git/emacs/elpa.git" instead of nil which create a
-    ;; redirection to a savannah url and finally make git cloning the whole
-    ;; elpa repo, in such cases we set url to nil to fallback later to the
-    ;; emacsmirror address hooping the package is available there.
-    (when (and url (string-match "\\`http[s]?://git.sv.gnu.org" url))
-      (setq url nil))
     (if (stringp url)
         url
       ;; Sometimes the recipe for a package refers to the same url as another
@@ -302,23 +288,32 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
   (let* ((name      (symbol-name package))
          (directory (read-directory-name
                      "Clone in directory: "
-                     helm-packages-default-clone-directory nil t)))
+                     helm-packages-default-clone-directory nil t))
+         (url (helm-packages-get-url-for-cloning package))
+         (fix-url (if (or (string-match "\\.git\\'" url)
+                          ;; For git-remote-hg.
+                          (string-match "\\`hg" url))
+                      url
+                    (concat url ".git")))
+         ;; In gnu archive all packages maintained on Elpa are pointing to
+         ;; "https://git.sv.gnu.org/git/emacs/elpa.git", to be able to clone a
+         ;; package from such url we have to use:
+         ;; git clone --single-branch -b externals/<PACKAGE> URL PACKAGE-NAME.
+         ;; This create a directory named PACKAGE-NAME with only PACKAGE inside.
+         ;; If PACKAGE-NAME is ommited this create a repo named elpa which clash if
+         ;; such a dir already exists.
+         (switches (if (string-match "\\`http[s]?://git.sv.gnu.org" url)
+                       `("clone" "--single-branch"
+                                 "-b" ,(format "externals/%s" package)
+                                 ,fix-url)
+                     `("clone" ,fix-url))))
     (cl-assert (not (file-directory-p (expand-file-name name directory)))
                nil (format "Package already exists in %s" directory))
     (with-helm-default-directory directory
-      (let* ((url (or (helm-packages-get-url-for-cloning package)
-                      ;; Fallback to emacsmirror if no url found.
-                      (format (assoc-default "emacsmirror" helm-packages-recipes-alist)
-                              package)))
-             process-connection-type
-             (proc (start-process
-                    "git" "*helm packages clone*"
-                    "git" "clone" (if (or (string-match "\\.git\\'" url)
-                                          ;; For git-remote-hg.
-                                          (string-match "\\`hg" url))
-                                      url
-                                    (concat url ".git"))
-                    name)))
+      (let (process-connection-type
+            (proc (apply #'start-process
+                         "git" "*helm packages clone*"
+                         "git" (append switches (list name)))))
         (save-selected-window
           (display-buffer (process-buffer proc)
                           '(display-buffer-below-selected
