@@ -309,15 +309,15 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
          (switches (if (string-match "\\`http[s]?://git.sv.gnu.org" url)
                        `("clone" "--single-branch"
                                  "-b" ,(format "externals/%s" package)
-                                 ,fix-url)
-                     `("clone" ,fix-url))))
+                                 ,fix-url ,name)
+                     `("clone" ,fix-url ,name))))
     (cl-assert (not (file-directory-p (expand-file-name name directory)))
                nil (format "Package already exists in %s" directory))
     (with-helm-default-directory directory
       (let (process-connection-type
             (proc (apply #'start-process
                          "git" "*helm packages clone*"
-                         "git" (append switches (list name)))))
+                         "git" switches)))
         (save-selected-window
           (display-buffer (process-buffer proc)
                           '(display-buffer-below-selected
