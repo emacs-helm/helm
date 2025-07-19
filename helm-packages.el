@@ -475,6 +475,7 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
              for available = (and pkg (not (package-disabled-p sym cversion)) pkg)
              ;; Exclude packages installed with package-vc (issue#2692).
              when (and available
+                       (not (package-vc-p desc))
                        (or (and include-builtins (not cversion))
                            (and cversion
                                 (version-list-<
