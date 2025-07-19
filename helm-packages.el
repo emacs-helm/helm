@@ -247,7 +247,7 @@ Arg PACKAGES is a list of strings."
 
 (defun helm-packages-get-url-from-elpa (package provider)
   "Get PACKAGE url from PROVIDER's recipe.
-PROVIDER can be one of \"gnu\" or \"nongnu\"."
+PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
   (let* ((address (assoc-default provider helm-packages-recipes-alist))
          (cache (helm-acase provider
                   ("gnu"    'helm-packages--gnu-elpa-recipes-cache)
