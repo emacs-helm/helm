@@ -263,7 +263,11 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
                                (if (keywordp (cadr data)) (car data) data))))))
          (package-recipe (assq package recipe))
          (core (plist-get (cdr package-recipe) :core))
-         (url (plist-get (cdr package-recipe) :url)))
+         (url (or (plist-get (cdr package-recipe) :url)
+                  ;; Assume that when :url = nil the package is maintained in
+                  ;; elpa. When recipe is fetched from package-archives
+                  ;; addresses the url is always specified.
+                  "https://git.sv.gnu.org/git/emacs/elpa.git")))
     (cl-assert (null core) nil
                (format "Package '%s' already provided in Emacs at '%s'"
                        package core))
