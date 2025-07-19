@@ -323,6 +323,7 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
                           '(display-buffer-below-selected
                             (window-height . fit-window-to-buffer)
                             (preserve-size . (nil . t)))))
+        (set-process-filter proc #'helm-packages--clone-filter-process)
         (set-process-sentinel
          proc (lambda (proc event)
                 (let ((status (process-exit-status proc)))
@@ -336,6 +337,11 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
                      (symbol-name package) directory)))))
         (message "Cloning package %s..." package)))))
 
+(defun helm-packages--clone-filter-process (proc string)
+  (when (buffer-live-p (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (erase-buffer)
+      (insert (car (split-string string ""))))))
 
 ;;; Transformers
 ;;
