@@ -78,9 +78,10 @@
   "Default directory where to clone packages."
   :type 'string)
 
-(defvar helm-packages-clone-after-hook nil
+(defcustom helm-packages-clone-after-hook nil
   "Hook that run after cloning a package.
-It is called with two args respectively PACKAGE as a string and DIRECTORY.")
+It is called with two args respectively PACKAGE as a string and DIRECTORY."
+  :type 'hook)
 
 ;;; Actions
 ;;
