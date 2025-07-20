@@ -238,7 +238,7 @@ Arg PACKAGES is a list of strings."
 ;;; Cloning packages
 ;;
 
-(defun helm-packages-get-url-from-elpa (package provider)
+(defun helm-packages-get-recipe-from-elpa (package provider)
   "Get PACKAGE url from PROVIDER's recipe.
 PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
   (let* ((address (assoc-default provider helm-packages-recipes-alist))
@@ -267,25 +267,26 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
                   ;; Assume that when :url = nil the package is maintained in
                   ;; elpa. When recipe is fetched from package-archives
                   ;; addresses the url is always specified.
-                  "https://git.sv.gnu.org/git/emacs/elpa.git")))
+                  "https://git.sv.gnu.org/git/emacs/elpa.git"))
+         (branch (plist-get (cdr package-recipe) :branch)))
     (cl-assert (null core) nil
                (format "Package '%s' already provided in Emacs at '%s'"
                        package core))
-    (if (stringp url)
-        url
+    (unless (stringp url)
       ;; Sometimes the recipe for a package refers to the same url as another
       ;; package by setting :url to the name of this package (symbol) e.g.
       ;; In nongnu recipe, we have:
       ;; (helm :url "https://...") and (helm-core :url helm)
-      (and url (plist-get (cdr (assq url recipe)) :url)))))
+      (setq url (and url (plist-get (cdr (assq url recipe)) :url))))
+    `(:url ,url :branch ,branch)))
 
 (defun helm-packages-get-provider (package)
   (let ((desc (assq package package-archive-contents)))
     (package-desc-archive (cadr desc))))
 
-(defun helm-packages-get-url-for-cloning (package)
+(defun helm-packages-get-recipe-for-cloning (package)
   (let ((provider (helm-packages-get-provider package)))
-    (helm-packages-get-url-from-elpa package provider)))
+    (helm-packages-get-recipe-from-elpa package provider)))
 
 (defun helm-packages-clone-package (package)
   "Git clone PACKAGE."
@@ -293,7 +294,9 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
          (directory (read-directory-name
                      "Clone in directory: "
                      helm-packages-default-clone-directory nil t))
-         (url (helm-packages-get-url-for-cloning package))
+         (recipe (helm-packages-get-recipe-for-cloning package))
+         (url (plist-get recipe :url))
+         (branch (plist-get recipe :branch))
          (fix-url (if (or (string-match "\\.git\\'" url)
                           ;; For git-remote-hg.
                           (string-match "\\`hg" url))
@@ -305,12 +308,17 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
          ;; git clone --single-branch -b externals/<PACKAGE> URL PACKAGE-NAME.
          ;; This create a directory named PACKAGE-NAME with only PACKAGE inside.
          ;; If PACKAGE-NAME is ommited this create a repo named elpa which clash if
-         ;; such a dir already exists.
-         (switches (if (string-match "\\`http[s]?://git.sv.gnu.org" url)
-                       `("clone" "--single-branch"
-                                 "-b" ,(format "externals/%s" package)
-                                 ,fix-url ,name)
-                     `("clone" ,fix-url ,name))))
+         ;; such a dir already exists.  Another case is packages coming either
+         ;; from nongnu or melpa giving the nongnu url as :url and specifying a
+         ;; branch, example:
+         ;; (ws-butler :url "https://git.savannah.gnu.org/git/emacs/nongnu.git"
+         ;;            :branch "elpa/ws-butler")
+         (switches (append
+                    (if (string-match "\\(elpa\\|nongnu\\)\\.git\\'" url)
+                        `("clone" "--single-branch"
+                                  "-b" ,(or branch (format "externals/%s" package)))
+                      (delq nil `("clone" ,(and branch "-b") ,branch)))
+                    `(,fix-url ,name))))
     (cl-assert (not (file-directory-p (expand-file-name name directory)))
                nil (format "Package already exists in %s" directory))
     (with-helm-default-directory directory
