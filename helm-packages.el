@@ -302,7 +302,7 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
          (branch (plist-get recipe :branch))
          (fix-url (if (or (string-match "\\.git\\'" url)
                           ;; For git-remote-hg.
-                          (string-match "\\`hg" url))
+                          (string-match "\\`hg::" url))
                       url
                     (concat url ".git")))
          ;; In gnu archive all packages maintained on Elpa are pointing to
