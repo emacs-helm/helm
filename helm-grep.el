@@ -1766,7 +1766,7 @@ grep ag."
 
 (defvar helm-source-grep-ag nil)
 
-(defun helm-grep-ag-1 (directory &optional type input)
+(defun helm-grep-ag-1 (directory &optional type input default-input)
   "Start helm ag in DIRECTORY maybe searching in files of type TYPE.
 If INPUT is provided, use it as the search string."
   (setq helm-source-grep-ag
@@ -1787,6 +1787,7 @@ If INPUT is provided, use it as the search string."
   (helm-set-local-variable 'helm-input-idle-delay helm-grep-input-idle-delay)
   (helm :sources 'helm-source-grep-ag
         :history 'helm-grep-ag-history
+        :default default-input
         :input input
         :truncate-lines helm-grep-truncate-lines
         :buffer (format "*helm %s*" (helm-grep--ag-command))))
@@ -1801,7 +1802,7 @@ If INPUT is provided, use it as the search string."
 (helm-make-command-from-action helm-grep-run-ag-grep-parent-directory
     "Ag grep parent directory." 'helm-grep-ag-grep-parent-directory)
 
-(defun helm-grep-ag (directory with-types)
+(defun helm-grep-ag (directory with-types default)
   "Start grep AG in DIRECTORY.
 When WITH-TYPES is non-nil provide completion on AG types."
   (require 'helm-adaptive)
@@ -1814,7 +1815,8 @@ When WITH-TYPES is non-nil provide completion on AG types."
                          :must-match t
                          :marked-candidates t
                          :fc-transformer 'helm-adaptive-sort
-                         :buffer (format "*helm %s types*" com))))))
+                         :buffer (format "*helm %s types*" com)))
+                    default)))
 
 ;;; Git grep
 ;;
@@ -1841,16 +1843,16 @@ arg INPUT is what you will have by default at prompt on startup."
 
 
 ;;;###autoload
-(defun helm-do-grep-ag (arg)
+(defun helm-do-grep-ag (arg &optional default)
   "Preconfigured `helm' for grepping with AG in `default-directory'.
 With prefix arg prompt for type if available with your AG
 version."
   (interactive "P")
   (require 'helm-files)
-  (helm-grep-ag (expand-file-name default-directory) arg))
+  (helm-grep-ag (expand-file-name default-directory) arg default))
 
 ;;;###autoload
-(defun helm-do-grep-ag-project (arg)
+(defun helm-do-grep-ag-project (arg &optional default)
   "Preconfigured `helm' for grepping with AG from the current project root.
 If no project found use `default-directory'.
 With prefix arg prompt for type if available with your AG version."
@@ -1863,15 +1865,15 @@ With prefix arg prompt for type if available with your AG version."
                         ;; projectile returns (type . path).
                         ((dst* (_type . path)) path)
                         (t default-directory))))
-    (helm-grep-ag (expand-file-name project-root) arg)))
+    (helm-grep-ag (expand-file-name project-root) arg default)))
 
 ;;;###autoload
-(defun helm-grep-do-git-grep (arg)
+(defun helm-grep-do-git-grep (arg &optional default)
   "Preconfigured `helm' for git-grepping `default-directory'.
 With a prefix arg ARG git-grep the whole repository."
   (interactive "P")
   (require 'helm-files)
-  (helm-grep-git-1 default-directory arg))
+  (helm-grep-git-1 default-directory arg default))
 
 
 (provide 'helm-grep)
