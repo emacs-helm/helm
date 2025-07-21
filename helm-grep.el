@@ -1852,21 +1852,18 @@ version."
 ;;;###autoload
 (defun helm-do-grep-ag-project (arg)
   "Preconfigured `helm' for grepping with AG from the current project root.
+If no project found use `default-directory'.
 With prefix arg prompt for type if available with your AG version."
   (interactive "P")
   (require 'helm-files)
   (require 'project)
-  (helm-aif (project-current)
-      (let* ((project-type (car it))
-             (project-root (cond ((equal project-type 'vc)
-                                  (car (last it)))
-                                 ((equal project-type 'projectile)
-                                  (cdr it))
-                                 (t default-directory)))
-             (project-root-abs (expand-file-name project-root))
-             (default-directory project-root-abs))
-        (helm-grep-ag project-root-abs arg))
-    (message "Not in any project!")))
+  (let ((project-root (helm-acase (project-current)
+                        ;; vc returns (type backend path).
+                        ((dst* (_type _backend path)) path)
+                        ;; projectile returns (type . path).
+                        ((dst* (_type . path)) path)
+                        (t default-directory))))
+    (helm-grep-ag (expand-file-name project-root) arg)))
 
 ;;;###autoload
 (defun helm-grep-do-git-grep (arg)
