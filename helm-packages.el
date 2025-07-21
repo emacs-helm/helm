@@ -293,60 +293,63 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
 
 (defun helm-packages-clone-package (package)
   "Git clone PACKAGE."
-  (let* ((name      (symbol-name package))
-         (directory (read-directory-name
-                     "Clone in directory: "
-                     helm-packages-default-clone-directory nil t))
-         (recipe (helm-packages-get-recipe-for-cloning package))
-         (url (plist-get recipe :url))
-         (branch (plist-get recipe :branch))
-         (fix-url (if (or (string-match "\\.git\\'" url)
-                          ;; For git-remote-hg.
-                          (string-match "\\`hg::" url))
-                      url
-                    (concat url ".git")))
-         ;; In gnu archive all packages maintained on Elpa are pointing to
-         ;; "https://git.sv.gnu.org/git/emacs/elpa.git", to be able to clone a
-         ;; package from such url we have to use:
-         ;; git clone --single-branch -b externals/<PACKAGE> URL PACKAGE-NAME.
-         ;; This create a directory named PACKAGE-NAME with only PACKAGE inside.
-         ;; If PACKAGE-NAME is ommited this create a repo named elpa which clash if
-         ;; such a dir already exists.  Another case is packages coming either
-         ;; from nongnu or melpa giving the nongnu url as :url and specifying a
-         ;; branch, example:
-         ;; (ws-butler :url "https://git.savannah.gnu.org/git/emacs/nongnu.git"
-         ;;            :branch "elpa/ws-butler")
-         (switches (append
-                    (if (string-match "\\(elpa\\|nongnu\\)\\.git\\'" url)
-                        `("clone" "--single-branch"
-                                  "-b" ,(or branch (format "externals/%s" package)))
-                      (delq nil `("clone" ,(and branch "-b") ,branch)))
-                    `(,fix-url ,name))))
-    (cl-assert (not (file-directory-p (expand-file-name name directory)))
-               nil (format "Package already exists in %s" directory))
-    (with-helm-default-directory directory
-      (let (process-connection-type
-            (proc (apply #'start-process
-                         "git" "*helm packages clone*"
-                         "git" switches)))
-        (save-selected-window
-          (display-buffer (process-buffer proc)
-                          '(display-buffer-below-selected
-                            (window-height . fit-window-to-buffer)
-                            (preserve-size . (nil . t)))))
-        (set-process-filter proc #'helm-packages--clone-filter-process)
-        (set-process-sentinel
-         proc (lambda (proc event)
-                (let ((status (process-exit-status proc)))
-                  (if (string= event "finished\n")
-                      (message "Cloning package %s done" package)
-                    (message "Cloning package %s failed" package))
-                  (when (= status 0)
-                    (quit-window t (get-buffer-window (process-buffer proc)))
-                    (run-hook-with-args
-                     'helm-packages-clone-after-hook
-                     (symbol-name package) directory)))))
-        (message "Cloning package %s..." package)))))
+  (catch 'abort
+    (let* ((name      (symbol-name package))
+           (directory (condition-case _err
+                          (read-directory-name
+                           "Clone in directory: "
+                           helm-packages-default-clone-directory nil t)
+                        (quit (throw 'abort nil))))
+           (recipe (helm-packages-get-recipe-for-cloning package))
+           (url (plist-get recipe :url))
+           (branch (plist-get recipe :branch))
+           (fix-url (if (or (string-match "\\.git\\'" url)
+                            ;; For git-remote-hg.
+                            (string-match "\\`hg::" url))
+                        url
+                      (concat url ".git")))
+           ;; In gnu archive all packages maintained on Elpa are pointing to
+           ;; "https://git.sv.gnu.org/git/emacs/elpa.git", to be able to clone a
+           ;; package from such url we have to use:
+           ;; git clone --single-branch -b externals/<PACKAGE> URL PACKAGE-NAME.
+           ;; This create a directory named PACKAGE-NAME with only PACKAGE inside.
+           ;; If PACKAGE-NAME is ommited this create a repo named elpa which clash if
+           ;; such a dir already exists.  Another case is packages coming either
+           ;; from nongnu or melpa giving the nongnu url as :url and specifying a
+           ;; branch, example:
+           ;; (ws-butler :url "https://git.savannah.gnu.org/git/emacs/nongnu.git"
+           ;;            :branch "elpa/ws-butler")
+           (switches (append
+                      (if (string-match "\\(elpa\\|nongnu\\)\\.git\\'" url)
+                          `("clone" "--single-branch"
+                                    "-b" ,(or branch (format "externals/%s" package)))
+                        (delq nil `("clone" ,(and branch "-b") ,branch)))
+                      `(,fix-url ,name))))
+      (cl-assert (not (file-directory-p (expand-file-name name directory)))
+                 nil (format "Package already exists in %s" directory))
+      (with-helm-default-directory directory
+        (let (process-connection-type
+              (proc (apply #'start-process
+                           "git" "*helm packages clone*"
+                           "git" switches)))
+          (save-selected-window
+            (display-buffer (process-buffer proc)
+                            '(display-buffer-below-selected
+                              (window-height . fit-window-to-buffer)
+                              (preserve-size . (nil . t)))))
+          (set-process-filter proc #'helm-packages--clone-filter-process)
+          (set-process-sentinel
+           proc (lambda (proc event)
+                  (let ((status (process-exit-status proc)))
+                    (if (string= event "finished\n")
+                        (message "Cloning package %s done" package)
+                      (message "Cloning package %s failed" package))
+                    (when (= status 0)
+                      (quit-window t (get-buffer-window (process-buffer proc)))
+                      (run-hook-with-args
+                       'helm-packages-clone-after-hook
+                       (symbol-name package) directory)))))
+          (message "Cloning package %s..." package))))))
 
 (defun helm-packages--clone-filter-process (proc string)
   (when (buffer-live-p (process-buffer proc))
