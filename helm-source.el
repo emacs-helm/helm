@@ -1045,7 +1045,7 @@ or `search'."
               (remove 'helm-mm-match helm-mm-default-match-functions)
             helm-mm-default-match-functions))
          (helm-mm-default-search-functions
-          (if (cl-loop for fn in defmatch
+          (if (cl-loop for fn in defsearch
                        thereis (memq fn '(helm-mm-3p-search
                                           helm-mm-3-search
                                           helm-mm-2-search
