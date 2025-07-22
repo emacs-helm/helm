@@ -1766,9 +1766,10 @@ grep ag."
 
 (defvar helm-source-grep-ag nil)
 
-(defun helm-grep-ag-1 (directory &optional type input)
+(defun helm-grep-ag-1 (directory &optional type input default)
   "Start helm ag in DIRECTORY maybe searching in files of type TYPE.
-If INPUT is provided, use it as the search string."
+Arg DEFAULT is what you will have with `next-history-element',
+arg INPUT is what you will have by default at prompt on startup."
   (setq helm-source-grep-ag
         (helm-make-source (upcase (helm-grep--ag-command)) 'helm-grep-ag-class
           :header-name (lambda (name)
@@ -1788,6 +1789,7 @@ If INPUT is provided, use it as the search string."
   (helm :sources 'helm-source-grep-ag
         :history 'helm-grep-ag-history
         :input input
+        :default default
         :truncate-lines helm-grep-truncate-lines
         :buffer (format "*helm %s*" (helm-grep--ag-command))))
 
