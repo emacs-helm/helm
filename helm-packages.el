@@ -238,30 +238,32 @@ Arg PACKAGES is a list of strings."
 
 ;;; Cloning packages
 ;;
+(defun helm-packages-fetch-recipe (provider)
+  (let ((address (assoc-default provider helm-packages-recipes-alist)))
+    (with-temp-buffer
+      (url-insert-file-contents address)
+      (goto-char (point-min))
+      (let ((data (read (current-buffer))))
+        ;; Recipes do not have the same form depending from
+        ;; where we fetch them, they may be like
+        ;; ((foo :url "somewhere")
+        ;;  (bar :url "somewhere"))
+        ;; or
+        ;; (((foo :url "somewhere")
+        ;;   (bar :url "somewhere"))
+        ;;  :version "1" :else "")
+        (if (keywordp (cadr data)) (car data) data)))))
 
-(defun helm-packages-get-recipe-from-elpa (package provider)
+(defun helm-packages-get-package-url (package provider)
   "Get PACKAGE url from PROVIDER's recipe.
+Returns a plist like (:url <url> :branch <branch>).
 PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
-  (let* ((address (assoc-default provider helm-packages-recipes-alist))
-         (cache (helm-acase provider
+  (let* ((cache (helm-acase provider
                   ("gnu"    'helm-packages--gnu-elpa-recipes-cache)
                   ("nongnu" 'helm-packages--nongnu-elpa-recipes-cache)
                   ("melpa"  'helm-packages--melpa-recipes-cache)))
          (recipe  (or (symbol-value cache)
-                      (set cache
-                           (with-temp-buffer
-                             (url-insert-file-contents address)
-                             (goto-char (point-min))
-                             (let ((data (read (current-buffer))))
-                               ;; Recipes do not have the same form depending from
-                               ;; where we fetch them, they may be like
-                               ;; ((foo :url "somewhere")
-                               ;;  (bar :url "somewhere"))
-                               ;; or
-                               ;; (((foo :url "somewhere")
-                               ;;   (bar :url "somewhere"))
-                               ;;  :version "1" :else "")
-                               (if (keywordp (cadr data)) (car data) data))))))
+                      (set cache (helm-packages-fetch-recipe provider))))
          (package-recipe (assq package recipe))
          (core (plist-get (cdr package-recipe) :core))
          (url (or (plist-get (cdr package-recipe) :url)
@@ -289,7 +291,7 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
 
 (defun helm-packages-get-recipe-for-cloning (package)
   (let ((provider (helm-packages-get-provider package)))
-    (helm-packages-get-recipe-from-elpa package provider)))
+    (helm-packages-get-package-url package provider)))
 
 (defun helm-packages-clone-package (package)
   "Git clone PACKAGE."
