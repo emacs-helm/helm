@@ -122,7 +122,7 @@ Be aware that a nil value will make tramp display very slow."
   ((init :initform (lambda ()
                      (require 'recentf)
                      (when helm-turn-on-recentf (recentf-mode 1))
-                     ;; Use a copy of not recentf-list itself but the of its
+                     ;; Use a copy of not recentf-list itself but of its
                      ;; elements to not corrupt them with text props.
                      (setq helm-recentf-cache (helm-copy-sequence recentf-list))))
    (candidates :initform 'helm-recentf-cache)
