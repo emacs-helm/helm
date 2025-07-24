@@ -240,7 +240,7 @@ Colorize only symlinks, directories and files."
                               (invalid-regexp nil))
                         (add-face-text-property
                          (match-beginning 1) (match-end 1)
-                         'helm-ff-file-extension t disp)))
+                         'helm-ff-file-extension nil disp)))
                   (cons (helm-ff-prefix-filename disp i) i)))))
 
 
