@@ -116,6 +116,7 @@
 (defvar wfnames-buffer)
 (defvar Info-current-file)
 (defvar generated-autoload-file)
+(defvar vc-deduce-backend-nonvc-modes)
 
 ;;; Internal vars
 ;;
@@ -7132,6 +7133,7 @@ and
                                     (fboundp 'helm-hg-root)
                                     (helm-hg-root))
                          it))
+         (vc-deduce-backend-nonvc-modes t)
          (project-type (vc-deduce-backend)))
     (cl-flet ((push-to-hist (root)
                 (setq helm-browse-project-history
