@@ -99,7 +99,6 @@ Be aware that a nil value will make tramp display very slow."
 ;;
 ;;
 (defvar helm-recentf--basename-flag nil)
-(defvar helm-recentf-cache nil)
 
 (defun helm-recentf-pattern-transformer (pattern)
   (let ((pattern-no-flag (replace-regexp-in-string " -b" "" pattern)))
@@ -121,11 +120,8 @@ Be aware that a nil value will make tramp display very slow."
 (defclass helm-recentf-source (helm-source-sync helm-type-file)
   ((init :initform (lambda ()
                      (require 'recentf)
-                     (when helm-turn-on-recentf (recentf-mode 1))
-                     ;; Use a copy of not recentf-list itself but of its
-                     ;; elements to not corrupt them with text props.
-                     (setq helm-recentf-cache (helm-copy-sequence recentf-list))))
-   (candidates :initform 'helm-recentf-cache)
+                     (when helm-turn-on-recentf (recentf-mode 1))))
+   (candidates :initform 'recentf-list)
    (pattern-transformer :initform 'helm-recentf-pattern-transformer)
    (match-part :initform (lambda (candidate)
                            (if (or helm-ff-transformer-show-only-basename
@@ -183,16 +179,21 @@ Colorize only symlinks, directories and files."
                             'identity)
            with sname = (helm-get-attr 'name source)
            for i in files
-           for disp = (if (or (and (not helm-ff-show-dot-file-path)
-                                   (helm-ff-dot-file-p i))
-                              (and helm-ff-transformer-show-only-basename
-                                   (not (member sname
-                                                helm-sources-for-files-no-basename))
-                                   (not (helm-ff-dot-file-p i))
-                                   (not (and helm--url-regexp
-                                             (string-match helm--url-regexp i)))
-                                   (not (string-match helm-ff-url-regexp i))))
-                          (helm-basename i) (abbreviate-file-name i))
+           ;; As long as we use this transformer on file lists like recentf that
+           ;; are printed and saved to a file we make a copy of the display
+           ;; string and add text props to it, this to not corrupt the elemnts
+           ;; of the original list (Bug#2709).
+           for disp = (copy-sequence
+                       (if (or (and (not helm-ff-show-dot-file-path)
+                                    (helm-ff-dot-file-p i))
+                               (and helm-ff-transformer-show-only-basename
+                                    (not (member sname
+                                                 helm-sources-for-files-no-basename))
+                                    (not (helm-ff-dot-file-p i))
+                                    (not (and helm--url-regexp
+                                              (string-match helm--url-regexp i)))
+                                    (not (string-match helm-ff-url-regexp i))))
+                           (helm-basename i) (abbreviate-file-name i)))
            for isremote = (or (file-remote-p i)
                               (helm-file-on-mounted-network-p i))
            ;; file-attributes is too slow on remote files,
