@@ -50,6 +50,7 @@
 (declare-function eshell-resume-eval "esh-cmd")
 (declare-function helm-ls-git "ext:helm-ls-git")
 (declare-function helm-hg-find-files-in-project "ext:helm-ls-hg")
+(declare-function helm-ls-svn-ls "ext:helm-ls-svn")
 (declare-function helm-gid "helm-id-utils.el")
 (declare-function helm-find-1 "helm-find")
 (declare-function helm-fd-1 "helm-fd")
@@ -7111,10 +7112,10 @@ If the current directory is found in the cache, start
 NOTE: The prefix ARG have no effect on the VCS controlled
 directories.
 
-Needed dependencies for VCS:
+Needed dependencies for VCS (not mandatory, pickup what you need):
 <https://github.com/emacs-helm/helm-ls-git>
-and
-<https://github.com/emacs-helm/helm-ls-hg>."
+<https://github.com/emacs-helm/helm-ls-hg>
+<http://melpa.org/#/helm-ls-svn>."
   (interactive "P")
   (require 'helm-x-files)
   (require 'vc)
@@ -7132,6 +7133,10 @@ and
                                     (fboundp 'helm-hg-root)
                                     (helm-hg-root))
                          it))
+         (svn-project (helm-aif (and (require 'helm-ls-svn nil t)
+                                     (fboundp 'helm-ls-svn-root-dir)
+                                     (helm-ls-svn-root-dir))
+                          it))
          (project-type (vc-deduce-backend)))
     (cl-flet ((push-to-hist (root)
                 (setq helm-browse-project-history
@@ -7142,6 +7147,9 @@ and
                   ((and (equal project-type 'Hg) hg-project)
                    (push-to-hist it)
                    (helm-hg-find-files-in-project))
+                  ((and (equal project-type 'Svn) svn-project)
+                   (push-to-hist it)
+                   (helm-ls-svn-ls))
                   ((helm-browse-project-get--root-dir (helm-current-directory))
                    (if (or arg (gethash it helm--browse-project-cache))
                        (progn
