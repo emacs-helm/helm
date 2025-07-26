@@ -7102,9 +7102,10 @@ by git or hg, otherwise it has no effect."
 (defun helm-browse-project (arg)
   "Preconfigured helm to browse projects.
 Browse files and see status of project with its VCS.
-Only HG and GIT are supported for now.
+GIT, HG and SVN are supported for now, but only git is fully featured with
+`helm-ls-git' package.
 Fall back to `helm-browse-project-find-files' if current
-directory is not under control of one of those VCS.
+directory is not under control or one of those VCS.
 With a prefix ARG browse files recursively, with two prefix ARG
 rebuild the cache.
 If the current directory is found in the cache, start
