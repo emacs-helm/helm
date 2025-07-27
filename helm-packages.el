@@ -239,6 +239,10 @@ Arg PACKAGES is a list of strings."
 ;;; Cloning packages
 ;;
 (defun helm-packages-fetch-recipe (url)
+  "Fetch package recipes from URL.
+They are generally contained in a file named elpa-packages.eld on remote which
+contains the urls needed for cloning packages, each entry is like
+\(foo :url \"somewhere\") and may contain as well :branch."
   (with-temp-buffer
     (url-insert-file-contents url)
     (goto-char (point-min))
