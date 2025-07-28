@@ -848,11 +848,16 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (helm-aif (get-buffer-window "*Diff*" 'visible)
       (progn (kill-buffer "*Diff*")
              (set-window-buffer it helm-current-buffer))
-    (let ((buf (get-buffer candidate)))
-      (if (buffer-file-name buf)
-          (diff-buffer-with-file buf)
-        (user-error "Buffer `%s' is not associated to a file"
-                    (buffer-name buf))))))
+    ;; Expect the prop at pos 2 because of icon at 1.
+    (let* ((type (get-text-property 2 'type (helm-get-selection nil 'withprop)))
+           (buf  (helm-aif (get-buffer candidate)
+                     (or (buffer-base-buffer it) it)))
+           (file (buffer-file-name buf)))
+      (cl-assert file nil (format "Buffer `%s' is not associated to a file"
+                                  (buffer-name buf)))
+      (if (eq type 'modout)
+          (diff buf file)   ; Buffer modified externally.
+        (diff file buf))))) ; Buffer modified inside emacs and not saved.
 
 (helm-make-persistent-command-from-action helm-buffer-diff-persistent
   "Toggle diff buffer without quitting helm."
