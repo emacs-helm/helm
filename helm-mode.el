@@ -1552,7 +1552,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
           prompt (if pref-arg
                      (concat (helm-acase helm-M-x-prefix-argument
                                (- "-")
-                               ((dst* l &rest args)
+                               ((dst* (l &rest args))
                                 (if (eq l 4) "C-u " (format "%d " l)))
                                ((guard* (integerp it)) (format "%d " it)))
                              prompt)
