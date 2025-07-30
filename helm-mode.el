@@ -1552,6 +1552,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
           prompt (if pref-arg
                      (concat (helm-acase helm-M-x-prefix-argument
                                (- "-")
+                               ;; Why &rest? isn't this always a list of one arg?
                                ((dst* (l &rest args))
                                 (if (eq l 4) "C-u " (format "%d " l)))
                                ((guard* (integerp it)) (format "%d " it)))

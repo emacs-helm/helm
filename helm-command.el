@@ -347,6 +347,7 @@ Arg HISTORY default to `extended-command-history'."
                        :fuzzy-match helm-M-x-fuzzy-match)))
          (prompt (concat (helm-acase helm-M-x-prefix-argument
                            (- "-")
+                           ;; Why &rest? isn't this always a list of one arg?
                            ((dst* (l &rest args))
                             (if (eq l 4) "C-u " (format "%d " l)))
                            ((guard* (integerp it)) (format "%d " it)))
