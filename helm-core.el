@@ -525,7 +525,9 @@ Default to Helm group when group is not defined in source."
     (helm-run-after-exit 'helm-customize-group-1 (helm-get-attr 'group source))))
 (put 'helm-customize-group 'helm-only t)
 
-(defun helm--action-at-nth-set-fn-1 (value &optional negative)
+(defun helm--action-at-nth-set-fn-1 (value &optional negative unset)
+  "Bind VALUE to (+-)nth candidate depending of NEGATIVE arg value.
+If UNSET is specified unbind VALUE instead."
   (dotimes (n 9)
     (let ((key (format value (1+ n)))
           (fn (lambda ()
@@ -533,15 +535,16 @@ Default to Helm group when group is not defined in source."
                 (helm-execute-selection-action-at-nth
                  (if negative (- (1+ n)) (1+ n))))))
       (define-key helm-map (kbd key) nil)
-      (define-key helm-map (kbd key) fn))))
+      (unless unset
+        (define-key helm-map (kbd key) fn)))))
 
-(defun helm--action-at-nth-set-fn- (var val)
-  (set var val)
-  (helm--action-at-nth-set-fn-1 val 'negative))
+(defun helm--action-at-nth-set-fn- (val &optional unset)
+  ;; Bind `helm-action-at-nth-negative-prefix-key' to `helm-map'.
+  (helm--action-at-nth-set-fn-1 val 'negative unset))
 
-(defun helm--action-at-nth-set-fn+ (var val)
-  (set var val)
-  (helm--action-at-nth-set-fn-1 val))
+(defun helm--action-at-nth-set-fn+ (val &optional unset)
+  ;; Bind `helm-action-at-nth-positive-prefix-key' to `helm-map'.
+  (helm--action-at-nth-set-fn-1 val nil unset))
 
 (defcustom helm-action-at-nth-negative-prefix-key "M-%d"
   "The prefix key to execute default action on nth <-n> candidate.
@@ -549,13 +552,11 @@ Default to Helm group when group is not defined in source."
 This is a format spec where %d will be replaced by the candidate
 number.
 
-This is useful when `helm-display-line-numbers-mode' is turned on.
-
-NOTE: `setq' have no effect until you restart Emacs, use
-customize for immediate effect."
+This is activated only when `helm-display-line-numbers-mode' is turned on.
+Note that default value `M-<n>' defeat the usage of `M-<n>' as prefix argument
+in `helm-M-x'."
   :group 'helm
-  :type 'string
-  :set #'helm--action-at-nth-set-fn-)
+  :type 'string)
 
 (defcustom helm-action-at-nth-positive-prefix-key "C-%d"
   "The prefix key to execute default action on nth <+n> candidate.
@@ -563,13 +564,11 @@ customize for immediate effect."
 This is a format spec where %d will be replaced by the candidate
 number.
 
-This is useful when `helm-display-line-numbers-mode' is turned on.
-
-NOTE: `setq' have no effect until you restart Emacs, use
-customize for immediate effect."
+This is activated only when `helm-display-line-numbers-mode' is turned on.
+Note that default value `C-<n>' defeat the usage of `C-<n>' as prefix argument
+in `helm-M-x'."
   :group 'helm
-  :type 'string
-  :set #'helm--action-at-nth-set-fn+)
+  :type 'string)
 
 
 ;;; User variables
@@ -1823,7 +1822,7 @@ You can also toggle line numbers with
 buffer.
 
 Of course when enabling `global-display-line-numbers-mode' Helm
-buffers will have line numbers as well. \(Don't forget to
+buffers will have line numbers as well. (Don't forget to
 customize `display-line-numbers-type' to relative).
 
 In Emacs versions < to 26 you will have to use
@@ -1831,19 +1830,19 @@ In Emacs versions < to 26 you will have to use
 package and `helm-linum-relative-mode'.
 
 Then when line numbers are enabled with one of the methods above
-the following keys are available([1]):
+the following keys are available:
 
-C-x <n>: Execute default action on the n-th candidate before
+<negative prefix> <n>: Execute default action on the n-th candidate before
 currently selected candidate.
 
-C-c <n>: Execute default action on the n-th candidate after
-current selected candidate.
+<positive prefix> <n>: Execute default action on the n-th candidate after
+currently selected candidate.
 
-\"n\" is limited to 1-9.  For larger jumps use other navigation
-keys.
+Where <negative prefix> and <positive prefix> are respectively the value of
+the customizable variables `helm-action-at-nth-negative-prefix-key' and
+`helm-action-at-nth-positive-prefix-key'.
 
-\[1] Note that the key bindings are always available even if line
-numbers are not displayed.  They are just useless in this case.
+<n> is limited to 1-9.
 
 ** Mouse control in Helm
 
@@ -4244,6 +4243,7 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
       (setq mode-line-format (default-value 'mode-line-format))
       (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
       (remove-hook 'post-command-hook 'helm--update-header-line)
+      (helm-display-line-numbers-mode -1)
       ;; Be sure we call cleanup functions from helm-buffer.
       (helm-compute-attr-in-sources 'cleanup)
       ;; Delete or make invisible helm frame.
@@ -5540,9 +5540,17 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
                "`display-line-numbers' not available")
     (if helm-display-line-numbers-mode
         (with-helm-buffer
-          (setq display-line-numbers 'relative))
+          (setq display-line-numbers 'relative)
+          (helm--action-at-nth-set-fn+
+           helm-action-at-nth-positive-prefix-key)
+          (helm--action-at-nth-set-fn-
+           helm-action-at-nth-negative-prefix-key))
       (with-helm-buffer
-        (setq display-line-numbers nil)))))
+        (setq display-line-numbers nil)
+        (helm--action-at-nth-set-fn+
+         helm-action-at-nth-positive-prefix-key 'unset)
+        (helm--action-at-nth-set-fn-
+         helm-action-at-nth-negative-prefix-key 'unset)))))
 (put 'helm-display-line-numbers-mode 'helm-only t)
 
 
