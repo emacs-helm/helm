@@ -1491,6 +1491,12 @@ If object is a lambda, return \"Anonymous\"."
   (cl-letf (((symbol-function 'message) #'ignore))
     (funcall helm-describe-variable-function (helm-symbolify var))))
 
+(defun helm-describe-symbol (sym)
+  "Display documentation of SYM, a symbol or a string."
+  (cl-letf (((symbol-function 'message) #'ignore))
+    (let ((helm-describe-function-function 'describe-symbol))
+      (funcall helm-describe-function-function (helm-symbolify sym)))))
+
 (defun helm-describe-face (face)
   "Display documentation of FACE, a symbol or a string."
   (let ((faces (helm-marked-candidates)))

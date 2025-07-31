@@ -1053,9 +1053,11 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                (flags . (helm-completing-read--buffer-lgst-mode))))
     (symbol-help . (metadata
                     (affixation-function . helm-symbol-completion-table-affixation)
+                    (persistent-fn . t)
                     (category . symbol-help)))
     (command-help . (metadata
                      (prefix-arg . t)
+                     (persistent-fn . t)
                      (affixation-function . helm-symbol-completion-table-affixation)
                      (category . symbol-help)))
     (eww-help . (metadata ;; Emacs-30 only
@@ -1527,7 +1529,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
                       metadata 'display-sort-function)
                      (lambda (candidates)
                        (sort candidates #'helm-generic-sort-fn)))))
-         popup-info flags pref-arg keymap)
+         popup-info flags pref-arg pers-fn keymap)
     (helm-aif (and (null category)
                    (assoc-default name helm-completing-read-command-categories))
         (setq metadata `(metadata (category . ,it))
@@ -1541,6 +1543,8 @@ dynamically otherwise use `helm-completing-read-default-2'."
                 afix (completion-metadata-get metadata 'affixation-function)
                 ;; prefix-arg metadata is only in command-help category.
                 pref-arg (completion-metadata-get metadata 'prefix-arg)
+                pers-fn  (and (completion-metadata-get metadata 'persistent-fn)
+                              (helm-mode--get-persistent-fn name))
                 popup-info (completion-metadata-get metadata 'popup-info-function)
                 flags (completion-metadata-get metadata 'flags))))
     (setq keymap (if pref-arg
@@ -1583,8 +1587,8 @@ dynamically otherwise use `helm-completing-read-default-2'."
               :alistp alistp
               :diacritics helm-mode-ignore-diacritics
               :help-message #'helm-comp-read-help-message
-              :persistent-action (and pref-arg #'helm-M-x-persistent-action)
-              :persistent-help (if pref-arg "Toggle Describe command" "DoNothing")
+              :persistent-action pers-fn
+              :persistent-help (if pers-fn (format "Toggle %s" name) "DoNothing")
               :name name
               :requires-pattern (if (and (stringp default)
                                          (string= default "")
@@ -1622,6 +1626,16 @@ dynamically otherwise use `helm-completing-read-default-2'."
              (advice-add 'command-execute :around #'helm--advice-command-execute)))
       (when pref-arg (helm-M-x--unwind-forms))
       (dolist (f flags) (set f nil)))))
+
+(defun helm-mode--get-persistent-fn (name)
+  "Return a lambda to use in symbol-help persistent-action for NAME."
+  (lambda (candidate)
+    (helm-elisp--persistent-help
+     candidate
+     (helm-acase name
+       ("describe-symbol"   'helm-describe-symbol)
+       ("describe-variable" 'helm-describe-variable)
+       (t                   'helm-describe-function)))))
 
 (defun helm--advice-command-execute (old--fn &rest args)
   (helm-M-x--unwind-forms 'done)
