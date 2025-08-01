@@ -2,6 +2,15 @@
 
 * NEWS
 ** Version 4.0.5
+*** Enable persistent actions in symbol-help categories
+Thats mean that C-h f/v/x/o etc... have now persistent action to display help.
+*** helm-action at nth only available when helm-display-line-numbers-mode is enabled.
+Before the keys were available even when line relative numbers were
+not enabled.
+*** Change behavior of helm-buffer-toggle-diff
+When buffer has changes not saved to file do "diff file buffer".
+When file has changes done externally and buffer is not up to date do
+"diff buffer file".
 *** New action in helm-packages to clone packages
 *** Diacritics can now be ignored in helm-find-files
 and read-file-name with the variable `helm-find-files-ignore-diacritics`.
@@ -32,7 +41,8 @@ with the preselection on the last occurence of "foo".
 Same for previous.
 *** Change default prefix binding to reach nth candidates
 Now you can reach next nth candidate with C-<n> and previous nth
-candidate with M-<n>, it is easier to remember.
+candidate with M-<n>, it is easier to remember.  Note that this defeat
+the ability to specify prefix arg with C-<n> or M-<n>.
 *** helm-completions-detailed is now enabled by default
 ** Version 4.0.3
 *** New drag-and-drop support for helm-find-files (only Emacs-29+)
@@ -42,7 +52,7 @@ dired frames and windows. See helm-find-files documentation.
 *** Remove old drag-and-drop support for helm-find-files
 *** Add a new completion metadata category command-help
 Handle helm-M-x prefix arg integration in this category.  That's mean
-you can have helm-M-x prefix arg in M-X.
+you can have helm-M-x prefix arg feature in M-X.
 *** Allow filtering sources in current session
 It is bound to C-M-e in helm-map.
 *** Change `helm-current-directory-alist` default value
