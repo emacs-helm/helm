@@ -273,11 +273,13 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
          (url (or (plist-get (cdr package-recipe) :url)
                   ;; Assume that when :url = nil the package is maintained in
                   ;; elpa or nongnu. When recipe is fetched from package-archives
-                  ;; addresses the url is always specified.
+                  ;; addresses the url is always specified or the package if not
+                  ;; clonable not present at all e.g. cond-star.
                   (helm-acase provider
                     ("gnu"    "https://git.sv.gnu.org/git/emacs/elpa.git")
                     ("nongnu" "https://git.sv.gnu.org/git/emacs/nongnu.git"))))
          (branch (plist-get (cdr package-recipe) :branch)))
+    (cl-assert package-recipe nil (format "Couldn't find package '%s'" package))
     (cl-assert (null core) nil
                (format "Package '%s' already provided in Emacs at '%s'"
                        package core))
