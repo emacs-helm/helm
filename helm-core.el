@@ -5637,7 +5637,7 @@ See `helm-default-output-filter'."
         (helm-skip-noncandidate-line 'next)
         (helm-mark-current-line nil 'nomouse)
         ;; FIXME Don't hardcode follow delay.
-        (helm-follow-execute-persistent-action-maybe 0.5)
+        (helm-follow-execute-persistent-action-maybe)
         (helm-display-mode-line (helm-get-current-source))
         (helm-log-run-hook "helm-output-filter--post-process"
                            'helm-after-update-hook)
@@ -8040,7 +8040,7 @@ The real value of each candidate is used."
 ;;; Follow-mode: Automatic execution of persistent-action
 ;;
 ;;
-(defvar helm-follow-input-idle-delay nil
+(defvar helm-follow-input-idle-delay 0.5
   "`helm-follow-mode' will execute its persistent action after this delay.
 Note that if the `follow-delay' attr is present in source, it
 will take precedence over this.")
@@ -8128,12 +8128,6 @@ This happen after: DELAY or the \\='follow-attr value of current
 source or `helm-follow-input-idle-delay' or
 `helm-input-idle-delay' secs."
   (let* ((src (helm-get-current-source))
-         (at (or delay
-                 (assoc-default 'follow-delay src)
-                 helm-follow-input-idle-delay
-                 (or (and helm-input-idle-delay
-                          (max helm-input-idle-delay 0.01))
-                     0.01)))
          (suspend (and helm--in-update
                        ;; Specific to helm-find-files.
                        (assoc-default 'suspend-follow-in-update src))))
@@ -8147,9 +8141,27 @@ source or `helm-follow-input-idle-delay' or
                (null (eq (assoc-default 'follow src) 'never))
                (helm-get-selection nil nil src))
       (helm-follow-mode-set-source 1 src)
-      (run-with-idle-timer at nil (lambda ()
-                                    (when helm-alive-p
-                                      (helm-execute-persistent-action)))))))
+      (helm--execute-persistent-action-when-idle delay src))))
+
+(defvar helm--execute-persistent-action-timer nil)
+(defun helm--execute-persistent-action-when-idle (&optional delay src)
+  ;; More or less similar to what the debounce fn in timeout package does,
+  ;; except the timer is stored in a global var instead of beeing stored in a
+  ;; closure and there is no default output, we just execute
+  ;; helm-execute-persistent-action once emacs is idle.
+  (when helm-alive-p
+    (let ((at (or delay
+                  (assoc-default 'follow-delay src)
+                  helm-follow-input-idle-delay)))
+      (if (timerp helm--execute-persistent-action-timer)
+          (timer-set-idle-time helm--execute-persistent-action-timer at)
+        (setq helm--execute-persistent-action-timer
+              (run-with-idle-timer
+               at nil
+               (lambda ()
+                 (cancel-timer helm--execute-persistent-action-timer)
+                 (setq helm--execute-persistent-action-timer nil)
+                 (helm-execute-persistent-action))))))))
 
 (defun helm-follow-mode-p (&optional source)
   (with-helm-buffer

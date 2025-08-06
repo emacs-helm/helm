@@ -629,7 +629,7 @@
     :documentation
     "  `helm-follow-mode' will execute persistent-action after this delay.
   Otherwise value of `helm-follow-input-idle-delay' is used if non--nil,
-  If none of these are found fallback to `helm-input-idle-delay'.")
+  Fall back to 0.5 when none of these are found.")
 
    (multimatch
     :initarg :multimatch
