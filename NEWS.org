@@ -2,6 +2,9 @@
 
 * NEWS
 ** Version 4.0.5
+*** Improve scrolling in follow-mode
+Now when you keep pressing C-n or C-p selected candidates are not
+displayed continuously, only when emacs becomes idle.
 *** Enable persistent actions in symbol-help categories
 Thats mean that C-h f/v/x/o etc... have now persistent action to display help.
 *** helm-action at nth only available when helm-display-line-numbers-mode is enabled.
