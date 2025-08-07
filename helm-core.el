@@ -1140,6 +1140,13 @@ A prefix arg reverse the behavior of this variable."
           (const :tag "Kill display" display)
           (const :tag "Kill real"    real)))
 
+(defcustom helm-follow-input-idle-delay 0.5
+  "`helm-follow-mode' will execute action after this delay once idle.
+Note that if the `follow-delay' attr is present in source, it
+will take precedence over this."
+  :group 'helm
+  :type 'float)
+
 (defvar helm-update-edebug nil
   "Development feature.
 If set to true then all functions invoked after `helm-update' can be
@@ -5636,7 +5643,6 @@ See `helm-default-output-filter'."
       (with-selected-window it
         (helm-skip-noncandidate-line 'next)
         (helm-mark-current-line nil 'nomouse)
-        ;; FIXME Don't hardcode follow delay.
         (helm-follow-execute-persistent-action-maybe)
         (helm-display-mode-line (helm-get-current-source))
         (helm-log-run-hook "helm-output-filter--post-process"
@@ -8040,11 +8046,6 @@ The real value of each candidate is used."
 ;;; Follow-mode: Automatic execution of persistent-action
 ;;
 ;;
-(defvar helm-follow-input-idle-delay 0.5
-  "`helm-follow-mode' will execute its persistent action after this delay.
-Note that if the `follow-delay' attr is present in source, it
-will take precedence over this.")
-
 (defun helm-follow-mode (&optional arg)
   "Execute persistent action every time the cursor is moved.
 
