@@ -8154,8 +8154,7 @@ source or `helm-follow-input-idle-delay' or
     (let ((at (or delay
                   (assoc-default 'follow-delay src)
                   helm-follow-input-idle-delay)))
-      (if (timerp helm--execute-persistent-action-timer)
-          (timer-set-idle-time helm--execute-persistent-action-timer at)
+      (unless (timerp helm--execute-persistent-action-timer)
         (setq helm--execute-persistent-action-timer
               (run-with-idle-timer
                at nil
