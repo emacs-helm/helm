@@ -6,4 +6,5 @@
          (byte-compile-warnings . (not obsolete docstrings docstrings-non-ascii-quotes))))
  (emacs-lisp-mode . ((mode . bug-reference-prog)
                      (indent-tabs-mode . nil)
-                     (fill-column . 80))))
+                     (fill-column . 80)
+                     (outline-regexp . "^;;;[[:blank:]]+"))))
