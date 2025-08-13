@@ -8126,8 +8126,7 @@ They are bound by default to \\[helm-follow-action-forward] and
   "Execute persistent action in mode `helm-follow-mode'.
 
 This happen after: DELAY or the \\='follow-attr value of current
-source or `helm-follow-input-idle-delay' or
-`helm-input-idle-delay' secs."
+source or `helm-follow-input-idle-delay'."
   (let* ((src (helm-get-current-source))
          (suspend (and helm--in-update
                        ;; Specific to helm-find-files.
