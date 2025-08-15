@@ -8128,9 +8128,6 @@ They are bound by default to \\[helm-follow-action-forward] and
 This happen after: DELAY or the \\='follow-attr value of current
 source or `helm-follow-input-idle-delay'."
   (let* ((src (helm-get-current-source))
-         (at (or delay
-                 (assoc-default 'follow-delay src)
-                 helm-follow-input-idle-delay))
          (suspend (and helm--in-update
                        ;; Specific to helm-find-files.
                        (assoc-default 'suspend-follow-in-update src))))
@@ -8144,9 +8141,26 @@ source or `helm-follow-input-idle-delay'."
                (null (eq (assoc-default 'follow src) 'never))
                (helm-get-selection nil nil src))
       (helm-follow-mode-set-source 1 src)
-      (run-with-idle-timer at nil (lambda ()
-                                    (when helm-alive-p
-                                      (helm-execute-persistent-action)))))))
+      (helm--execute-persistent-action-when-idle delay src))))
+
+(defvar helm--execute-persistent-action-timer nil)
+(defun helm--execute-persistent-action-when-idle (&optional delay src)
+  ;; More or less similar to what the debounce fn in timeout package does,
+  ;; except the timer is stored in a global var instead of beeing stored in a
+  ;; closure and there is no default output, we just execute
+  ;; helm-execute-persistent-action once emacs is idle.
+  (when helm-alive-p
+    (let ((at (or delay
+                  (assoc-default 'follow-delay src)
+                  helm-follow-input-idle-delay)))
+      (unless (timerp helm--execute-persistent-action-timer)
+        (setq helm--execute-persistent-action-timer
+              (run-with-idle-timer
+               at nil
+               (lambda ()
+                 (cancel-timer helm--execute-persistent-action-timer)
+                 (setq helm--execute-persistent-action-timer nil)
+                 (helm-execute-persistent-action))))))))
 
 (defun helm-follow-mode-p (&optional source)
   (with-helm-buffer
