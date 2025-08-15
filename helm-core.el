@@ -8143,6 +8143,12 @@ source or `helm-follow-input-idle-delay'."
       (helm-follow-mode-set-source 1 src)
       (helm--execute-persistent-action-when-idle delay src))))
 
+;; We could use a simple idle timer here as before with a delay fixed at minimum
+;; 0.5, the effect is the same but it creates a timer at each call, with this
+;; code a new timer is created only after being idle 0.5 and restarting
+;; scrolling.  That's mean that when hitting C-n continuously no new timer is
+;; created, we reuse `helm--execute-persistent-action-timer' until it is not
+;; consumed i.e. the PA is executed because we are idle.
 (defvar helm--execute-persistent-action-timer nil)
 (defun helm--execute-persistent-action-when-idle (&optional delay src)
   ;; More or less similar to what the debounce fn in timeout package does,
