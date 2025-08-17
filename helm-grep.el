@@ -670,7 +670,7 @@ Have no effect when grep backend use \"--color=\"."
                               proc-name
                               (helm-get-candidate-number)
                               (- (float-time) start-time))
-                    (helm-maybe-show-help-echo)
+                    (helm-maybe-show-popup-tip-info)
                     (with-helm-window
                       (setq mode-line-format
                             `(" " mode-line-buffer-identification " "
@@ -1685,7 +1685,7 @@ returns if available with current AG version."
                               proc-name
                               (helm-get-candidate-number)
                               (- (float-time) start-time))
-                  (helm-maybe-show-help-echo)
+                  (helm-maybe-show-popup-tip-info)
                   (with-helm-window
                     (setq mode-line-format
                           `(" " mode-line-buffer-identification " "

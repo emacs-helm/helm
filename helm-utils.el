@@ -1052,48 +1052,48 @@ Assume regexp is a pcre based regexp."
 
 ;;; Popup-info
 ;;
-(defvar helm--show-help-echo-timer nil)
-(defvar helm--maybe-show-help-echo-overlay nil)
+(defvar helm--show-popup-info-timer nil)
+(defvar helm--maybe-show-popup-info-overlay nil)
 (defface helm-tooltip
   '((((type tty pc))
      :background "yellow" :foreground "black")
     (t :background "goldenrod" :foreground "black"))
-  "Face used by `helm-tooltip-show'."
+  "Face used by `helm-popup-tip-show'."
   :group 'helm-grep-faces)
 
-(defun helm-cancel-help-echo-timer ()
-  (when helm--show-help-echo-timer
-    (cancel-timer helm--show-help-echo-timer)
-    (setq helm--show-help-echo-timer nil))
-  (when helm--maybe-show-help-echo-overlay
-    (delete-overlay helm--maybe-show-help-echo-overlay)
-    (setq helm--maybe-show-help-echo-overlay nil)))
+(defun helm-cancel-popup-tip-timer ()
+  (when helm--show-popup-info-timer
+    (cancel-timer helm--show-popup-info-timer)
+    (setq helm--show-popup-info-timer nil))
+  (when helm--maybe-show-popup-info-overlay
+    (delete-overlay helm--maybe-show-popup-info-overlay)
+    (setq helm--maybe-show-popup-info-overlay nil)))
 
-(defun helm-tooltip-show (text pos)
+(defun helm-popup-tip-show (text pos)
   "Display TEXT at POS in an overlay."
-  (setq helm--maybe-show-help-echo-overlay
+  (setq helm--maybe-show-popup-info-overlay
         (make-overlay pos (1+ pos)))
-  (overlay-put helm--maybe-show-help-echo-overlay
+  (overlay-put helm--maybe-show-popup-info-overlay
                'display
                (propertize
                 (concat text "\n")
                 'face 'helm-tooltip)))
 
-(defun helm-maybe-show-help-echo ()
-  (when helm--maybe-show-help-echo-overlay
-    (delete-overlay helm--maybe-show-help-echo-overlay))
+(defun helm-maybe-show-popup-tip-info ()
+  (when helm--maybe-show-popup-info-overlay
+    (delete-overlay helm--maybe-show-popup-info-overlay))
   (let* ((src (helm-get-current-source))
          (popup-info-fn (assoc-default 'popup-info src)))
     (when (and helm-alive-p
                helm-popup-tip-mode
                popup-info-fn)
-      (unless (timerp helm--show-help-echo-timer)
-        (setq helm--show-help-echo-timer
+      (unless (timerp helm--show-popup-info-timer)
+        (setq helm--show-popup-info-timer
               (run-with-idle-timer
                1 nil
                (lambda ()
-                 (cancel-timer helm--show-help-echo-timer)
-                 (setq helm--show-help-echo-timer nil)
+                 (cancel-timer helm--show-popup-info-timer)
+                 (setq helm--show-popup-info-timer nil)
                  ;; We may have an error (wrong-type-argument window-live-p nil)
                  ;; when switching to help window, the error may occur in the
                  ;; small lap of time where the helm-window is deleted and the
@@ -1105,7 +1105,7 @@ Assume regexp is a pcre based regexp."
                              (str (and popup-info-fn
                                        (funcall popup-info-fn (helm-get-selection)))))
                          (when (and str (not (string= str "")))
-                           (helm-tooltip-show
+                           (helm-popup-tip-show
                             (concat " " str)
                             pos)))))))))))))
 
@@ -1119,12 +1119,12 @@ this source to fetch infos on candidate."
   :global t
   (if helm-popup-tip-mode
       (progn
-        (add-hook 'helm-move-selection-after-hook 'helm-maybe-show-help-echo)
-        (add-hook 'helm-help-mode-after-hook 'helm-maybe-show-help-echo)
-        (add-hook 'helm-cleanup-hook 'helm-cancel-help-echo-timer))
-    (remove-hook 'helm-move-selection-after-hook 'helm-maybe-show-help-echo)
-    (remove-hook 'helm-help-mode-after-hook 'helm-maybe-show-help-echo)
-    (remove-hook 'helm-cleanup-hook 'helm-cancel-help-echo-timer)))
+        (add-hook 'helm-move-selection-after-hook 'helm-maybe-show-popup-tip-info)
+        (add-hook 'helm-help-mode-after-hook 'helm-maybe-show-popup-tip-info)
+        (add-hook 'helm-cleanup-hook 'helm-cancel-popup-tip-timer))
+    (remove-hook 'helm-move-selection-after-hook 'helm-maybe-show-popup-tip-info)
+    (remove-hook 'helm-help-mode-after-hook 'helm-maybe-show-popup-tip-info)
+    (remove-hook 'helm-cleanup-hook 'helm-cancel-popup-tip-timer)))
 
 (defun helm-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."

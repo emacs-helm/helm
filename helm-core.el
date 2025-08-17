@@ -45,7 +45,7 @@
 (declare-function transient--delete-window "ext:transient" ())
 (declare-function transient--preserve-window-p "ext:transient"
                   (&optional nohide))
-(declare-function helm-maybe-show-help-echo "helm-utils")
+(declare-function helm-maybe-show-popup-tip-info "helm-utils")
 
 (defvar helm-marked-buffer-name)
 (defvar display-buffer-function)
@@ -5486,7 +5486,7 @@ specified as respectively `helm-cand-num' and `helm-cur-source'."
               (forward-line 1)))
           (helm-mark-current-line)
           (when helm-popup-tip-mode
-            (helm-maybe-show-help-echo))
+            (helm-maybe-show-popup-tip-info))
           (helm-follow-execute-persistent-action-maybe))
       (select-window (minibuffer-window))
       (set-buffer (window-buffer window)))))

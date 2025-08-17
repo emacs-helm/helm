@@ -57,7 +57,7 @@ MacPorts to install id-utils, it should be `gid32'."
        proc (lambda (process event)
               (when (or (string= event "finished\n")
                         (process-get process 'reach-limit))
-                (helm-maybe-show-help-echo)
+                (helm-maybe-show-popup-tip-info)
                 (with-helm-window
                   (setq mode-line-format
                         `(" " mode-line-buffer-identification " "
