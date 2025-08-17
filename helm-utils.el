@@ -1080,9 +1080,6 @@ Assume regexp is a pcre based regexp."
                 'face 'helm-tooltip)))
 
 (defun helm-maybe-show-help-echo ()
-  (when helm--show-help-echo-timer
-    (cancel-timer helm--show-help-echo-timer)
-    (setq helm--show-help-echo-timer nil))
   (when helm--maybe-show-help-echo-overlay
     (delete-overlay helm--maybe-show-help-echo-overlay))
   (let* ((src (helm-get-current-source))
@@ -1090,24 +1087,27 @@ Assume regexp is a pcre based regexp."
     (when (and helm-alive-p
                helm-popup-tip-mode
                popup-info-fn)
-      (setq helm--show-help-echo-timer
-            (run-with-idle-timer
-             1 nil
-             (lambda ()
-               ;; We may have an error (wrong-type-argument window-live-p nil)
-               ;; when switching to help window, the error may occur in the
-               ;; small lap of time where the helm-window is deleted and the
-               ;; help buffer not already displayed.
-               (ignore-error wrong-type-argument
-                 (save-selected-window
-                   (with-helm-window
-                     (let ((pos (save-excursion (end-of-visual-line) (point)))
-                           (str (and popup-info-fn
-                                     (funcall popup-info-fn (helm-get-selection)))))
-                       (when (and str (not (string= str "")))
-                         (helm-tooltip-show
-                          (concat " " str)
-                          pos))))))))))))
+      (unless (timerp helm--show-help-echo-timer)
+        (setq helm--show-help-echo-timer
+              (run-with-idle-timer
+               1 nil
+               (lambda ()
+                 (cancel-timer helm--show-help-echo-timer)
+                 (setq helm--show-help-echo-timer nil)
+                 ;; We may have an error (wrong-type-argument window-live-p nil)
+                 ;; when switching to help window, the error may occur in the
+                 ;; small lap of time where the helm-window is deleted and the
+                 ;; help buffer not already displayed.
+                 (ignore-error wrong-type-argument
+                   (save-selected-window
+                     (with-helm-window
+                       (let ((pos (save-excursion (end-of-visual-line) (point)))
+                             (str (and popup-info-fn
+                                       (funcall popup-info-fn (helm-get-selection)))))
+                         (when (and str (not (string= str "")))
+                           (helm-tooltip-show
+                            (concat " " str)
+                            pos)))))))))))))
 
 ;;;###autoload
 (define-minor-mode helm-popup-tip-mode
