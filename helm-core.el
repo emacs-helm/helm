@@ -8151,9 +8151,9 @@ source or `helm-follow-input-idle-delay'."
 ;; consumed i.e. the PA is executed because we are idle.
 (defvar helm--execute-persistent-action-timer nil)
 (defun helm--execute-persistent-action-when-idle (&optional delay src)
-  "Call persistent action only once idle DELAY many seconds.
+  "Call persistent action only once idle DELAY that many seconds.
 SRC is used to check if there is a delay specified for this source.
-Also avoid creating unneedlessly a timer at each call."
+Also avoid creating needlessly a timer at each call."
   ;; More or less similar to what the debounce fn in timeout package does,
   ;; except the timer is stored in a global var instead of beeing stored in a
   ;; closure and there is no default output, we just execute
