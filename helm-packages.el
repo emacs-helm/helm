@@ -435,6 +435,11 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
     (setq helm-packages--gnu-elpa-recipes-cache nil
           helm-packages--nongnu-elpa-recipes-cache nil
           helm-packages--melpa-recipes-cache nil)
+    (setq package-menu--old-archive-contents package-archive-contents)
+    (setq package-menu--new-package-list nil)
+    ;; `package-desc-status' adds the status 'new' to a package according to
+    ;; `package-menu--new-package-list'.
+    (package-menu--populate-new-package-list)
     (package-refresh-contents))
   (helm-set-local-variable 'helm-packages--updated t))
 
