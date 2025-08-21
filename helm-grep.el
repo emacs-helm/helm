@@ -1719,7 +1719,7 @@ grep ag."
                                    (point-min) (point-max))
                                   "\n")))
            (transfo    (helm-get-attr 'filtered-candidate-transformer src))
-           (actions    (helm-get-attr 'action src))
+           (actions    helm-grep-actions)
            (name       (helm-get-attr 'name src))
            (directory  (helm-get-attr 'directory src)))
       (helm :sources (helm-build-sync-source (format "Search in %s" name)
