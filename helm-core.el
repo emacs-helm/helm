@@ -1677,7 +1677,13 @@ Only simple bindings are available and they are defined in
 `helm-help-hkmap', which is a simple alist of (key . function).
 You can define or redefine bindings in help with
 `helm-help-define-key' or by adding/removing entries directly in
-`helm-help-hkmap'.
+`helm-help-hkmap'.  For example if you want to replace isearch by [[https://github.com/thierryvolpiatto/isearch-light][isl-search]]
+to have multi match like helm use:
+
+    (helm-help-define-key \"C-s\" nil)
+    (helm-help-define-key \"C-r\" nil)
+    (helm-help-define-key \"C-s\" 'isl-search))
+
 See `helm-help-hkmap' for restrictions on bindings and functions.
 
 The documentation of default bindings are:
