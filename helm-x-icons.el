@@ -23,7 +23,8 @@
   "Compatibility functions between icons provider packages."
   :group 'helm)
 
-(defcustom helm-x-icons-provider 'all-the-icons
+(defcustom helm-x-icons-provider (if (display-graphic-p)
+                                     'all-the-icons 'nerd-icons)
   "The icons provider package.
 The currently supported providers are `all-the-icons' and `nerd-icons'.
 Do not use setq to set this variable but customize."
