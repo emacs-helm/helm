@@ -5016,7 +5016,10 @@ file."
                                        (delete-minibuffer-contents)
                                        (set-text-properties 0 (length fname)
                                                             nil fname)
-                                       (insert fname))))))
+                                       ;; Backup files have "!" to replace "/"
+                                       ;; in their basenames.
+                                       (insert (replace-regexp-in-string
+                                                "/!" "/\\\\!" fname)))))))
     (helm-set-attr 'candidate-number-limit helm-ff-candidate-number-limit)
     (unless (helm-ff--maybe-follow candidate)
       (when follow
@@ -5747,7 +5750,8 @@ Use it for non-interactive calls of `helm-find-files'."
   (helm-build-dummy-source "New file or directory"
     :filtered-candidate-transformer
     (lambda (_candidates _source)
-      (unless (file-exists-p helm-pattern)
+      ;; Unquote helm-pattern maybe quoted by PA.
+      (unless (file-exists-p (replace-regexp-in-string "\\s\\" "" helm-pattern))
         (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))
     :all-marked t
     :keymap 'helm-find-files-map
