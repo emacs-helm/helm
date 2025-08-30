@@ -3974,9 +3974,14 @@ If PATTERN is a valid directory name, return PATTERN unchanged."
                ;; bn as well.
                (regexp-quote bn)))
       (t (concat (regexp-quote bd)
-                 (if (>= (length bn) 2) ; wait 2nd char before concating.
+                 ;; wait 2nd char before transforming to fuzzy.
+                 (if (>= (length bn) 2)
                      (helm--mapconcat-pattern bn)
-                     (concat ".*" (regexp-quote bn))))))))
+                   ;; Here BN length is 1, we were previously matching
+                   ;; everything before BN i.e. (concat ".*" (regexp-quote bn))
+                   ;; but it is too slow on large directories. We could use
+                   ;; previous clause for this but keep it here for clarity.
+                   (regexp-quote bn)))))))
 
 (defalias 'helm-dir-is-dot 'helm-ff-dot-file-p)
 (make-obsolete 'helm-dir-is-dot 'helm-ff-dot-file-p "3.8.8")
