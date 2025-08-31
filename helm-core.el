@@ -2417,25 +2417,39 @@ If NO-UPDATE is non-nil, skip executing `helm-update'."
   (unless no-init (helm-compute-attr-in-sources 'init))
   (unless no-update (helm-update)))
 
+(defun helm--get-candidate-number-limit-value (arg)
+  "Return a suitable value for candidate-number-limit according to pref ARG."
+  (helm-acase arg
+    ;; Using a large number instead of nil allows always having a value with
+    ;; helm-get-attr.
+    ((guard* (consp arg)) 9999999)
+    ((guard* (numberp arg)) it)
+    (t (default-value 'helm-candidate-number-limit))))
+
 (defun helm-show-all-candidates-in-source (arg)
   "Toggle all sources or only current source visibility.
 With a prefix arg show all candidates in current source
 disregarding candidate-number-limit and with a numeric prefix arg
-show ARG number of candidates."
+show ARG number of candidates.  With no prefix arg candidate-number-limit is
+reset to default value."
   (interactive "P")
   (with-helm-alive-p
     (with-helm-buffer
       (if helm-source-filter
           (progn
-            (setq-local helm-candidate-number-limit
-                        (default-value 'helm-candidate-number-limit))
+            (if (helm-get-attr 'candidate-number-limit)
+                (helm-set-attr 'candidate-number-limit
+                               (helm--get-candidate-number-limit-value arg))
+              (setq-local helm-candidate-number-limit
+                          (default-value 'helm-candidate-number-limit)))
             (helm-set-source-filter nil))
+        ;; FIXME: What default-directory has to do with this?
         (with-helm-default-directory (helm-default-directory)
-          (setq-local helm-candidate-number-limit
-                      (helm-acase arg
-                        ((guard* (consp arg)) nil)
-                        ((guard* (numberp arg)) it)
-                        (t (default-value 'helm-candidate-number-limit))))
+          (if (helm-get-attr 'candidate-number-limit)
+              (helm-set-attr 'candidate-number-limit
+                             (helm--get-candidate-number-limit-value arg))
+            (setq-local helm-candidate-number-limit
+                        (helm--get-candidate-number-limit-value arg)))
           (helm-set-source-filter
            (list (helm-get-current-source))))))))
 (put 'helm-show-all-candidates-in-source 'helm-only t)
