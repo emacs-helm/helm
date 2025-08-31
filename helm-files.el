@@ -417,7 +417,7 @@ Note that when non-nil this will slow down slightly
 `helm-find-files'."
   :type 'boolean)
 
-(defcustom helm-ff-candidate-number-limit 5000
+(defcustom helm-ff-candidate-number-limit 500
   "The `helm-candidate-number-limit' for `helm-find-files' and friends.
 Note that when going one level up with
 `\\<helm-find-files-map>\\[helm-find-files-up-one-level]' the
