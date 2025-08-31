@@ -427,22 +427,25 @@ directory/file if this one is situated lower than
 `helm-ff-candidate-number-limit' num candidate."
   :type 'integer)
 
-(defcustom helm-ff-preselect-ignore-large-dirs nil
-  "Preselect directory belonging to current-buffer even if large."
+(defvar helm-ff-preselect-ignore-large-dirs nil
+  "This variable has no effect, use `helm-ff-dynamic-candidate-number-limit'.")
+(make-obsolete-variable 'helm-ff-preselect-ignore-large-dirs
+                        'helm-ff-dynamic-candidate-number-limit
+                        "4.0.6")
+
+(defvaralias 'helm-ff-up-one-level-preselect 'helm-ff-dynamic-candidate-number-limit)
+(defcustom helm-ff-dynamic-candidate-number-limit t
+  " When non-nil `candidate-number-limit' source value is modified dynamically.
+This when going one level up if the position of previous candidate in
+its directory is > to `helm-ff-candidate-number-limit' This ensure
+preselection on previous directory when going one level up possible.  It
+can be helpful to disable this and reduce
+`helm-ff-candidate-number-limit' if you often navigate across very large
+directories."
   :type 'boolean)
-
-(defcustom helm-ff-up-one-level-preselect t
-  "Always preselect previous directory when going one level up.
-
-When non-nil `candidate-number-limit' source value is modified
-dynamically when going one level up if the position of previous
-candidate in its directory is > to
-`helm-ff-candidate-number-limit'.
-
-It can be helpful to disable this and reduce
-`helm-ff-candidate-number-limit' if you often navigate across
-very large directories."
-  :type 'boolean)
+(make-obsolete-variable 'helm-ff-up-one-level-preselect
+                        'helm-ff-dynamic-candidate-number-limit
+                        "4.0.6")
 
 (defcustom helm-files-save-history-extra-sources
   '("Find" "Fd" "Locate" "Recentf"
@@ -3026,7 +3029,7 @@ If prefix numeric arg is given go ARG level up."
             ;; predicate is used e.g. images and the default is a non
             ;; file image.
             (helm-set-attr 'candidate-number-limit
-                           (if helm-ff-up-one-level-preselect
+                           (if helm-ff-dynamic-candidate-number-limit
                                (max (gethash new-pattern
                                              helm-ff--directory-files-length
                                              helm-ff-candidate-number-limit)
@@ -5728,7 +5731,7 @@ Use it for non-interactive calls of `helm-find-files'."
     ;; of this directory is unknown and candidate will NOT be selected until
     ;; next time we call HFF on this same buffer.
     (helm-aif (and preselect
-                   (not helm-ff-preselect-ignore-large-dirs)
+                   helm-ff-dynamic-candidate-number-limit
                    (gethash fname helm-ff--directory-files-length
                             helm-ff-candidate-number-limit))
         (helm-set-attr 'candidate-number-limit
