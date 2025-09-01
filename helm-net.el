@@ -260,6 +260,7 @@ Can be \"--new-tab\" (default), \"--new-window\" or \"--private-window\"."
 ;; also `helm-browse-url-default-browser-alist'.
 
 (defvar helm-browse-url-chromium-program "chromium-browser")
+(defvar helm-browse-url-brave-program "brave-browser")
 (defvar helm-browse-url-uzbl-program "uzbl-browser")
 (defvar helm-browse-url-nyxt-program "nyxt")
 (defvar helm-browse-url-conkeror-program "conkeror")
@@ -270,6 +271,7 @@ Can be \"--new-tab\" (default), \"--new-window\" or \"--private-window\"."
   '((helm-browse-url-w3m-program . w3m-browse-url)
     (browse-url-firefox-program . browse-url-firefox)
     (helm-browse-url-chromium-program . helm-browse-url-chromium)
+    (helm-browse-url-brave-program . helm-browse-url-brave)
     (helm-browse-url-conkeror-program . helm-browse-url-conkeror)
     (helm-browse-url-opera-program . helm-browse-url-opera)
     (helm-browse-url-uzbl-program . helm-browse-url-uzbl)
@@ -335,6 +337,13 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
   (interactive "sURL: ")
   (helm-generic-browser
    url helm-browse-url-chromium-program))
+
+;;;###autoload
+(defun helm-browse-url-brave (url &optional _ignore)
+  "Browse URL with Brave browser."
+  (interactive "sURL: ")
+  (helm-generic-browser
+   url helm-browse-url-brave-program))
 
 ;;;###autoload
 (defun helm-browse-url-uzbl (url &optional _ignore)
