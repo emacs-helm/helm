@@ -6088,8 +6088,8 @@ This is a toggle command."
 (put 'helm-exchange-minibuffer-and-header-line 'helm-only t)
 
 (defun helm--update-header-line ()
-  ;; This should be used in `post-command-hook',
-  ;; nowhere else.
+  ;; This is already called in `post-command-hook',
+  ;; so it should not be called elsewhere.
   (when (with-helm-buffer helm-echo-input-in-header-line)
     (helm--set-header-line t)))
 

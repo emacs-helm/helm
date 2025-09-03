@@ -2607,8 +2607,7 @@ at end of pattern using \\<helm-map>\\[backward-char] and
       (setq helm-ff--deleting-char-backward t)
       (call-interactively
        (lookup-key (current-global-map)
-                   (read-kbd-macro "DEL")))
-      (helm--update-header-line))))
+                   (read-kbd-macro "DEL"))))))
 (put 'helm-ff-delete-char-backward 'helm-only t)
 
 (defun helm-ff-delete-char-backward--exit-fn ()
