@@ -5725,17 +5725,13 @@ Use it for non-interactive calls of `helm-find-files'."
       (helm-set-attr 'follow -1 helm-source-find-files))
     ;; If preselected candidate is further than `helm-ff-candidate-number-limit'
     ;; in the directory file list, we have to increase `candidate-number-limit'
-    ;; attr to have this candidate visible for preselection.  NOTE:
-    ;; When HFF has yet not been launched in this directory the maximum length
-    ;; of this directory is unknown and candidate will NOT be selected until
-    ;; next time we call HFF on this same buffer.
-    (helm-aif (and preselect
-                   helm-ff-dynamic-candidate-number-limit
-                   (gethash fname helm-ff--directory-files-length
-                            helm-ff-candidate-number-limit))
-        (helm-set-attr 'candidate-number-limit
-                       (max it helm-ff-candidate-number-limit)
-                       helm-source-find-files))
+    ;; attr to have this candidate visible for preselection.
+    (when (and preselect helm-ff-dynamic-candidate-number-limit)
+      (helm-set-attr 'candidate-number-limit
+                     (helm-aif (gethash fname helm-ff--directory-files-length)
+                         (max it helm-ff-candidate-number-limit)
+                       99999)
+                     helm-source-find-files))
     (helm-ff-setup-update-hook)
     (add-hook 'helm-resume-after-hook 'helm-ff--update-resume-after-hook)
     (unwind-protect
