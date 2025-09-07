@@ -5134,7 +5134,7 @@ Unlike `while-no-input' this macro ensure to not returns `t'."
 
 (defun helm-active-minibuffer-window ()
   "Check if helm-window has an active minibuffer."
-  (helm-aand (helm-window) (minibuffer-window-active-p it)))
+  (and (helm-window) (minibuffer-window-active-p (minibuffer-window))))
 
 (defun helm--collect-matches (src-list)
   "Return a list of matches for each source in SRC-LIST.
