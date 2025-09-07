@@ -2091,8 +2091,12 @@ common directory is returned."
   "Set minibuffer contents to PATTERN.
 If optional NOUPDATE is non-nil, the Helm buffer is not changed."
   (with-selected-window (or (active-minibuffer-window) (minibuffer-window))
-    (delete-minibuffer-contents)
-    (insert pattern))
+    ;; Minibuffer may have a read-only string when using completion-in-region,
+    ;; which prevent inserting in minibuffer.  see
+    ;; `helm-mode--completion-in-region-initial-input'.
+    (let ((inhibit-read-only t))
+      (delete-minibuffer-contents)
+      (insert pattern)))
   (when noupdate
     (setq helm-pattern pattern)))
 
