@@ -448,6 +448,7 @@ i.e. the loop is not entered after running COMMAND."
     (define-key map (kbd "C-r")        #'undefined)
     (define-key map (kbd "C-M-r")      #'undefined)
     (define-key map (kbd "C-M-s")      #'undefined)
+    (define-key map (kbd "C-M-i")      #'undefined)
     (define-key map (kbd "C-}")        #'helm-narrow-window)
     (define-key map (kbd "C-{")        #'helm-enlarge-window)
     (define-key map (kbd "C-c -")      #'helm-swap-windows)
@@ -4281,7 +4282,11 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
                ;; i.e. helm--nested == t   => delete
                ;;      helm--nested == nil => delete
                ;;      helm--nested == share => don't delete
-               (not (eq helm--nested 'share)))
+               (not (eq helm--nested 'share))
+               ;; Do not delete inadvertently the main frame, this may happen
+               ;; when hitting quickly twice the same command
+               ;; e.g. completion-at-point.
+               (not (eql frame helm-initial-frame)))
           (progn
             (setq-local helm--last-frame-parameters
                         (helm--get-frame-parameters))
