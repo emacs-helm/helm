@@ -2817,6 +2817,8 @@ is non-nil."
 Can be used for `completion-in-region-function' by advicing it with an
 :around advice to allow passing the old
 `completion-in-region-function' value in ORIGFUN."
+  (cl-assert (not (get-buffer-window helm-buffer 'visible)) nil
+             "Error: Trying to run helm while a helm session is already running")
   (if (memq major-mode helm-mode-no-completion-in-region-in-modes)
       (funcall origfun start end collection predicate)
     (advice-add
