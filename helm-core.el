@@ -3744,6 +3744,11 @@ version < emacs-28."
      buffer `(display-buffer-pop-up-frame
               . ((pop-up-frame-parameters . ,frame-alist))))))
 
+(defun helm--frame ()
+  (cl-loop for f in (frame-list)
+           when (equal (frame-parameter f 'title) "Helm")
+           return f))
+
 ;; Ensure to quit helm when user delete helm frame manually.
 ;; If user deletes another frame keep session running.
 (defun helm--delete-frame-function (frame)
@@ -4264,7 +4269,7 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
       ;; so fallback to selected-window in such cases.
       (or (get-buffer-window helm-buffer)
           (selected-window))
-    (let ((frame (selected-frame)))
+    (let ((frame (helm--frame)))
       (setq cursor-type (default-value 'cursor-type))
       ;; Ensure restoring default-value of mode-line to allow user
       ;; using the mouse when helm is inactive (Bug#1517,Bug#2377).
@@ -4285,7 +4290,8 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
                (not (eq helm--nested 'share))
                ;; Do not delete inadvertently the main frame, this may happen
                ;; when hitting quickly twice the same command
-               ;; e.g. completion-at-point.
+               ;; e.g. completion-at-point. Should not happen now we use
+               ;; `helm--frame'.
                (not (eql frame helm-initial-frame)))
           (progn
             (setq-local helm--last-frame-parameters
