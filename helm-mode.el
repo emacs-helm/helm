@@ -2817,6 +2817,11 @@ is non-nil."
 Can be used for `completion-in-region-function' by advicing it with an
 :around advice to allow passing the old
 `completion-in-region-function' value in ORIGFUN."
+  ;; This error may happen when user hits quickly twice e.g. TAB for
+  ;; completion-at-point which start a second time this function because the
+  ;; first helm-buffer with its keymap is not ready yet (this happen when helm is
+  ;; displayed in a frame which is slower to popup than a window).  FIXME: Should
+  ;; I prevent this at a lower level as well?
   (cl-assert (not (get-buffer-window helm-buffer 'visible)) nil
              "Error: Trying to run helm while a helm session is already running")
   (if (memq major-mode helm-mode-no-completion-in-region-in-modes)
