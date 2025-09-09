@@ -1271,7 +1271,8 @@ is used."
          ;; Not already defined function. To test add an advice on a non
          ;; existing function.
          (propertize comp 'face 'helm-completion-invalid))
-       ;; Prefixes.
+       ;; Prefixes meaning: (see `help--symbol-class' which returns such strings for a
+       ;; given symbol).
        ;; " c " command
        ;; " - " obsolete, 'byte-obsolete-info
        ;; " v " var, not a defcustom
