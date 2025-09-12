@@ -2335,28 +2335,6 @@ broken."
 (when (< emacs-major-version 26)
   (advice-add 'ansi-color-apply :override #'helm--ansi-color-apply))
 
-
-;;; Fontlock
-(dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-  (font-lock-add-keywords
-   mode
-   '(("(\\<\\(with-helm-after-update-hook\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-temp-hook\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-window\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-current-buffer\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-buffer\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-show-completion\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-default-directory\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-restore-variables\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-multi-key-defun\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-while-no-input\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-aif\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-awhile\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-acond\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-aand\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-with-gensyms\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-read-answer-dolist-with-action\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-read-answer\\)\\>" 1 font-lock-keyword-face))))
 
 (provide 'helm-lib)
 
