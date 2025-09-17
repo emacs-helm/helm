@@ -1344,14 +1344,8 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
          (cdir (helm-aand
                 (eq action 'compress)
                 (helm-common-dir ifiles)
-                ;; We want a common dir, however `helm-common-dir' may return a
-                ;; common name which is not a directory e.g. for
-                ;; "/home/you/img-001.jpg" and "home/you/img-002.jpg"
-                ;; `helm-common-dir' returns "/home/you/img-00".
                 (if (stringp it)
-                    (file-name-as-directory
-                     (or (and (file-directory-p it) it)
-                         (file-name-directory it)))
+                    (file-name-as-directory it)
                   (error "Try to compress files not belonging to same drive"))))
          helm-ff--move-to-first-real-candidate
          helm-display-source-at-screen-top ; prevent setting window-start.

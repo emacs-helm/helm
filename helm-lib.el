@@ -2047,19 +2047,24 @@ Take same args as `directory-files'."
     ;; at least 27.1, see bug#2662.
     (apply #'directory-files directory args)))
 
-(defun helm-common-dir-1 (files)
-  "Find the common directories of FILES."
+(defun helm-common-str-1 (files &optional dirp)
+  "Find the common string or directory in FILES.
+When DIRP is non nil return the common part which is a directory."
   (if (cdr files)
       (cl-loop with base = (car files)
                with others = nil
                for file in files
-               for cpart = (fill-common-string-prefix base file)
+               for cpart = (if dirp
+                               (helm-acase (fill-common-string-prefix base file)
+                                 ((guard* (and it (file-directory-p it))) it)
+                                 (t (and it (file-name-directory it))))
+                             (fill-common-string-prefix base file))
                if cpart
                do (setq base cpart)
                else do (push file others)
                finally return (if (and others base)
                                   (nconc (list (directory-file-name base))
-                                         (helm-common-dir-1 others))
+                                         (helm-common-str-1 others))
                                 (list (and base (directory-file-name base)))))
     (and files (list (directory-file-name
                       (file-name-directory (car files)))))))
@@ -2068,7 +2073,7 @@ Take same args as `directory-files'."
   "Return the longest common directory path of FILES list.
 If FILES are not all common to the same drive (Windows) a list of
 common directory is returned."
-  (let ((result (helm-common-dir-1 files)))
+  (let ((result (helm-common-str-1 files t)))
     (if (cdr result) result (car result))))
 
 ;; Tests:
