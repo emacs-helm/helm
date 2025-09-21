@@ -587,8 +587,8 @@ to avoid errors with outdated packages no more availables."
   "Helm interface to find packages by keywords with `finder'.
 To have more actions on packages, use `helm-packages'."
   (interactive "P")
-  (when arg (package-refresh-contents))
-  (package-initialize) ; needed to feed package-archive-contents.
+  (package-initialize)
+  (when arg (helm-packages--refresh-contents))
   (helm :sources
         (helm-build-in-buffer-source "helm finder"
           :data (cl-loop for p in package-archive-contents
