@@ -956,7 +956,6 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
            (src-list (list src-hist
                            (if candidates-in-buffer
                                src-1 src)))
-           (helm-execute-action-at-once-if-one exec-when-only-one)
            (helm-quit-if-no-candidate quit-when-no-cand)
            result)
       (when nomark
@@ -978,6 +977,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                     :keymap keymap ;; Needed with empty collection.
                     :allow-nest allow-nest
                     :candidate-number-limit candidate-number-limit
+                    :execute-action-at-once-if-one exec-when-only-one
                     :case-fold-search case-fold
                     :history (and (symbolp input-history) input-history)
                     :buffer buffer))
