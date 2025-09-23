@@ -34,6 +34,10 @@
 (require 'helm-multi-match)
 (require 'helm-source)
 
+(defun helm-acase-extra-fontifications ()
+  (font-lock-add-keywords nil '(("\\<\\(guard\\|dst\\)\\>\\*" . font-lock-type-face))))
+(add-hook 'emacs-lisp-mode-hook #'helm-acase-extra-fontifications)
+
 ;; Setup completion styles for helm-mode
 (helm--setup-completion-styles-alist)
 
