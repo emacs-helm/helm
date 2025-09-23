@@ -600,11 +600,10 @@ after running winner-undo/redo."
   (cl-pushnew helm-buffer winner-boring-buffers :test 'equal))
 (add-hook 'helm-cleanup-hook #'helm-handle-winner-boring-buffers)
 
-(defun helm-quit-and-find-file ()
+(defun helm-quit-and-find-file-1 ()
   "Drop into `helm-find-files' from `helm'.
 If current selection is a buffer or a file, `helm-find-files'
 from its directory."
-  (interactive)
   (with-helm-alive-p
     (require 'helm-grep)
     (require 'helm-elisp)
@@ -625,7 +624,6 @@ from its directory."
                                          (helm-basename f) f))))
              (helm-find-files-1 f))))
        (helm--quit-and-find-file-default-file src)))))
-(put 'helm-quit-and-find-file 'helm-only t)
 
 (defun helm--quit-and-find-file-default-file (source)
   (let ((target-fn (or (helm-get-attr 'find-file-target source)

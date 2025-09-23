@@ -43,7 +43,7 @@
 
 (declare-function helm-comp-read "helm-mode.el")
 (declare-function custom-unlispify-tag-name "cus-edit.el")
-(declare-function helm-quit-and-find-file "helm-utils.el")
+(declare-function helm-quit-and-find-file-1 "helm-utils.el")
 (declare-function linum-mode "linum.el")
 (declare-function minibuffer-depth-setup "mb-depth.el")
 (declare-function transient--delete-window "ext:transient" ())
@@ -2656,6 +2656,13 @@ i.e. functions called with RET."
                          (lambda () (helm-set-local-variable 'helm-display-function nil
                                                              'helm--last-frame-parameters nil))))
   (helm-exit-minibuffer))
+
+(defun helm-quit-and-find-file ()
+  (interactive)
+  (if (fboundp 'helm-quit-and-find-file-1)
+      (helm-quit-and-find-file-1)
+    (error "No rules to find file, please install helm package for this")))
+(put 'helm-quit-and-find-file 'helm-only t)
 
 (defun helm--get-frame-parameters (&optional frame)
   (cl-loop with params = (frame-parameters frame)
