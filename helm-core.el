@@ -2653,8 +2653,10 @@ i.e. functions called with RET."
     ;; If no helm based action run within 0.5 seconds, the next helm
     ;; session will have to resolve again those variable values.
     (run-with-idle-timer 0.5 nil
-                         (lambda () (helm-set-local-variable 'helm-display-function nil
-                                                             'helm--last-frame-parameters nil))))
+                         (lambda ()
+                           (helm-set-local-variable
+                            'helm-display-function nil
+                            'helm--last-frame-parameters nil))))
   (helm-exit-minibuffer))
 
 (defun helm-quit-and-find-file ()
