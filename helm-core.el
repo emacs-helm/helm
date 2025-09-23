@@ -520,13 +520,17 @@ i.e. the loop is not entered after running COMMAND."
 Default to Helm group when group is not defined in source."
   (interactive)
   (let ((source (or (helm-get-current-source)
-                    (helm-comp-read
-                       "Customize variables for: "
-                       (cl-loop for src in (with-helm-buffer helm-sources)
-                                collect `(,(assoc-default 'name src) .
-                                          ,src))
-                       :allow-nest t
-                       :exec-when-only-one t))))
+                    (and (fboundp 'helm-comp-read)
+                         (helm-comp-read
+                          "Customize variables for: "
+                          (cl-loop for src in (with-helm-buffer helm-sources)
+                                   collect `(,(assoc-default 'name src) .
+                                              ,src))
+                          :allow-nest t
+                          :exec-when-only-one t))
+                    ;; No completion on sources when only helm-core package is
+                    ;; used.
+                    (car helm-sources))))
     (helm-run-after-exit 'helm-customize-group-1 (helm-get-attr 'group source))))
 (put 'helm-customize-group 'helm-only t)
 
@@ -2474,18 +2478,22 @@ This is a toggle command, when hit a second time reset to all sources."
     (with-helm-buffer
       (if (null helm-source-filter)
           (when (cdr helm-sources)
-            (let ((headers (helm-comp-read
-                            "Limit to source(s): "
-                            (mapcar
-                             (lambda (s)
-                               (let* ((name (assoc-default 'name s))
-                                      (disp (helm-aif (assoc-default 'header-name s)
-                                                (funcall it name) name)))
-                                 (cons disp name)))
-                             helm-sources)
-                            :marked-candidates t
-                            :allow-nest t
-                            :buffer "*helm sources*")))
+            (let ((headers (if (fboundp 'helm-comp-read)
+                               (helm-comp-read
+                                "Limit to source(s): "
+                                (mapcar
+                                 (lambda (s)
+                                   (let* ((name (assoc-default 'name s))
+                                          (disp (helm-aif (assoc-default 'header-name s)
+                                                    (funcall it name) name)))
+                                     (cons disp name)))
+                                 helm-sources)
+                                :marked-candidates t
+                                :allow-nest t
+                                :buffer "*helm sources*")
+                             ;; No completion on sources when only helm-core package is
+                             ;; used.
+                             (list (assoc-default 'name (helm-get-current-source))))))
               (helm-set-source-filter headers)))
         (helm-set-source-filter nil)))))
 (put 'helm-limit-to-sources 'helm-only t)
@@ -8255,16 +8263,20 @@ message explaining this is added instead.
 The global `helm-help-message' is always added after this local
 help."
   (interactive)
-  (require 'helm-mode) ; for helm-comp-read.
+  (require 'helm-mode nil t) ; for helm-comp-read.
   (with-helm-alive-p
-    (let ((source (or (helm-get-current-source)
-                      (helm-comp-read
-                       "Help for: "
-                       (cl-loop for src in (with-helm-buffer helm-sources)
-                                collect `(,(assoc-default 'name src) .
-                                          ,src))
-                       :allow-nest t
-                       :exec-when-only-one t))))
+    (let ((source (or (helm-get-current-source) ; nil when helm-buffer is empty.
+                      (and (fboundp 'helm-comp-read)
+                           (helm-comp-read
+                            "Help for: "
+                            (cl-loop for src in (with-helm-buffer helm-sources)
+                                     collect `(,(assoc-default 'name src) .
+                                                ,src))
+                            :allow-nest t
+                            :exec-when-only-one t))
+                      ;; No completion on sources when only helm-core package is
+                      ;; used.
+                      (car helm-sources))))
       (save-selected-window
         (helm-help-internal
          helm-help-buffer-name
