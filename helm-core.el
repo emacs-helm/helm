@@ -39,7 +39,7 @@
 (add-hook 'emacs-lisp-mode-hook #'helm-acase-extra-fontifications)
 
 ;; Setup completion styles for helm-mode
-(when (featurep 'helm-mode) (helm--setup-completion-styles-alist))
+(helm--setup-completion-styles-alist)
 
 (declare-function helm-comp-read "helm-mode.el")
 (declare-function custom-unlispify-tag-name "cus-edit.el")
