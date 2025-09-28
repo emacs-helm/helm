@@ -1086,7 +1086,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
             (category . man)))
     (info . (metadata
              (affixation-function . helm-completion-info-file-affixation)
-             (category . info))))
+             (category . info)))
+    (bookmark . (metadata
+                 (affixation-function . helm-completion-bookmark-affixation)
+                 (category . bookmark))))
   "Extra metadatas for completing-read.
 
 It is used to add `affixation-function' or `annotation-function' if original
@@ -1159,7 +1162,8 @@ FLAGS is a list of variables to renitialize to nil when exiting or quitting.")
     ("list-charset-chars" . charset)
     ("info-display-manual" . info)
     ;; Emacs-30 only
-    ("eww" . eww-help))
+    ("eww" . eww-help)
+    ("bookmark-jump" . bookmark))
   "An alist to specify metadata category by command.
 
 Some commands provide a completion-table with no category
@@ -1338,6 +1342,15 @@ is used."
       (list comp
             ""
             (helm-aand (propertize doc 'face 'helm-completions-detailed)
+                       (propertize " " 'display (concat sep it)))))))
+
+(defun helm-completion-bookmark-affixation (_completions)
+  (lambda (comp)
+    (let* ((sep (helm-make-separator comp))
+           (loc (bookmark-location comp)))
+      (list (propertize comp 'face 'bookmark-menu-bookmark)
+            ""
+            (helm-aand (propertize loc 'face 'helm-completions-detailed)
                        (propertize " " 'display (concat sep it)))))))
 
 (defun helm--get-theme-doc-1 (sym)
