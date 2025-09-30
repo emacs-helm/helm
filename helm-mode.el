@@ -1174,6 +1174,8 @@ should be specified as a string and the category as a symbol.")
 ;; We can't reuse the function from helm-man.el because the candidates are here
 ;; differents e.g. apt vs apt(8).
 (defun helm-completion-man-popup-info (candidate)
+  "Popup-info function for `man' category.
+See `helm-completing-read-extra-metadata'."
   ;; Man has the stupid habit to use symbol at point as default, try to not
   ;; match it.
   (let* ((com (if (string-match "\\(.*\\) ?([^()]+)" candidate)
@@ -1186,6 +1188,8 @@ should be specified as a string and the category as a symbol.")
 
 (defvar helm-completing-read--buffer-lgst-mode nil)
 (defun helm-completing-read-buffer-affixation (completions)
+  "Affixation function for `buffer' category.
+See `helm-completing-read-extra-metadata'."
   (let ((len-mode (or helm-completing-read--buffer-lgst-mode
                       (setq helm-completing-read--buffer-lgst-mode
                             (cl-loop for bn in completions
@@ -1235,7 +1239,10 @@ should be specified as a string and the category as a symbol.")
               (propertize " " 'display suffix))))))
 
 (defun helm-symbol-completion-table-affixation (_completions)
-  "Override `help--symbol-completion-table-affixation'.
+  "Affixation function for `symbol-help' category.
+See `helm-completing-read-extra-metadata'.
+
+Override `help--symbol-completion-table-affixation'.
 
 Normally affixation functions use COMPLETIONS as arg, and return a list of
 modified COMPLETIONS. Now we allow affixations functions to return a
@@ -1312,6 +1319,8 @@ is used."
         (propertize (format " (%s)" binding) 'face 'helm-completions-key-binding)))))
 
 (defun helm-completion-package-affixation (_completions)
+  "Affixation function for `package' category.
+See `helm-completing-read-extra-metadata'."
   (lambda (comp)
     (let* ((sym (intern-soft comp))
            (id (package-get-descriptor sym))
@@ -1333,6 +1342,8 @@ is used."
                 "")))))
 
 (defun helm-completion-theme-affixation (_completions)
+  "Affixation function for `theme' category.
+See `helm-completing-read-extra-metadata'."
   (lambda (comp)
     (let* ((sym (intern-soft comp))
            (sep (helm-make-separator comp))
@@ -1345,6 +1356,8 @@ is used."
                        (propertize " " 'display (concat sep it)))))))
 
 (defun helm-completion-bookmark-affixation (_completions)
+  "Affixation function for `bookmark' category.
+See `helm-completing-read-extra-metadata'."
   (lambda (comp)
     (let* ((sep (helm-make-separator comp))
            (loc (bookmark-location comp)))
@@ -1386,6 +1399,8 @@ is used."
       (buffer-substring beg end))))
 
 (defun helm-completion-coding-system-affixation (_comps)
+  "Affixation function for `coding-system' category.
+See `helm-completing-read-extra-metadata'."
   (require 'mule-diag)
   (lambda (comp)
     (let ((doc (with-output-to-string
@@ -1398,6 +1413,8 @@ is used."
                                (propertize " " 'display (concat sep it)))))))
 
 (defun helm-completion-charset-affixation (_comps)
+  "Affixation function for `charset' category.
+See `helm-completing-read-extra-metadata'."
   (lambda (comp)
     (let ((doc (charset-description (intern comp)))
           (sep (helm-make-separator comp)))
@@ -1405,6 +1422,8 @@ is used."
                                (propertize " " 'display (concat sep it)))))))
 
 (defun helm-completion-color-affixation (_comps)
+  "Affixation function for `color' category.
+See `helm-completing-read-extra-metadata'."
   (lambda (comp)
     (let ((sep (helm-make-separator comp))
           (rgb (condition-case nil
@@ -1423,6 +1442,8 @@ is used."
                        (propertize " " 'display (concat sep it)))))))
 
 (defun helm-completion-library-affixation (_comps)
+  "Affixation function for `library' category.
+See `helm-completing-read-extra-metadata'."
   ;; We share here the same cache as `helm-locate-library'.
   (require 'helm-elisp)
   (lambda (comp)
@@ -1446,6 +1467,8 @@ is used."
                          (propertize " " 'display (concat sep it))))))))
 
 (defun helm-completion-eww-affixation (_completions)
+  "Affixation function for `eww-help' category.
+See `helm-completing-read-extra-metadata'."
   (lambda (comp)
     (let* ((title (or (cl-loop for bmk in eww-bookmarks
                                for title = (plist-get bmk :title)
@@ -1461,6 +1484,8 @@ is used."
             ""))))
 
 (defun helm-completion-info-file-affixation (_completions)
+  "Affixation function for `info' category.
+See `helm-completing-read-extra-metadata'."
   ;; We share here the same cache as `helm-info'.
   (require 'info)
   (require 'helm-info)
