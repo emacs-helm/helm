@@ -1341,6 +1341,17 @@ See `helm-completing-read-extra-metadata'."
                            (propertize " " 'display (concat sep it)))
                 "")))))
 
+(defun helm-completion-bookmark-affixation (_completions)
+  "Affixation function for `bookmark' category.
+See `helm-completing-read-extra-metadata'."
+  (lambda (comp)
+    (let* ((sep (helm-make-separator comp))
+           (loc (bookmark-location comp)))
+      (list (propertize comp 'face 'bookmark-menu-bookmark)
+            ""
+            (helm-aand (propertize loc 'face 'helm-completions-detailed)
+                       (propertize " " 'display (concat sep it)))))))
+
 (defun helm-completion-theme-affixation (_completions)
   "Affixation function for `theme' category.
 See `helm-completing-read-extra-metadata'."
@@ -1353,17 +1364,6 @@ See `helm-completing-read-extra-metadata'."
       (list comp
             ""
             (helm-aand (propertize doc 'face 'helm-completions-detailed)
-                       (propertize " " 'display (concat sep it)))))))
-
-(defun helm-completion-bookmark-affixation (_completions)
-  "Affixation function for `bookmark' category.
-See `helm-completing-read-extra-metadata'."
-  (lambda (comp)
-    (let* ((sep (helm-make-separator comp))
-           (loc (bookmark-location comp)))
-      (list (propertize comp 'face 'bookmark-menu-bookmark)
-            ""
-            (helm-aand (propertize loc 'face 'helm-completions-detailed)
                        (propertize " " 'display (concat sep it)))))))
 
 (defun helm--get-theme-doc-1 (sym)
