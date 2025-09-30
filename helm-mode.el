@@ -1095,6 +1095,9 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
 It is used to add `affixation-function' or `annotation-function' if original
 metadata doesn't have some or to override existing metadata according to the
 category extracted from current metadata.
+Helm provides as well an extra property called `popup-info-function' for
+categories where it would be too costly to extract informations for all
+candidates (See \\='man' category).
 
 It is an alist composed of (CATEGORY . METADATA) elements.
 CATEGORY is a symbol specifying the category according
