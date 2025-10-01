@@ -2339,18 +2339,19 @@ Keys description:
     (setq fname (expand-file-name
                  (or initial buffer-file-name dir)
                  dir)))
+  ;; completing-read default maybe a list of defaults.
   (if (and fname (consp fname))
-      (setq fname (cl-loop for f in fname
-                           collect (if (file-name-absolute-p fname)
-                                       (expand-file-name
-                                        f (helm-mode-root-dir dir))
-                                     (expand-file-name fname dir))))
-      (if (file-name-absolute-p fname)
-          (if (file-remote-p fname)
-              fname
-            (substitute-in-file-name
-             (concat (helm-mode-root-dir dir) fname)))
-        (expand-file-name fname dir))))
+      (cl-loop for f in fname
+               collect (helm-mode--resolve-fname f dir))
+    (helm-mode--resolve-fname fname dir)))
+
+(defun helm-mode--resolve-fname (fname dir)
+  (if (file-name-absolute-p fname)
+      (if (file-remote-p fname)
+          fname
+        (substitute-in-file-name
+         (concat (helm-mode-root-dir dir) fname)))
+    (expand-file-name fname dir)))
 
 (defun helm-mode-root-dir (dir)
   (if (file-remote-p dir)
