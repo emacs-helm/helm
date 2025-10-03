@@ -297,6 +297,24 @@ Can be \"--new-tab\" (default), \"--new-window\" or \"--private-window\"."
          (when (string= event "finished\n")
            (message "%s process %s" process event))))))
 
+(defun helm-browse-url-detached (cmd url &optional new-tab)
+  "Browse URL with browser CMD and detach it from Emacs.
+
+NEW-TAB is the command line argument supported by CMD e.g. \"--new-tab\".
+
+So when you quit Emacs you can keep your browser session open and
+not be prompted to kill the browser process.
+
+NOTE: Probably not supported on some systems (e.g., Windows)."
+  (setq url (browse-url-encode-url url))
+  (setq new-tab (if (stringp new-tab)
+                       (concat " " (replace-regexp-in-string
+                                    " " "" new-tab))
+                     ""))
+  (let ((process-environment (browse-url-process-environment)))
+    (call-process-shell-command
+     (format "(%s%s %s &)" cmd new-tab (shell-quote-argument url)))))
+
 ;;;###autoload
 (defun helm-browse-url-firefox (url &optional _ignore)
   "Same as `browse-url-firefox' but detach from Emacs.
@@ -307,13 +325,8 @@ not be prompted to kill the Firefox process.
 NOTE: Probably not supported on some systems (e.g., Windows)."
   (interactive (list (read-string "URL: " (browse-url-url-at-point))
                      nil))
-  (setq url (browse-url-encode-url url))
-  (let ((process-environment (browse-url-process-environment)))
-    (call-process-shell-command
-     (format "(%s %s %s &)"
-             browse-url-firefox-program
-             helm-browse-url-firefox-new-window
-             (shell-quote-argument url)))))
+  (helm-browse-url-detached browse-url-firefox-program url
+                            helm-browse-url-firefox-new-window))
 
 ;;;###autoload
 (defun helm-browse-url-opera (url &optional _ignore)
@@ -325,25 +338,33 @@ not be prompted to kill the Opera process.
 NOTE: Probably not supported on some systems (e.g., Windows)."
   (interactive (list (read-string "URL: " (browse-url-url-at-point))
                      nil))
-  (setq url (browse-url-encode-url url))
-  (let ((process-environment (browse-url-process-environment)))
-    (call-process-shell-command
-     (format "(%s %s &)"
-             helm-browse-url-opera-program (shell-quote-argument url)))))
+  (helm-browse-url-detached helm-browse-url-opera-program url))
 
 ;;;###autoload
 (defun helm-browse-url-chromium (url &optional _ignore)
-  "Browse URL with Google Chrome browser."
-  (interactive "sURL: ")
-  (helm-generic-browser
-   url helm-browse-url-chromium-program))
+  "Same as `browse-url-chromium' but detach from emacs.
+
+So when you quit Emacs you can keep your Chromium session open and
+not be prompted to kill the Chromium process.
+
+NOTE: Probably not supported on some systems (e.g., Windows)."
+  (interactive (list (read-string "URL: " (browse-url-url-at-point))
+                     nil))
+  (helm-browse-url-detached
+   helm-browse-url-chromium-program url))
 
 ;;;###autoload
 (defun helm-browse-url-brave (url &optional _ignore)
-  "Browse URL with Brave browser."
-  (interactive "sURL: ")
-  (helm-generic-browser
-   url helm-browse-url-brave-program))
+  "Browse URL with Brave browser and detach from emacs.
+
+So when you quit Emacs you can keep your Opera session open and
+not be prompted to kill the Opera process.
+
+NOTE: Probably not supported on some systems (e.g., Windows)."
+  (interactive (list (read-string "URL: " (browse-url-url-at-point))
+                     nil))
+  (helm-browse-url-detached
+   helm-browse-url-brave-program url "--new-tab"))
 
 ;;;###autoload
 (defun helm-browse-url-uzbl (url &optional _ignore)
