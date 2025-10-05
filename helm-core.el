@@ -7915,10 +7915,12 @@ ALL-SOURCES key value is non-nil returns marked candidates of all
 sources."
   (with-current-buffer helm-buffer
     (let* ((current-src (helm-get-current-source))
+           (src-name    (assq 'name current-src))
+           (dummy       (equal (helm-get-attr 'candidates current-src) '("dummy")))
            (candidates
             (cl-loop for (source . real) in (reverse helm-marked-candidates)
                      for use-wc = (and with-wildcard
-                                       (string-match-p "\\*" real)
+                                       (string-match-p "[[*?]" real)
                                        (null (file-exists-p real)))
                      when (or all-sources
                               (and
@@ -7926,10 +7928,8 @@ sources."
                                ;; dummy sources (or more) should share their
                                ;; (unique) marked candidate only when
                                ;; :all-marked is non nil.
-                               (not (equal (helm-get-attr 'candidates)
-                                           '("dummy")))
-                               (equal (assq 'name source)
-                                      (assq 'name current-src))))
+                               (not dummy)
+                               (equal (assq 'name source) src-name)))
                      nconc (helm--compute-marked real source use-wc) into mkds
                      finally return
                      (if (and with-wildcard all-sources)
@@ -7938,8 +7938,7 @@ sources."
            sel)
       (unless candidates
         (setq sel (helm-get-selection
-                   nil (helm-get-attr 'marked-with-props
-                                  current-src)
+                   nil (helm-get-attr 'marked-with-props current-src)
                    current-src))
         (setq candidates
               (helm--compute-marked
