@@ -397,10 +397,6 @@ a whole tree."
   "Hide tooltips automatically after this many seconds."
   :type 'integer)
 
-(defcustom helm-ff-file-name-history-use-recentf nil
-  "Use `recentf-list' instead of `file-name-history' in `helm-find-files'."
-  :type 'boolean)
-
 (defcustom helm-ff-skip-boring-files nil
   "Non-nil to skip boring files.
 I.e. the files matching regexps in `helm-boring-file-regexp-list'.
@@ -6807,42 +6803,10 @@ be existing directories."
 (helm-make-command-from-action helm-ff-run-mcp
     "Copy the car of marked candidates to the remaining marked candidates."
   'helm-ff-mcp)
+
 ;;; File name history
 ;;
 ;;
-(defun helm-files-save-file-name-history (&optional force)
-  "Save marked files to `file-name-history'."
-  (let* ((src (helm-get-current-source))
-         (src-name (assoc-default 'name src)))
-    (when (or force (helm-file-completion-source-p src)
-              (member src-name helm-files-save-history-extra-sources))
-      (let ((mkd (helm-marked-candidates :with-wildcard t))
-            (history-delete-duplicates t))
-        (cl-loop for sel in mkd
-                 when (and sel
-                           (stringp sel)
-                           ;; If file was one of HFF candidates assume it
-                           ;; is an existing file, so no need to call
-                           ;; file-exists-p which is costly on remote candidates.
-                           ;; (file-exists-p sel)
-                           (not (helm-ff--file-directory-p sel))
-                           ;; When creating a new directory previous test
-                           ;; check for file-directory-p BEFORE its
-                           ;; creation, so check for ending slash as
-                           ;; well to know if it is a future directory.
-                           (not (string-match "/\\'" sel)))
-                 do
-                 ;; we use `abbreviate-file-name' here because
-                 ;; other parts of Emacs seems to,
-                 ;; and we don't want to introduce duplicates.
-                 (add-to-history 'file-name-history
-                                 (abbreviate-file-name
-                                  (expand-file-name
-                                   ;; See comments in `helm-recentf-source'
-                                   ;; about bug#2709.
-                                   (substring-no-properties sel)))))))))
-(add-hook 'helm-exit-minibuffer-hook 'helm-files-save-file-name-history)
-
 (defvar helm-source-file-name-history
   (helm-build-sync-source "File Name History"
     :candidates 'file-name-history
@@ -6901,32 +6865,17 @@ be existing directories."
   "Switch back to current HFF session with selection as preselect."
   'helm-ff-file-name-history-ff)
 
-(defun helm-ff-file-name-history-delete-item (_candidate)
-  (let ((files (helm-marked-candidates)))
-    (with-helm-display-marked-candidates
-      helm-marked-buffer-name
-      (helm-ff--count-and-collect-dups files)
-      (when (y-or-n-p "Delete file(s) from history? ")
-        (cl-loop for f in files do
-                 (setq file-name-history (delete f file-name-history))))
-      (message nil))))
-
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
   (interactive)
   (let ((src (helm-build-sync-source "File name history"
                :init (lambda ()
-                       (with-helm-alive-p
-                         (when helm-ff-file-name-history-use-recentf
-                           (require 'recentf)
-                           (or recentf-mode (recentf-mode 1)))))
+                       (require 'recentf)
+                       (or recentf-mode (recentf-mode 1)))
                :candidate-number-limit (helm-aand (or (get 'file-name-history 'history-length)
                                                       history-length)
                                                   (and (numberp it) it))
-               :candidates (lambda ()
-                             (if helm-ff-file-name-history-use-recentf
-                                 recentf-list
-                               file-name-history))
+               :candidates (lambda () recentf-list)
                :help-message 'helm-file-name-history-help-message
                :fuzzy-match t
                :persistent-action 'ignore
@@ -6937,8 +6886,7 @@ be existing directories."
                                       (helm-set-pattern
                                        (expand-file-name candidate))
                                       (with-helm-after-update-hook (helm-exit-minibuffer)))
-                        "Find file in helm" 'helm-ff-file-name-history-ff
-                        "Delete candidate(s)" 'helm-ff-file-name-history-delete-item)
+                        "Find file in helm" 'helm-ff-file-name-history-ff)
                :keymap helm-file-name-history-map)))
     (with-helm-alive-p
       (helm :sources src
