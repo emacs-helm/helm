@@ -3730,7 +3730,10 @@ Add a `helm-ff-dir' property on each fname ending with \"/\"."
     (cl-loop with files = (helm-file-name-all-completions-internal directory)
              for f in (sort files (or sort-method 'string-lessp))
              for split = (split-string f "->" t)
-             for fname = (replace-regexp-in-string " $" "" (car split))
+             ;; For some reasons adb (or tramp) add a "*" at end of fnames, but
+             ;; the real name is without the ending "*".
+             for fname = (helm-aand (replace-regexp-in-string " $" "" (car split))
+                                    (replace-regexp-in-string "\\*\\'" "" it))
              for truename = (cadr split)
              collect (cond ((string-match "/\\'" fname)
                             (propertize (helm--dir-file-name fname directory)
