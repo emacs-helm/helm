@@ -835,12 +835,19 @@ is only used to test DEFAULT."
                                              disp 'face 'font-lock-keyword-face
                                              'display (concat ":" disp))
                                             real)))
+                   :persistent-action (lambda (candidate)
+                                        (helm-elisp--persistent-help
+                                         candidate
+                                         #'helm-elisp--describe-slot))
                    :persistent-help "Describe slot"
                    :popup-info (lambda (c) (caddr (split-string c "\n" t)))
-                   :action (lambda (candidate)
-                             (with-output-to-temp-buffer (help-buffer)
-                               (princ candidate))))
+                   :action (helm-make-actions
+                            "Describe slot" 'helm-elisp--describe-slot))
         :buffer "*helm class slots*"))
+
+(defun helm-elisp--describe-slot (slot)
+  (with-output-to-temp-buffer (help-buffer)
+    (princ slot)))
 
 (defun helm-apropos-toggle-details ()
   "Toggle details in `helm-apropos'."
