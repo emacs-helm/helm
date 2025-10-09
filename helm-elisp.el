@@ -757,7 +757,8 @@ is only used to test DEFAULT."
     :keymap helm-apropos-map
     :action '(("Describe Class" . helm-describe-class)
               ("Find Class (C-u for source)" . helm-find-function)
-              ("Info lookup" . helm-info-lookup-symbol))))
+              ("Info lookup" . helm-info-lookup-symbol)
+              ("Describe slots" . helm-elisp-describe-slots))))
 
 (defun helm-def-source--eieio-generic (&optional default)
   (helm-build-in-buffer-source "Generic functions"
@@ -821,6 +822,25 @@ is only used to test DEFAULT."
   ;; with the fallback source.
   ;; (run-with-idle-timer 0.01 nil #'helm-info-lookup-symbol-1 candidate)
   (helm-info-lookup-symbol-1 candidate))
+
+(defun helm-elisp-describe-slots (class)
+  (helm :sources (helm-build-sync-source "Class slots"
+                   :header-name (lambda (name) (format "%s in `%s'" name class))
+                   :candidates (helm-elisp-collect-slots-in-class
+                                (intern-soft class))
+                   :candidate-transformer
+                   (lambda (candidates)
+                     (cl-loop for (disp . real) in candidates
+                              collect (cons (propertize
+                                             disp 'face 'font-lock-keyword-face
+                                             'display (concat ":" disp))
+                                            real)))
+                   :persistent-help "Describe slot"
+                   :popup-info (lambda (c) (caddr (split-string c "\n" t)))
+                   :action (lambda (candidate)
+                             (with-output-to-temp-buffer (help-buffer)
+                               (princ candidate))))
+        :buffer "*helm class slots*"))
 
 (defun helm-apropos-toggle-details ()
   "Toggle details in `helm-apropos'."

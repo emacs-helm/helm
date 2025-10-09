@@ -56,6 +56,8 @@
 (declare-function helm-read-file-name "helm-mode.el")
 (declare-function find-function-library "find-func.el")
 (declare-function find-library-name "find-func.el")
+(declare-function cl--describe-class-slots "cl-extra.el")
+(declare-function cl--find-class "cl-macs.el")
 
 (defvar helm-sources)
 (defvar helm-initial-frame)
@@ -1480,6 +1482,23 @@ If object is a lambda, return \"Anonymous\"."
         (cl-describe-type (helm-symbolify class))
       (let ((helm-describe-function-function 'describe-function))
         (helm-describe-function (helm-symbolify class))))))
+
+(defun helm-elisp-collect-slots-in-class (class)
+  (with-temp-buffer
+    (cl-letf (((symbol-function 'cl--print-table)
+               #'helm-source--cl--print-table))
+      (cl--describe-class-slots (cl--find-class class))
+      (goto-char (point-min))
+      (cl-loop while (re-search-forward "^\\* \\(.*\\)" nil t)
+               for name = (match-string 1)
+               for doc = (save-excursion
+                           (forward-line 1)
+                           (let ((beg (point))
+                                 (end (when (re-search-forward "^\\*" nil t)
+                                        (1- (match-beginning 0)))))
+                             (when (and beg end)
+                               (buffer-substring beg end))))
+               collect (cons name (concat "* " name "\n" doc))))))
 
 (defun helm-describe-function (func)
   "Display documentation of FUNC, a symbol or string."
