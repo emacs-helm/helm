@@ -461,7 +461,7 @@ Like `this-command' but return the real command, and not
 ;;
 (defun helm-iter-list (seq &optional cycle)
   "Return an iterator object from SEQ.
-The iterator die and return nil when it reach end of SEQ.
+The iterator dies and returns nil when it reaches end of SEQ.
 When CYCLE is specified the iterator never ends."
   (let ((lis seq))
     (lambda ()
