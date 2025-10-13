@@ -7324,7 +7324,8 @@ unless FORCE-LONGEST is non nil."
                          (user-error "Attempt to resplit a single window"))
                         ((helm-action-window)
                          (user-error "Can't resplit while selecting actions"))
-                        ((window-parameter (get-buffer-window helm-current-buffer) 'window-slot)
+                        ((window-parameter
+                          (get-buffer-window helm-current-buffer) 'window-slot)
                          (user-error "Can't resplit a side window"))
                         (t (helm--toggle-resplit-window)))
                   (setq helm--window-side-state (helm--get-window-side-state)))
