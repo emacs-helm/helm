@@ -274,13 +274,6 @@ DELAY seconds."
                  delay nil (lambda ()
                              (setcar iterator nil))))))
 
-(helm-multi-key-defun helm-toggle-resplit-and-swap-windows
-    "Multi key command to re-split and swap Helm window.
-First call runs `helm-toggle-resplit-window',
-and second call within 1s runs `helm-swap-windows'."
-  '(helm-toggle-resplit-window helm-swap-windows) 1)
-(put 'helm-toggle-resplit-and-swap-windows 'helm-only t)
-
 (defun helm-command-with-subkeys (map subkey command
                                   &optional other-subkeys prompt exit-fn delay)
   "Build a command that run COMMAND when SUBKEY is read.
