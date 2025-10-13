@@ -7308,7 +7308,9 @@ unless FORCE-LONGEST is non nil."
 ;;
 (defvar helm--toggle-resplit-window-iterator nil)
 (defun helm-toggle-resplit-window ()
-  "Toggle resplit helm window, vertically or horizontally."
+  "Toggle resplit helm window, vertically or horizontally.
+When more than two windows use `helm-swap-windows' which display
+`helm-buffer' in each different windows, otherwise split windows clockwise."
   (interactive)
   (with-helm-alive-p
     (cond ((> (length (window-list nil 1)) 2)
@@ -7399,7 +7401,8 @@ If N is positive enlarge, if negative narrow."
 (put 'helm-toggle-full-frame 'helm-only t)
 
 (defun helm-swap-windows ()
-  "Swap window holding `helm-buffer' with other window."
+  "Swap window holding `helm-buffer' with other windows.
+Start swapping in the same order of windows as window-list."
   (interactive)
   (with-helm-alive-p
     (cond ((and helm-full-frame (one-window-p t))
