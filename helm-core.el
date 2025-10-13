@@ -477,7 +477,7 @@ i.e. the loop is not entered after running COMMAND."
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    #'undefined)
     ;; Multi keys
-    (define-key map (kbd "C-t")        #'helm-toggle-resplit-and-swap-windows)
+    (define-key map (kbd "C-t")        #'helm-toggle-resplit-window)
     ;; Debugging command
     (define-key map (kbd "C-h C-d")    #'helm-enable-or-switch-to-debug)
     (define-key map (kbd "C-h c")      #'helm-customize-group)
@@ -7313,6 +7313,7 @@ unless FORCE-LONGEST is non nil."
 ;;; Resplit helm window
 ;;
 ;;
+(defvar helm--toggle-resplit-window-iterator nil)
 (defun helm-toggle-resplit-window ()
   "Toggle resplit helm window, vertically or horizontally."
   (interactive)
@@ -7332,34 +7333,29 @@ unless FORCE-LONGEST is non nil."
                          (user-error "Can't resplit while selecting actions"))
                         ((window-parameter (get-buffer-window helm-current-buffer) 'window-slot)
                          (user-error "Can't resplit a side window"))
-                        (t
-                         (let ((before-height (window-height)))
-                           (delete-window)
-                           (set-window-buffer
-                            (select-window
-                             (if (= (window-height) before-height) ; initial split was horizontal.
-                                 ;; Split window vertically with `helm-buffer' placed
-                                 ;; on the good side according to actual value of
-                                 ;; `helm-split-window-default-side'.
-                                 (prog1
-                                     (cond ((or (eq helm-split-window-default-side 'above)
-                                                (eq helm-split-window-default-side 'left))
-                                            (split-window
-                                             (selected-window) nil 'above))
-                                           (t (split-window-vertically)))
-                                   (setq helm-split-window-state 'vertical))
-                               ;; Split window vertically, same comment as above.
-                               (setq helm-split-window-state 'horizontal)
-                               (cond ((or (eq helm-split-window-default-side 'left)
-                                          (eq helm-split-window-default-side 'above))
-                                      (split-window (selected-window) nil 'left))
-                                     (t (split-window-horizontally)))))
-                            helm-buffer))))
+                        (t (helm--toggle-resplit-window)))
                   (setq helm--window-side-state (helm--get-window-side-state)))
              (when helm-prevent-escaping-from-minibuffer
                (helm-prevent-switching-other-window :enabled t))))
           (t (error "current window configuration not suitable for splitting")))))
 (put 'helm-toggle-resplit-window 'helm-only t)
+
+(defun helm--toggle-resplit-window ()
+  (let ((state (helm--get-window-side-state)))
+    (unless (and helm--toggle-resplit-window-iterator
+                 (eq state helm--window-side-state))
+      (setq helm--toggle-resplit-window-iterator
+            (helm-iter-circular (helm-acase state
+                                  (right '(below left above right))
+                                  (left  '(above right below left))
+                                  (below '(left above right below))
+                                  (above '(right below left above))))))
+    (delete-window)
+    (set-window-buffer
+     (select-window
+      (split-window (selected-window) nil
+                    (helm-iter-next helm--toggle-resplit-window-iterator)))
+     helm-buffer)))
 
 ;; Utility: Resize helm window.
 (defun helm-enlarge-window-1 (n)
@@ -7453,7 +7449,8 @@ If N is positive enlarge, if negative narrow."
                (and resize (window-resize w2 resize split-state))
                (set-window-start w1 s2 t)
                (set-window-start w2 s1 t))
-             (setq helm--window-side-state (helm--get-window-side-state)))))))
+             (setq helm--window-side-state (helm--get-window-side-state)
+                   helm--toggle-resplit-window-iterator nil))))))
 (put 'helm-swap-windows 'helm-only t)
 
 (defun helm--get-window-side-state ()
