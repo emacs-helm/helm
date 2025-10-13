@@ -7337,20 +7337,24 @@ When more than two windows use `helm-swap-windows' which display
 (put 'helm-toggle-resplit-window 'helm-only t)
 
 (defun helm--toggle-resplit-window ()
-  (let ((state (helm--get-window-side-state)))
+  (let ((current-state (helm--get-window-side-state))
+        new-state)
     (unless (and helm--toggle-resplit-window-iterator
-                 (eq state helm--window-side-state))
+                 (eq current-state helm--window-side-state))
       (setq helm--toggle-resplit-window-iterator
-            (helm-iter-circular (helm-acase state
+            (helm-iter-circular (helm-acase current-state
                                   (right '(below left above right))
                                   (left  '(above right below left))
                                   (below '(left above right below))
                                   (above '(right below left above))))))
+    (setq new-state (helm-iter-next helm--toggle-resplit-window-iterator)
+          helm-split-window-state (helm-acase new-state
+                                    ((right left)  'horizontal)
+                                    ((below above) 'vertical)))
     (delete-window)
     (set-window-buffer
      (select-window
-      (split-window (selected-window) nil
-                    (helm-iter-next helm--toggle-resplit-window-iterator)))
+      (split-window (selected-window) nil new-state))
      helm-buffer)))
 
 ;; Utility: Resize helm window.
