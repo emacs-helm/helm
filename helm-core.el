@@ -7309,7 +7309,7 @@ unless FORCE-LONGEST is non nil."
 (defvar helm--toggle-resplit-window-iterator nil)
 (defun helm-toggle-resplit-window ()
   "Toggle resplit helm window, vertically or horizontally.
-When more than two windows use `helm-swap-windows' which display
+When more than two windows `helm-swap-windows' is used which display
 `helm-buffer' in each different windows, otherwise split windows clockwise."
   (interactive)
   (with-helm-alive-p
