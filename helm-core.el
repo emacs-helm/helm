@@ -469,8 +469,8 @@ i.e. the loop is not entered after running COMMAND."
     (helm-define-key-with-subkeys map (kbd "C-c n") ?n #'helm-run-cycle-resume)
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    #'undefined)
-    ;; Multi keys
-    (define-key map (kbd "C-t")        #'helm-toggle-resplit-window)
+    (define-key map (kbd "C-t")        #'helm-toggle-resplit-window-forward)
+    (define-key map (kbd "C-r")        #'helm-toggle-resplit-window-backward)
     ;; Debugging command
     (define-key map (kbd "C-h C-d")    #'helm-enable-or-switch-to-debug)
     (define-key map (kbd "C-h c")      #'helm-customize-group)
@@ -7307,11 +7307,22 @@ unless FORCE-LONGEST is non nil."
 ;;
 ;;
 (defvar helm--toggle-resplit-window-iterator nil)
-(defun helm-toggle-resplit-window ()
+(defvar helm--toggle-resplit-window-last-command nil)
+(defun helm-toggle-resplit-window-forward ()
+  "Toggle resplit helm window clockwise."
+  (interactive)
+  (helm-toggle-resplit-window-1 1))
+
+(defun helm-toggle-resplit-window-backward ()
+  "Toggle resplit helm window counterclockwise."
+  (interactive)
+  (helm-toggle-resplit-window-1 -1))
+
+(defun helm-toggle-resplit-window-1 (arg)
   "Toggle resplit helm window, vertically or horizontally.
 When more than two windows `helm-swap-windows' is used which display
-`helm-buffer' in each different windows, otherwise split windows clockwise."
-  (interactive)
+`helm-buffer' in each different windows, otherwise split windows clockwise if
+ARG is positive otherwise counterclockwise if negative."
   (with-helm-alive-p
     (cond ((> (length (window-list nil 1)) 2)
            (helm-swap-windows))
@@ -7329,24 +7340,21 @@ When more than two windows `helm-swap-windows' is used which display
                         ((window-parameter
                           (get-buffer-window helm-current-buffer) 'window-slot)
                          (user-error "Can't resplit a side window"))
-                        (t (helm--toggle-resplit-window)))
-                  (setq helm--window-side-state (helm--get-window-side-state)))
+                        (t (helm--toggle-resplit-window arg))))
              (when helm-prevent-escaping-from-minibuffer
                (helm-prevent-switching-other-window :enabled t))))
           (t (error "current window configuration not suitable for splitting")))))
 (put 'helm-toggle-resplit-window 'helm-only t)
 
-(defun helm--toggle-resplit-window ()
+(defun helm--toggle-resplit-window (arg)
   (let ((current-state (helm--get-window-side-state))
         new-state)
-    (unless (and helm--toggle-resplit-window-iterator
+    (unless (and (eq helm--toggle-resplit-window-last-command this-command)
                  (eq current-state helm--window-side-state))
       (setq helm--toggle-resplit-window-iterator
-            (helm-iter-circular (helm-acase current-state
-                                  (right '(below left above right))
-                                  (left  '(above right below left))
-                                  (below '(left above right below))
-                                  (above '(right below left above))))))
+            (helm-iter-circular (helm--resplit-window-direction
+                                 current-state arg)))
+      (setq helm--toggle-resplit-window-last-command this-command))
     (setq new-state (helm-iter-next helm--toggle-resplit-window-iterator)
           helm-split-window-state (helm-acase new-state
                                     ((right left)  'horizontal)
@@ -7355,7 +7363,17 @@ When more than two windows `helm-swap-windows' is used which display
     (set-window-buffer
      (select-window
       (split-window (selected-window) nil new-state))
-     helm-buffer)))
+     helm-buffer)
+    (setq helm--window-side-state (helm--get-window-side-state))))
+
+(defun helm--resplit-window-direction (state arg)
+  (let ((clockwise (helm-acase state
+                     (right '(below left above))
+                     (left  '(above right below))
+                     (below '(left above right))
+                     (above '(right below left)))))
+    (append (if (< arg 0) (reverse clockwise) clockwise)
+            (list state))))
 
 ;; Utility: Resize helm window.
 (defun helm-enlarge-window-1 (n)
