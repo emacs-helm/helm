@@ -7307,7 +7307,6 @@ unless FORCE-LONGEST is non nil."
 ;;
 ;;
 (defvar helm--toggle-resplit-window-iterator nil)
-(defvar helm--toggle-resplit-window-last-command nil)
 (defun helm-toggle-resplit-window-forward ()
   "Toggle resplit helm window clockwise."
   (interactive)
@@ -7349,12 +7348,11 @@ ARG is positive otherwise counterclockwise if negative."
 (defun helm--toggle-resplit-window (arg)
   (let ((current-state (helm--get-window-side-state))
         new-state)
-    (unless (and (eq helm--toggle-resplit-window-last-command this-command)
+    (unless (and (eq last-command this-command)
                  (eq current-state helm--window-side-state))
       (setq helm--toggle-resplit-window-iterator
             (helm-iter-circular (helm--resplit-window-direction
-                                 current-state arg)))
-      (setq helm--toggle-resplit-window-last-command this-command))
+                                 current-state arg))))
     (setq new-state (helm-iter-next helm--toggle-resplit-window-iterator)
           helm-split-window-state (helm-acase new-state
                                     ((right left)  'horizontal)
