@@ -7493,13 +7493,16 @@ Start swapping in the same order of windows as window-list."
     default))
 
 (defun helm--get-window-side-state ()
-  "Return the position of `helm-window' from `helm-current-buffer'.
+  "Return the position of `helm-window' w.r.t main window.
+Main window can be the window handling `helm-current-buffer' but also the
+persistent action window.
 Possible values are \\='left \\='right \\='below or \\='above."
   (let ((side-list '(left right below above)))
     (cl-loop for side in side-list
              thereis (and (equal (helm-window)
                                  (window-in-direction
-                                  side (get-buffer-window helm-current-buffer t)
+                                  side (or (get-buffer-window helm-current-buffer t)
+                                           (helm-persistent-action-display-window))
                                   t))
                           side))))
 
