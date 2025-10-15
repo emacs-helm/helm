@@ -7325,7 +7325,7 @@ When more than two windows `helm-swap-windows' is used which display
 ARG is positive otherwise counterclockwise if negative."
   (with-helm-alive-p
     (cond ((> (length (window-list nil 1)) 2)
-           (helm-swap-windows))
+           (helm-swap-windows arg))
           ((and (= (length (window-list nil 1)) 2)
                 (not (window-dedicated-p
                       (get-buffer-window helm-current-buffer))))
@@ -7422,10 +7422,10 @@ If N is positive enlarge, if negative narrow."
       (setq helm-onewindow-p t))))
 (put 'helm-toggle-full-frame 'helm-only t)
 
-(defun helm-swap-windows ()
+(defun helm-swap-windows (&optional arg)
   "Swap window holding `helm-buffer' with other windows.
 Start swapping in the same order of windows as window-list."
-  (interactive)
+  (interactive "p")
   (with-helm-alive-p
     (cond ((and helm-full-frame (one-window-p t))
            (user-error "Can't swap windows in a single window"))
@@ -7443,9 +7443,9 @@ Start swapping in the same order of windows as window-list."
                   (w2          (with-selected-window (helm-window)
                                  ;; Don't try to display helm-buffer
                                  ;; in a dedicated window.
-                                 (get-window-with-predicate
+                                 (helm--get-window-with-predicate
                                   (lambda (w) (not (window-dedicated-p w)))
-                                  1 cur-frame)))
+                                  1 cur-frame nil arg)))
                   (w2size      (window-total-size w2 split-state))
                   (b2          (window-buffer w2)) ; probably helm-current-buffer
                   (s2          (window-start w2))
@@ -7471,6 +7471,18 @@ Start swapping in the same order of windows as window-list."
              (setq helm--window-side-state (helm--get-window-side-state)
                    helm--toggle-resplit-window-iterator nil))))))
 (put 'helm-swap-windows 'helm-only t)
+
+(defun helm--get-window-with-predicate (predicate &optional minibuf all-frames default arg)
+  "Same as `get-window-with-predicate' but allow changing direction with ARG."
+  (catch 'found
+    (dolist (window (window-list-1
+		     (if (< arg 0)
+                         (previous-window nil minibuf all-frames)
+                       (next-window nil minibuf all-frames))
+		     minibuf all-frames))
+      (when (funcall predicate window)
+        (throw 'found window)))
+    default))
 
 (defun helm--get-window-side-state ()
   "Return the position of `helm-window' from `helm-current-buffer'.
