@@ -446,6 +446,7 @@ i.e. the loop is not entered after running COMMAND."
     (define-key map (kbd "C-M-r")      #'undefined)
     (define-key map (kbd "C-M-s")      #'undefined)
     (define-key map (kbd "C-M-i")      #'undefined)
+    (define-key map (kbd "C-;")        #'undefined)
     (define-key map (kbd "C-}")        #'helm-narrow-window)
     (define-key map (kbd "C-{")        #'helm-enlarge-window)
     (define-key map (kbd "C-c -")      #'helm-swap-windows)
