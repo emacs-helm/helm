@@ -470,8 +470,8 @@ i.e. the loop is not entered after running COMMAND."
     (helm-define-key-with-subkeys map (kbd "C-c n") ?n #'helm-run-cycle-resume)
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    #'undefined)
-    (define-key map (kbd "C-t")        #'helm-toggle-resplit-window-forward)
-    (define-key map (kbd "C-r")        #'helm-toggle-resplit-window-backward)
+    (define-key map (kbd "C-t")        #'helm-resplit-window-clockwise)
+    (define-key map (kbd "C-r")        #'helm-resplit-window-counterclockwise)
     ;; Debugging command
     (define-key map (kbd "C-h C-d")    #'helm-enable-or-switch-to-debug)
     (define-key map (kbd "C-h c")      #'helm-customize-group)
@@ -7308,21 +7308,31 @@ unless FORCE-LONGEST is non nil."
 ;;
 ;;
 (defvar helm--toggle-resplit-window-iterator nil)
-(defun helm-toggle-resplit-window-forward ()
-  "Toggle resplit helm window clockwise."
+(defun helm-resplit-window-clockwise ()
+  "Change the window split to move Helm window clockwise w.r.t the main window.
+See `helm-resplit-window-1'."
   (interactive)
-  (helm-toggle-resplit-window-1 1))
+  (helm-resplit-window-1 1))
+(put 'helm-resplit-window-clockwise 'helm-only t)
 
-(defun helm-toggle-resplit-window-backward ()
-  "Toggle resplit helm window counterclockwise."
+(defun helm-resplit-window-counterclockwise ()
+  "Change the window split to move Helm window counterclockwise.
+See `helm-resplit-window-1'."
   (interactive)
-  (helm-toggle-resplit-window-1 -1))
+  (helm-resplit-window-1 -1))
+(put 'helm-resplit-window-counterclockwise 'helm-only t)
 
-(defun helm-toggle-resplit-window-1 (arg)
-  "Toggle resplit helm window, vertically or horizontally.
-When more than two windows `helm-swap-windows' is used which display
-`helm-buffer' in each different windows, otherwise split windows clockwise if
-ARG is positive otherwise counterclockwise if negative."
+(defun helm-resplit-window-1 (arg)
+  "Change the window split to move Helm window.
+
+At each call of this function, change the window split w.r.t the main
+window to left, above, right or below direction remembering your
+previous movement, this when there is only two windows. Split direction
+is clockwise if ARG is positive and counterclockwise if
+negative. Otherwise when there is more than two windows and the helm
+buffer is displayed in one of those windows i.e. `helm-always-two-windows' is
+nil, the helm buffer is moved in the next or previous window according to ARG
+value."
   (with-helm-alive-p
     (cond ((> (length (window-list nil 1)) 2)
            (helm-swap-windows arg))
@@ -7340,13 +7350,12 @@ ARG is positive otherwise counterclockwise if negative."
                         ((window-parameter
                           (get-buffer-window helm-current-buffer) 'window-slot)
                          (user-error "Can't resplit a side window"))
-                        (t (helm--toggle-resplit-window arg))))
+                        (t (helm--resplit-window arg))))
              (when helm-prevent-escaping-from-minibuffer
                (helm-prevent-switching-other-window :enabled t))))
           (t (error "current window configuration not suitable for splitting")))))
-(put 'helm-toggle-resplit-window 'helm-only t)
 
-(defun helm--toggle-resplit-window (arg)
+(defun helm--resplit-window (arg)
   (let ((current-state (helm--get-window-side-state))
         new-state)
     (unless (and (eq last-command this-command)
