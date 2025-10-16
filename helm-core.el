@@ -7307,7 +7307,7 @@ unless FORCE-LONGEST is non nil."
 ;;; Resplit helm window
 ;;
 ;;
-(defvar helm--toggle-resplit-window-iterator nil)
+(defvar helm--resplit-window-iterator nil)
 (defun helm-resplit-window-clockwise ()
   "Change the window split to move Helm window clockwise w.r.t the main window.
 See `helm-resplit-window-1'."
@@ -7360,10 +7360,10 @@ value."
         new-state)
     (unless (and (eq last-command this-command)
                  (eq current-state helm--window-side-state))
-      (setq helm--toggle-resplit-window-iterator
+      (setq helm--resplit-window-iterator
             (helm-iter-circular (helm--resplit-window-direction
                                  current-state arg))))
-    (setq new-state (helm-iter-next helm--toggle-resplit-window-iterator)
+    (setq new-state (helm-iter-next helm--resplit-window-iterator)
           helm-split-window-state (helm-acase new-state
                                     ((right left)  'horizontal)
                                     ((below above) 'vertical)))
@@ -7477,7 +7477,7 @@ Start swapping in the same order of windows as window-list."
                (set-window-start w1 s2 t)
                (set-window-start w2 s1 t))
              (setq helm--window-side-state (helm--get-window-side-state)
-                   helm--toggle-resplit-window-iterator nil))))))
+                   helm--resplit-window-iterator nil))))))
 (put 'helm-swap-windows 'helm-only t)
 
 (defun helm--get-window-with-predicate (predicate &optional minibuf all-frames default arg)
