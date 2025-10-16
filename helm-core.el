@@ -2071,7 +2071,7 @@ Do not set this globally.  Do not use this in async sources or in
 commands using an async source in their sources.
 Use this either let-bounded or helm buffer local.")
 
-;; Utility: logging
+;; logging
 (defun helm-log (from format-string &rest args)
   "Log message if `helm-debug' is non-nil.
 Messages are written to the `helm-debug-buffer' buffer.
@@ -7305,7 +7305,7 @@ unless FORCE-LONGEST is non nil."
       max)))
 
 
-;;; Resplit helm window
+;;; Actions on helm window
 ;;
 ;;
 (defvar helm--resplit-window-iterator nil)
@@ -7384,7 +7384,7 @@ value."
     (append (if (< arg 0) (reverse clockwise) clockwise)
             (list state))))
 
-;; Utility: Resize helm window.
+;; Resize helm window.
 (defun helm-enlarge-window-1 (n)
   "Enlarge or narrow helm window.
 If N is positive enlarge, if negative narrow."
@@ -7512,8 +7512,8 @@ Possible values are \\='left \\='right \\='below or \\='above."
   (when (get-buffer-window buffer1)
     (unrecord-window-buffer window buffer1)
     (set-window-buffer window buffer2)))
-
-;; Utility: select another action by key
+
+;; select another action by key
 (defun helm-select-nth-action (n)
   "Select the N nth action for the currently selected candidate."
   (let ((src (helm-get-current-source)))
@@ -7720,7 +7720,7 @@ Meaning of prefix ARG is the same as in `reposition-window'."
 (put 'helm-reposition-window-other-window 'helm-only t)
 
 
-;; Utility: Visible Mark
+;; Visible Mark
 
 (defun helm-clear-visible-mark ()
   (with-current-buffer (helm-buffer-get)
