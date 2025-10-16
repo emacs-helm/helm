@@ -711,7 +711,7 @@ See `helm-case-fold-search' for more info."
 
 (defcustom helm-reuse-last-window-split-state nil
   "Use the same state of window split, vertical or horizontal.
-`helm-toggle-resplit-window' for the next helm session will use
+For the next helm session `helm-resplit-window-clockwise' will use
 the same window scheme as the previous session unless
 `helm-split-window-default-side' is \\='same or \\='other."
   :group 'helm
@@ -1776,7 +1776,8 @@ and are by the way not compatible with Helm.
 | \\[helm-next-source]| Next source                                                                                |
 | \\[helm-delete-minibuffer-contents]| Delete pattern (with prefix arg delete from point to end or all [2])        |
 | \\[helm-execute-persistent-action]| Persistent action (Execute and keep Helm session)                            |
-|\\[helm-toggle-resplit-and-swap-windows]|Rotate or swap windows.                                                  |
+|\\[helm-resplit-window-clockwise]|Resplit helm window clockwise.                                                  |
+|\\[helm-resplit-window-counterclockwise]||Resplit helm window counterclockwise.                                   |
 |\\[helm-exchange-minibuffer-and-header-line]|Exchange minibuffer and header-line.                                 |
 |\\[helm-quit-and-find-file]|Drop into `helm-find-files'.                                                          |
 |\\[helm-kill-selection-and-quit]|Kill display value of candidate and quit (with prefix arg, kill the real value). |
