@@ -7362,7 +7362,7 @@ value."
     (unless (and (eq last-command this-command)
                  (eq current-state helm--window-side-state))
       (setq helm--resplit-window-iterator
-            (helm-iter-circular (helm--resplit-window-direction
+            (helm-iter-circular (helm--resplit-window-sides
                                  current-state arg))))
     (setq new-state (helm-iter-next helm--resplit-window-iterator)
           helm-split-window-state (helm-acase new-state
@@ -7375,7 +7375,7 @@ value."
      helm-buffer)
     (setq helm--window-side-state (helm--get-window-side-state))))
 
-(defun helm--resplit-window-direction (state arg)
+(defun helm--resplit-window-sides (state arg)
   (let ((clockwise (helm-acase state
                      (right '(below left above))
                      (left  '(above right below))
