@@ -6600,10 +6600,10 @@ message \\='no match'."
 
 (defun helm--updating-p ()
   ;; helm timer is between two cycles.
-  ;; IOW `helm-check-minibuffer-input' haven't yet compared input
+  ;; IOW `helm-check-minibuffer-input' hasn't yet compared input
   ;; and `helm-pattern'.
   (or (not (equal (minibuffer-contents) helm-pattern))
-      ;; `helm-check-minibuffer-input' have launched `helm-update'.
+      ;; `helm-check-minibuffer-input' has launched `helm-update'.
       helm--in-update))
 
 (defun helm-maybe-exit-minibuffer ()
