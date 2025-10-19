@@ -4584,7 +4584,7 @@ Arg FILE is the real part of candidate, a filename with no props."
                          (lambda (f)
                            (string-match "autoloads\\|loaddefs" f)))))
     (if (fboundp 'loaddefs-generate)
-        (loaddefs-generate default-directory file)
+        (loaddefs-generate default-directory file nil nil nil t)
       (let ((generated-autoload-file file))
         (update-directory-autoloads default-directory)))))
 
