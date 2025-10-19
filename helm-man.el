@@ -25,6 +25,7 @@
 (defvar woman-manpath)
 (defvar woman-path)
 (defvar woman-expanded-directory-path)
+(defvar warning-suppress-log-types)
 (declare-function woman-file-name "woman.el" (topic &optional re-cache))
 (declare-function woman-file-name-all-completions "woman.el" (topic))
 (declare-function Man-getpage-in-background "man.el" (topic))
@@ -82,7 +83,9 @@ source.")
              (Man-getpage-in-background candidate)))))
 
 (defun helm-man--init ()
-  (require 'woman)
+  (require 'warnings)
+  (let ((warning-suppress-log-types '((defvaralias))))
+    (require 'woman))
   (require 'helm-utils)
   (unless helm-man--pages
     (setq woman-expanded-directory-path
