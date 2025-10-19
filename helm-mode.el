@@ -1115,6 +1115,7 @@ FLAGS is a list of variables to renitialize to nil when exiting or quitting.")
 
 (defvar helm-completing-read-command-categories
   '(("man" . man)
+    ("manual-entry" . man)
     ("customize-variable" . symbol-help)
     ("customize-set-variable" . symbol-help)
     ("customize-set-value" . symbol-help)
