@@ -619,7 +619,7 @@ Set this value to nil for no limit."
   :group 'helm
   :type '(choice (const :tag "Disabled" nil) integer))
 
-(defcustom helm-input-idle-delay (if (display-graphic-p) 0.01 0.1) ; Issue #2730.
+(defcustom helm-input-idle-delay (if (display-graphic-p) 0.01 0.05) ; Issue #2730.
   "Idle time before updating, specified in seconds."
   :group 'helm
   :type 'float)
