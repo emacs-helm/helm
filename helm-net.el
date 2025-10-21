@@ -357,6 +357,8 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
 (defun helm-browse-url-brave (url &optional _ignore)
   "Browse URL with Brave browser and detach from emacs.
 
+Brave browser executable is determined by `helm-browse-url-brave-program'.
+
 So when you quit Emacs you can keep your Opera session open and
 not be prompted to kill the Opera process.
 
