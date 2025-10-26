@@ -443,12 +443,6 @@ directories."
                         'helm-ff-dynamic-candidate-number-limit
                         "4.0.6")
 
-(defcustom helm-files-save-history-extra-sources
-  '("Find" "Fd" "Locate" "Recentf"
-    "Files from Current Directory" "File Cache" "Etags")
-  "Extras source that save candidate to `file-name-history'."
-  :type '(repeat (choice string)))
-
 (defcustom helm-find-files-before-init-hook nil
   "Hook that run before initialization of `helm-find-files'."
   :type 'hook)
