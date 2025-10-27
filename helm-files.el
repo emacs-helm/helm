@@ -912,13 +912,6 @@ to nil to avoid error messages when using `helm-find-files'."
   "Delay in seconds between each image in slideshow."
   :type 'integer)
 
-(defcustom helm-file-name-history-hide-deleted nil
-  "Hide deleted files in file-name-history when non nil.
-
-This can be toggled at any time from `helm-ff-file-name-history' with \
-\\<helm-file-name-history-map>\\[helm-file-name-history-show-or-hide-deleted]."
-  :type 'boolean)
-
 (defcustom helm-file-name-history-max-length 72
   "Max length of candidates in helm file name history before truncating."
   :type 'integer)
@@ -6816,17 +6809,9 @@ be existing directories."
     :filtered-candidate-transformer #'helm-file-name-history-transformer
     :action 'helm-type-file-actions))
 
-(defun helm-file-name-history-show-or-hide-deleted ()
-  (interactive)
-  (setq helm-file-name-history-hide-deleted
-        (not helm-file-name-history-hide-deleted))
-  (helm-update))
-(put 'helm-file-name-history-show-or-hide-deleted 'helm-only t)
-
 (defvar helm-file-name-history-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c d")   'helm-file-name-history-show-or-hide-deleted)
     (define-key map (kbd "C-x C-f") 'helm-ff-file-name-history-run-ff)
     map))
 
@@ -6847,8 +6832,8 @@ be existing directories."
                                 (concat (propertize c 'face 'helm-ff-file)
                                         (make-string (1+ (- lgst (length c))) ? )
                                         last-access))))
-                            (t (unless helm-file-name-history-hide-deleted
-                                 (propertize c 'face 'helm-history-deleted))))
+                            ;; Should not happen as long as we use recentf.
+                            (t (propertize c 'face 'helm-history-deleted)))
            when disp
            collect (cons (if helm-ff-icon-mode
                              (concat (helm-x-icons-icon-for-file
