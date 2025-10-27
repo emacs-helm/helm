@@ -6860,7 +6860,7 @@ be existing directories."
   'helm-ff-file-name-history-ff)
 
 (defun helm-ff-file-name-history ()
-  "Switch to `file-name-history' without quitting `helm-find-files'."
+  "Switch to `recentf' without quitting `helm-find-files'."
   (interactive)
   (let ((src (helm-build-sync-source "File name history"
                :init (lambda ()
