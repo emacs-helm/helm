@@ -117,6 +117,7 @@
 (defvar wfnames-buffer)
 (defvar Info-current-file)
 (defvar generated-autoload-file)
+(defvar recentf-max-saved-items)
 
 ;;; Internal vars
 ;;
@@ -6862,13 +6863,15 @@ be existing directories."
 (defun helm-ff-file-name-history ()
   "Switch to `recentf' without quitting `helm-find-files'."
   (interactive)
+  (recentf-mode 1)
   (let ((src (helm-build-sync-source "File name history"
-               :init (lambda ()
-                       (require 'recentf)
-                       (or recentf-mode (recentf-mode 1)))
-               :candidate-number-limit (helm-aand (or (get 'file-name-history 'history-length)
-                                                      history-length)
-                                                  (and (numberp it) it))
+               :candidate-number-limit
+               (helm-aand
+                (or
+                 recentf-max-saved-items
+                 (get 'file-name-history 'history-length)
+                 history-length)
+                (and (numberp it) it))
                :candidates (lambda () recentf-list)
                :help-message 'helm-file-name-history-help-message
                :fuzzy-match t
