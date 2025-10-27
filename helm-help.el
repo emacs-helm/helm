@@ -1361,14 +1361,15 @@ If `all-the-icons' package is installed, turning on
   "* Helm file name history
 
 ** Tips
-You can open directly the selected file and exit helm or preselect the file in helm-find-files,
-see actions in action menu.
 
-You can toggle the view of deleted files, see commands below.
+Helm is turning on `recentf-mode' for you only when calling this command
+and if `helm-turn-on-recentf' is non nil.  That's mean that the files
+opened prior calling this command would not be saved if you didn't
+enable `recentf-mode' yourself in your init file or manually.
 
 ** Commands
 \\<helm-file-name-history-map>
-\\[helm-file-name-history-show-or-hide-deleted]|Toggle deleted files view.")
+\\[helm-ff-file-name-history-run-ff]|Preselect file in helm-find-files.")
 
 ;;; Help for `helm-read-file-name'
 ;;
