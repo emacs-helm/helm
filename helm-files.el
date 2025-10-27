@@ -968,6 +968,11 @@ Setting this with `setq' may have no effect on this variable, use
          ;; Force rebuilding the source to pass diacritics fn to diacritics
          ;; slot.
          (setq helm-source-find-files nil)))
+
+(defcustom helm-turn-on-recentf t
+  "Automatically turn on `recentf-mode' when non-nil."
+  :group 'helm-files
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -6863,12 +6868,13 @@ be existing directories."
 (defun helm-ff-file-name-history ()
   "Switch to `recentf' without quitting `helm-find-files'."
   (interactive)
-  (recentf-mode 1)
+  (when helm-turn-on-recentf (recentf-mode 1))
   (let ((src (helm-build-sync-source "File name history"
                :candidate-number-limit
                (helm-aand
                 (or
-                 recentf-max-saved-items
+                 (and (boundp 'recentf-max-saved-items)
+                      recentf-max-saved-items)
                  (get 'file-name-history 'history-length)
                  history-length)
                 (and (numberp it) it))

@@ -112,11 +112,6 @@ Be aware that a nil value will make tramp display very slow."
         (t (setq helm-recentf--basename-flag nil)
            pattern))))
 
-(defcustom helm-turn-on-recentf t
-  "Automatically turn on `recentf-mode' when non-nil."
-  :group 'helm-files
-  :type 'boolean)
-
 (defclass helm-recentf-source (helm-source-sync helm-type-file)
   ((init :initform (lambda ()
                      (require 'recentf)
