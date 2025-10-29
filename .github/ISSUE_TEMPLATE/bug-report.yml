@@ -78,3 +78,5 @@ body:
       options:
         - label: I agree using a minimal configuration
           required: true
+        - label: I am not using Spacemacs to reproduce this bug
+          required: true
