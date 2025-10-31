@@ -333,10 +333,10 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
     (cl-assert (not (file-directory-p (expand-file-name name directory)))
                nil (format "Package already exists in %s" directory))
     (with-helm-default-directory directory
-      (let (process-connection-type
-            (proc (apply #'start-process
-                         "git" "*helm packages clone*"
-                         "git" switches)))
+      (let* (process-connection-type
+             (proc (apply #'start-process
+                          "git" "*helm packages clone*"
+                          "git" switches)))
         (save-selected-window
           (display-buffer (process-buffer proc)
                           '(display-buffer-below-selected
