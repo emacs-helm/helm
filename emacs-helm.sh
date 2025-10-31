@@ -156,6 +156,8 @@ fi
 
 
 cat > $CONF_FILE <<EOF
+;;; helm-cfg.el --- minimal helm config -*- lexical-binding: t -*-
+
 (setq initial-scratch-message
 ";; This buffer is for text that is not saved, and for Lisp evaluation.\\n\
 ;; You can hit \`C-j' at end of a lisp expression to eval it.\\n\\n\
