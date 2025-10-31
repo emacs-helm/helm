@@ -5679,7 +5679,7 @@ See `helm-default-output-filter'."
                 ;; Exit when we reach candidate-number-limit.
                 (when (>= (cdr item-count-info) (helm-candidate-number-limit source))
                   (process-put process 'reach-limit t)
-                  (helm-kill-async-process process #'kill-process)
+                  (helm-kill-async-process process #'kill-process) ; SIGKILL (9).
                   (helm-log-run-hook "helm-output-filter"
                                      'helm-async-outer-limit-hook)
                   (throw 'reach-limit nil))))))))
