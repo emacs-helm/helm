@@ -1651,7 +1651,10 @@ returns if available with current AG version."
                        (encode-coding-string directory locale-coding-system))
                    type))
         (start-time (float-time))
-        (proc-name (helm-grep--ag-command)))
+        (proc-name (helm-grep--ag-command))
+        ;; Fix error in MacOS with process-buffer deleted resulting in a nil
+        ;; helm-window (with-helm-window) in sentinel see issue#2741.
+        process-connection-type)
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
     (helm-log "helm-grep-ag-init" "Starting %s process in directory `%s'"
               proc-name directory)
