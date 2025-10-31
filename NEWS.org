@@ -1,6 +1,14 @@
 #+STARTUP:showall
 
 * NEWS
+** Version 4.0.7
+*** file-name-history in HFF is now inconditionally using recentf
+The user vars `helm-ff-file-name-history-use-recentf`
+and `helm-files-save-history-extra-sources` have been removed.
+*** Improve splitting helm-window
+We can now split in both directions with two different commands (C-r
+and C-t).
+*** helm-packages is now showing new packages
 ** Version 4.0.6
 *** Mostly bugfixes
 *** Change default value of helm-ff-candidate-number-limit
