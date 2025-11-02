@@ -344,7 +344,8 @@ See also `helm-locate'."
                            (mapconcat 'identity it " "))
                         (shell-quote-argument (car args)))))
          (default-directory (if (file-directory-p default-directory)
-                                default-directory "/")))
+                                default-directory "/"))
+         process-connection-type)
     (helm-log "helm-locat-init" "Starting helm-locate process")
     (helm-log "helm-locat-init" "Command line used was:\n\n%s"
               (concat ">>> " (propertize cmd 'face 'font-lock-comment-face) "\n\n"))
