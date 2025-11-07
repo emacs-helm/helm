@@ -96,6 +96,8 @@ source.")
   (helm-init-candidates-in-buffer 'global helm-man--pages))
 
 (defun helm-man-popup-info (candidate)
+  ;; On some systems mandb don't run automatically, in this case whatis or man
+  ;; -f return nothing.
   (let ((output (shell-command-to-string (format "man -f '%s'" candidate))))
     (when (string-match (format "\\(%s ?([^(]+)\\) *- ?\\(.*\\)\n" candidate)
                         output)
