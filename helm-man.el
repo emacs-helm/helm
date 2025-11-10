@@ -108,10 +108,22 @@ source.")
       (match-string 2 output))))
 
 (defun helm-man-tldr-render (command)
-  (with-current-buffer-window "*tldr*" nil nil
-    (call-process "tldr" nil t nil "--color" "always" command)
-    (ansi-color-apply-on-region (point-min) (point-max))
-    (local-set-key "q" 'quit-window)))
+  (with-current-buffer-window "*tldr*" '(display-buffer-full-frame) nil
+    (let ((status (call-process "tldr" nil t nil "--color" "always" command))
+          map)
+      (when (zerop status)
+        (ansi-color-apply-on-region (point-min) (point-max))
+        (goto-char (point-min))
+        (setq map (let ((m (make-sparse-keymap)))
+                    (define-key m (kbd "<return>") #'browse-url-at-point)
+                    m))
+        (save-excursion
+          (while (re-search-forward "http[s]://" nil t)
+            (let* ((pos (bounds-of-thing-at-point 'url))
+                   (ov (make-overlay (car pos) (cdr pos))))
+              (overlay-put ov 'face 'font-lock-keyword-face)
+              (overlay-put ov 'keymap map))))
+      (local-set-key "q" 'quit-window)))))
 
 (defun helm-man--tldr-cache ()
   (when (executable-find "tldr")
