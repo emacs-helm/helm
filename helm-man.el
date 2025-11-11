@@ -85,6 +85,7 @@ source.")
              (Man-getpage-in-background candidate)))))
 
 (defun helm-man--init ()
+  "Init caches for helm-man."
   (require 'warnings)
   (let ((warning-suppress-log-types '((defvaralias))))
     (require 'woman))
@@ -100,14 +101,16 @@ source.")
   (helm-init-candidates-in-buffer 'global helm-man--pages))
 
 (defun helm-man-popup-info (candidate)
+  "The popup-info function for `helm-man-pages-class'."
   ;; On some systems mandb don't run automatically, in this case whatis or man
-  ;; -f return nothing.
+  ;; -f may return nothing.
   (let ((output (shell-command-to-string (format "man -f '%s'" candidate))))
     (when (string-match (format "\\(%s ?([^(]+)\\) *- ?\\(.*\\)\n" candidate)
                         output)
       (match-string 2 output))))
 
 (defun helm-man-tldr-render (command)
+  "Display the output of `tldr' command."
   (with-current-buffer-window "*tldr*" '(display-buffer-full-frame) nil
     (let ((status (call-process "tldr" nil t nil "--color" "always" command))
           map)
@@ -129,12 +132,14 @@ source.")
       (local-set-key "q" 'quit-window)))))
 
 (defun helm-man--tldr-cache ()
+  "Return the output of tldr -l as a list."
   (when (executable-find "tldr")
     (with-temp-buffer
       (call-process "tldr" nil t nil "-l")
       (split-string (buffer-string) "\n"))))
 
 (defun helm-man-action-transformer (actions _candidate)
+  "The action transformer fn for `helm-man-woman'."
   (let ((disp (helm-get-selection nil t)))
     (if (member disp helm-man--tldr-cache)
         (append actions '(("tldr" . helm-man-tldr-render)))
