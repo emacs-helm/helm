@@ -2,6 +2,13 @@
 
 * NEWS
 ** Version 4.0.7
+*** Add tldr action to helm-man
+See https://github.com/tealdeer-rs/tealdeer
+and https://github.com/tldr-pages/tldr
+Don't forget to feed the cache if not already done:
+
+    tldr --update
+
 *** file-name-history in HFF is now inconditionally using recentf
 The user vars `helm-ff-file-name-history-use-recentf`
 and `helm-files-save-history-extra-sources` have been removed.
