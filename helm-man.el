@@ -142,7 +142,7 @@ source.")
   "The action transformer fn for `helm-man-woman'."
   (let ((disp (helm-get-selection nil t)))
     (if (member disp helm-man--tldr-cache)
-        (append actions '(("tldr" . helm-man-tldr-render)))
+        (append actions '(("Tldr" . helm-man-tldr-render)))
       actions)))
 
 (defclass helm-man-pages-class (helm-source-in-buffer)
