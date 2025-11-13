@@ -3339,27 +3339,6 @@ editing absolute fnames in previous Emacs versions."
     "Execute `helm-ff-edit-marked-files' interactively."
   'helm-ff-edit-marked-files)
 
-(defun helm-ff--create-tramp-name (fname)
-  "Build filename from `helm-pattern' like /su:: or /sudo::."
-  ;; `tramp-make-tramp-file-name' takes 7 args on emacs-26 whereas it
-  ;; takes only 5 args in emacs-24/25.
-  (apply #'tramp-make-tramp-file-name
-         ;; `tramp-dissect-file-name' returns a list in emacs-26
-         ;; whereas in 24.5 it returns a vector, thus the car is a
-         ;; symbol (`tramp-file-name') which is not needed as argument
-         ;; for `tramp-make-tramp-file-name' so transform the cdr in
-         ;; vector, and for 24.5 use directly the returned value.
-         (cl-loop with v = (helm-ff--tramp-cons-or-vector
-                            (tramp-dissect-file-name fname))
-                  for i across v collect i)))
-
-(defun helm-ff--tramp-cons-or-vector (vector-or-cons)
-  "Return VECTOR-OR-CONS as a vector."
-  (helm-acase vector-or-cons
-    ((guard* (and (consp it) (cdr it))) (vconcat guard))
-    ((guard* (vectorp it)) it)
-    (t (error "Wrong type argument: %s" it))))
-
 (defun helm-ff--get-tramp-methods ()
   "Return a list of the car of `tramp-methods'."
   (or helm-ff--tramp-methods
@@ -3509,7 +3488,7 @@ debugging purpose."
                 (setq cur-method (match-string 1 pattern))
                 (member cur-method methods))
            (setq tramp-name (expand-file-name
-                             (helm-ff--create-tramp-name
+                             (file-remote-p
                               (match-string 0 pattern))))
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:maybe_hostname:"
@@ -3517,7 +3496,7 @@ debugging purpose."
                 postfixed
                 (setq cur-method (match-string 1 pattern))
                 (member cur-method methods))
-           (setq tramp-name (helm-ff--create-tramp-name
+           (setq tramp-name (file-remote-p
                              (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/hostname:"
@@ -3525,7 +3504,7 @@ debugging purpose."
                 postfixed
                 (setq cur-method (match-string 1 pattern))
                 (and cur-method (not (member cur-method methods))))
-           (setq tramp-name (helm-ff--create-tramp-name
+           (setq tramp-name (file-remote-p
                              (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:" in this case don't try to connect.
