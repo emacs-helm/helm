@@ -3368,7 +3368,7 @@ Return nil on valid file name remote or not."
   ;; solution apart disabling tramp-mode when a file/dir located at /
   ;; is matching helm-tramp-file-name-regexp; This would prevent usage
   ;; of tramp if one have such a directory at / (who would want to
-  ;; have such a dir at / ???)  See emacs-bug#31489.
+  ;; have such a dir at / ???)  See https://debbugs.gnu.org/31489.
   (when (string-match-p helm-tramp-file-name-regexp fname)
     (let* ((bn    (helm-basename fname))
            (bd    (replace-regexp-in-string (regexp-quote bn) "" fname))
