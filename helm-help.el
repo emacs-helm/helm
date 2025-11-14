@@ -1183,6 +1183,13 @@ mode or letters, see 'chmod' man page for more infos.
 NOTE: Another way to change modes on files in helm-find-files is
 running `\\<helm-find-files-map>\\[helm-ff-run-switch-to-shell]' and use 'chmod' directly.
 
+*** Change owner and/or group on files
+
+Change owner of marked files with `\\<helm-find-files-map>\\[helm-ff-run-chown]' and group with `\\<helm-find-files-map>\\[helm-ff-run-chgrp]'.
+To change both at the same time use e.g. \"user:user\" at prompt.
+If you have not the rights to do this, you may have an error (see dired-log), in this case
+open the directory as root with tramp methods sudo or su to operate.
+
 *** Delete files
 
 You can delete files without quitting helm with
@@ -1308,6 +1315,8 @@ If `all-the-icons' package is installed, turning on
 |\\[helm-ff-run-hardlink-file]|Hardlink files.
 |\\[helm-ff-run-relsymlink-file]|Relative symlink Files.
 |\\[helm-ff-run-chmod]|Change mode on Files.
+|\\[helm-ff-run-chown]|Change owner on Files.
+|\\[helm-ff-run-chgrp]|Change group on Files.
 |\\[helm-ff-run-delete-file]|Delete Files.
 |\\[helm-ff-run-touch-files]|Touch files.
 |\\[helm-ff-run-kill-buffer-persistent]|Kill buffer candidate without leaving Helm.

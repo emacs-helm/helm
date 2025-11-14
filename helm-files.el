@@ -220,6 +220,8 @@ Should not be used among other sources.")
     (define-key map (kbd "M-K")           'helm-ff-run-kill-buffer-persistent)
     (define-key map (kbd "M-T")           'helm-ff-run-touch-files)
     (define-key map (kbd "M-M")           'helm-ff-run-chmod)
+    (define-key map (kbd "M-O")           'helm-ff-run-chown)
+    (define-key map (kbd "M-G")           'helm-ff-run-chgrp)
     (define-key map (kbd "C-c z")         'helm-ff-persistent-compress)
     (define-key map (kbd "M-Z")           'helm-ff-run-compress-marked-files)
     (define-key map (kbd "M-c")           'helm-ff-run-compress-to)
@@ -857,6 +859,8 @@ want to use it, helm is still providing
    "Compress file(s) to archive `M-c'" 'helm-find-files-compress-to
    "Compress or uncompress file(s) `M-Z'" 'helm-ff-compress-marked-files
    "Change mode on file(s) `M-M'" 'helm-ff-chmod
+   "Change owner on file(s) `M-O'" 'helm-ff-chown
+   "Change group on file(s) `M-G'" 'helm-ff-chgrp
    "Find file other window `C-c o'" 'helm-find-files-other-window
    "Find file other frame `C-c C-o'" 'find-file-other-frame
    (lambda () (and (fboundp 'tab-bar-mode)
@@ -1715,6 +1719,47 @@ the car of marked files i.e. the first marked file."
             (set-file-modes f mode)))
         (message "Changed file mode to `%s' on %s file(s)"
                  smode (length candidates))))))
+
+(defun helm-ff--dired-marked-files (&rest _args)
+  ;; Internally dired-do-chxxx needs basenames.
+  (cl-loop for f in (helm-marked-candidates :with-wildcard t)
+           collect (helm-basename f)))
+
+(defun helm-ff--dired-get-filename (&rest _args)
+  ;; Internally dired-do-chxxx needs basenames.
+  (helm-aif (helm-get-selection) (helm-basename it)))
+
+(defun helm-ff-dired-do-chxxx (&rest args)
+  "Variation of `dired-do-chxxx' for helm."
+  (cl-letf (((symbol-function 'dired-get-marked-files)
+             #'helm-ff--dired-marked-files)
+            ((symbol-function 'dired-do-redisplay)
+             #'ignore)
+            ((symbol-function 'dired-get-filename)
+             #'helm-ff--dired-get-filename))
+    (let (dired-click-to-select-mode)
+      (apply #'dired-do-chxxx args))))
+
+(defun helm-ff-chown (_candidate)
+  "Variation of `dired-do-chown' for helm."
+  (with-helm-default-directory helm-ff-default-directory
+    (when (and (memq system-type '(ms-dos windows-nt))
+               (not (file-remote-p default-directory)))
+      (error "chown not supported on this system"))
+    (helm-ff-dired-do-chxxx "Owner" dired-chown-program 'chown nil)))
+
+(defun helm-ff-chgrp (_candidate)
+  "Variation of `dired-do-chgrp' for helm."
+  (with-helm-default-directory helm-ff-default-directory
+    (when (and (memq system-type '(ms-dos windows-nt))
+               (not (file-remote-p default-directory)))
+      (error "chown not supported on this system"))
+    (helm-ff-dired-do-chxxx "Group" "chgrp" 'chgrp nil)))
+
+(helm-make-command-from-action helm-ff-run-chown "Change owner on file(s)." 'helm-ff-chown)
+(helm-make-command-from-action helm-ff-run-chgrp "Change group on file(s)." 'helm-ff-chgrp)
+(put 'helm-ff-run-chown 'helm-only t)
+(put 'helm-ff-run-chgrp 'helm-only t)
 
 (defun helm-find-files-other-window (_candidate)
   "Keep current-buffer and open files in separate windows.
