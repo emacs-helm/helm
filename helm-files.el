@@ -1555,8 +1555,7 @@ DEST must be a directory.  SWITCHES when unspecified default to
             (setq helm-rsync-progress-str-alist
                   (delete (assoc process helm-rsync-progress-str-alist)
                           helm-rsync-progress-str-alist))
-            (helm-rsync-restore-mode-line process)
-            (force-mode-line-update)))
+            (helm-rsync-restore-mode-line process)))
     (set-process-filter proc #'helm-rsync-process-filter)))
 
 (defun helm-rsync-process-filter (proc output)
