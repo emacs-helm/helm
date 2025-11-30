@@ -1730,12 +1730,15 @@ the car of marked files i.e. the first marked file."
 
 (defun helm-ff-dired-do-chxxx (&rest args)
   "Variation of `dired-do-chxxx' for helm."
+  (require 'dired-aux)
   (cl-letf (((symbol-function 'dired-get-marked-files)
              #'helm-ff--dired-marked-files)
             ((symbol-function 'dired-do-redisplay)
              #'ignore)
             ((symbol-function 'dired-get-filename)
              #'helm-ff--dired-get-filename))
+    ;; dired-aux is requiring dired so dired-click-to-select-mode should be
+    ;; also available.
     (let (dired-click-to-select-mode)
       (apply #'dired-do-chxxx args))))
 
