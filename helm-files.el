@@ -220,7 +220,9 @@ Should not be used among other sources.")
     (define-key map (kbd "M-K")           'helm-ff-run-kill-buffer-persistent)
     (define-key map (kbd "M-T")           'helm-ff-run-touch-files)
     (define-key map (kbd "M-M")           'helm-ff-run-chmod)
-    (define-key map (kbd "M-O")           'helm-ff-run-chown)
+    (define-key map (if (display-graphic-p)
+                        (kbd "M-O") (kbd "M-O O"))
+      'helm-ff-run-chown)
     (define-key map (kbd "M-G")           'helm-ff-run-chgrp)
     (define-key map (kbd "C-c z")         'helm-ff-persistent-compress)
     (define-key map (kbd "M-Z")           'helm-ff-run-compress-marked-files)
@@ -859,7 +861,7 @@ want to use it, helm is still providing
    "Compress file(s) to archive `M-c'" 'helm-find-files-compress-to
    "Compress or uncompress file(s) `M-Z'" 'helm-ff-compress-marked-files
    "Change mode on file(s) `M-M'" 'helm-ff-chmod
-   "Change owner on file(s) `M-O'" 'helm-ff-chown
+   "Change owner on file(s) `M-O' or `M-O O' in ttys" 'helm-ff-chown
    "Change group on file(s) `M-G'" 'helm-ff-chgrp
    "Find file other window `C-c o'" 'helm-find-files-other-window
    "Find file other frame `C-c C-o'" 'find-file-other-frame
