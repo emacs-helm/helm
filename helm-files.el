@@ -220,6 +220,7 @@ Should not be used among other sources.")
     (define-key map (kbd "M-K")           'helm-ff-run-kill-buffer-persistent)
     (define-key map (kbd "M-T")           'helm-ff-run-touch-files)
     (define-key map (kbd "M-M")           'helm-ff-run-chmod)
+    ;; M-O in ttys is a prefix key.
     (define-key map (if (display-graphic-p)
                         (kbd "M-O") (kbd "M-O O"))
       'helm-ff-run-chown)
