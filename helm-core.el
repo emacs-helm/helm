@@ -1151,11 +1151,13 @@ will take precedence over this."
   :type 'float)
 
 (defvar helm-update-edebug nil
-  "Development feature.
+  "Development feature, make easier Edebug usage while in Helm.
 If set to true then all functions invoked after `helm-update' can be
 instrumented by `edebug' for stepping. `helm--maybe-use-while-no-input'
 then doesn't use `while-no-input', because `while-no-input' throws on
-`edebug' command key input.")
+`edebug' command key input.  NOTE: This may hang helm a few seconds
+while you are typing so use it only for debugging purpose, not
+permanently.")
 
 (defvar helm-default-output-filter #'helm-output-filter
   "The `process-filter' function for Helm async sources.")
