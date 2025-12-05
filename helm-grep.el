@@ -1639,22 +1639,22 @@ returns if available with current AG version."
 
 (defun helm-grep-ag-init (directory &optional type)
   "Start AG process in DIRECTORY maybe searching only files of type TYPE."
-  (let ((default-directory (or helm-ff-default-directory
-                               (helm-default-directory)
-                               default-directory))
-        (cmd-line (helm-grep-ag-prepare-cmd-line
-                   ;; NOTE Encode directory name and pattern,
-                   ;; or it may not work with Chinese and maybe other non-utf8
-                   ;; characters on MSWindows systems issue#2677 and issue#2678.
-                   (encode-coding-string helm-pattern locale-coding-system)
-                   (or (file-remote-p directory 'localname)
-                       (encode-coding-string directory locale-coding-system))
-                   type))
-        (start-time (float-time))
-        (proc-name (helm-grep--ag-command))
-        ;; Fix error in MacOS with process-buffer deleted resulting in a nil
-        ;; helm-window (with-helm-window) in sentinel see issue#2741.
-        process-connection-type)
+  (let* ((default-directory (or helm-ff-default-directory
+                                (helm-default-directory)
+                                default-directory))
+         (cmd-line (helm-grep-ag-prepare-cmd-line
+                    ;; NOTE Encode directory name and pattern,
+                    ;; or it may not work with Chinese and maybe other non-utf8
+                    ;; characters on MSWindows systems issue#2677 and issue#2678.
+                    (encode-coding-string helm-pattern locale-coding-system)
+                    (or (file-remote-p directory 'localname)
+                        (encode-coding-string directory locale-coding-system))
+                    type))
+         (start-time (float-time))
+         (proc-name (helm-grep--ag-command))
+         ;; Fix error in MacOS with process-buffer deleted resulting in a nil
+         ;; helm-window (with-helm-window) in sentinel see issue#2741.
+         (process-connection-type (string= proc-name "ag")))
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
     (helm-log "helm-grep-ag-init" "Starting %s process in directory `%s'"
               proc-name directory)
