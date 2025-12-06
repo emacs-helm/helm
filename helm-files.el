@@ -4966,16 +4966,15 @@ This affects directly file CANDIDATE."
                   (helm-ff-display-image-native-p))
              nil "Resizing image not available")
   (if (> arg 0)
-      (run-with-idle-timer
-       0.3 nil
-       (lambda ()
-         (with-selected-window (helm-persistent-action-display-window)
-           (image--change-size 1.2))))
-    (run-with-idle-timer
-     0.3 nil
-     (lambda ()
-       (with-selected-window (helm-persistent-action-display-window)
-         (image--change-size 0.8))))))
+      (helm-ff--image-change-size 1.2)
+    (helm-ff--image-change-size 0.8)))
+
+(defun helm-ff--image-change-size (factor)
+  (run-with-idle-timer
+   0.3 nil
+   (lambda ()
+     (with-selected-window (helm-persistent-action-display-window)
+       (image--change-size factor)))))
 
 (defun helm-ff-increase-image-size (_candidate)
   (helm-ff-resize-image-1 1))
