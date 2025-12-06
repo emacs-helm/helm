@@ -2534,11 +2534,12 @@ when you want the `display-to-real' function(s) to be applied."
              ;; this happen with grep sentinel sending an
              ;; error message in helm-buffer when no matches.
              (disp (unless (= beg end)
-                     (if (eq force-display-part 'noicon)
-                         ;; Remove icon if some from display see issue#2743.
-                         (replace-regexp-in-string
-                          "^[^[:ascii:]][ \t]*" "" (funcall disp-fn beg (1- end)))
-                       (funcall disp-fn beg (1- end)))))
+                     (helm-acase (funcall disp-fn beg (1- end))
+                         ((guard* (eq force-display-part 'noicon))
+                          ;; Remove icon if some from display see issue#2743.
+                          (replace-regexp-in-string
+                           "^[^[:ascii:]][ \t]*" "" it))
+                         (t it))))
              (src  (or source (helm-get-current-source)))
              (selection (helm-acond (force-display-part disp)
                                     ;; helm-realvalue always takes precedence
