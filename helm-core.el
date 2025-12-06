@@ -2507,6 +2507,9 @@ If FORCE-DISPLAY-PART is non-nil, return the display part of candidate.
 If FORCE-DISPLAY-PART value is `withprop' the display part of
 candidate is returned with its properties.
 
+If FORCE-DISPLAY-PART value is `noicon' return the display part without its
+leading icon if some.
+
 When FORCE-DISPLAY-PART is nil the real part of candidate is returned.
 
 SOURCE default to current-source when unspecified but it is better to
@@ -2531,9 +2534,11 @@ when you want the `display-to-real' function(s) to be applied."
              ;; this happen with grep sentinel sending an
              ;; error message in helm-buffer when no matches.
              (disp (unless (= beg end)
-                     ;; Remove icon if some from display.
-                     (replace-regexp-in-string
-                      "^[[:multibyte:] \t]*" "" (funcall disp-fn beg (1- end)))))
+                     (if (eq force-display-part 'noicon)
+                         ;; Remove icon if some from display see issue#2743.
+                         (replace-regexp-in-string
+                          "^[^[:ascii:]][ \t]*" "" (funcall disp-fn beg (1- end)))
+                       (funcall disp-fn beg (1- end)))))
              (src  (or source (helm-get-current-source)))
              (selection (helm-acond (force-display-part disp)
                                     ;; helm-realvalue always takes precedence
@@ -8121,7 +8126,7 @@ this variable."
      (format "%s" (helm-get-selection
                    nil (helm-acase helm-kill-real-or-display-selection
                          (real arg)
-                         (display (not arg))))))))
+                         (display 'noicon)))))))
 (put 'helm-kill-selection-and-quit 'helm-only t)
 
 (defun helm-insert-or-copy (&optional arg)
