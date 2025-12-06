@@ -2530,7 +2530,10 @@ when you want the `display-to-real' function(s) to be applied."
              ;; is not empty but have no selection yet,
              ;; this happen with grep sentinel sending an
              ;; error message in helm-buffer when no matches.
-             (disp (unless (= beg end) (funcall disp-fn beg (1- end))))
+             (disp (unless (= beg end)
+                     ;; Remove icon if some from display.
+                     (replace-regexp-in-string
+                      "^[[:multibyte:] \t]*" "" (funcall disp-fn beg (1- end)))))
              (src  (or source (helm-get-current-source)))
              (selection (helm-acond (force-display-part disp)
                                     ;; helm-realvalue always takes precedence
