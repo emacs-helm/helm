@@ -2524,7 +2524,7 @@ when you want the `display-to-real' function(s) to be applied."
                 (helm-pos-header-line-p))
       (let* ((beg     (overlay-start helm-selection-overlay))
              (end     (overlay-end helm-selection-overlay))
-             (disp-fn (if (eq force-display-part 'withprop)
+             (disp-fn (if (memq force-display-part '(withprop noicon))
                           'buffer-substring
                         'buffer-substring-no-properties))
              ;; If there is no selection at point, the
@@ -2535,7 +2535,8 @@ when you want the `display-to-real' function(s) to be applied."
              ;; error message in helm-buffer when no matches.
              (disp (unless (= beg end)
                      (helm-acase (funcall disp-fn beg (1- end))
-                       ((guard* (eq force-display-part 'noicon))
+                       ((guard* (and (eq force-display-part 'noicon)
+                                     (get-text-property 0 'icon it)))
                         ;; Remove icon if some from display see issue#2743.
                         (replace-regexp-in-string
                          "^[[:multibyte:]][ \t]+" "" it))

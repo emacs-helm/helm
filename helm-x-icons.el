@@ -61,8 +61,12 @@ The returned alist is computed according to `helm-x-icons-provider'."
   "Compatibility function for `*-icon-for-file'."
   (let ((fn (helm-acase helm-x-icons-provider
               (all-the-icons 'all-the-icons-icon-for-file)
-              (nerd-icons 'nerd-icons-icon-for-file))))
-    (when fn (apply fn args))))
+              (nerd-icons 'nerd-icons-icon-for-file)))
+        icon)
+    (when fn
+      (setq icon (apply fn args))
+      (add-text-properties 0 1 '(icon t) icon)
+      icon)))
 
 (defvar helm-x-icons-nerd-icons-compat-alist
   '(("file-symlink-directory" . (nerd-icons-codicon . "nf-cod-file_symlink_directory"))
@@ -144,7 +148,7 @@ Run an `all-the-icons' or `nerd-icons' function according to
 `helm-x-icons-provider'and ICON-NAME.
 Functions and icon names are found in `helm-x-icons-all-the-icons-compat-alist'
 and `helm-x-icons-nerd-icons-compat-alist'."
-  (let (fn)
+  (let (fn icon)
     (helm-acase helm-x-icons-provider
       (nerd-icons
        (helm-acase (assoc-default icon-name helm-x-icons-nerd-icons-compat-alist)
@@ -154,8 +158,10 @@ and `helm-x-icons-nerd-icons-compat-alist'."
        (helm-acase (assoc-default icon-name helm-x-icons-all-the-icons-compat-alist)
         ((dst* (sym . name))
          (setq fn sym icon-name name)))))
-    (when fn (apply fn icon-name args))))
-
+    (when fn
+      (setq icon (apply fn icon-name args))
+      (add-text-properties 0 1 '(icon t) icon)
+      icon)))
 
 (provide 'helm-x-icons)
 
