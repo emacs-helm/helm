@@ -65,7 +65,7 @@ The returned alist is computed according to `helm-x-icons-provider'."
         icon)
     (when fn
       (setq icon (apply fn args))
-      (add-text-properties 0 1 '(icon t) icon)
+      (add-text-properties 0 1 `(icon ,(length icon)) icon)
       icon)))
 
 (defvar helm-x-icons-nerd-icons-compat-alist
@@ -160,7 +160,7 @@ and `helm-x-icons-nerd-icons-compat-alist'."
          (setq fn sym icon-name name)))))
     (when fn
       (setq icon (apply fn icon-name args))
-      (add-text-properties 0 1 '(icon t) icon)
+      (add-text-properties 0 1 `(icon ,(length icon)) icon)
       icon)))
 
 (provide 'helm-x-icons)
