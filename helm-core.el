@@ -8121,13 +8121,13 @@ this variable."
      (lambda (sel)
        (kill-new sel)
        ;; Return nil to force `helm-mode--keyboard-quit'
-       ;; in `helm-comp-read' otherwise the value "Saved to kill-ring: foo"
+       ;; in `helm-comp-read' otherwise the message itself
        ;; is used as exit value for `helm-comp-read'.
        (prog1 nil (message "Saved to kill-ring: %s" sel) (sit-for 1)))
      (format "%s" (helm-get-selection
                    nil (helm-acase helm-kill-real-or-display-selection
                          (real arg)
-                         (display 'noicon)))))))
+                         (display (and (not arg) 'noicon))))))))
 (put 'helm-kill-selection-and-quit 'helm-only t)
 
 (defun helm-insert-or-copy (&optional arg)
