@@ -2538,7 +2538,7 @@ when you want the `display-to-real' function(s) to be applied."
                        ((guard* (eq force-display-part 'noicon))
                         ;; Remove icon if some from display see issue#2743.
                         (replace-regexp-in-string
-                         "^[^[:ascii:]][ \t]*" "" it))
+                         "^[[:multibyte:]][ \t]+" "" it))
                        (t it))))
              (src  (or source (helm-get-current-source)))
              (selection (helm-acond (force-display-part disp)
