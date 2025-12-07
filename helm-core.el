@@ -2507,8 +2507,8 @@ If FORCE-DISPLAY-PART is non-nil, return the display part of candidate.
 If FORCE-DISPLAY-PART value is `withprop' the display part of
 candidate is returned with its properties.
 
-If FORCE-DISPLAY-PART value is `noicon' return the display part without its
-leading icon if some.
+If FORCE-DISPLAY-PART value is `noicon' return the display part with its
+properties but without its leading icon if some.
 
 When FORCE-DISPLAY-PART is nil the real part of candidate is returned.
 
