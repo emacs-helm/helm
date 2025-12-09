@@ -6855,11 +6855,9 @@ be existing directories."
                             ((file-exists-p elm)
                              (let ((last-access (format-time-string "%d/%m/%Y  %X"
                                                  (nth 4 (file-attributes elm)))))
-                               (propertize
-                                elm 'display
-                                (concat (propertize c 'face 'helm-ff-file)
-                                        (make-string (1+ (- lgst (length c))) ? )
-                                        last-access))))
+                               (concat (propertize c 'face 'helm-ff-file)
+                                       (make-string (1+ (- lgst (length c))) ? )
+                                       last-access)))
                             ;; Should not happen as long as we use recentf.
                             (t (propertize c 'face 'helm-history-deleted)))
            when disp
