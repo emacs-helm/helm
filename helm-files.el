@@ -6843,7 +6843,7 @@ be existing directories."
     (define-key map (kbd "C-x C-f") 'helm-ff-file-name-history-run-ff)
     map))
 
-(defun helm-file-name-history-transformer (candidates _source)
+(defun helm-file-name-history-transformer (candidates)
   (cl-loop with lgst = helm-file-name-history-max-length
            for elm in candidates
            for c = (truncate-string-to-width
@@ -6892,9 +6892,10 @@ be existing directories."
                :candidates (lambda () recentf-list)
                :help-message 'helm-file-name-history-help-message
                :fuzzy-match t
+               :match-on-real t
                :persistent-action 'ignore
                :migemo t
-               :filtered-candidate-transformer 'helm-file-name-history-transformer
+               :candidate-transformer 'helm-file-name-history-transformer
                :action (helm-make-actions
                         "Find file" (lambda (candidate)
                                       (helm-set-pattern
