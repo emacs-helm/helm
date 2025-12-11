@@ -5017,6 +5017,14 @@ emacs-27 to provide such scoring in emacs<27."
         searchfns (list searchfns))))
 
 (defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
+  "Filter CANDS list in SOURCE with functions in MATCHFNS.
+If MATCH-PART-FN is a valid function, use it to determine in each
+candidate of CANDS the part of candidate we want to match on (see the
+:match-part documentation in `helm-source').  When LIMIT in CANDS is
+reached, stop and return the filtered list.  This function is used only
+by sync sources, i.e. sources built with `helm-source-sync', see
+`helm-search-from-candidate-buffer' for `helm-source-in-buffer' sources
+and `helm-output-filter' for async sources."
   (when cands ; nil in async sources.
     (condition-case-unless-debug err
         (cl-loop with hash = (make-hash-table :test 'equal)
