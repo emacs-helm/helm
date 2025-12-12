@@ -6833,6 +6833,8 @@ be existing directories."
     :candidates 'file-name-history
     :persistent-action #'ignore
     ;; See comments in `helm-recentf-source' about bug#2709.
+    ;; This is probably not needed as long as we use
+    ;; `helm-file-name-history-transformer' which uses only propertize.
     :coerce 'substring-no-properties
     :match-on-real t
     :candidate-transformer #'helm-file-name-history-transformer
