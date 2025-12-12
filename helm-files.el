@@ -6834,7 +6834,7 @@ be existing directories."
     :persistent-action #'ignore
     ;; See comments in `helm-recentf-source' about bug#2709.
     :coerce 'substring-no-properties
-    :filtered-candidate-transformer #'helm-file-name-history-transformer
+    :candidate-transformer #'helm-file-name-history-transformer
     :action 'helm-type-file-actions))
 
 (defvar helm-file-name-history-map
