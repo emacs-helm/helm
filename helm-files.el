@@ -6830,6 +6830,9 @@ be existing directories."
 ;;
 (defvar helm-source-file-name-history
   (helm-build-sync-source "File Name History"
+    :init (lambda ()
+            (require 'recentf)
+            (when helm-turn-on-recentf (recentf-mode 1)))
     :candidates 'file-name-history
     :persistent-action #'ignore
     ;; See comments in `helm-recentf-source' about bug#2709.
