@@ -6847,6 +6847,8 @@ be existing directories."
     map))
 
 (defun helm-file-name-history-transformer (candidates)
+  ;; As this transformer uses propertize and not add-text-properties or similar
+  ;; it doesn't suffer of nasty side effect like in bug#2709.
   (cl-loop with lgst = helm-file-name-history-max-length
            for elm in candidates
            for c = (truncate-string-to-width
