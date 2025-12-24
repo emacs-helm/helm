@@ -170,9 +170,6 @@ than `helm-candidate-number-limit'.")
 (defvar helm-ff--trash-directory-regexp "\\.?Trash[/0-9]+files/?\\'")
 (defvar helm-ff--show-directories-only nil)
 (defvar helm-ff--show-files-only nil)
-(defvar helm-ff--trashed-files nil
-  "[INTERNAL] Files already trashed are stored here during file deletion.
-This is used only as a let binding.")
 (defvar helm-ff--show-thumbnails nil)
 (defvar helm-ff--thumbnailed-directories nil)
 (defvar helm-source-find-files nil
@@ -6329,8 +6326,6 @@ When a prefix arg is given, meaning of
   (with-helm-window
     (let* ((marked (helm-marked-candidates))
            (trash (helm-ff--delete-by-moving-to-trash (car marked)))
-           (helm-ff--trashed-files
-            (and trash (helm-ff-trash-list (helm-trash-directory))))
            (old--allow-recursive-deletes helm-ff-allow-recursive-deletes)
            (buffers (cl-loop for f in marked
                              append (helm-file-buffers f))))
@@ -6433,8 +6428,6 @@ When a prefix arg is given, meaning of
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (len 0)
          (trash (helm-ff--delete-by-moving-to-trash (car files)))
-         (helm-ff--trashed-files
-          (and trash (helm-ff-trash-list (helm-trash-directory))))
          (prmt (if trash "Trash" "Delete"))
          (old--allow-recursive-deletes helm-ff-allow-recursive-deletes)
          (buffers (cl-loop for f in files
