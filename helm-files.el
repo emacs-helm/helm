@@ -1366,12 +1366,18 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                   (regexp-quote
                                    (if helm-ff-transformer-show-only-basename
                                        (helm-basename cand) cand))))
-                        :default (and cdir
-                                      (expand-file-name
-                                       (format "%s.tar.gz" (if cand
-                                                               (helm-basename cand)
-                                                             "new_archive"))
-                                       cdir))
+                        :default (when cdir
+                                   (mapcar (lambda (x)
+                                             (let ((ext (replace-regexp-in-string
+                                                         "[\\']" "" (car x))))
+                                               (expand-file-name
+                                                (format "%s%s"
+                                                        (if cand
+                                                            (helm-basename cand)
+                                                          "new_archive")
+                                                        ext)
+                                                cdir)))
+                                           dired-compress-files-alist))
                         :must-match (and cdir (lambda (f) (not (file-directory-p f))))
                         :initial-input (or cdir (helm-dwim-target-directory))
                         :history (helm-find-files-history nil :comp-read nil))))))
