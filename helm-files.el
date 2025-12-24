@@ -4623,10 +4623,7 @@ Arg FILE is the real part of candidate, a filename with no props."
                           (helm-basedir candidate)))
       (setq actions (helm-append-at-nth
                      actions '(("Recover file" . recover-file)) 4)))
-    (cond ((and (file-exists-p candidate)
-                (string-match helm-ff--trash-directory-regexp
-                              (helm-basedir (expand-file-name candidate)))
-                (not (member (helm-basename candidate) '("." ".."))))
+    (cond ((helm-ff-trash-file-p candidate)
            (helm-append-at-nth
             actions
             '(("Restore file(s) from trash" . helm-restore-file-from-trash)
