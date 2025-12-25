@@ -1366,18 +1366,22 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                   (regexp-quote
                                    (if helm-ff-transformer-show-only-basename
                                        (helm-basename cand) cand))))
-                        :default (when cdir
-                                   (mapcar (lambda (x)
-                                             (let ((ext (replace-regexp-in-string
-                                                         "[\\']" "" (car x))))
-                                               (expand-file-name
-                                                (format "%s%s"
-                                                        (if cand
-                                                            (helm-basename cand)
-                                                          "new_archive")
-                                                        ext)
-                                                cdir)))
-                                           dired-compress-files-alist))
+                        :default (if cdir
+                                     (mapcar (lambda (x)
+                                               (let ((ext (replace-regexp-in-string
+                                                           "[\\']" "" (car x))))
+                                                 (expand-file-name
+                                                  (format "%s%s"
+                                                          (if cand
+                                                              (helm-basename cand)
+                                                            "new_archive")
+                                                          ext)
+                                                  cdir)))
+                                             dired-compress-files-alist)
+                                   ;; Specify default-directory as default
+                                   ;; otherwise we get thing-at-point from the
+                                   ;; *helm marked* buffer.
+                                   default-directory)
                         :must-match (and cdir (lambda (f) (not (file-directory-p f))))
                         :initial-input (or cdir (helm-dwim-target-directory))
                         :history (helm-find-files-history nil :comp-read nil))))))
