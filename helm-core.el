@@ -205,6 +205,8 @@ It is let-bounded in `helm-read-file-name'. Same as
 `minibuffer-completing-file-name' but doesn't affect `file-directory-p' when
 called on remote files.
 WARN: Use this only in `helm-read-file-name'.")
+(defvar helm-initial-windows nil
+  "Store the `window-list' before starting helm.")
 
 ;;; Multi keys
 ;;
@@ -3802,6 +3804,7 @@ For RESUME INPUT DEFAULT and SOURCES see `helm'."
   (helm-log "helm-initialize" "start initialization: resume=%S input=%S"
             resume input)
   (helm-frame-or-window-configuration 'save)
+  (setq helm-initial-windows (window-list nil 1))
   (let ((sources-list (helm-get-sources sources)))
     (setq helm--in-fuzzy
           (cl-loop for s in sources-list
