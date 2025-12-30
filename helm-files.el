@@ -874,6 +874,7 @@ want to use it, helm is still providing
 (defcustom helm-dwim-target nil
   "Default target directory for file actions.
 
+Currently only Ediff action in helm-find-files is affected by this.
 Define the directory where you want to start navigating for the
 target directory when copying, renaming, etc..  You can use the
 `default-directory' of `next-window', the visited directory, the
@@ -1242,9 +1243,10 @@ Used when showing tramp host completions."
 (put 'helm-ff-bookmark-set 'helm-only t)
 
 (defun helm-dwim-target-directories ()
+  "Provide a list of default targets for `helm-find-files' actions."
   (cl-loop for w in helm-initial-windows collect
-           (with-selected-window w
-             default-directory)))
+           (with-selected-window w default-directory) into lst
+           finally return (delete helm-ff-default-directory lst)))
 
 (defun helm-dwim-target-directory ()
   "Try to return a suitable directory according to `helm-dwim-target'."
@@ -1256,7 +1258,7 @@ Used when showing tramp host completions."
     (let ((wins (remove (get-buffer-window helm-marked-buffer-name)
                         (window-list))))
       (expand-file-name
-       (cond (;; Provide completion on all the directory belonging to
+       (cond (;; Provide completion on all the directories belonging to
               ;; visible windows if some.
               (and (cdr wins)
                    (eq helm-dwim-target 'completion))
@@ -1270,7 +1272,7 @@ Used when showing tramp host completions."
                                                   default-directory)))
                                :test 'equal)))
              ;; Use default-directory of next-window if more than 1 window
-             ;; otherwise use default-directory.
+             ;; otherwise fall-back to default-directory.
              ((eq helm-dwim-target 'next-window)
               (if (cdr wins)
                   (with-selected-window (next-window)
