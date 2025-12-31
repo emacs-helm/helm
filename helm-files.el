@@ -1378,10 +1378,11 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                                           ext)
                                                   cdir)))
                                              dired-compress-files-alist)
-                                   ;; Specify default-directory as default
-                                   ;; otherwise we get thing-at-point from the
-                                   ;; *helm marked* buffer.
-                                   default-directory)
+                                   ;; List of all `default-directory' belonging
+                                   ;; to each visible windows before starting helm.
+                                   (cl-loop for w in helm-initial-windows collect
+                                            (with-selected-window w
+                                              default-directory)))
                         :must-match (and cdir (lambda (f) (not (file-directory-p f))))
                         :initial-input (or cdir (helm-dwim-target-directory))
                         :history (helm-find-files-history nil :comp-read nil))))))
