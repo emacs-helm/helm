@@ -1244,9 +1244,17 @@ Used when showing tramp host completions."
 
 (defun helm-dwim-target-directories ()
   "Provide a list of default targets for `helm-find-files' actions."
-  (cl-loop for w in helm-initial-windows collect
-           (with-selected-window w default-directory) into lst
-           finally return (delete helm-ff-default-directory lst)))
+  (cl-loop for w in helm-initial-windows
+           for dir = (with-selected-window w default-directory)
+           unless (member dir dirs)
+           collect dir into dirs
+           ;; Prevent having helm-ff-default-directory in defaults while we are
+           ;; already in it, if it is the only member of list return this list
+           ;; to prevent helm using the thing-at-point in *helm marked* buffer
+           ;; which is irrelevant.
+           finally return (if (cdr dirs)
+                              (delete helm-ff-default-directory dirs)
+                            dirs)))
 
 (defun helm-dwim-target-directory ()
   "Try to return a suitable directory according to `helm-dwim-target'."
