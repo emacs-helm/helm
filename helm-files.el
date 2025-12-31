@@ -1241,6 +1241,11 @@ Used when showing tramp host completions."
     (message "Helm find files session bookmarked! ")))
 (put 'helm-ff-bookmark-set 'helm-only t)
 
+(defun helm-dwim-target-directories ()
+  (cl-loop for w in helm-initial-windows collect
+           (with-selected-window w
+             default-directory)))
+
 (defun helm-dwim-target-directory ()
   "Try to return a suitable directory according to `helm-dwim-target'."
   (with-selected-window (or
@@ -1256,16 +1261,20 @@ Used when showing tramp host completions."
               (and (cdr wins)
                    (eq helm-dwim-target 'completion))
               (helm-comp-read "Browse target starting from: "
-                              (append (list (or (car-safe helm-ff-history)
-                                                default-directory)
-                                            default-directory)
-                                      (cl-loop for w in wins collect
-                                               (with-selected-window w
-                                                 default-directory)))))
-             ;; Use default-directory of next-window.
-             ((and (cdr wins)
-                   (eq helm-dwim-target 'next-window))
-              (with-selected-window (next-window)
+                              (helm-fast-remove-dups
+                               (append (list (or (car-safe helm-ff-history)
+                                                 default-directory)
+                                             default-directory)
+                                       (cl-loop for w in wins collect
+                                                (with-selected-window w
+                                                  default-directory)))
+                               :test 'equal)))
+             ;; Use default-directory of next-window if more than 1 window
+             ;; otherwise use default-directory.
+             ((eq helm-dwim-target 'next-window)
+              (if (cdr wins)
+                  (with-selected-window (next-window)
+                    default-directory)
                 default-directory))
              ;; Always use default-directory when only one window.
              ((and (null (cdr wins))
@@ -1380,11 +1389,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                              dired-compress-files-alist)
                                    ;; List of all `default-directory' belonging
                                    ;; to each visible windows before starting helm.
-                                   (cl-loop for w in helm-initial-windows collect
-                                            (with-selected-window w
-                                              default-directory)))
+                                   (helm-dwim-target-directories))
                         :must-match (and cdir (lambda (f) (not (file-directory-p f))))
-                        :initial-input (or cdir (helm-dwim-target-directory))
+                        :initial-input (or cdir helm-ff-default-directory)
                         :history (helm-find-files-history nil :comp-read nil))))))
          (dest-dir-p (file-directory-p dest))
          (dest-dir   (if dest-dir-p dest (helm-basedir dest))))
@@ -1820,6 +1827,7 @@ windows layout."
       (funcall fun candidate (helm-read-file-name
                               (format prompt bname)
                               :initial-input input
+                              :default (helm-dwim-target-directories)
                               :preselect presel)))))
 
 (defun helm-find-files-ediff-files (candidate)
