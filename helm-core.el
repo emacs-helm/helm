@@ -2645,7 +2645,9 @@ i.e. functions called with RET."
   ;; When toggling minibuffer and header-line, we want next action
   ;; inherit this setting.
   (helm-set-local-variable 'helm-echo-input-in-header-line
-                           (with-helm-buffer helm-echo-input-in-header-line))
+                           (with-helm-buffer helm-echo-input-in-header-line)
+                           'helm-current-buffer
+                           (with-helm-buffer helm-current-buffer))
   ;; Ensure next action use same display function as initial helm-buffer when
   ;; helm-actions-inherit-frame-settings is non nil.
   (when (and helm-actions-inherit-frame-settings
