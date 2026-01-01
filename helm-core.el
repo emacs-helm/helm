@@ -2642,12 +2642,14 @@ i.e. functions called with RET."
   (setq helm-saved-action action)
   (setq helm-saved-selection (or (helm-get-selection) ""))
   (setq helm--executing-helm-action t)
-  ;; When toggling minibuffer and header-line, we want next action
-  ;; inherit this setting.
-  (helm-set-local-variable 'helm-echo-input-in-header-line
-                           (with-helm-buffer helm-echo-input-in-header-line)
-                           'helm-current-buffer
-                           (with-helm-buffer helm-current-buffer))
+  (helm-set-local-variable
+   ;; When toggling minibuffer and header-line, we want next action
+   ;; inherit this setting.
+   'helm-echo-input-in-header-line
+   (with-helm-buffer helm-echo-input-in-header-line)
+   ;; Keep the same buffer for subsequent helm sessions started as actions.
+   'helm-current-buffer
+   (with-helm-buffer helm-current-buffer))
   ;; Ensure next action use same display function as initial helm-buffer when
   ;; helm-actions-inherit-frame-settings is non nil.
   (when (and helm-actions-inherit-frame-settings
