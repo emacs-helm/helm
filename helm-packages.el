@@ -82,6 +82,13 @@
   "Hook that run after cloning a package.
 It is called with two args respectively PACKAGE as a string and DIRECTORY."
   :type 'hook)
+
+(defcustom helm-packages-default-urls-for-cloning
+  '(("gnu" .    "https://git.sv.gnu.org/git/elpa/elpa.git")
+    ("nongnu" . "https://git.sv.gnu.org/git/elpa/nongnu.git"))
+  "Urls used for packages not specifying :url in their recipes.
+This is generally the packages maintained directly in Elpa or NonGnu."
+  :type '(alist :key-type string :value-type string))
 
 ;;; Actions
 ;;
@@ -273,11 +280,9 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
          (url (or (plist-get (cdr package-recipe) :url)
                   ;; Assume that when :url = nil the package is maintained in
                   ;; elpa or nongnu. When recipe is fetched from package-archives
-                  ;; addresses the url is always specified or the package if not
-                  ;; clonable not present at all e.g. cond-star.
-                  (helm-acase provider
-                    ("gnu"    "https://git.sv.gnu.org/git/emacs/elpa.git")
-                    ("nongnu" "https://git.sv.gnu.org/git/emacs/nongnu.git"))))
+                  ;; addresses, the url is always specified or the package if not
+                  ;; clonable, not present at all e.g. cond-star.
+                  (assoc-default provider helm-packages-default-urls-for-cloning)))
          (branch (plist-get (cdr package-recipe) :branch)))
     (cl-assert package-recipe nil (format "Couldn't find package '%s'" package))
     (cl-assert (null core) nil
