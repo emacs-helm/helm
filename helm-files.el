@@ -6356,14 +6356,15 @@ When a prefix arg is given, meaning of
     (let* ((marked (helm-marked-candidates))
            (trash (helm-ff--delete-by-moving-to-trash (car marked)))
            (old--allow-recursive-deletes helm-ff-allow-recursive-deletes)
-           (buffers (cl-loop for f in marked
-                             append (helm-file-buffers f))))
+           (buffers '()))
       (unwind-protect
            (progn
              (helm-read-answer-dolist-with-action
               "Really %s file `%s'"
               marked
-              (lambda (file) (helm-ff--quick-delete-action file trash))
+              (lambda (file)
+                (helm-ff--quick-delete-action file trash)
+                (setq buffers (append (helm-file-buffers file))))
               (list (if trash "Trash" "Delete") #'abbreviate-file-name))
              (when buffers
                (helm-read-answer-dolist-with-action
