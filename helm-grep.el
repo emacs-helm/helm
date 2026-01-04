@@ -1604,10 +1604,10 @@ Ripgrep (rg) types are also supported if this backend is used."
            (ripgrep (string= com "rg"))
            (regex (if ripgrep "^\\(.*\\):" "^ *\\(--[a-z]*\\)"))
            (prefix (if ripgrep "-t " "")))
-      (when (equal (call-process com
-                                 nil t nil
+      (when (zerop (call-process com nil t nil
                                  (if ripgrep
-                                     "--type-list" "--list-file-types")) 0)
+                                     "--type-list"
+                                   "--list-file-types")))
         (goto-char (point-min))
         (cl-loop while (re-search-forward regex nil t)
                  for type = (match-string 1)
