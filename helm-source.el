@@ -1,6 +1,6 @@
 ;;; helm-source.el --- Helm source creation. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2015 ~ 2025  Thierry Volpiatto
+;; Copyright (C) 2015 ~ 2026  Thierry Volpiatto
 
 ;; Author: Thierry Volpiatto
 ;; URL: http://github.com/emacs-helm/helm

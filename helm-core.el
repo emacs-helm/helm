@@ -1,6 +1,6 @@
 ;;; helm-core.el --- Development files for Helm  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022 ~ 2025  Thierry Volpiatto
+;; Copyright (C) 2022 ~ 2026  Thierry Volpiatto
 
 ;; Author: Thierry Volpiatto <thievol@posteo.net>
 ;; URL: https://emacs-helm.github.io/helm/
