@@ -1593,6 +1593,7 @@ non-file buffers."
 (defun helm-grep--ag-command ()
   (and helm-grep-ag-command
        (car (helm-remove-if-match
+             ;; Probably an env var added at beginning of command line.
              "\\`[A-Z]*=" (split-string helm-grep-ag-command)))))
 
 (defun helm-grep-ag-get-types ()
