@@ -84,7 +84,7 @@ It is called with two args respectively PACKAGE as a string and DIRECTORY."
   :type 'hook)
 
 (defcustom helm-packages-default-urls-for-cloning
-  '(("gnu" .    "https://git.sv.gnu.org/git/elpa/elpa.git")
+  '(("gnu" .    "https://git.sv.gnu.org/git/elpa/gnu.git")
     ("nongnu" . "https://git.sv.gnu.org/git/elpa/nongnu.git"))
   "Urls used for packages not specifying :url in their recipes.
 This is generally the packages maintained directly in Elpa or NonGnu."
@@ -330,7 +330,7 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
          ;; (ws-butler :url "https://git.savannah.gnu.org/git/emacs/nongnu.git"
          ;;            :branch "elpa/ws-butler")
          (switches (append
-                    (if (string-match "\\(elpa\\|nongnu\\)\\.git\\'" url)
+                    (if (string-match "\\(elpa\\|nongnu\\|gnu\\)\\.git\\'" url)
                         `("clone" "--single-branch"
                                   "-b" ,(or branch (format "externals/%s" package)))
                       (delq nil `("clone" ,(and branch "-b") ,branch)))
