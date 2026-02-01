@@ -6723,12 +6723,16 @@ This is the default function for `helm-debug-function'."
   (let ((local-vars (buffer-local-variables (get-buffer helm-buffer)))
         (count 1))
     (insert (format "* Helm debug from `%s' buffer\n\n" helm-buffer))
-    (insert "** Local variables\n\n#+begin_src elisp\n"
+    (insert "** Helm local variables\n\n#+begin_src elisp\n"
             (pp-to-string (remove (assq 'helm-sources local-vars) local-vars))
+            "\n#+end_src\n")
+    (insert "** Minibuffer local variables\n\n#+begin_src elisp\n"
+            (pp-to-string (with-selected-window (minibuffer-window)
+                            (buffer-local-variables)))
             "\n#+end_src\n")
     (dolist-with-progress-reporter (v (helm-interpret-value helm-debug-function))
         "Calculating all helm-related values..."
-      (insert (format "** Value%s\n" count)
+      (insert (format "** Source%s value\n" count)
               "#+begin_src elisp\n" (pp-to-string v) "\n#+end_src\n")
       (cl-incf count))))
 
