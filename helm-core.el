@@ -6715,7 +6715,7 @@ If action buffer is displayed, kill it."
 (put 'helm-debug-output 'helm-only t)
 
 (defun helm-default-debug-function ()
-  "Collect sources of helm current session without their keymap.
+  "Collect sources of helm current session.
 This is the default function for `helm-debug-function'."
   (with-helm-buffer helm-sources))
 
