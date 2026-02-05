@@ -4671,7 +4671,7 @@ Arg FILE is the real part of candidate, a filename with no props."
               (lambda ()
                 (and (fboundp 'image-dired-wallpaper-set)
                      (display-graphic-p)
-                     "Change wall paper"))
+                     "Change wallpaper"))
               'image-dired-wallpaper-set)
             3))
           ((string-match "\\.el\\'" candidate)
