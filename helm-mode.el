@@ -516,10 +516,16 @@ data would not be fully collected at init time.
 
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   (unless input (setq input helm-pattern))
-  ;; Ensure COLLECTION is computed from `helm-current-buffer'
-  ;; because some functions used as COLLECTION work
-  ;; only in the context of current-buffer (Bug#1030) .
-  (with-helm-current-buffer
+  ;; Ensure COLLECTION is computed from `helm-current-buffer' because some
+  ;; functions used as COLLECTION work only in the context of current-buffer,
+  ;; presumably when completing-region (Bug#1030) OTOH completion functions used
+  ;; from completing-read generally expect to be called from the minibuffer
+  ;; (Bug#2744).
+  (with-current-buffer (if helm--completing-region
+                           helm-current-buffer
+                         (window-buffer
+                          (or (active-minibuffer-window)
+                              (minibuffer-window))))
     (let ((cands
            (cond ((and alistp (hash-table-p collection))
                   (cl-loop for k being the hash-keys of collection
