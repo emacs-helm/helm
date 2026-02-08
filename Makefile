@@ -26,7 +26,7 @@
 EMACS_COMMAND   := emacs
 
 # Use -q to have /usr/local/share/emacs/site-lisp and subdirs in load-path
-EMACS		:= $(EMACS_COMMAND) -q -batch
+EMACS		:= "$(EMACS_COMMAND)" -q -batch
 
 EVAL := $(EMACS) --eval
 
@@ -57,7 +57,7 @@ ASYNC_STRAIGHT_DIR  =  $(shell \
 	find -L $(STRAIGHT_DIR) -maxdepth 1 -regex '.*/async' 2> /dev/null | \
 	sort | tail -n 1)
 ifneq "$(ASYNC_STRAIGHT_DIR)" ""
-	LOADPATH += -L $(ASYNC_STRAIGHT_DIR)
+	LOADPATH += -L "$(ASYNC_STRAIGHT_DIR)"
 endif
 
 # Files to compile
