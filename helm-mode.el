@@ -1148,6 +1148,10 @@ FLAGS is a list of variables to renitialize to nil when exiting or quitting.")
     ("locate-library" . library)
     ("kill-buffer" . buffer)
     ("package-install" . package)
+    ("package-upgrade" . package)
+    ("package-recompile" . package)
+    ("package-reinstall" . package)
+    ("package-delete" . package)
     ("package-vc-install" . package)
     ("package-vc-checkout" . package)
     ("package-vc-log-incoming" . package)
@@ -1328,11 +1332,18 @@ is used."
       (when binding
         (propertize (format " (%s)" binding) 'face 'helm-completions-key-binding)))))
 
+(defun helm-mode--package-name-from-full-name (comp)
+  "Extract the package name from a package full-name.
+e.g. w3m-20251201.129 => w3m."
+  (if (string-match "\\(.*\\)-[[:digit:]]+" comp)
+      (match-string 1 comp)
+    comp))
+
 (defun helm-completion-package-affixation (_completions)
   "Affixation function for `package' category.
 See `helm-completing-read-extra-metadata'."
   (lambda (comp)
-    (let* ((sym (intern-soft comp))
+    (let* ((sym (intern-soft (helm-mode--package-name-from-full-name comp)))
            (id (package-get-descriptor sym))
            (built-in (package-built-in-p sym))
            (status (and id (package-desc-status id)))
