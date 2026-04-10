@@ -72,7 +72,7 @@
     (define-key map (kbd "C-c C-x") 'helm-ff-run-open-file-externally)
     (define-key map (kbd "C-c X")   'helm-ff-run-open-file-with-default-tool)
     (define-key map (kbd "C-c @")   'helm-ff-run-insert-org-link)
-    (define-key map (kbd "C-x C-q") 'helm-ff-run-marked-files-in-dired)
+    (define-key map (kbd "C-x C-q") 'helm-ff-run-edit-marked-files)
     (define-key map (kbd "C-c C-a") 'helm-ff-run-mail-attach-files)
     map)
   "Generic Keymap for files.")
