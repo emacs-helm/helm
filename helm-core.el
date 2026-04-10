@@ -7806,10 +7806,11 @@ If ARG is negative toggle backward."
   (interactive "p")
   (with-helm-alive-p
     (with-helm-window
-      (let ((nomark (assq 'nomark (helm-get-current-source)))
-            (next-fns (if (< arg 0)
-                          '(helm-beginning-of-source-p . helm-previous-line)
-                        '(helm-end-of-source-p . helm-next-line))))
+      (let* ((src      (helm-get-current-source))
+             (nomark   (assq 'nomark src))
+             (next-fns (if (< arg 0)
+                           '(helm-beginning-of-source-p . helm-previous-line)
+                         '(helm-end-of-source-p . helm-next-line))))
         (if nomark
             (message "Marking not allowed in this source")
           (cl-loop with n = (if (< arg 0) (* arg -1) arg)
@@ -7820,7 +7821,7 @@ If ARG is negative toggle backward."
                        (helm-make-visible-mark))
                      (if (funcall (car next-fns))
                          (progn
-                           (helm-display-mode-line (helm-get-current-source))
+                           (helm-display-mode-line src)
                            (cl-return nil))
                        (funcall (cdr next-fns)))))
           (set-window-margins (selected-window)
