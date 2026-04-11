@@ -799,11 +799,12 @@ Symlink all marked files with incremental numbering to a specific directory.
 
 *** Edit marked files in a dired buffer
 
-You can open a dired buffer containing only marked files with `\\<helm-find-files-map>\\[helm-ff-run-marked-files-in-dired]'.
-With a prefix argument you can open this same dired buffer in wdired mode for
-editing.  Note that wildcards are supported as well, so you can use e.g.
-\"*.txt\" to select all \".txt\" files in the current directory or \"**.txt\" to
-select all files recursively from the current directory.
+You can edit marked files with `\\<helm-find-files-map>\\[helm-ff-run-edit-marked-files]'.  According
+to the user variable `helm-ff-edit-marked-files-fn' you can use either
+wdired or wfnames.  The default is to use wfnames wich works properly in
+all emacs versions.  Wildcards are supported as well, so you can use
+e.g.  \"*.txt\" to select all \".txt\" files in the current directory or
+\"**.txt\" to select all files recursively from the current directory.
 See [[Use the wildcard to select multiple files]] section above.
 
 *** Defining default target directory for copying, renaming, etc
