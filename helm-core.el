@@ -2196,7 +2196,8 @@ E.g. (helm-log-error \"Error %s: %s\" (car err) (cdr err))."
 (defmacro helm-make-command-from-action (symbol doc action &rest body)
   "Make a command SYMBOL from ACTION with docstring DOC.
 The command SYMBOL will quit helm before execute.
-Argument ACTION should be an existing helm action.
+Argument ACTION should be an existing helm action in the source from where this
+command will be called.
 BODY form will run before calling action.
 
 Example:
