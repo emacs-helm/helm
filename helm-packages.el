@@ -313,11 +313,6 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
          (recipe (helm-packages-get-recipe-for-cloning package))
          (url (plist-get recipe :url))
          (branch (plist-get recipe :branch))
-         (fix-url (if (or (string-match "\\.git\\'" url)
-                          ;; For git-remote-hg.
-                          (string-match "\\`hg::" url))
-                      url
-                    (concat url ".git")))
          ;; In gnu archive all packages maintained on Elpa are pointing to
          ;; "https://git.sv.gnu.org/git/emacs/elpa.git", to be able to clone a
          ;; package from such url we have to use:
@@ -334,7 +329,7 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
                         `("clone" "--single-branch"
                                   "-b" ,(or branch (format "externals/%s" package)))
                       (delq nil `("clone" ,(and branch "-b") ,branch)))
-                    `(,fix-url ,name))))
+                    `(,url ,name))))
     (cl-assert (not (file-directory-p (expand-file-name name directory)))
                nil (format "Package already exists in %s" directory))
     (with-helm-default-directory directory
