@@ -2,6 +2,10 @@
 
 * NEWS
 ** Version 4.0.7
+*** Improve helm-dwim-target-directory
+You can use now M-n to cycle in default directories bound to each
+window.
+
 *** Add tldr action to helm-man
 See https://github.com/tealdeer-rs/tealdeer
 and https://github.com/tldr-pages/tldr
