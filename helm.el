@@ -14,7 +14,7 @@
 ;; Version: 4.0.7
 ;; URL: https://emacs-helm.github.io/helm/
 ;; Package-Requires: ((helm-core "4.0.7") (wfnames "1.2"))
-;; Keywords: helm, convenience, files, buffers, grep, completion, lisp, matching, tools, help
+;; Keywords: helm, convenience, files, buffers, grep, completion, lisp, matching, tools, help, package
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
