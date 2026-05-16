@@ -6762,84 +6762,79 @@ list."
                                   (message "No files found in file(s)"))
           :buffer "*helm find files in files*")))
 
-(cl-defun helm-ff-mcp (_candidate)
-  "Copy the car of marked candidates to the remaining marked candidates.
+(defun helm-ff--mcp-make-alist (files targets)
+  (let ((skipped 0)
+        jobs yes-for-all)
+    (dolist (d targets)
+      (dolist (f files)
+        (let* ((dest-file (expand-file-name (helm-basename f) d))
+               (dir-ok (file-accessible-directory-p d))
+               (exists (and dir-ok (file-exists-p dest-file)))
+               (overwrite (or (null exists)
+                              yes-for-all
+                              (helm-acase (helm-read-answer
+                                           (format
+                                            "File `%s' already-exists, overwrite (y,n,!,q) ? "
+                                            dest-file)
+                                           '("y" "n" "!" "q"))
+                                ("y" t)
+                                ("n" nil)
+                                ("!" (prog1 t
+                                       (setq yes-for-all t)))
+                                ("q" (cl-return-from helm-ff-mcp
+                                       (message "Operation aborted")))))))
+          (if dir-ok
+              (if overwrite
+                  (push (list f (file-name-as-directory d) overwrite) jobs)
+                (cl-incf skipped))
+            (cl-incf skipped)))))
+    (nreverse jobs)))
 
-The car of marked should be a regular file and the rest of marked (cdr) should
-be existing directories."
-  (let* ((mkd     (helm-marked-candidates))
-         (file    (car mkd))
-         (targets (cdr mkd))
-         (skipped 0)
-         operations)
-    (cl-assert (file-regular-p file) nil (format "ERROR: Not a regular file `%s'" file))
-    (cl-assert targets nil (format "ERROR: No destination specified for file `%s'" file))
-    (cl-assert (cl-loop for f in targets always (file-directory-p f)) nil
-               "ERROR: Destinations must be existing directories")
-    (when targets
-      (cl-loop with yes-for-all
-               for dest in targets
-               for dest-file = (expand-file-name (helm-basename file) dest)
-               for dir-ok = (file-accessible-directory-p dest)
-               for exists = (and dir-ok
-                                 (file-exists-p
-                                  (expand-file-name
-                                   (helm-basename file) dest)))
-               for overwrite = (or (null exists)
-                                   yes-for-all
-                                   (helm-acase (helm-read-answer
-                                                (format
-                                                 "File `%s' already-exists, overwrite (y,n,!,q) ? "
-                                                 dest-file)
-                                                '("y" "n" "!" "q"))
-                                     ("y" t)
-                                     ("n" nil)
-                                     ("!" (prog1 t
-                                            (setq yes-for-all t)))
-                                     ("q" (cl-return-from helm-ff-mcp
-                                            (message "Operation aborted")))))
-               if dir-ok
-               do (if overwrite
-                      (push (list file (file-name-as-directory dest) overwrite) operations)
-                    (cl-incf skipped))
-               else do (cl-incf skipped))
-      (when operations
-        (with-helm-display-marked-candidates
-          helm-marked-buffer-name
-          (mapcar #'abbreviate-file-name targets)
-          (if (y-or-n-p (format "Copy `%s' to directories?" (helm-basename file)))
-              (progn
-                (process-put
-                 (async-start
-                  `(lambda ()
-                     (require 'cl-lib)
-                     (cl-loop with copies = 0
-                              with skipped = ,skipped
-                              for (file dest overwrite) in ',operations
-                              do (condition-case _err
-                                     (progn
-                                       (copy-file file dest overwrite)
-                                       (cl-incf copies))
-                                   (file-error (cl-incf skipped)))
-                              finally return (list file copies skipped)))
-                  (lambda (result)
-                    (let ((copied (nth 1 result)))
-                      (unless (dired-async-processes)
-                        (dired-async--modeline-mode -1))
-                      (run-with-idle-timer
-                       0.1 nil
-                       (lambda ()
-                         (dired-async-mode-line-message
-                          "Mcp done, %s %s of %s done, %s files skipped"
-                          'dired-async-message
-                          copied
-                          (if (> copied 1)
-                              "copies" "copy")
-                          (helm-basename (nth 0 result))
-                          (nth 2 result)))))))
-                 'dired-async-process t)
-                (dired-async--modeline-mode 1))
-            (message "Operation aborted")))))))
+(defun helm-ff-mcp (_candidate)
+  "Copy marked files to directories."
+  (let* ((files (helm-marked-candidates :with-wildcard t))
+         (targets (helm-read-file-name "Copy marked files to directories: "
+                                       :test 'file-directory-p
+                                       :marked-candidates t :noret t
+                                       :default (helm-dwim-target-directories)
+                                       :initial-input helm-ff-default-directory))
+         (operations (helm-ff--mcp-make-alist files targets)))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      (mapcar (lambda (op)
+                (concat (abbreviate-file-name (car op))
+                        " -> "
+                        (abbreviate-file-name (cadr op))))
+              operations)
+      (if (y-or-n-p "Copy files to directories?")
+          (progn
+            (process-put
+             (async-start
+              `(lambda ()
+                 (require 'cl-lib)
+                 (cl-loop with skipped = 0
+                          with copies = 0
+                          for (file dest overwrite) in ',operations
+                          do (condition-case _err
+                                 (progn
+                                   (copy-file
+                                    file (file-name-as-directory dest) overwrite)
+                                   (cl-incf copies))
+                               (file-error (cl-incf skipped)))
+                          finally return (list copies skipped)))
+              (lambda (result)
+                (unless (dired-async-processes)
+                  (dired-async--modeline-mode -1))
+                (run-with-idle-timer
+                 0.1 nil
+                 (lambda ()
+                   (dired-async-mode-line-message
+                    "Mcp done, %s file(s) copied, %s file(s) skipped"
+                    'dired-async-message
+                    (nth 0 result) (nth 1 result))))))
+             'dired-async-process t)
+            (dired-async--modeline-mode 1))
+        (message "Operation aborted")))))
 
 (helm-make-command-from-action helm-ff-run-mcp
     "Copy the car of marked candidates to the remaining marked candidates."
