@@ -6765,29 +6765,29 @@ list."
 (defun helm-ff--mcp-make-alist (files targets)
   (let ((skipped 0)
         jobs yes-for-all)
-    (dolist (d targets)
-      (dolist (f files)
-        (let* ((dest-file (expand-file-name (helm-basename f) d))
-               (dir-ok (file-accessible-directory-p d))
-               (exists (and dir-ok (file-exists-p dest-file)))
-               (overwrite (or (null exists)
-                              yes-for-all
-                              (helm-acase (helm-read-answer
-                                           (format
-                                            "File `%s' already-exists, overwrite (y,n,!,q) ? "
-                                            dest-file)
-                                           '("y" "n" "!" "q"))
-                                ("y" t)
-                                ("n" nil)
-                                ("!" (prog1 t
-                                       (setq yes-for-all t)))
-                                ("q" (cl-return-from helm-ff-mcp
-                                       (message "Operation aborted")))))))
-          (if dir-ok
-              (if overwrite
-                  (push (list f (file-name-as-directory d) overwrite) jobs)
-                (cl-incf skipped))
-            (cl-incf skipped)))))
+    (catch 'abort
+      (dolist (d targets)
+        (dolist (f files)
+          (let* ((dest-file (expand-file-name (helm-basename f) d))
+                 (dir-ok (file-accessible-directory-p d))
+                 (exists (and dir-ok (file-exists-p dest-file)))
+                 (overwrite (or (null exists)
+                                yes-for-all
+                                (helm-acase (helm-read-answer
+                                             (format
+                                              "File `%s' already-exists, overwrite (y,n,!,q) ? "
+                                              dest-file)
+                                             '("y" "n" "!" "q"))
+                                  ("y" t)
+                                  ("n" nil)
+                                  ("!" (prog1 t
+                                         (setq yes-for-all t)))
+                                  ("q" (throw 'abort (message "Operation aborted")))))))
+            (if dir-ok
+                (if overwrite
+                    (push (list f (file-name-as-directory d) overwrite) jobs)
+                  (cl-incf skipped))
+              (cl-incf skipped))))))
     (nreverse jobs)))
 
 (defun helm-ff-mcp (_candidate)
@@ -6801,43 +6801,44 @@ list."
          (operations (helm-ff--mcp-make-alist files targets))
          (lgst (cl-loop for (file _dest _overwrite) in operations
                         maximize (length file))))
-    (with-helm-display-marked-candidates
-      helm-marked-buffer-name
-      (mapcar (lambda (op)
-                (concat (abbreviate-file-name (car op))
-                        (format "%s-> "
-                                (make-string (- lgst (length (car op))) ? ))
-                        (abbreviate-file-name (cadr op))))
-              operations)
-      (if (y-or-n-p "Files will be copied to directories?")
-          (progn
-            (process-put
-             (async-start
-              `(lambda ()
-                 (require 'cl-lib)
-                 (cl-loop with skipped = 0
-                          with copies = 0
-                          for (file dest overwrite) in ',operations
-                          do (condition-case _err
-                                 (progn
-                                   (copy-file
-                                    file (file-name-as-directory dest) overwrite)
-                                   (cl-incf copies))
-                               (file-error (cl-incf skipped)))
-                          finally return (list copies skipped)))
-              (lambda (result)
-                (unless (dired-async-processes)
-                  (dired-async--modeline-mode -1))
-                (run-with-idle-timer
-                 0.1 nil
-                 (lambda ()
-                   (dired-async-mode-line-message
-                    "Mcp done, %s file(s) copied, %s file(s) skipped"
-                    'dired-async-message
-                    (nth 0 result) (nth 1 result))))))
-             'dired-async-process t)
-            (dired-async--modeline-mode 1))
-        (message "Operation aborted")))))
+    (when operations
+      (with-helm-display-marked-candidates
+        helm-marked-buffer-name
+        (mapcar (lambda (op)
+                  (concat (abbreviate-file-name (car op))
+                          (format "%s-> "
+                                  (make-string (- lgst (length (car op))) ? ))
+                          (abbreviate-file-name (cadr op))))
+                operations)
+        (if (y-or-n-p "Files will be copied to directories?")
+            (progn
+              (process-put
+               (async-start
+                `(lambda ()
+                   (require 'cl-lib)
+                   (cl-loop with skipped = 0
+                            with copies = 0
+                            for (file dest overwrite) in ',operations
+                            do (condition-case _err
+                                   (progn
+                                     (copy-file
+                                      file (file-name-as-directory dest) overwrite)
+                                     (cl-incf copies))
+                                 (file-error (cl-incf skipped)))
+                            finally return (list copies skipped)))
+                (lambda (result)
+                  (unless (dired-async-processes)
+                    (dired-async--modeline-mode -1))
+                  (run-with-idle-timer
+                   0.1 nil
+                   (lambda ()
+                     (dired-async-mode-line-message
+                      "Mcp done, %s file(s) copied, %s file(s) skipped"
+                      'dired-async-message
+                      (nth 0 result) (nth 1 result))))))
+               'dired-async-process t)
+              (dired-async--modeline-mode 1))
+          (message "Operation aborted"))))))
 
 (helm-make-command-from-action helm-ff-run-mcp
     "Copy the car of marked candidates to the remaining marked candidates."
