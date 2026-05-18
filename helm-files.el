@@ -6798,15 +6798,18 @@ list."
                                        :marked-candidates t :noret t
                                        :default (helm-dwim-target-directories)
                                        :initial-input helm-ff-default-directory))
-         (operations (helm-ff--mcp-make-alist files targets)))
+         (operations (helm-ff--mcp-make-alist files targets))
+         (lgst (cl-loop for (file _dest _overwrite) in operations
+                        maximize (length file))))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (mapcar (lambda (op)
                 (concat (abbreviate-file-name (car op))
-                        " -> "
+                        (format "%s-> "
+                                (make-string (- lgst (length (car op))) ? ))
                         (abbreviate-file-name (cadr op))))
               operations)
-      (if (y-or-n-p "Copy files to directories?")
+      (if (y-or-n-p "Files will be copied to directories?")
           (progn
             (process-put
              (async-start
