@@ -89,7 +89,7 @@ clean:
 # Make autoloads file
 autoloads:
 	$(EVAL) "(progn (setq generated-autoload-file (expand-file-name \"helm-autoloads.el\" \"$(PKGDIR)\")) \
-(setq backup-inhibited t) (update-directory-autoloads \"$(PKGDIR)\"))"
+(setq backup-inhibited t) (if (< emacs-major-version 29) (update-directory-autoloads \"$(PKGDIR)\") (loaddefs-generate \"$(PKGDIR)\" generated-autoload-file nil nil nil t)))"
 
 PREFIX=/usr/local/
 BIN=${PREFIX}bin/
