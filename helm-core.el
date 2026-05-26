@@ -1415,6 +1415,7 @@ size of `helm-debug-buffer' grows quickly.")
 \\<helm-map>\
 \\[helm-help]:Help \
 \\[helm-select-action]:Act \
+\\[helm-next-source]:NextSrc \
 \\[helm-maybe-exit-minibuffer]/\
 f1..f12:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend \
@@ -1450,13 +1451,24 @@ diverse [[Helm sources][sources]], see [[https://github.com/emacs-helm/helm/wiki
 Helm generally uses familiar Emacs keys to navigate the list.
 Here follow some of the less obvious bindings:
 
-- `\\<helm-map>\\[helm-maybe-exit-minibuffer]' selects the
-candidate from the list, executes the default action upon exiting
-the Helm session.
+- `\\<helm-map>\\[helm-maybe-exit-minibuffer]' selects the candidate
+from the list, executes the default action upon exiting the Helm
+session.  The first 12 actions are bound by default to F1..12.  Note
+that according to filtered actions (see below) the action order may
+differ, this mean that the F3 key for example may be bound to an action
+for one type of candidate and to another action for another candidate.
+In addition to these F1..12 bindings each action may have specific
+keybinding according to its own keymap.  You can of course configure
+your keybindings in each helm keymap as needed just like in any Emacs
+keymap.  See [[Modify keybindings in Helm][Modify keybindings in Helm]].
 
 - `\\<helm-map>\\[helm-execute-persistent-action]' executes the
 default action but without exiting the Helm session.  Not all
 sources support this.
+
+- `\\<helm-map>\\[helm-next-source]' Jump to next source.
+
+- `\\<helm-map>\\[helm-previous-source]' Jump to previous source.
 
 - `\\<helm-map>\\[helm-select-action]' displays a list of actions
 available on current candidate or all marked candidates.  The
@@ -1471,8 +1483,9 @@ are called filtered actions.
 ** Helm sources
 
 Helm uses what's called sources to provide different kinds of
-completions.  Each Helm session can handle one or more source.  A
-source is an alist object which is build from various classes,
+completions.  Each Helm session can handle one or more source.
+Each source has its own keymap.
+A source is an alist object which is build from various classes,
 see [[Writing your own Helm sources][here]] and [[https://github.com/emacs-helm/helm/wiki/Developing#creating-a-source][Helm wiki]] for more infos.
 
 *** Configure sources
