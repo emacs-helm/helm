@@ -92,11 +92,13 @@ This is generally the packages maintained directly in Elpa or NonGnu."
 
 
 ;;; Compat
-(defun helm-packages-get-descriptor (pkg)
-  "Return the package desc for PKG.
-PKG is a symbol. Same as `helm-packages-get-descriptor' but for Helm."
-  (when (boundp 'package-archive-contents)
-    (cadr (assq pkg package-archive-contents))))
+(defun helm-packages-get-descriptor (pkg-name)
+  "Return the package desc for PKG-NAME.
+This is the inlined version of Emacs-30 `package-get-descriptor'."
+  (unless package--initialized (package-initialize 'no-activate))
+  (or (package--get-activatable-pkg pkg-name)
+      (cadr (assq pkg-name package-alist))
+      (cadr (assq pkg-name package-archive-contents))))
 
 
 ;;; Actions
