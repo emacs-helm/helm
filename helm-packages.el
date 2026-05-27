@@ -89,6 +89,15 @@ It is called with two args respectively PACKAGE as a string and DIRECTORY."
   "Urls used for packages not specifying :url in their recipes.
 This is generally the packages maintained directly in Elpa or NonGnu."
   :type '(alist :key-type string :value-type string))
+
+
+;;; Compat
+(defun helm-packages-get-descriptor (pkg)
+  "Return the package desc for PKG.
+PKG is a symbol. Same as `helm-packages-get-descriptor' but for Helm."
+  (when (boundp 'package-archive-contents)
+    (cadr (assq pkg package-archive-contents))))
+
 
 ;;; Actions
 ;;
@@ -113,7 +122,7 @@ This is generally the packages maintained directly in Elpa or NonGnu."
 
 (defun helm-packages-get-homepage-url (candidate)
   "Get package CANDIDATE home page url."
-  (let* ((id     (package-get-descriptor candidate))
+  (let* ((id     (helm-packages-get-descriptor candidate))
          (extras (package-desc-extras id)))
     (and (listp extras) (cdr-safe (assoc :url extras)))))
 
@@ -142,7 +151,7 @@ This is generally the packages maintained directly in Elpa or NonGnu."
   "Run `package-delete' on PACKAGES.
 If FORCE is non nil force deleting packages."
   (mapc (lambda (x)
-          (package-delete (package-get-descriptor x) force))
+          (package-delete (helm-packages-get-descriptor x) force))
         packages))
 
 (defun helm-packages-uninstall (_candidate)
@@ -197,7 +206,7 @@ as dependencies."
 
 (defun helm-packages--get-deps (pkg)
   "Recursively find PKG dependencies."
-  (let ((desc (cadr (assq pkg package-archive-contents))))
+  (let ((desc (helm-packages-get-descriptor pkg)))
     (when desc
       (cl-loop for req in (package-desc-reqs desc) ; (foo (1 2 3))
                for sym = (car req)
@@ -238,7 +247,7 @@ Arg PACKAGES is a list of strings."
 (defun helm-packages-quit-an-find-file (source)
   "`find-file-target' function for `helm-packages'."
   (let* ((sel (helm-get-selection nil nil source))
-         (pkg (package-get-descriptor (intern sel))))
+         (pkg (helm-packages-get-descriptor (intern sel))))
     (if (and pkg (package-installed-p pkg))
         (expand-file-name (package-desc-dir pkg))
       package-user-dir)))
@@ -372,7 +381,7 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
            for c in candidates
            for sym = (intern-soft c)
            for archive = (assq sym package-archive-contents)
-           for id = (package-get-descriptor sym)
+           for id = (helm-packages-get-descriptor sym)
            for provider = (if archive
                               (package-desc-archive (cadr archive))
                             (and (assq sym package--builtins) "emacs"))
@@ -447,7 +456,7 @@ PROVIDER can be one of \"melpa\", \"gnu\" or \"nongnu\"."
     (exts (cl-loop for p in package-archive-contents
                         for sym = (car p)
                         when (package--has-keyword-p
-                              (package-get-descriptor sym)
+                              (helm-packages-get-descriptor sym)
                               (list key))
                         collect sym)))
     (unless (or exts built-in)
@@ -551,7 +560,7 @@ to avoid errors with outdated packages no more availables."
                       :data (lambda ()
                               (cl-loop for p in package-archive-contents
                                        for sym = (car p)
-                                       for id = (package-get-descriptor sym)
+                                       for id = (helm-packages-get-descriptor sym)
                                        for status = (and id (package-desc-status id))
                                        when (equal status "new")
                                        nconc (list (car p))))
@@ -560,7 +569,7 @@ to avoid errors with outdated packages no more availables."
                       :data (lambda ()
                               (cl-loop for p in package-archive-contents
                                        for sym = (car p)
-                                       for id = (package-get-descriptor sym)
+                                       for id = (helm-packages-get-descriptor sym)
                                        for status = (package-desc-status id)
                                        unless (or (and id (member
                                                            status
@@ -576,7 +585,7 @@ to avoid errors with outdated packages no more availables."
                                        ;; well on (m)elpa. Other builtins don't
                                        ;; have a package-descriptor, the format is
                                        ;; (sym . [version reqs summary]).
-                                       when (package-desc-p (package-get-descriptor (car p)))
+                                       when (package-desc-p (helm-packages-get-descriptor (car p)))
                                        collect (car p)))
                       :action (remove (assoc "Clone package" standard-actions)
                                       standard-actions)))
@@ -593,7 +602,7 @@ To have more actions on packages, use `helm-packages'."
         (helm-build-in-buffer-source "helm finder"
           :data (cl-loop for p in package-archive-contents
                          for sym = (car p)
-                         for desc = (package-get-descriptor sym)
+                         for desc = (helm-packages-get-descriptor sym)
                          nconc (copy-sequence (package-desc--keywords desc)) into keywords
                          finally return (helm-fast-remove-dups keywords :test 'equal))
           :filtered-candidate-transformer
