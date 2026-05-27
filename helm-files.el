@@ -634,6 +634,14 @@ i.e. filtering filenames inside directory."
           (const :tag "size" size)
           (const :tag "extensions" ext)))
 
+(defcustom helm-ff-tooltip-horizontal-padding 0
+  "Specify amount of horizontal padding used by windowing system when
+rendering tooltips. The specified amount of padding is used to move the
+tooltip horizontally when Helm renders a file properties tool tip (`M-i'
+is pressed) to avoid the windowing system applied padding obscuring the
+end of the filename."
+  :type 'integer)
+
 (defcustom helm-ff-rotate-image-program "exiftran"
   "External program used to rotate images.
 When nil and `helm-ff-display-image-native' is enabled, fallback to
@@ -4086,11 +4094,17 @@ to avoid an unnecessary call to `file-truename'."
              (access             (cl-getf it :access-time))
              (ext                (helm-get-default-program-for-file candidate))
              (tooltip-hide-delay (or helm-tooltip-hide-delay tooltip-hide-delay))
+             (frame-params       (with-helm-window (frame-parameters)))
+             (frame-left         (cdr (assoc 'left frame-params)))
+             (frame-top          (cdr (assoc 'top  frame-params)))
              (posn (with-helm-window
                      (posn-at-point (save-excursion (end-of-visual-line) (point)))))
              (tooltip-frame-parameters (append tooltip-frame-parameters
-                                               `((left . ,(car (posn-x-y posn)))
-                                                 (top .  ,(cdr (posn-x-y posn)))))))
+                                               `((left . ,(+ frame-left
+                                                             helm-ff-tooltip-horizontal-padding
+                                                             (car (posn-x-y posn))))
+                                                 (top .  ,(+ frame-top
+                                                             (cdr (posn-x-y posn))))))))
         (if (and (display-graphic-p) tooltip-mode)
             (tooltip-show
              (concat
@@ -4117,9 +4131,9 @@ to avoid an unnecessary call to `file-truename'."
                         (helm-directory-size
                          candidate current-prefix-arg t)))
               (format "Modified: %s\n" modif)
-              (format "Accessed: %s\n" access)
+              (format "Accessed: %s" access)
               (and (stringp trash)
-                   (format "Trash: %s\n"
+                   (format "\nTrash: %s"
                            (abbreviate-file-name trash)))))
           (message dired-line) (sit-for 5)))
     (message "Permission denied, file not readable")))
