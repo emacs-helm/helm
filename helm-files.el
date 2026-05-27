@@ -5635,7 +5635,10 @@ Show the first `helm-ff-history-max-length' elements of
   (interactive "p")
   (let ((history (when helm-ff-history
                    (helm-fast-remove-dups helm-ff-history
-                                          :test 'equal))))
+                                          :test 'equal)))
+        ;; Force reusing the same frame when helm session is displayed in its
+        ;; own frame (issue #2750).
+        (helm-display-function 'helm-default-display-buffer))
     (when history
       (setq helm-ff-history
             (if (>= (length history) helm-ff-history-max-length)
