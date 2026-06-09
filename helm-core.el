@@ -3184,6 +3184,7 @@ HISTORY args see `helm'."
               ;; Add also to update hook otherwise keymap is not updated
               ;; until a key is hit (Bug#1670).
               (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
+              (add-hook 'helm-after-update-hook 'read-only-mode)
               (add-hook 'post-command-hook 'helm--update-header-line)
               (helm-log "helm-internal" "show prompt")
               (unwind-protect
@@ -5274,7 +5275,8 @@ without recomputing them, it should be a list of lists."
     (with-helm-window (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
-    (let ((ov '(nil)))
+    (let ((ov '(nil))
+          (inhibit-read-only t))
       (unwind-protect
            (let (sources matches)
              ;; Collect sources ready to be updated.
