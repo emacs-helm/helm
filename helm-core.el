@@ -5662,7 +5662,8 @@ See `helm-default-output-filter'."
            (insertion-marker     (cdr (assq 'insertion-marker source)))
            (incomplete-line-info (assq 'incomplete-line source))
            (item-count-info      (assq 'item-count source))
-           (multiline            (assq 'multiline source)))
+           (multiline            (assq 'multiline source))
+           (inhibit-read-only t))
       (with-helm-buffer
         (save-excursion
           (if insertion-marker
