@@ -6814,26 +6814,27 @@ CANDIDATE-OR-REGEXP from there."
 (defun helm-delete-current-selection ()
   "Delete the currently selected item."
   (with-helm-window
-    (cond ((helm-pos-multiline-p)
-           (helm-aif (helm-get-next-candidate-separator-pos)
-               (delete-region (pos-bol)
-                              (1+ (progn (goto-char it) (pos-eol))))
-             ;; last candidate
-             (goto-char (helm-get-previous-candidate-separator-pos))
-             (delete-region (pos-bol) (point-max)))
-           (when (helm-end-of-source-p)
-             (goto-char (or (helm-get-previous-candidate-separator-pos)
-                            (point-min)))
-             (forward-line 1)))
-          (t
-           (delete-region (pos-bol) (1+ (pos-eol)))
-           (when (helm-end-of-source-p t)
-             (let ((headp (save-excursion
-                            (forward-line -1)
-                            (not (helm-pos-header-line-p)))))
-               (and headp (forward-line -1))))))
-    (unless (helm-end-of-source-p t)
-      (helm-mark-current-line))))
+    (let ((inhibit-read-only t))
+      (cond ((helm-pos-multiline-p)
+             (helm-aif (helm-get-next-candidate-separator-pos)
+                 (delete-region (pos-bol)
+                                (1+ (progn (goto-char it) (pos-eol))))
+               ;; last candidate
+               (goto-char (helm-get-previous-candidate-separator-pos))
+               (delete-region (pos-bol) (point-max)))
+             (when (helm-end-of-source-p)
+               (goto-char (or (helm-get-previous-candidate-separator-pos)
+                              (point-min)))
+               (forward-line 1)))
+            (t
+             (delete-region (pos-bol) (1+ (pos-eol)))
+             (when (helm-end-of-source-p t)
+               (let ((headp (save-excursion
+                              (forward-line -1)
+                              (not (helm-pos-header-line-p)))))
+                 (and headp (forward-line -1))))))
+      (unless (helm-end-of-source-p t)
+        (helm-mark-current-line)))))
 
 (defun helm-end-of-source-1 (n at-point)
   (save-excursion
