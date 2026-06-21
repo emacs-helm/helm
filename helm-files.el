@@ -4569,7 +4569,7 @@ Arg FILE is the real part of candidate, a filename with no props."
 (defun helm-ff--in-backup-directory ()
   (when backup-directory-alist
     (cl-loop for (_p . f) in backup-directory-alist
-             thereis (file-equal-p f helm-ff-default-directory))))
+             thereis (and (file-equal-p f helm-ff-default-directory)))))
 
 (defun helm-ff-restore-backups (_candidate)
   (let ((mkd (helm-marked-candidates))
