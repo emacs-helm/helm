@@ -199,7 +199,14 @@ Colorize only symlinks, directories and files."
            for type = (and (or (null isremote)
                                (and (null helm-for-files-tramp-not-fancy)
                                     (file-remote-p i nil t)))
-                           (car (file-attributes i)))
+                           ;; Don't let an unreadable file (e.g. under a
+                           ;; directory whose permissions were revoked) signal a
+                           ;; file-error and abort highlighting the whole list;
+                           ;; treat it as a plain file.  Same guard as in
+                           ;; `helm-ff-filter-candidate-one-by-one' (bug#2405).
+                           (car (condition-case nil
+                                    (file-attributes i)
+                                  (file-error nil))))
            collect
            (cond (;; No fancy display on remote files with basic predicates.
                   (and (null type) isremote) (cons disp i))
