@@ -3852,9 +3852,11 @@ filename \\='.' and \\='..' even on root directories in Windows
 systems.
 When FORCE-UPDATE is non nil recompute candidates even if DIRECTORY is
 in cache."
-  (let* ((method (file-remote-p directory 'method))
-         (dfn (directory-file-name directory))
-         (truename (and (file-symlink-p dfn) (file-truename dfn))))
+  (let* ((method   (file-remote-p directory 'method))
+         (dfn      (directory-file-name directory))
+         (truename (and (file-symlink-p dfn) (file-truename dfn)))
+         (watcher  (gethash directory helm-ff--file-notify-watchers))
+         watcher-is-valid)
     (setq directory (file-name-as-directory
                      (expand-file-name directory)))
     (when truename
@@ -3862,6 +3864,10 @@ in cache."
                   helm-ff--list-directory-links :test 'equal))
     (or (and (not force-update)
              (not (member method helm-ff-inotify-unsupported-methods))
+             ;; Use the cache only when watcher is valid, otherwise we may endup
+             ;; with a cache not up to date if changes have been made to
+             ;; DIRECTORY and the watcher didn't notify those changes (bug#2758).
+             (setq watcher-is-valid (file-notify-valid-p watcher))
              (gethash directory helm-ff--list-directory-cache))
         (let* (file-error
                (ls   (condition-case err
@@ -3882,8 +3888,7 @@ in cache."
                           (setq file-error t)))))
                (dot  (concat directory "."))
                (dot2 (concat directory ".."))
-               (candidates (append (and (not file-error) (list dot dot2)) ls))
-               watcher)
+               (candidates (append (and (not file-error) (list dot dot2)) ls)))
           (puthash directory (+ (length ls) 2) helm-ff--directory-files-length)
           (prog1
               (puthash directory
@@ -3894,12 +3899,8 @@ in cache."
             ;; Put an inotify watcher to check directory modifications.
             (unless (or (null helm-ff-use-notify)
                         (member method helm-ff-inotify-unsupported-methods)
-                        (helm-aand (setq watcher (gethash
-                                                  directory
-                                                  helm-ff--file-notify-watchers))
-                                   ;; [1] If watcher is invalid enter
-                                   ;; next and delete it.
-                                   (file-notify-valid-p it)))
+                        ;; [1] If watcher is invalid enter next and delete it.
+                        watcher-is-valid)
               (condition-case-unless-debug err
                   (let ((to-watch (or truename directory)))
                     (when watcher
