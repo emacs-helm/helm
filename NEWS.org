@@ -1,6 +1,14 @@
 #+STARTUP:showall
 
 * NEWS
+** Version 4.0.8
+*** Helm buffer is now read-only
+So it is now impossible to edit it inadvertantly.
+
+*** It is now possible to copy a set of files to different directories
+`helm-ff-mcp` has been rewrited, previously it was only possible to
+copy a single file to several directories.
+
 ** Version 4.0.7
 *** Improve helm-dwim-target-directory
 You can use now M-n to cycle in default directories bound to each
