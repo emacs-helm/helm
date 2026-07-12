@@ -1131,6 +1131,7 @@ FLAGS is a list of variables to renitialize to nil when exiting or quitting.")
     ("describe-symbol" . symbol-help)  ; For Emacs-27.
     ("describe-command" . symbol-help) ; For Emacs-27.
     ("set-variable" . symbol-help)
+    ("remove-hook" . symbol-help)
     ("customize-group" . symbol-help)
     ("find-function" . symbol-help)
     ("find-variable" . symbol-help)
