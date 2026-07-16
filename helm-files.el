@@ -3844,6 +3844,9 @@ later in the transformer."
 ;; watcher ring on the truename remove the symlinked directory from cache.
 (defvar helm-ff--list-directory-links nil)
 
+(defvar helm-ff--inotify-unsupported-hosts nil
+  "Known hosts to not have file-notify support.")
+
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -3853,6 +3856,7 @@ systems.
 When FORCE-UPDATE is non nil recompute candidates even if DIRECTORY is
 in cache."
   (let* ((method   (file-remote-p directory 'method))
+         (host     (file-remote-p directory 'host))
          (dfn      (directory-file-name directory))
          (truename (and (file-symlink-p dfn) (file-truename dfn)))
          (watcher  (gethash directory helm-ff--file-notify-watchers))
@@ -3899,9 +3903,10 @@ in cache."
             ;; Put an inotify watcher to check directory modifications.
             (unless (or (null helm-ff-use-notify)
                         (member method helm-ff-inotify-unsupported-methods)
+                        (member host helm-ff--inotify-unsupported-hosts)
                         ;; [1] If watcher is invalid enter next and delete it.
                         watcher-is-valid)
-              (condition-case-unless-debug err
+              (condition-case err
                   (let ((to-watch (or truename directory)))
                     (when watcher
                       ;; If watcher is still in cache and we are here,
@@ -3918,7 +3923,15 @@ in cache."
                               '(change attribute-change)
                               (helm-ff--inotify-make-callback to-watch))
                              helm-ff--file-notify-watchers))
-                (file-notify-error (user-error "Error: %S %S" (car err) (cdr err))))))))))
+                (file-notify-error
+                 ;; We used user-error here during years, but is seems some
+                 ;; remotes don't have inotify error, so use here message to
+                 ;; ensure file listing is provided to user instead of failing
+                 ;; with error (bug#2758).
+                 (message "Error: %S %S" (car err) (cdr err))
+                 ;; Once host is pushed to helm-ff--inotify-unsupported-hosts
+                 ;; next call should not provide an error message.
+                 (and host (push host helm-ff--inotify-unsupported-hosts))))))))))
 
 (defun helm-ff--inotify-make-callback (directory)
   "Return a callback for `file-notify-add-watch'."
