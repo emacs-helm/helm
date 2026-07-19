@@ -3925,7 +3925,7 @@ in cache."
                              helm-ff--file-notify-watchers))
                 (file-notify-error
                  ;; We used user-error here during years, but is seems some
-                 ;; remotes don't have inotify error, so use here message to
+                 ;; remotes don't have inotify support, so use here message to
                  ;; ensure file listing is provided to user instead of failing
                  ;; with error (bug#2758).
                  (message "Error: %S %S" (car err) (cdr err))
