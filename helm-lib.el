@@ -2131,7 +2131,8 @@ That is what completion commands operate on."
   "Eval BODY inside `helm-buffer'."
   (declare (indent 0) (debug t))
   `(with-current-buffer (helm-buffer-get)
-     ,@body))
+     (let ((inhibit-read-only t))
+       ,@body)))
 
 (defmacro with-helm-current-buffer (&rest body)
   "Eval BODY inside `helm-current-buffer'."
@@ -2160,7 +2161,8 @@ That is what completion commands operate on."
   "Be sure BODY is excuted in the helm window."
   (declare (indent 0) (debug t))
   `(with-selected-window (helm-window)
-     ,@body))
+     (let ((inhibit-read-only t))
+       ,@body)))
 
 (defmacro helm-without-follow (&rest body)
   "Ensure BODY runs without following.
