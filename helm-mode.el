@@ -3135,9 +3135,9 @@ Be sure to know what you are doing when modifying this.")
                          crm-separator)
                         (and (stringp crm-separator)
                              (or (get-text-property 0 'separator crm-separator)
-                                 (let ((sep (string-replace
-                                             "[ \t]*" "" crm-separator)))
-                                   (and (eq (length sep) 1) sep))))
+                                 (helm-aand (string-replace
+                                             "[ \t]*" "" crm-separator)
+                                            (and (eq (length it) 1) it))))
                         helm-crm-default-separator)))
            ;; Try to find a default separator. If `crm-separator' is a
            ;; regexp use the string the regexp is matching.
