@@ -590,35 +590,6 @@ command on remote (and/or locally if you want to trash as root).
 On Ubuntu-based distributions it is \\='trash-cli'."
   :type 'boolean)
 
-(defvaralias 'helm-list-directory-function 'helm-list-remote-directory-fn)
-(make-obsolete-variable 'helm-list-directory-function 'helm-list-remote-directory-fn "4.0")
-
-(defcustom helm-list-remote-directory-fn
-  (cl-case system-type
-    (gnu/linux #'helm-list-dir-external)
-    (berkeley-unix #'helm-list-dir-lisp)
-    (windows-nt #'helm-list-dir-lisp)
-    (t #'helm-list-dir-lisp))
-  "The function used in `helm-find-files' to list remote directories.
-
-Currently Helm provides two functions to do this:
-`helm-list-dir-lisp' and `helm-list-dir-external'.
-
-Using `helm-list-dir-external' will provide a similar display to
-what is provided with local files i.e. colorized symlinks,
-executables files etc., whereas using `helm-list-dir-lisp' will
-allow colorizing only directories but it is more portable.
-
-NOTE: `helm-list-dir-external' needs ls and awk as dependencies.
-Also the ls version installed on the remote side should support
-the same arguments as the GNU/ls version, which are -A -1 -F -b
-and -Q.  So even if you are using a GNU/ls version locally and you
-want to connect e.g. on a Freebsd server, you may have failures
-due to the incompatible ls version installed on remote server.  In
-such case use `helm-list-dir-lisp' which works everywhere but is
-slower and less featured (only directories colorized)."
-  :type 'function)
-
 (defcustom helm-ff-initial-sort-method nil
   "Sort method to use when initially listing a directory.
 
@@ -3694,30 +3665,27 @@ debugging purpose."
 (defun helm-list-directory (directory &optional sel)
   "List directory DIRECTORY.
 
-If DIRECTORY is remote use `helm-list-remote-directory-fn',
-otherwise use `directory-files'.
+If DIRECTORY is remote use external ls with automatic fallback to
+lisp implementation, otherwise use `directory-files'.
 SEL argument is only here for debugging purpose, it default to
 `helm-get-selection'."
-  (let* ((remote (file-remote-p directory 'method))
-         (helm-list-remote-directory-fn
-          (helm-acase remote
-            ("ftp" #'helm-list-dir-lisp)
-            ("adb" #'helm-list-dir-adb)
-            (t helm-list-remote-directory-fn)))
-         (use-ext-remote-fn
-          (and remote
-               (eq helm-list-remote-directory-fn 'helm-list-dir-external)))
-         (sort-method (helm-acase helm-ff-initial-sort-method
-                        (newest (if use-ext-remote-fn
-                                    "-t" #'file-newer-than-file-p))
-                        (size (if use-ext-remote-fn
-                                  "-S" #'helm-ff-file-larger-that-file-p))
-                        (ext (if use-ext-remote-fn
-                                 #'identity
-                               #'helm-group-candidates-by)))))
+   (let* ((remote (file-remote-p directory 'method))
+         (remote-fn (helm-acase remote
+                      ("ftp" #'helm-list-dir-lisp)
+                      ("adb" #'helm-list-dir-adb)
+                      (t #'helm-list-dir-external)))
+         (use-ext-fn (eq remote-fn #'helm-list-dir-external))
+         (sort-methods (helm-acase helm-ff-initial-sort-method
+                        (newest '("-t" . #'file-newer-than-file-p))
+                        (size   '("-S" . #'helm-ff-file-larger-that-file-p))
+                        (ext    '(#'identity . #'helm-group-candidates-by))))
+         (sort-method (if use-ext-fn (car sort-methods) (cdr sort-methods))))
     (if remote
-        (ignore-errors
-          (funcall helm-list-remote-directory-fn directory sort-method))
+        (or (ignore-errors (funcall remote-fn directory sort-method))
+            (and use-ext-fn
+                 (ignore-errors
+                   (funcall #'helm-list-dir-lisp directory
+                            (cdr sort-methods)))))
       (helm-acase helm-ff-initial-sort-method
         ((newest size)
          (sort (helm-local-directory-files
@@ -3795,7 +3763,15 @@ Add a `helm-ff-dir' property on each fname ending with \"/\"."
 
 This function is fast enough to be used for remote files and save
 the type of files at the same time in a property for using it
-later in the transformer."
+later in the transformer.
+
+Provides a similar display to local files i.e. colorized symlinks,
+executable files etc.
+
+Requires ls and awk on the remote side. The ls version should
+support the same arguments as GNU/ls, which are -A -1 -F -b and -Q.
+On systems with incompatible ls versions (e.g., FreeBSD, BusyBox),
+this function returns nil."
   (let ((default-directory (file-name-as-directory
                             (expand-file-name dir))))
     (with-temp-buffer
@@ -3809,7 +3785,7 @@ later in the transformer."
                   ;; "foo*" for the real file foo. The downside is
                   ;; that we need an extra step to remove the quotes
                   ;; at the end which impact performances.
-                  "ls -A -1 -F -b -Q %s | awk -v dir=%s '{print dir $0}'"
+                  "ls -A -1 -F -b -Q %s 2>/dev/null | awk -v dir=%s '{print dir $0}'"
                   (or sort-method "")
                   (shell-quote-argument default-directory))
                  nil t nil)
