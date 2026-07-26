@@ -2690,6 +2690,8 @@ See `helm-ff-RET' for details."
       ;; `helm--minibuffer-completing-file-name' is non nil that's mean we are
       ;; in `helm-read-file-name'.
       (if (and helm--minibuffer-completing-file-name (null sel))
+          ;; FIXME: This should never be called as we use now a dummy source
+          ;; either in HFF and in helm-read-file-name.
           (throw 'must-match (minibuffer-message "[No match]"))
         (cl-assert sel nil "Trying to exit with no candidates"))
       (if (and (or (file-directory-p sel)
