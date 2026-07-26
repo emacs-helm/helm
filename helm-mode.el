@@ -2307,12 +2307,11 @@ Keys description:
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
              :volatile t
-             ;; Because we don't use :must-match in this source,
-             ;; helm-read-file-map is NOT merged with must-match map, this to
-             ;; not override helm-ff-RET, so MUST-MATCH == t is handled by
-             ;; helm-ff-RET, otherwise the dummy source enter in action and
-             ;; handle the other possible values of MUST-MATCH.
              :keymap helm-read-file-map
+             ;; Use MUST-MATCH here only when it is a function, otherwise let
+             ;; the dummy source handling the other possible values of
+             ;; MUST-MATCH.  See how keymaps are merged in helm-source.
+             :must-match (and (functionp must-match) must-match)
              :cleanup 'helm-find-files-cleanup
              :nomark nomark
              :action action-fn)))
