@@ -1087,10 +1087,8 @@ to complete the pattern in the minibuffer.
 Starting at helm version 2.9.7 it is somewhat possible to
 colorize fnames by listing files without loosing performances with
 external commands (ls and awk) if your system is compatible.
-For this you can use `helm-list-dir-external' as value
-for `helm-list-remote-directory-fn'.
-
-See `helm-list-remote-directory-fn' documentation for more infos.
+Requires support for GNU ls arguments (-A -1 -F -b -Q) on the
+remote side, with fallback to a lisp implementation.
 
 **** Completing host
 
