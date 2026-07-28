@@ -3679,7 +3679,7 @@ SEL argument is only here for debugging purpose, it default to
          (use-ext-fn   (and remote (eq remote-fn #'helm-list-dir-external)))
          (sort-methods (helm-acase helm-ff-initial-sort-method
                          (newest '("-t" . file-newer-than-file-p))
-                         (size   '("-S" . helm-ff-file-larger-that-file-p))
+                         (size   '("-S" . helm-ff-file-larger-than-file-p))
                          (ext    '(identity . helm-group-candidates-by))))
          ;; Note that `helm-group-candidates-by' is NOT a sort fn, it has to be
          ;; called on a whole list of candidates.
@@ -3717,7 +3717,7 @@ SEL argument is only here for debugging purpose, it default to
         (t (helm-local-directory-files
             directory t directory-files-no-dot-files-regexp))))))
 
-(defsubst helm-ff-file-larger-that-file-p (f1 f2)
+(defsubst helm-ff-file-larger-than-file-p (f1 f2)
   (let ((attr1 (file-attributes f1))
         (attr2 (file-attributes f2)))
     (> (nth 7 attr1) (nth 7 attr2))))
