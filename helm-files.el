@@ -3671,33 +3671,49 @@ If DIRECTORY is remote use external ls with automatic fallback to
 lisp implementation, otherwise use `directory-files'.
 SEL argument is only here for debugging purpose, it default to
 `helm-get-selection'."
-   (let* ((remote (file-remote-p directory 'method))
-         (remote-fn (helm-acase remote
-                      ("ftp" #'helm-list-dir-lisp)
-                      ("adb" #'helm-list-dir-adb)
-                      (t     #'helm-list-dir-external)))
-         (use-ext-fn (and remote (eq remote-fn #'helm-list-dir-external)))
+  (let* ((remote       (file-remote-p directory 'method))
+         (remote-fn    (helm-acase remote
+                         ("ftp" #'helm-list-dir-lisp)
+                         ("adb" #'helm-list-dir-adb)
+                         (t     #'helm-list-dir-external)))
+         (use-ext-fn   (and remote (eq remote-fn #'helm-list-dir-external)))
          (sort-methods (helm-acase helm-ff-initial-sort-method
-                        (newest '("-t" . file-newer-than-file-p))
-                        (size   '("-S" . helm-ff-file-larger-that-file-p))
-                        (ext    '(identity . helm-group-candidates-by))))
-         (sort-method (if use-ext-fn (car sort-methods) (cdr sort-methods))))
+                         (newest '("-t" . file-newer-than-file-p))
+                         (size   '("-S" . helm-ff-file-larger-that-file-p))
+                         (ext    '(identity . helm-group-candidates-by))))
+         ;; Note that `helm-group-candidates-by' is NOT a sort fn, it has to be
+         ;; called on a whole list of candidates.
+         (sort-method  (if use-ext-fn (car sort-methods) (cdr sort-methods)))
+         (sort-by-ext  (eq helm-ff-initial-sort-method 'ext))
+         ;; If we are on remote try first `helm-list-dir-external', if it fails
+         ;; for some reasons (presumably because the GNU ls is not installed on
+         ;; remote) fall back to `helm-list-dir-lisp'.
+         (rem-lst      (and remote
+                            (condition-case _err
+                                (funcall remote-fn directory
+                                         (and (not sort-by-ext)
+                                              sort-method))
+                              (error
+                               (and use-ext-fn
+                                    (funcall #'helm-list-dir-lisp directory
+                                             (unless sort-by-ext
+                                               (cdr sort-methods)))))))))
     (if remote
-        (or (ignore-errors (funcall remote-fn directory sort-method))
-            (and use-ext-fn
-                 (ignore-errors
-                   (funcall #'helm-list-dir-lisp directory
-                            (cdr sort-methods)))))
+        (if (and rem-lst sort-by-ext)
+            (helm-group-candidates-by
+             rem-lst #'file-name-extension
+             (or sel (helm-get-selection) ""))
+          rem-lst)
       (helm-acase helm-ff-initial-sort-method
         ((newest size)
          (sort (helm-local-directory-files
                 directory t directory-files-no-dot-files-regexp)
                sort-method))
-        (ext (funcall sort-method
-                      (helm-local-directory-files
-                       directory t directory-files-no-dot-files-regexp)
-                      #'file-name-extension
-                      (or sel (helm-get-selection) "")))
+        (ext (helm-group-candidates-by
+              (helm-local-directory-files
+               directory t directory-files-no-dot-files-regexp)
+              #'file-name-extension
+              (or sel (helm-get-selection) "")))
         (t (helm-local-directory-files
             directory t directory-files-no-dot-files-regexp))))))
 
