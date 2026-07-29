@@ -106,6 +106,7 @@
 (defvar recentf-list)
 (defvar helm-mm-matching-method)
 (defvar dired-async-mode)
+(defvar dired-async-file-directory-p-fn)
 (defvar org-directory)
 (defvar eshell-current-command)
 (defvar eshell-debug-command)
@@ -1375,7 +1376,10 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                         :initial-input (or cdir helm-ff-default-directory)
                         :history (helm-find-files-history nil :comp-read nil))))))
          (dest-dir-p (file-directory-p dest))
-         (dest-dir   (if dest-dir-p dest (helm-basedir dest))))
+         (dest-dir   (if dest-dir-p dest (helm-basedir dest)))
+         ;; Using this speedup dramatically preprocessing of remote candidates
+         ;; e.g. with `adb'.
+         (dired-async-file-directory-p-fn #'helm-ff--file-directory-p))
     ;; Ignore `dired-create-destination-dirs' and handle directory creation from
     ;; here like we were doing before. Dired is failing to create directories
     ;; when e.g. symlinking some files to a not yet existing directory.
