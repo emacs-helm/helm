@@ -33,7 +33,7 @@
 (declare-function eww-read-bookmarks "eww")
 
 (defvar eww-bookmarks)
-
+(defvar w3m-initial-frames)
 
 (defgroup helm-bookmark nil
   "Predefined configurations for `helm.el'."
@@ -223,7 +223,13 @@ will be honored."
 
 (defun helm-bookmark-jump-other-frame (candidate)
   "Jump to bookmark in other frame action."
-  (helm-bookmark-jump-1 candidate #'switch-to-buffer-other-frame))
+  (let ((handler (bookmark-get-handler candidate)))
+    (helm-bookmark-jump-1 candidate #'switch-to-buffer-other-frame)
+    ;; Specific to w3m. W3m set this variable when a frame is created
+    ;; specifically for its buffer, it is not the case here as we use an
+    ;; existing frame created previously with DISPLAY-FUNCTION.
+    (when (eq handler 'bookmark-w3m-bookmark-jump)
+      (setq-local w3m-initial-frames (cons (selected-frame) w3m-initial-frames)))))
 
 (defun helm-bookmark-jump-other-window (candidate)
   "Jump to bookmark in other window action."
