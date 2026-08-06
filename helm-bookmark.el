@@ -203,11 +203,19 @@ will be honored."
   "Toggle bookmark location visibility."
   'toggle-filename 'helm-bookmark-toggle-filename-1)
 
-(defun helm-bookmark-jump-1 (candidate &optional fn)
+(defun helm-bookmark-jump-1 (candidate &optional display-function)
   (let (;; FIXME Why is prefarg necessary here?
         (current-prefix-arg helm-current-prefix-arg)
-        non-essential)
-    (bookmark-jump candidate fn)))
+        non-essential qr)
+      (when display-function
+        (funcall display-function helm-current-buffer)
+        (setq qr (window-parameter (selected-window) 'quit-restore)))
+      (bookmark-jump candidate)
+      (set-window-prev-buffers (selected-window) nil)
+      (when qr
+        (set-window-parameter (selected-window) 'quit-restore
+                              (append (delete (car (last qr)) qr)
+                                      (list (current-buffer)))))))
 
 (defun helm-bookmark-jump (candidate)
   "Jump to bookmark action."
