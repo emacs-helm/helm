@@ -571,7 +571,7 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
            (helm-buffer--show-details
             name name-prefix file-name size mode dir
             'helm-buffer-modified 'helm-buffer-process nil details 'mod))
-          ;; A buffer file not modified and saved on disk.=>green
+          ;; A buffer file not modified and saved on disk.=>blue
           (file-name
            (helm-buffer--show-details
             name name-prefix file-name size mode dir
@@ -607,9 +607,7 @@ Should be called after others transformers i.e. (boring
 buffers)."
   (cl-assert helm-fuzzy-matching-highlight-fn nil "Wrong type argument functionp: nil")
   (cl-loop for i in buffers
-           for (name size mode meta) = (if helm-buffer-details-flag
-                                           (helm-buffer--details i 'details)
-                                         (helm-buffer--details i))
+           for (name size mode meta) = (helm-buffer--details i 'details)
            for truncbuf = (if (> (string-width name) helm-buffer-max-length)
                               (helm-substring-by-width
                                name helm-buffer-max-length
