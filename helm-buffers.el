@@ -182,7 +182,10 @@ Don't use `setq' to set this."
   "The elements displayed in helm-buffers-list.
 This is a list of 4 symbols maximum, which are in this order: \\='buffer,
 \\='size, \\='mode, \\='location.  The default is to show all, but you can
-remove some if you want."
+remove some if you want.
+Note that this affect only helm native commands using
+`helm-source-buffers-list', not helm generic implementation of
+`switch-to-buffer' and friends."
   :type '(set
           (const :tag "Buffer name" buffer)
           (const :tag "Buffer size" size)
