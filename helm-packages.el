@@ -88,7 +88,8 @@ It is called with two args respectively PACKAGE as a string and DIRECTORY."
   '(("gnu" .    "https://git.sv.gnu.org/git/elpa/gnu.git")
     ("nongnu" . "https://git.sv.gnu.org/git/elpa/nongnu.git"))
   "Urls used for packages not specifying :url in their recipes.
-This is generally the packages maintained directly in Elpa or NonGnu."
+This is generally the packages maintained directly in Elpa or NonGnu.
+There is not such problem with Melpa, packages are always maintained elsewhere."
   :type '(alist :key-type string :value-type string))
 
 ;;; Actions
