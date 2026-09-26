@@ -1154,10 +1154,10 @@ will take precedence over this."
 
 (defcustom helm-use-region-when-at 'always
   "Decide when and how to use region.
-If the value is \\='end and point is at region end or if the value is
-\\='beginning and point is at region beginning, search in this region,
+If the value is \\+`end' and point is at region end or if the value is
+\\+`beginning' and point is at region beginning, search in this region,
 otherwise use the current region as default for searching.
-If the value is \\='always never use the region as default and always
+If the value is \\+`always' never use the region as default and always
 search in this region."
   :type '(choice
           (symbol :tag "Search in region when point is at beginning" beginning)
