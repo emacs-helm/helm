@@ -1152,6 +1152,23 @@ will take precedence over this."
   :group 'helm
   :type 'float)
 
+(defcustom helm-use-region-when-at 'always
+  "Decide when and how to use region.
+If the value is \\='end and point is at region end or if the value is
+\\='beginning and point is at region beginning, search in this region,
+otherwise use the current region as default for searching.
+If the value is \\='always never use the region as default and always
+search in this region."
+  :type '(choice
+          (symbol :tag "Search in region when point is at beginning" beginning)
+          (symbol :tag "Search in region when point is at end" end)
+          (symbol :tag "Always search in region" always)))
+
+(defcustom helm-max-region-length 30
+  "Maximum region length accepted to use region as default.
+It has no effect when `helm-use-region-when-at' value is \\='always."
+  :type 'integer)
+
 (defvar helm-update-edebug nil
   "Development feature, make easier Edebug usage while in Helm.
 If set to true then all functions invoked after `helm-update' can be
@@ -3945,7 +3962,10 @@ Argument SAVE-OR-RESTORE is either save or restore."
                helm-input ""))
         (helm-maybe-use-default-as-input
          (setq helm-pattern (or (with-helm-current-buffer
-                                  (thing-at-point 'symbol))
+                                  ;; Be sure we have a string here.
+                                  (helm-acase (helm--default)
+                                    ((guard* (consp it)) (car it))
+                                    (t it)))
                                 "")
                helm-input ""))
         (t
@@ -4062,6 +4082,51 @@ please don't use it outside of Helm.
   (setq helm-pattern "")
   (setq helm-maybe-use-default-as-input nil))
 
+
+;;; Setup default and/or usage of region.
+;;
+;; See Issue #2763
+
+(defvar helm-prog-modes '(prog-mode))
+
+(defun helm--type-for-mode ()
+  "Return the type of thing to use with `thing-at-point' according to context."
+  (if (and (derived-mode-p helm-prog-modes)
+           (not (nth 3 (syntax-ppss))))
+      'symbol 'filename))
+
+(defun helm--thing-at-point ()
+  "Collect symbol or filename at point in all visible buffers.
+The return value is a list."
+  (cl-loop for win in (window-list nil 1)
+           when (with-selected-window win
+                  (thing-at-point (helm--type-for-mode) t))
+           collect it))
+
+(defun helm--default ()
+  "Define default value for :default in `helm'."
+  (if (or (helm--use-region-p) (not (use-region-p)))
+      (helm--thing-at-point)
+    (let ((region (buffer-substring-no-properties
+                   (region-beginning)
+                   (region-end))))
+      (if (or (> (length region) helm-max-region-length)
+              ;; Prevent inserting multiline string in minibuf.
+              (string-match-p "\n" region))
+        "" region))))
+
+(defun helm--use-region-p ()
+  "Decide when to use the region for searching.
+This according to the value of `helm-use-region-when-at' and current
+position in buffer."
+  (let ((fn (helm-acase helm-use-region-when-at
+              (beginning #'region-beginning)
+              (end       #'region-end)
+              (always    #'point))))
+    (and (use-region-p)
+         (eql (funcall fn) (point)))))
+
+
 (defun helm-read-from-minibuffer (prompt
                                 input preselect resume
                                 keymap default history)
@@ -4142,7 +4207,8 @@ For PRESELECT RESUME KEYMAP DEFAULT HISTORY, see `helm'."
             (t              ; Enter now minibuffer and wait for input.
              (let ((tap (or default
                             (with-helm-current-buffer
-                              (thing-at-point 'symbol)))))
+                              ;; A list or a string.
+                              (helm--default)))))
                (when helm-execute-action-at-once-if-one
                  (helm-display-buffer helm-buffer resume)
                  (select-window (helm-window)))

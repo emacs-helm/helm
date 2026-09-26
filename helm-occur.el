@@ -237,7 +237,7 @@ engine beeing completely different and also much faster."
            (unless (> (buffer-size) 2000000)
              helm-sources-using-default-as-input))
           def pos)
-      (when (use-region-p)
+      (when (helm--use-region-p)
         ;; When user mark defun with `mark-defun' with intention of
         ;; using helm-occur on this region, it is relevant to use the
         ;; thing-at-point located at previous position which have been
@@ -254,8 +254,12 @@ engine beeing completely different and also much faster."
            (helm :sources 'helm-source-occur
                  :buffer "*helm occur*"
                  :history 'helm-occur-history
-                 :default (or def (helm-aif (thing-at-point 'symbol)
-                                      (regexp-quote it)))
+                 ;; Return either a regexp-quoted string or a list of strings
+                 ;; regexp-quoted.
+                 :default (or def (helm-acase (helm--default)
+                                    ((guard* (consp it))
+                                     (mapcar #'regexp-quote it))
+                                    (t (regexp-quote it))))
                  :preselect (and (memq 'helm-source-occur
                                        helm-sources-using-default-as-input)
                                  (format "^%d:" (line-number-at-pos
