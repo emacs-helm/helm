@@ -259,7 +259,7 @@ engine beeing completely different and also much faster."
                  :default (or def (helm-acase (helm--default)
                                     ((guard* (consp it))
                                      (mapcar #'regexp-quote it))
-                                    (t (regexp-quote it))))
+                                    (t (and (stringp it) (regexp-quote it)))))
                  :preselect (and (memq 'helm-source-occur
                                        helm-sources-using-default-as-input)
                                  (format "^%d:" (line-number-at-pos
