@@ -5813,6 +5813,8 @@ Use it for non-interactive calls of `helm-find-files'."
       ;; Unquote helm-pattern maybe quoted by PA.
       (unless (file-exists-p (replace-regexp-in-string "\\s\\" "" helm-pattern))
         (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))
+    :popup-info (lambda (candidate)
+                  (get-text-property (- (length candidate) 1) 'bad-url candidate))
     :all-marked t
     :keymap 'helm-find-files-map
     :action 'helm-find-files-actions
@@ -6023,7 +6025,9 @@ source is `helm-source-find-files'."
 
 (defun helm-ff-find-url-at-point ()
   "Try to find link to an url in text-property at point."
-  (let* ((he      (get-text-property (point) 'help-echo))
+  (require 'textsec-check)
+  (let* ((url     (thing-at-point 'url))
+         (he      (get-text-property (point) 'help-echo))
          (ov      (overlays-at (point)))
          (ov-he   (and ov (overlay-get
                            (car (overlays-at (point))) 'help-echo)))
@@ -6033,7 +6037,11 @@ source is `helm-source-find-files'."
     (when (and (stringp he) (string-match "^LINK: " he))
       (setq he (replace-match "" t t he)))
     (cl-loop for i in (list he ov-he w3m-l nt-prop)
-          thereis (and (stringp i) helm--url-regexp (string-match helm--url-regexp i) i))))
+             when (and (stringp i)
+                       helm--url-regexp
+                       (string-match helm--url-regexp i))
+             return (helm-aif (textsec-suspicious-p (cons url i) 'link)
+                        (propertize (concat i "⚠️") 'bad-url it) i))))
 
 (defun helm-find-library-at-point ()
   "Try to find library path at point.
