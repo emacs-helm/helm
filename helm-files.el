@@ -3580,7 +3580,6 @@ debugging purpose."
     ;; Tramp check if path is valid without waiting a valid
     ;; connection and may send a file-error.
     (setq helm--ignore-errors (file-remote-p path))
-    (set-text-properties 0 (length path) nil path)
     ;; Bug#118 allow creation of newdir+newfile.
     (unless (or
              ;; A tramp file name not completed.
@@ -7269,7 +7268,6 @@ files."
                                'helm--last-frame-parameters
                                (with-current-buffer helm-ff-history-buffer-name
                                  helm--last-frame-parameters)))
-    (set-text-properties 0 (length input) nil input)
     (setq current-prefix-arg nil)
     ;; Allow next helm session to reuse helm--last-frame-parameters as
     ;; resume would do.
