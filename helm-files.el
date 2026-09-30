@@ -6026,7 +6026,7 @@ source is `helm-source-find-files'."
 (defun helm-ff-find-url-at-point ()
   "Try to find link to an url in text-property at point."
   (require 'textsec-check)
-  (let* ((url     (thing-at-point 'url))
+  (let* ((link    (thing-at-point 'url))
          (he      (get-text-property (point) 'help-echo))
          (ov      (overlays-at (point)))
          (ov-he   (and ov (overlay-get
@@ -6036,12 +6036,15 @@ source is `helm-source-find-files'."
     ;; Org link.
     (when (and (stringp he) (string-match "^LINK: " he))
       (setq he (replace-match "" t t he)))
-    (cl-loop for i in (list he ov-he w3m-l nt-prop)
-             when (and (stringp i)
+    (cl-loop for url in (list he ov-he w3m-l nt-prop)
+             when (and (stringp url)
                        helm--url-regexp
-                       (string-match helm--url-regexp i))
-             return (helm-aif (textsec-suspicious-p (cons url i) 'link)
-                        (propertize (concat i "⚠️") 'bad-url it) i))))
+                       (string-match helm--url-regexp url))
+             return (helm-aif (or (textsec-suspicious-p url 'url)
+                                  (and link (textsec-suspicious-p
+                                             (cons url link) 'link)))
+                        (propertize (concat url "⚠️") 'bad-url it)
+                      url))))
 
 (defun helm-find-library-at-point ()
   "Try to find library path at point.
