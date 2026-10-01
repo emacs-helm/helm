@@ -5814,6 +5814,7 @@ Use it for non-interactive calls of `helm-find-files'."
       (unless (file-exists-p (replace-regexp-in-string "\\s\\" "" helm-pattern))
         (list (helm-ff-filter-candidate-one-by-one helm-pattern nil t))))
     :popup-info (lambda (candidate)
+                  ;; See `helm-ff-find-url-at-point'.
                   (get-text-property (- (length candidate) 1) 'bad-url candidate))
     :all-marked t
     :keymap 'helm-find-files-map
@@ -6043,6 +6044,8 @@ source is `helm-source-find-files'."
              return (helm-aif (or (textsec-suspicious-p url 'url)
                                   (and link (textsec-suspicious-p
                                              (cons url link) 'link)))
+                        ;; Will be used in a popup-info in
+                        ;; `helm-find-files-dummy-source'.
                         (propertize (concat url "⚠️") 'bad-url it)
                       url))))
 
