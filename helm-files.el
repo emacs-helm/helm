@@ -6024,21 +6024,10 @@ source is `helm-source-find-files'."
                     (file-exists-p file-at-pt)))
            (expand-file-name file-at-pt)))))
 
-(defun helm-ff--not-prefixed-url-at-point ()
-  "Return and complete an url at point starting with \"www\"."
-  ;; E.g. on www.google.fr it returns https://www.google.fr.
-  ;; So when there is a link in a buffer that looks like www.foo.com and
-  ;; point to an url like https://1234.badurl.com `textsec-suspicious-p' should
-  ;; return an appropriate warning, otherwise if www.foo.com is not considered
-  ;; as a url, like thing-at-point does `textsec-suspicious-p' returns nil.
-  (let ((thing-at-point-beginning-of-url-regexp "www\\."))
-    (thing-at-point 'url)))
-
 (defun helm-ff-find-url-at-point ()
   "Try to find link to an url in text-property at point."
   (require 'textsec-check)
-  (let* ((link    (or (thing-at-point 'url)
-                      (helm-ff--not-prefixed-url-at-point)))
+  (let* ((link    (thing-at-point 'url))
          (he      (get-text-property (point) 'help-echo))
          (ov      (overlays-at (point)))
          (ov-he   (and ov (overlay-get
