@@ -35,6 +35,7 @@
 (require 'helm-source)
 
 (defun helm-acase-extra-fontifications ()
+  "Highlight `helm-acase' symbols \\+`dst*' and \\+`guard*' in `emacs-lisp-mode'."
   (font-lock-add-keywords nil '(("\\<\\(guard\\|dst\\)\\>\\*" . font-lock-type-face))))
 (add-hook 'emacs-lisp-mode-hook #'helm-acase-extra-fontifications)
 

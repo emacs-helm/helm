@@ -553,12 +553,12 @@ returned value that can be used in the cdr of clause.  When
 KEYLIST match EXPR or `guard*' sexp evaluation is non-nil, BODY
 is executed and `helm-acase' exits with its value.
 Note:
-`guard*' sexp should not be a single symbol to eval, e.g. (guard* foo)
+\\+`guard*' sexp should not be a single symbol to eval, e.g. (guard* foo)
 in such cases you should use (guard* (progn foo)).
 
-KEYLIST can also be a list starting with special symbol `dst*'
+KEYLIST can also be a list starting with special symbol \\+`dst*'
 followed by an expression suitable for `cl-destructuring-bind'.
-In this case all elements of `it' are bound to the elements of
+In this case all elements of \\+`it' are bound to the elements of
 this expression e.g.
 
     (helm-acase \\='(1 2 3 4 5)
@@ -567,13 +567,13 @@ this expression e.g.
 
 If KEYLIST is a list, it is compared with EXPR, also each
 elements of the list are checked with `member' to see if one
-matches EXPR, ensure to not use special symbols `guard*' and
-`dst*' at start of such KEYLIST to avoid confusing helm-acase
+matches EXPR, ensure to not use special symbols \\+`guard*' and
+\\+`dst*' at start of such KEYLIST to avoid confusing helm-acase
 even if this is partially supported.
 
-The last clause can use `t' or \\='otherwise as KEYLIST to specify a
+The last clause can use `t' or \\+`otherwise' as KEYLIST to specify a
 fallback clause when previous clauses didn't match, if such a clause
-starting with `t' or \\='otherwise is specified before last clause it
+starting with `t' or \\+`otherwise' is specified before last clause it
 will override all next clauses, if you want to match an EXPR value equal
 to `t' in any clauses quote it, i.e. `'t' or use an explicit
 \(guard* (eq it t)).
