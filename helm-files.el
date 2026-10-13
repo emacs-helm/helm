@@ -3636,7 +3636,8 @@ debugging purpose."
                             (and helm--url-regexp
                                  (string-match helm--url-regexp path)))
                   basedir))))
-    (when (and (string-match ":\\'" path)
+    (when (and basedir
+               (string-match ":\\'" path)
                (file-remote-p basedir nil t))
       (setq helm-pattern basedir))
     (cond (invalid-basedir nil)
