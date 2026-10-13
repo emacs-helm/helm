@@ -5806,6 +5806,63 @@ Use it for non-interactive calls of `helm-find-files'."
       (setq helm-ff-default-directory nil)
       (advice-remove 'x-dnd-handle-drag-n-drop-event 'helm-ff--restore-frame))))
 
+;;; Dummy source
+;;
+(defcustom helm-find-files-dummy-actions
+  (helm-make-actions
+   "Find File" 'helm-find-file-or-marked
+   "Touch File(s) `M-T'" 'helm-ff-touch-files
+   "Find file other window `C-c o'" 'helm-find-files-other-window
+   "Find file other frame `C-c C-o'" 'find-file-other-frame
+   "Find alternate file `C-x C-v'" 'find-alternate-file
+   "Switch to Eshell `M-e'" 'helm-ff-switch-to-shell
+   "Find file as root `C-c r'" 'helm-find-file-as-root
+   (lambda () (and (fboundp 'tab-bar-mode)
+                   "Find file other tab `C-c C-t'"))
+   'helm-ff-find-file-other-tab
+   "Find shell command `C-c /'" 'helm-ff-find-sh-command
+   "Fd shell command (C-/)" 'helm-ff-fd
+   "Browse project `C-x C-d'" 'helm-ff-browse-project)
+  "Actions for `helm-find-files' dummy source."
+  :type '(alist :key-type string :value-type function))
+
+(defvar helm-find-files-dummy-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "RET")           'helm-ff-RET)
+    (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
+    (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
+    (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
+    (define-key map (kbd "C-x r b")       'helm-find-files-switch-to-bookmark)
+    (define-key map (kbd "M-T")           'helm-ff-run-touch-files)
+    (define-key map (kbd "M-e")           'helm-ff-run-switch-to-shell)
+    (define-key map (kbd "C-c o")         'helm-ff-run-switch-other-window)
+    (define-key map (kbd "C-c C-o")       'helm-ff-run-switch-other-frame)
+    (define-key map (kbd "C-c t")         'helm-ff-toggle-thumbnails)
+    (define-key map (kbd "M-p")           'helm-find-files-history)
+    (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
+    (define-key map (kbd "C-}")           'helm-narrow-window)
+    (define-key map (kbd "C-{")           'helm-enlarge-window)
+    (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
+    (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
+    (define-key map (kbd "C-c /")         'helm-ff-run-find-sh-command)
+    (define-key map (kbd "C-/")           'helm-ff-run-fd)
+    (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
+    (define-key map (kbd "C-:")           'helm-ff-complete-tramp-methods)
+    (define-key map (kbd "C-_")           'helm-ff-undo)
+    (define-key map (kbd "C-;")           'helm-find-files-down-last-level)
+    (define-key map (kbd "C-c r")         'helm-ff-run-find-file-as-root)
+    (define-key map (kbd "C-x C-v")       'helm-ff-run-find-alternate-file)
+    (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
+                                  '((C-backspace . helm-ff-run-toggle-auto-update)
+                                    ([C-c DEL] . helm-ff-run-toggle-auto-update))
+                                  nil 'helm-ff-delete-char-backward--exit-fn)
+    (when (fboundp 'tab-bar-mode)
+      (define-key map (kbd "C-c C-t")       'helm-ff-run-find-file-other-tab))
+    map)
+
+  "Keymap for `helm-find-files'.")
+
 (defvar helm-find-files-dummy-source
   (helm-build-dummy-source "New file or directory"
     :filtered-candidate-transformer
@@ -5817,8 +5874,8 @@ Use it for non-interactive calls of `helm-find-files'."
                   ;; See `helm-ff-find-url-at-point'.
                   (get-text-property (- (length candidate) 1) 'bad-url candidate))
     :all-marked t
-    :keymap 'helm-find-files-map
-    :action 'helm-find-files-actions
+    :keymap 'helm-find-files-dummy-map
+    :action 'helm-find-files-dummy-actions
     :action-transformer 'helm-find-files-dummy-action-transformer))
 
 (defun helm-find-files-dummy-action-transformer (actions candidate)
