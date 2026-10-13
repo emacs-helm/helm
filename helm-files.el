@@ -5865,6 +5865,8 @@ Use it for non-interactive calls of `helm-find-files'."
 
 (defvar helm-find-files-dummy-source
   (helm-build-dummy-source "New file or directory"
+    :header-name (lambda (name) (if (string-match helm--url-regexp helm-pattern)
+                                    "Url" name))
     :filtered-candidate-transformer
     (lambda (_candidates _source)
       ;; Unquote helm-pattern maybe quoted by PA.
