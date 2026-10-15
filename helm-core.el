@@ -3719,6 +3719,7 @@ version < emacs-28."
            (frame-info (frame-geometry))
            (screen-width (display-pixel-width x-display-name))
            (helm-frame-width (* (frame-char-width) (+ 2 helm-display-buffer-width)))
+           (monitor-position (frame-monitor-workarea (selected-frame)))
            (prmt-size (length helm--prompt))
            (prmt-width (* prmt-size (frame-char-width)))
            (line-height (frame-char-height))
@@ -3733,6 +3734,8 @@ version < emacs-28."
                  ;; lateral constraint to keep the frame inside of the screen
                  (left . ,(cond ((> (+ px helm-frame-width) screen-width)
                                  (- screen-width helm-frame-width))
+                                ((< (- (car pos) (car monitor-position)) prmt-width)
+                                 (car monitor-position))
                                 (t (max (- px prmt-width) 0))))
                  ;; Try to put frame at the best possible place.
                  ;; Frame should be below point if enough
