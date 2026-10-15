@@ -3734,7 +3734,7 @@ version < emacs-28."
                  ;; lateral constraint to keep the frame inside of the screen
                  (left . ,(cond ((> (+ px helm-frame-width) screen-width)
                                  (- screen-width helm-frame-width))
-                                ((< (- (car pos (car monitor-position)) prmt-width)
+                                ((< (- (car pos) (car monitor-position)) prmt-width)
                                  (car monitor-position))
                                 (t (max (- px prmt-width) 0))))
                  ;; Try to put frame at the best possible place.
