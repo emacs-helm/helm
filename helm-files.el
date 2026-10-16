@@ -2989,7 +2989,7 @@ extension."
           (and (not (helm-this-visible-mark))
                (eq (get-text-property (min 2 (length cand)) 'face cand) face)
                (equal ext (file-name-extension cand)))))
-      (helm-mark-current-line)
+      (helm-select-current-line)
       (helm-display-mode-line src t)
       (when helm-marked-candidates
         (message "%s candidates marked" (length helm-marked-candidates))
@@ -3137,7 +3137,7 @@ hitting C-j on \"..\"."
                        (concat (regexp-quote presel) " ?$"))
                nil t)
           (forward-line 0)
-          (helm-mark-current-line)))
+          (helm-select-current-line)))
       (setq helm-ff-last-expanded nil))))
 
 (defun helm-ff-undo ()

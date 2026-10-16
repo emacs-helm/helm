@@ -789,7 +789,7 @@ If N is positive go forward otherwise go backward."
          (mark-maybe (lambda ()
                          (if allow-mode
                              (ignore)
-                           (helm-mark-current-line)))))
+                           (helm-select-current-line)))))
     (catch 'break
       (while (not (funcall bob-or-eof))
         (forward-line n) ; Go forward or backward depending of n value.

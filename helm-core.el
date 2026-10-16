@@ -3450,7 +3450,7 @@ Don't use this directly, use instead `helm' with the keyword
           (setq helm--prompt orig-helm--prompt)
           (setq helm--in-fuzzy orig-helm--in-fuzzy)
           (helm-initialize-overlays helm-buffer)
-          (unless (helm-empty-buffer-p) (helm-mark-current-line t))
+          (unless (helm-empty-buffer-p) (helm-select-current-line t))
           (setq helm-last-frame-or-window-configuration
                 orig-helm-last-frame-or-window-configuration)
           (setq cursor-type nil)
@@ -4141,7 +4141,7 @@ For PRESELECT RESUME KEYMAP DEFAULT HISTORY, see `helm'."
              ;; When no source, helm-buffer is empty
              ;; or contain non--candidate lines (e.g grep exit status)
              (helm-get-current-source))
-        (helm-mark-current-line t)
+        (helm-select-current-line t)
       (helm-update preselect))
     (let* ((src        (helm-get-current-source))
            (src-keymap (assoc-default 'keymap src))
@@ -5436,7 +5436,7 @@ Argument OVERLAY is a ref-cell."
                                   :direction 'next
                                   :follow t)
     (forward-line 1)
-    (helm-mark-current-line)
+    (helm-select-current-line)
     ;; If we are here, it is because helm-window is not ready, if one of the
     ;; functions in `helm-move-selection-after-hook' is called with
     ;; `with-helm-window' (it shouldn't but never know) we will have an error.
@@ -5643,7 +5643,7 @@ specified as respectively `helm-cand-num' and `helm-cur-source'."
               (goto-char (or (helm-get-previous-candidate-separator-pos)
                              (helm-get-previous-header-pos)))
               (forward-line 1)))
-          (helm-mark-current-line)
+          (helm-select-current-line)
           (when helm-popup-tip-mode
             (helm-maybe-show-popup-tip-info))
           (helm-follow-execute-persistent-action-maybe))
@@ -5802,7 +5802,7 @@ See `helm-default-output-filter'."
   (helm-aif (get-buffer-window helm-buffer 'visible)
       (with-selected-window it
         (helm-skip-noncandidate-line 'next)
-        (helm-mark-current-line nil 'nomouse)
+        (helm-select-current-line nil 'nomouse)
         (helm-follow-execute-persistent-action-maybe)
         (helm-display-mode-line (helm-get-current-source))
         (helm-log-run-hook "helm-output-filter--post-process"
@@ -6328,7 +6328,7 @@ Key arg DIRECTION can be one of:
         (when (helm-pos-multiline-p)
           (helm-move--beginning-of-multiline-candidate))
         (helm-display-source-at-screen-top-maybe where)
-        (helm-mark-current-line)
+        (helm-select-current-line)
         (when follow
           (helm-follow-execute-persistent-action-maybe))
         (helm-display-mode-line (setq source (helm-get-current-source)))
@@ -6594,7 +6594,7 @@ hitting `C-<down>` again will not switch to next file but kill its buffer.")
   (with-helm-alive-p (helm--follow-action -1)))
 (put 'helm-follow-action-backward 'helm-only t)
 
-(defun helm-mark-current-line (&optional resumep nomouse)
+(defun helm-select-current-line (&optional resumep nomouse)
   "Move `helm-selection-overlay' to current line.
 When RESUMEP is non nil move overlay to `helm-selection-point'.
 When NOMOUSE is specified do not set mouse bindings.
@@ -6619,6 +6619,9 @@ marking candidates."
     (setq helm-selection-point (overlay-start helm-selection-overlay))
     (when (and helm-allow-mouse (null nomouse) (not resumep))
       (helm--bind-mouse-for-selection helm-selection-point))))
+
+(defalias 'helm-mark-current-line 'helm-select-current-line)
+(make-obsolete 'helm-mark-current-line 'helm-select-current-line "4.0.8")
 
 (defun helm-confirm-and-exit-minibuffer ()
   "Maybe ask for confirmation when exiting helm.
@@ -6876,7 +6879,7 @@ CANDIDATE-OR-REGEXP from there."
     (when (helm-pos-header-line-p) (forward-line 1))
     (when helm-allow-mouse
       (helm--mouse-reset-selection-help-echo))
-    (helm-mark-current-line)
+    (helm-select-current-line)
     (when helm--deleting-minibuffer-contents-from (recenter))
     (helm-display-mode-line (or source (helm-get-current-source)))
     (helm-log-run-hook "helm-preselect" 'helm-after-preselection-hook)))
@@ -6904,7 +6907,7 @@ CANDIDATE-OR-REGEXP from there."
                               (not (helm-pos-header-line-p)))))
                  (and headp (forward-line -1))))))
       (unless (helm-end-of-source-p t)
-        (helm-mark-current-line)))))
+        (helm-select-current-line)))))
 
 (defun helm-end-of-source-1 (n at-point)
   (save-excursion
@@ -6938,7 +6941,7 @@ CANDIDATE-OR-REGEXP from there."
                               (or (helm-get-next-candidate-separator-pos)
                                   (point-max))
                               'helm-multiline multiline))
-      (helm-mark-current-line))))
+      (helm-select-current-line))))
 
 (defmacro helm-edit-current-selection (&rest forms)
   "Evaluate FORMS at current selection in the helm buffer.
@@ -7956,13 +7959,13 @@ sources."
           (helm-awhile (helm-get-next-header-pos)
             (goto-char it)
             (forward-line 1)
-            (helm-mark-current-line)
+            (helm-select-current-line)
             (helm-mark-all-1))
           ;; `save-excursion' seems confused if used in addition of
           ;; the one used in `helm-mark-all-1', so save POS and back
           ;; to it when loop is finished.
           (goto-char pos)
-          (helm-mark-current-line)
+          (helm-select-current-line)
           (helm-display-mode-line (helm-get-current-source) t))))))
 (put 'helm-mark-all 'helm-only t)
 
@@ -7994,7 +7997,7 @@ starting it is not needed."
                                       (point))))
                     (maxpoint  (or end (point-max))))
                (while (< (point) maxpoint)
-                 (helm-mark-current-line)
+                 (helm-select-current-line)
                  (let* ((prefix (or (get-text-property (pos-bol) 'helm-new-file)
                                     (get-text-property (pos-bol) 'unknown)))
                         (cand   (helm-get-selection
@@ -8017,7 +8020,7 @@ starting it is not needed."
                     (or (helm-get-next-candidate-separator-pos)
                         (point-max))))
                  (forward-line 1))))
-           (helm-mark-current-line))
+           (helm-select-current-line))
       (helm-follow-mode follow))))
 
 (defun helm-unmark-all ()
@@ -8028,7 +8031,7 @@ starting it is not needed."
       (save-excursion
         (helm-clear-visible-mark))
       (setq helm-marked-candidates nil)
-      (helm-mark-current-line)
+      (helm-select-current-line)
       (helm-display-mode-line (helm-get-current-source))
       (set-window-margins (selected-window) helm-left-margin-width))))
 (put 'helm-unmark-all 'helm-only t)
@@ -8196,7 +8199,7 @@ If PREV is non-nil move to precedent."
                     (point)
                     (sort (mapcar 'overlay-start helm-visible-mark-overlays) '<)
                     prev)))
-      (helm-mark-current-line))))
+      (helm-select-current-line))))
 (put 'helm-next-visible-mark 'helm-only t)
 
 (defun helm-prev-visible-mark ()

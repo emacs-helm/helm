@@ -696,7 +696,7 @@ buffers)."
       (setq helm-buffer-details-flag (not helm-buffer-details-flag))
       (helm-force-update (lambda ()
                            (helm-awhile (re-search-forward preselect nil t)
-                             (helm-mark-current-line)
+                             (helm-select-current-line)
                              (when (equal buf (helm-get-selection))
                                (cl-return t))))))))
 (put 'helm-toggle-buffers-details 'helm-only t)
@@ -725,7 +725,7 @@ buffers)."
         (lambda (cand)
           (and (not (helm-this-visible-mark))
                (eq (get-text-property 2 'type cand) type))))
-      (helm-mark-current-line)
+      (helm-select-current-line)
       (helm-display-mode-line src t)
       (when helm-marked-candidates
         (message "%s candidates marked" (length helm-marked-candidates))

@@ -249,7 +249,7 @@ The sexp should be an `all-the-icons' function with its args."
       (while (and (not (funcall stop-fn))
                   (string= curtype (funcall fn)))
         (forward-line n))
-      (helm-mark-current-line)
+      (helm-select-current-line)
       (helm-follow-execute-persistent-action-maybe))))
 
 (defun helm-imenu-next-section ()

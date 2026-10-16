@@ -198,7 +198,7 @@ This happen only in `helm-source-occur' which is always related to
               (setq closest (helm-closest-number-in-list
                              helm-occur--initial-pos lst))))
           (when (and closest (re-search-forward (format "^%s" closest) end t))
-            (helm-mark-current-line)
+            (helm-select-current-line)
             (goto-char (overlay-start
                         helm-selection-overlay))))))))
 
