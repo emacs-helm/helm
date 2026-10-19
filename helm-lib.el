@@ -1108,12 +1108,12 @@ to `helm-sources'."
            thereis (and (string= name (assoc-default 'name source)) source)))
 
 (defun helm-make-actions (&rest args)
-  "Build an alist with (NAME . ACTION) elements with each pairs in ARGS.
-Where NAME is a string or a function returning a string or nil
+  "Build an alist with (NAME-OR-FN . ACTION) elements with each pairs in ARGS.
+Where NAME-OR-FN is a string or a function returning a string or nil
 and ACTION a function.
-If NAME returns nil the pair is skipped.
+If NAME-OR-FN returns nil the pair is skipped.
 
-\(fn NAME ACTION ...)"
+\(fn NAME-OR-FN ACTION ...)"
   (cl-loop for (name fn) on args by #'cddr
            when (functionp name)
            do (setq name (funcall name))
