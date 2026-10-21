@@ -6055,16 +6055,19 @@ If action buffer is selected, back to the Helm buffer."
             :mode-line '("Action(s)" "\\<helm-map>\\[helm-select-action]:BackToCands RET/f1/f2/fn:NthAct")
             :candidate-transformer
             (lambda (candidates)
-              (cl-loop for (i . j) in candidates
+              (cl-loop for (str . fn) in candidates
                        for count from 1
+                       ;; Ensure the keybinding face added by
+                       ;; substitute-command-keys is visible by merging faces.
+                       do (add-face-text-property 0 (length str) 'helm-action t str)
                        collect
                        (cons (concat (cond ((> count 12)
                                             "      ")
                                            ((< count 10)
                                             (format "[f%s]  " count))
                                            (t (format "[f%s] " count)))
-                                     (propertize i 'face 'helm-action))
-                             j)))
+                                     str)
+                             fn)))
             :candidate-number-limit nil)))
     (set (make-local-variable 'helm-source-filter) nil)
     (set (make-local-variable 'helm-selection-overlay) nil)
