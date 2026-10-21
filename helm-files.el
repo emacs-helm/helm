@@ -774,72 +774,75 @@ want to use it, helm is still providing
    "Find File" 'helm-find-file-or-marked
    "Find file in Dired" 'helm-point-file-in-dired
    "View file" 'view-file
-   "Query replace fnames on marked `M-@'" 'helm-ff-query-replace-fnames-on-marked
+   "Query replace fnames on marked `\\<%s>\\[helm-ff-run-query-replace-fnames-on-marked]'" 'helm-ff-query-replace-fnames-on-marked
    (lambda ()
      (helm-acase helm-ff-edit-marked-files-fn
-       (helm-marked-files-in-dired "Edit filenames in Wdired `C-x C-q'")
-       (helm-ff-wfnames "Edit filenames in Wfnames `C-x C-q'")))
+       (helm-marked-files-in-dired "Edit filenames in Wdired `\\<%s>\\[helm-ff-run-edit-marked-files]'")
+       (helm-ff-wfnames "Edit filenames in Wfnames `\\<%s>\\[helm-ff-run-edit-marked-files]'")))
    'helm-ff-edit-marked-files
-   "Query replace contents on marked `M-%'" 'helm-ff-query-replace
-   "Query replace regexp contents on marked `C-M-%'" 'helm-ff-query-replace-regexp
-   "Attach file(s) to mail buffer `C-c C-a'" 'helm-ff-mail-attach-files
+   "Query replace contents on marked `\\<%s>\\[helm-ff-run-query-replace]'" 'helm-ff-query-replace
+   "Query replace regexp contents on marked `\\<%s>\\[helm-ff-run-query-replace-regexp]'" 'helm-ff-query-replace-regexp
+   "Attach file(s) to mail buffer `\\<%s>\\[helm-ff-run-mail-attach-files]'" 'helm-ff-mail-attach-files
    "Serial rename files" 'helm-ff-serial-rename
    "Serial rename by symlinking files" 'helm-ff-serial-rename-by-symlink
    "Serial rename by copying files" 'helm-ff-serial-rename-by-copying
    "Open file with default tool" 'helm-open-file-with-default-tool
    "Find file in hex dump" 'hexl-find-file
-   "Browse project `C-x C-d'" 'helm-ff-browse-project
-   "Complete at point `C-c i'" 'helm-insert-file-name-completion-at-point
-   "Insert as org link `C-c @'" 'helm-files-insert-as-org-link
-   "Find shell command `C-c /'" 'helm-ff-find-sh-command
-   "Fd shell command (C-/)" 'helm-ff-fd
+   "Browse project `\\<%s>\\[helm-ff-run-browse-project]'" 'helm-ff-browse-project
+   "Complete at point `\\<%s>\\[helm-ff-run-complete-fn-at-point]'" 'helm-insert-file-name-completion-at-point
+   "Insert as org link `\\<%s>\\[helm-ff-run-insert-org-link]'" 'helm-files-insert-as-org-link
+   "Find shell command `\\<%s>\\[helm-ff-run-find-sh-command]'" 'helm-ff-find-sh-command
+   "Fd shell command `\\<%s>\\[helm-ff-run-fd]'" 'helm-ff-fd
    "Find files in file" 'helm-find-files-in-file
    "Add marked files to file-cache" 'helm-ff-cache-add-file
-   "Open file externally `C-c C-x, C-u to choose'" 'helm-open-file-externally
-   "Grep File(s) `C-s, C-u Recurse'" 'helm-find-files-grep
-   "Grep current directory with AG `M-g a, C-u select type'" 'helm-find-files-ag
-   "Git grep `M-g g, C-u from root'" 'helm-ff-git-grep
-   "Zgrep File(s) `M-g z, C-u Recurse'" 'helm-ff-zgrep
+   "Open file externally `\\<%s>\\[helm-ff-run-open-file-externally]' (C-u to choose)" 'helm-open-file-externally
+   "Grep File(s) `\\<%s>\\[helm-ff-run-grep]' (C-u Recurse)" 'helm-find-files-grep
+   "Grep current directory with AG `\\<%s>\\[helm-ff-run-grep-ag]' (C-u select type)" 'helm-find-files-ag
+   "Git grep `\\<%s>\\[helm-ff-run-git-grep]' (C-u from root)" 'helm-ff-git-grep
+   "Zgrep File(s) `\\<%s>\\[helm-ff-run-zgrep]' (C-u Recurse)" 'helm-ff-zgrep
    "Pdf Grep File(s)" 'helm-ff-pdfgrep
-   "Gid `M-g i'" 'helm-ff-gid
-   "Switch to Eshell `M-e'" 'helm-ff-switch-to-shell
-   "Etags `M-., C-u reload tag file'" 'helm-ff-etags-select
-   "Eshell command on file(s) `M-!, C-u take all marked as arguments.'"
+   "Gid `\\<%s>\\[helm-ff-run-gid]'" 'helm-ff-gid
+   "Switch to Eshell `\\<%s>\\[helm-ff-run-switch-to-shell]'" 'helm-ff-switch-to-shell
+   "Etags `\\<%s>\\[helm-ff-run-etags]' (C-u reload tag file)" 'helm-ff-etags-select
+   "Eshell command on file(s) `\\<%s>\\[helm-ff-run-eshell-command-on-file]' (C-u take all marked as arguments)"
    'helm-find-files-eshell-command-on-file
-   "Find file as root `C-c r'" 'helm-find-file-as-root
-   "Find alternate file `C-x C-v'" 'find-alternate-file
-   "Ediff File `C-c ='" 'helm-find-files-ediff-files
+   "Find file as root `\\<%s>\\[helm-ff-run-find-file-as-root]'" 'helm-find-file-as-root
+   "Find alternate file `\\<%s>\\[helm-ff-run-find-alternate-file]'" 'find-alternate-file
+   "Ediff File `\\<%s>\\[helm-ff-run-ediff-file]'" 'helm-find-files-ediff-files
    "Ediff Merge File `M-='" 'helm-find-files-ediff-merge-files
-   (lambda () (format "Delete File(s)%s `M-D' (C-u reverse trash)"
-                      (if (eq helm-ff-delete-files-function
-                              'helm-delete-marked-files-async)
-                          " async" "")))
+   (lambda ()
+     (concat
+      (format "Delete File(s)%s"
+              (if (eq helm-ff-delete-files-function
+                      'helm-delete-marked-files-async)
+                  " async" ""))
+      "`\\<%s>\\[helm-ff-run-delete-file]' (C-u reverse trash)"))
    'helm-ff-delete-files
-   "Touch File(s) `M-T'" 'helm-ff-touch-files
+   "Touch File(s) `\\<%s>\\[helm-ff-run-touch-files]'" 'helm-ff-touch-files
    "Encrypt file(s)" 'helm-ff-encrypt-files
-   "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
+   "Copy file(s) `\\<%s>\\[helm-ff-run-copy-file]' (C-u to follow)" 'helm-find-files-copy
    (lambda ()
      (and (executable-find "rsync")
-          "Rsync file(s) `M-V' (C-u edit command)"))
+          "Rsync file(s) `\\<%s>\\[helm-ff-run-rsync-file]' (C-u edit command)"))
    'helm-find-files-rsync
-   "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
+   "Rename file(s) `\\<%s>\\[helm-ff-run-rename-file]' (C-u to follow)" 'helm-find-files-rename
    "Backup files" 'helm-find-files-backup
-   "Copy file to dir(s) `C-M-c'" 'helm-ff-mcp
-   "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
-   "Relsymlink file(s) `M-Y, C-u to follow'" 'helm-find-files-relsymlink
-   "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
-   "Compress file(s) to archive `M-c'" 'helm-find-files-compress-to
-   "Compress or uncompress file(s) `M-Z'" 'helm-ff-compress-marked-files
-   "Change mode on file(s) `M-M'" 'helm-ff-chmod
-   "Change owner on file(s) `M-O' or `M-O O' in ttys" 'helm-ff-chown
-   "Change group on file(s) `M-G'" 'helm-ff-chgrp
-   "Find file other window `C-c o'" 'helm-find-files-other-window
-   "Find file other frame `C-c C-o'" 'find-file-other-frame
+   "Copy file to dir(s) `\\<%s>\\[helm-ff-run-mcp]'" 'helm-ff-mcp
+   "Symlink files(s) `\\<%s>\\[helm-ff-run-symlink-file]' (C-u to follow)" 'helm-find-files-symlink
+   "Relsymlink file(s) `\\<%s>\\[helm-ff-run-relsymlink-file]' (C-u to follow)" 'helm-find-files-relsymlink
+   "Hardlink file(s) `\\<%s>\\[helm-ff-run-hardlink-file]' (C-u to follow)" 'helm-find-files-hardlink
+   "Compress file(s) to archive `\\<%s>\\[helm-ff-run-compress-to]'" 'helm-find-files-compress-to
+   "Compress or uncompress file(s) `\\<%s>\\[helm-ff-run-compress-marked-files]'" 'helm-ff-compress-marked-files
+   "Change mode on file(s) `\\<%s>\\[helm-ff-run-chmod]'" 'helm-ff-chmod
+   "Change owner on file(s) `\\<%s>\\[helm-ff-run-chown]'" 'helm-ff-chown
+   "Change group on file(s) `\\<%s>\\[helm-ff-run-chgrp]'" 'helm-ff-chgrp
+   "Find file other window `\\<%s>\\[helm-ff-run-switch-other-window]'" 'helm-find-files-other-window
+   "Find file other frame `\\<%s>\\[helm-ff-run-switch-other-frame]'" 'find-file-other-frame
    (lambda () (and (fboundp 'tab-bar-mode)
-                   "Find file other tab `C-c C-t'"))
+                   "Find file other tab `\\<%s>\\[helm-ff-run-find-file-other-tab]'"))
    'helm-ff-find-file-other-tab
-   "Print File `C-c p, C-u to refresh'" 'helm-ff-print
-   "Locate `C-x C-f, C-u to specify locate db'" 'helm-ff-locate)
+   "Print File `\\<%s>\\[helm-ff-run-print-file]' (C-u to refresh)" 'helm-ff-print
+   "Locate `\\<%s>\\[helm-ff-run-locate]' (C-u to specify locate db)" 'helm-ff-locate)
   "Actions for `helm-find-files'."
   :type '(alist :key-type string :value-type function))
 
@@ -4677,8 +4680,10 @@ Arg FILE is the real part of candidate, a filename with no props."
            (helm-append-at-nth
             actions
             (helm-make-actions
-             "Rotate image right `M-r'" 'helm-ff-rotate-image-right
-              "Rotate image left `M-l'" 'helm-ff-rotate-image-left
+             "Rotate image right `\\<%s>\\[helm-ff-rotate-right-persistent]'"
+             'helm-ff-rotate-image-right
+              "Rotate image left `\\<%s>\\[helm-ff-rotate-left-persistent]'"
+              'helm-ff-rotate-image-left
               "Start slideshow with marked" 'helm-ff-start-slideshow-on-marked
               (lambda ()
                 (and (fboundp 'image-dired-wallpaper-set)
@@ -4689,7 +4694,7 @@ Arg FILE is the real part of candidate, a filename with no props."
           ((string-match "\\.el\\'" candidate)
            (helm-append-at-nth
             actions
-            `(("Byte compile lisp file(s) `M-B, C-u to load'"
+            `(("Byte compile lisp file(s) `\\<%s>\\[helm-ff-run-byte-compile-file]' (C-u to load)"
                . helm-find-files-byte-compile)
               ("Byte compile file(s) async"
                . ,(lambda (_candidate)
@@ -4699,13 +4704,15 @@ Arg FILE is the real part of candidate, a filename with no props."
                . ,(lambda (_)
                     (async-byte-recompile-directory
                      helm-ff-default-directory)))
-              ("Load File(s) `M-L'" . helm-find-files-load-files)
+              ("Load File(s) `\\<%s>\\[helm-ff-run-load-file]'"
+               . helm-find-files-load-files)
               ("Update directory autoloads" . helm-ff-update-directory-autoloads))
             2))
           ((string-match (concat (regexp-opt load-suffixes) "\\'") candidate)
            (helm-append-at-nth
             actions
-            '(("Load File(s) `M-L'" . helm-find-files-load-files))
+            '(("Load File(s) `\\<%s>\\[helm-ff-run-load-file]'"
+               . helm-find-files-load-files))
             2))
           ((and (string-match "\\.html?$" candidate)
                 (file-exists-p candidate))
@@ -5812,18 +5819,25 @@ Use it for non-interactive calls of `helm-find-files'."
 (defcustom helm-find-files-dummy-actions
   (helm-make-actions
    "Find File" 'helm-find-file-or-marked
-   "Touch File(s) `M-T'" 'helm-ff-touch-files
-   "Find file other window `C-c o'" 'helm-find-files-other-window
-   "Find file other frame `C-c C-o'" 'find-file-other-frame
-   "Find alternate file `C-x C-v'" 'find-alternate-file
-   "Switch to Eshell `M-e'" 'helm-ff-switch-to-shell
-   "Find file as root `C-c r'" 'helm-find-file-as-root
+   "Touch File(s) `\\<%s>\\[helm-ff-run-touch-files]'"
+   'helm-ff-touch-files
+   "Find file other window `\\<%s>\\[helm-ff-run-switch-other-window]'"
+   'helm-find-files-other-window
+   "Find file other frame `\\<%s>\\[helm-ff-run-switch-other-frame]'"
+   'find-file-other-frame
+   "Find alternate file `\\<%s>\\[helm-ff-run-find-alternate-file]'"
+   'find-alternate-file
+   "Switch to Eshell `\\<%s>\\[helm-ff-run-switch-to-shell]'"
+   'helm-ff-switch-to-shell
+   "Find file as root `\\<%s>\\[helm-ff-run-find-file-as-root]'"
+   'helm-find-file-as-root
    (lambda () (and (fboundp 'tab-bar-mode)
-                   "Find file other tab `C-c C-t'"))
+                   "Find file other tab `\\<%s>\\[helm-ff-run-find-file-other-tab]'"))
    'helm-ff-find-file-other-tab
-   "Find shell command `C-c /'" 'helm-ff-find-sh-command
-   "Fd shell command (C-/)" 'helm-ff-fd
-   "Browse project `C-x C-d'" 'helm-ff-browse-project)
+   "Find shell command `\\<%s>\\[helm-ff-run-find-sh-command]'"
+   'helm-ff-find-sh-command
+   "Fd shell command `\\<%s>\\[]'helm-ff-run-fd" 'helm-ff-fd
+   "Browse project `\\<%s>\\[helm-ff-run-browse-project]'" 'helm-ff-browse-project)
   "Actions for `helm-find-files' dummy source."
   :type '(alist :key-type string :value-type function))
 
