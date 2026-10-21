@@ -84,27 +84,48 @@
     "Find file other window"                  'helm-find-files-other-window
     "Find file other frame"                   'find-file-other-frame
     "Open dired in file's directory"          'helm-open-dired
-    "Attach file(s) to mail buffer `C-c C-a'" 'helm-ff-mail-attach-files
-    "Edit marked files `C-x C-q'"             'helm-ff-edit-marked-files
-    "Grep File(s) `C-u recurse'"              'helm-find-files-grep
-    "Zgrep File(s) `C-u Recurse'"             'helm-ff-zgrep
-    "Pdfgrep File(s)"                         'helm-ff-pdfgrep
-    "Insert as org link"                      'helm-files-insert-as-org-link
-    "Checksum File"                           'helm-ff-checksum
-    "Ediff File"                              'helm-find-files-ediff-files
-    "Ediff Merge File"                        'helm-find-files-ediff-merge-files
-    "View file"                               'view-file
-    "Insert file"                             'insert-file
-    "Add marked files to file-cache"          'helm-ff-cache-add-file
-    "Delete file(s)"                          'helm-ff-delete-files
-    "Copy file(s) `M-C, C-u to follow'"       'helm-find-files-copy
-    "Rename file(s) `M-R, C-u to follow'"     'helm-find-files-rename
-    "Symlink files(s) `M-S, C-u to follow'"   'helm-find-files-symlink
-    "Relsymlink file(s) `C-u to follow'"      'helm-find-files-relsymlink
-    "Hardlink file(s) `M-H, C-u to follow'"   'helm-find-files-hardlink
-    "Open file externally (C-u to choose)"    'helm-open-file-externally
-    "Open file with default tool"             'helm-open-file-with-default-tool
-    "Find file in hex dump"                   'hexl-find-file)
+    "Attach file(s) to mail buffer `\\<%s>\\[helm-ff-run-mail-attach-files]'"
+    'helm-ff-mail-attach-files
+    "Edit marked files `\\<%s>\\[helm-ff-run-edit-marked-files]'"
+    'helm-ff-edit-marked-files
+    "Grep File(s) `\\<%s>\\[helm-ff-run-grep]' (C-u recurse)"
+    'helm-find-files-grep
+    "Zgrep File(s) `\\<%s>\\[helm-ff-run-zgrep]' (C-u Recurse)"
+    'helm-ff-zgrep
+    "Pdfgrep File(s)"
+    'helm-ff-pdfgrep
+    "Insert as org link `\\<%s>\\[helm-ff-run-insert-org-link]'"
+    'helm-files-insert-as-org-link
+    "Checksum File"
+    'helm-ff-checksum
+    "Ediff File `\\<%s>\\[helm-ff-run-ediff-file]'"
+    'helm-find-files-ediff-files
+    "Ediff Merge File `\\<%s>\\[helm-ff-run-ediff-merge-file]'"
+    'helm-find-files-ediff-merge-files
+    "View file"
+    'view-file
+    "Insert file"
+    'insert-file
+    "Add marked files to file-cache"
+    'helm-ff-cache-add-file
+    "Delete file(s) `\\<%s>\\[helm-ff-run-delete-file]'"
+    'helm-ff-delete-files
+    "Copy file(s) `\\<%s>\\[helm-ff-run-copy-file]' (C-u to follow)"
+    'helm-find-files-copy
+    "Rename file(s) `\\<%s>\\[helm-ff-run-rename-file]' (C-u to follow)"
+    'helm-find-files-rename
+    "Symlink files(s) `\\<%s>\\[helm-ff-run-symlink-file]' (C-u to follow)"
+    'helm-find-files-symlink
+    "Relsymlink file(s) (C-u to follow)"
+    'helm-find-files-relsymlink
+    "Hardlink file(s) `\\<%s>\\[helm-ff-run-hardlink-file]' (C-u to follow)"
+    'helm-find-files-hardlink
+    "Open file externally `\\<%s>\\[helm-ff-run-open-file-externally]' (C-u to choose)"
+    'helm-open-file-externally
+    "Open file with default tool `\\<%s>\\[helm-ff-run-open-file-with-default-tool]'"
+    'helm-open-file-with-default-tool
+    "Find file in hex dump"
+    'hexl-find-file)
   "Default actions for type files."
   :group 'helm-files
   :type '(alist :key-type string :value-type function))
