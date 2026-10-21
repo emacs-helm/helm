@@ -155,6 +155,15 @@
     "  Specific keymap for this source.
   default value is `helm-map'.")
 
+   (symbol-keymap
+    :initarg :keymap
+    :initform 'helm-map
+    :type symbol
+    :documentation
+    "  The keymap name for this source.
+  Contrarily to `keymap' it is not evaled.
+  default value is `helm-map'.")
+
    (action
     :initarg :action
     :initform 'identity
@@ -1183,7 +1192,9 @@ The header line is based on one of `persistent-action-if',
                           (make-composed-keymap
                            must-match-map map)
                         map)))
-        (setf (slot-value source 'keymap) loc-map)))
+        (setf (slot-value source 'keymap) loc-map)
+        (when (symbolp it)
+          (setf (slot-value source 'symbol-keymap) it))))
   (helm-aif (slot-value source 'persistent-help)
       (setf (slot-value source 'header-line)
             (helm-source--persistent-help-string it source))

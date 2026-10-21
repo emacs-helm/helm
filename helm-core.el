@@ -2586,25 +2586,39 @@ when you want the `display-to-real' function(s) to be applied."
           (helm-log "helm-get-selection" "selection = %S" selection)
           selection)))))
 
+(defun helm-format-actions (actions map)
+  "Make key substitution in ACTIONS titles.
+When ACTIONS is a function return it inchanged (sole action)."
+  (if (functionp actions)
+      actions
+    (cl-loop for (str . fn) in actions
+             collect (cons (if (string-match "<%s>" str)
+                               (substitute-command-keys (format str map))
+                             str)
+                           fn))))
+
 (defun helm-get-actions-from-current-source (&optional source)
   "Return the associated action for the selected candidate.
 It is a function symbol (sole action) or list
 of (action-display . function)."
   (unless (helm-empty-buffer-p (helm-buffer-get))
     (let* ((src                (or source (helm-get-current-source)))
+           (map                (helm-get-attr 'symbol-keymap src))
            (marked             (helm-marked-candidates))
            (action-transformer (helm-get-attr 'action-transformer src))
            (actions            (helm-get-attr 'action src 'ignorefn)))
-      (if action-transformer
-          (helm-apply-functions-from-source
-           src action-transformer actions
-           ;; When there is marked candidates assume the set of
-           ;; candidates user selected contains candidates of the same
-           ;; type so that the actions added by transformer fit with
-           ;; all marked (previously we were looping on each marked
-           ;; but it is too costly for the benefit it brings).
-           (car marked))
-        actions))))
+      (helm-format-actions
+       (if action-transformer
+           (helm-apply-functions-from-source
+            src action-transformer actions
+            ;; When there is marked candidates assume the set of
+            ;; candidates user selected contains candidates of the same
+            ;; type so that the actions added by transformer fit with
+            ;; all marked (previously we were looping on each marked
+            ;; but it is too costly for the benefit it brings).
+            (car marked))
+         actions)
+       map))))
 
 (defun helm-get-current-source ()
   "Return the source for the current selection.
