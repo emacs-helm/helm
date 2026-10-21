@@ -194,37 +194,43 @@
 (defcustom helm-type-buffer-actions
   (helm-make-actions
    "Switch to buffer(s)" 'helm-buffer-switch-buffers
-   "Switch to buffer(s) other window `C-c o'"
+   "Switch to buffer(s) other window `\\<%s>\\[helm-buffer-switch-other-window]'"
    'helm-buffer-switch-buffers-other-window
-   "Switch to buffer(s) other frame `C-c C-o'"
+   "Switch to buffer(s) other frame `\\<%s>\\[helm-buffer-switch-other-frame]'"
    'helm-buffer-switch-to-buffer-other-frame
    "Raise buffer frame maybe"
    'helm-buffers-maybe-raise-buffer-frame
    (lambda () (and (fboundp 'tab-bar-mode)
-                   "Switch to buffer(s) other tab `C-c C-t'"))
+                   "Switch to buffer(s) other tab `\\<%s>\\[helm-buffers-switch-to-buffer-new-tab]'"))
    'helm-buffers-switch-buffers-in-tab
    "Switch to buffer at line number"
    'helm-switch-to-buffer-at-linum
-   "Browse project `C-x C-d'"
+   "Browse project `\\<%s>\\[helm-buffers-run-browse-project]'"
    'helm-buffers-browse-project
    "Switch to shell"
    'helm-buffer-switch-to-shell
-   "Query replace regexp `C-M-%'"
+   "Query replace regexp `\\<%s>\\[helm-buffer-run-query-replace-regexp]'"
    'helm-buffer-query-replace-regexp
-   "Query replace `M-%'" 'helm-buffer-query-replace
+   "Query replace `\\<%s>\\[helm-buffer-run-query-replace]'"
+   'helm-buffer-query-replace
    "View buffer" 'view-buffer
    "Display buffer" 'display-buffer
-   "Rename buffer `M-R'" 'helm-buffers-rename-buffer
-   "Grep buffer(s) `M-g s' (C-u grep all buffers)"
+   "Rename buffer `\\<%s>\\[helm-buffer-run-rename-buffer]'"
+   'helm-buffers-rename-buffer
+   "Grep buffer(s) `\\<%s>\\[helm-buffer-run-zgrep]' (C-u grep all buffers)"
    'helm-zgrep-buffers
-   "Multi occur buffer(s) `C-s (C-u search also in current)'"
+   "Multi occur buffer(s) `\\<%s>\\[helm-buffers-run-occur]' (C-u search also in current)"
    'helm-multi-occur-as-action
-   "Revert buffer(s) `M-G'" 'helm-revert-marked-buffers
+   "Revert buffer(s) `\\<%s>\\[helm-buffer-revert-persistent]'"
+   'helm-revert-marked-buffers
    "Insert buffer" 'insert-buffer
-   "Kill buffer(s) `M-D'" 'helm-kill-marked-buffers
-   "Diff with file `C-='" 'diff-buffer-with-file
-   "Ediff Marked buffers `C-c ='" 'helm-ediff-marked-buffers
-   "Ediff Merge marked buffers `M-='"
+   "Kill buffer(s) `\\<%s>\\[helm-buffer-run-kill-buffers]'"
+   'helm-kill-marked-buffers
+   "Diff with file `\\<%s>\\[helm-buffer-diff-persistent]'"
+   'diff-buffer-with-file
+   "Ediff Marked buffers `\\<%s>\\[helm-buffer-run-ediff]'"
+   'helm-ediff-marked-buffers
+   "Ediff Merge marked buffers `\\<%s>\\[helm-buffer-run-ediff-merge]'"
    (lambda (candidate)
      (helm-ediff-marked-buffers candidate t)))
   "Default actions for type buffers."
