@@ -1109,9 +1109,11 @@ to `helm-sources'."
 
 (defun helm-make-actions (&rest args)
   "Build an alist with (NAME-OR-FN . ACTION) elements with each pairs in ARGS.
-Where NAME-OR-FN is a string or a function returning a string or nil
-and ACTION a function.
-If NAME-OR-FN returns nil the pair is skipped.
+Where NAME-OR-FN is a string or a function returning a string or nil and
+ACTION a function.  The string provided by NAME-OR-FN can include
+`substitute-command-keys' annotations with \"<%s>\" as the keymap
+specification which will be replaced by the keymap in use in current
+source.  If NAME-OR-FN returns nil the pair is skipped.
 
 \(fn NAME-OR-FN ACTION ...)"
   (cl-loop for (name fn) on args by #'cddr
