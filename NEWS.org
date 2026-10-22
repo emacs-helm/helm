@@ -2,6 +2,12 @@
 
 * NEWS
 ** Version 4.0.8
+*** Keybindings in action buffer are no more hardcoded
+When writing an action one can use substitute-command-key
+specifications.
+
+*** A warning is provided when using helm-find-files on an unsafe url
+
 *** New user var helm-buffers-details
 which allow customizing which columns are displayed in
 `helm-source-buffers-list`.
