@@ -40,8 +40,12 @@
 (declare-function eshell-backward-argument "esh-mode" (&optional arg))
 (declare-function helm-quote-whitespace "helm-lib")
 (declare-function eshell-skip-prompt "em-prompt")
-(defvar eshell-special-chars-outside-quoting)
+(declare-function eshell-read-history "em-hist")
+(declare-function eshell-get-history "em-hist")
 
+(defvar eshell-special-chars-outside-quoting)
+(defvar eshell-history-ring)
+(defvar eshell-hist-ignoredups)
 
 (defgroup helm-eshell nil
   "Helm completion and history for Eshell."
@@ -196,21 +200,23 @@ at point."
 ;;; Eshell history.
 ;;
 ;;
+(defun helm-eshell-history-candidates ()
+  (require 'em-hist)
+  (eshell-read-history)
+  (with-helm-current-buffer
+    (cl-loop for c from 0 to (ring-length eshell-history-ring)
+             for elm = (eshell-get-history c)
+             unless (and (member elm lst)
+                         eshell-hist-ignoredups)
+             collect elm into lst
+             finally return lst)))
+
 (defclass helm-eshell-history-source (helm-source-sync)
   ((init :initform
          (lambda ()
            ;; Same comment as in `helm-source-esh'.
            (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
-   (candidates
-    :initform
-    (lambda ()
-      (with-helm-current-buffer
-        (cl-loop for c from 0 to (ring-length eshell-history-ring)
-                 for elm = (eshell-get-history c)
-                 unless (and (member elm lst)
-                             eshell-hist-ignoredups)
-                 collect elm into lst
-                 finally return lst))))
+   (candidates :initform #'helm-eshell-history-candidates)
    (nomark :initform t)
    (multiline :initform t)
    (keymap :initform 'helm-eshell-history-map)
