@@ -608,7 +608,7 @@ If `browse-url-browser-function' is set to something else than
                                         bookmark-set))
                   collect (cons name action))
          '(("Browse project" . helm-bookmark-browse-project)) 1))
-  (setf (slot-value source 'keymap) helm-bookmark-find-files-map))
+  (setf (slot-value source 'keymap) 'helm-bookmark-find-files-map))
 
 (defun helm-source-bookmark-helm-find-files-builder ()
   (helm-bookmark-build-source

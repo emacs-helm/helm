@@ -92,7 +92,7 @@ will not have separators between candidates any more."
     :persistent-action 'ignore
     :help-message 'helm-kill-ring-help-message
     :persistent-help "DoNothing"
-    :keymap helm-kill-ring-map
+    :keymap 'helm-kill-ring-map
     :migemo t
     :multiline 'helm-kill-ring-max-offset
     :group 'helm-ring)

@@ -245,7 +245,7 @@ at point."
   "Make and return the default source for Eshell completion."
   (helm-make-source "Eshell completions" 'helm-esh-source
     :fuzzy-match helm-eshell-fuzzy-match
-    :keymap helm-esh-completion-map))
+    :keymap 'helm-esh-completion-map))
 
 (defvar helm-esh-pcomplete-build-source-fn #'helm-esh-pcomplete-default-source
   "Function that builds a source or a list of sources.")
@@ -487,7 +487,7 @@ See `helm-eshell-prompts-list'."
                      helm-eshell-prompts-goto-other-window)
                     ("Go to prompt in other frame `C-c C-o`" .
                      helm-eshell-prompts-goto-other-frame))
-          :keymap helm-eshell-prompts-keymap)
+          :keymap 'helm-eshell-prompts-keymap)
         :buffer "*helm Eshell all prompts*"))
 
 (provide 'helm-eshell)

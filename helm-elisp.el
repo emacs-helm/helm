@@ -662,7 +662,7 @@ is only used to test DEFAULT."
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-variable))
     :persistent-help "Toggle describe variable"
-    :keymap helm-apropos-map
+    :keymap 'helm-apropos-map
     :action '(("Describe variable" . helm-describe-variable)
               ("Find variable" . helm-find-variable)
               ("Info lookup" . helm-info-lookup-symbol)
@@ -688,7 +688,7 @@ is only used to test DEFAULT."
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-face))
     :persistent-help "Toggle describe face"
-    :keymap helm-apropos-map
+    :keymap 'helm-apropos-map
     :action '(("Describe face" . helm-describe-face)
               ("Find face" . helm-find-face-definition)
               ("Customize face" . (lambda (candidate)
@@ -710,7 +710,7 @@ is only used to test DEFAULT."
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
     :persistent-help "Toggle describe command"
-    :keymap helm-apropos-map
+    :keymap 'helm-apropos-map
     :action 'helm-type-function-actions))
 
 (defun helm-def-source--emacs-functions (&optional default)
@@ -733,7 +733,7 @@ is only used to test DEFAULT."
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
     :persistent-help "Toggle describe function"
-    :keymap helm-apropos-map
+    :keymap 'helm-apropos-map
     :nomark t
     :action 'helm-type-function-actions))
 
@@ -754,7 +754,7 @@ is only used to test DEFAULT."
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-class))
     :persistent-help "Toggle describe class"
-    :keymap helm-apropos-map
+    :keymap 'helm-apropos-map
     :action '(("Describe Class" . helm-describe-class)
               ("Find Class (C-u for source)" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol)
@@ -777,7 +777,7 @@ is only used to test DEFAULT."
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
     :persistent-help "Toggle describe generic function"
-    :keymap helm-apropos-map
+    :keymap 'helm-apropos-map
     :action '(("Describe function" . helm-describe-function)
               ("Find function (C-u for source)" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
@@ -923,7 +923,7 @@ a prefix arg."
           (helm-build-in-buffer-source  "Elisp libraries (Scan)"
             :data #'helm-locate-library-scan-list
             :fuzzy-match helm-locate-library-fuzzy-match
-            :keymap helm-generic-files-map
+            :keymap 'helm-generic-files-map
             :candidate-transformer
             (lambda (candidates)
               (cl-loop with reporter = (unless done

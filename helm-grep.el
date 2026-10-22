@@ -1310,7 +1310,7 @@ matching `helm-zgrep-file-extension-regexp' only."
      :buffer (format "*helm %s*" (helm-grep-command recurse backend))
      :default default-input
      :input input
-     :keymap helm-grep-map
+     :keymap 'helm-grep-map
      :history 'helm-grep-history
      :truncate-lines helm-grep-truncate-lines)))
 
@@ -1566,7 +1566,7 @@ non-file buffers."
                 :nomark t
                 :filter-one-by-one #'helm-grep-filter-one-by-one
                 :history 'helm-grep-history
-                :keymap helm-pdfgrep-map
+                :keymap 'helm-pdfgrep-map
                 :help-message 'helm-pdfgrep-help-message
                 :action #'helm-pdfgrep-action
                 :persistent-help "Jump to PDF Page"

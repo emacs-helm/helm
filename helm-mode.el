@@ -651,7 +651,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (persistent-help "DoNothing")
                             (mode-line helm-comp-read-mode-line)
                             help-message
-                            (keymap helm-comp-read-map)
+                            (keymap 'helm-comp-read-map)
                             (name "Helm Completions")
                             header-name
                             candidates-in-buffer
@@ -2253,7 +2253,7 @@ Keys description:
           (unless (eq must-match t)
             ;; Non existing file or dir source.
             (helm-build-dummy-source "New file or directory"
-              :keymap helm-read-file-map
+              :keymap 'helm-read-file-map
               :must-match must-match ; Merge must-match-map and helm-read-file-map.
               :all-marked all-marked
               :nomark nomark
@@ -2276,7 +2276,7 @@ Keys description:
              :fuzzy-match fuzzy
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
-             :keymap helm-read-file-map
+             :keymap 'helm-read-file-map
              :nomark nomark
              :action action-fn)
            ;; List files source.
@@ -2319,7 +2319,7 @@ Keys description:
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
              :volatile t
-             :keymap helm-read-file-map
+             :keymap 'helm-read-file-map
              ;; Use MUST-MATCH here only when it is a function, otherwise let
              ;; the dummy source handling the other possible values of
              ;; MUST-MATCH.  See how keymaps are merged in helm-source.
@@ -3067,7 +3067,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                             :match-dynamic (eq helm-completion-style 'emacs)
                             :fuzzy (eq helm-completion-style 'helm-fuzzy)
                             :exec-when-only-one t
-                            :keymap helm-comp-in-region-map
+                            :keymap 'helm-comp-in-region-map
                             :quit-when-no-cand
                             (lambda ()
                               ;; Delay message to overwrite "Quit".

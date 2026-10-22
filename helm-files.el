@@ -7059,7 +7059,7 @@ list."
                                        (expand-file-name candidate))
                                       (with-helm-after-update-hook (helm-exit-minibuffer)))
                         "Find file in helm" 'helm-ff-file-name-history-ff)
-               :keymap helm-file-name-history-map)))
+               :keymap 'helm-file-name-history-map)))
     (with-helm-alive-p
       (helm :sources src
             :buffer "*helm-file-name-history*"

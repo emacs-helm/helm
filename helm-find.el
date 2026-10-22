@@ -65,7 +65,7 @@ that display the basename of candidate here."
     :persistent-action 'helm-ff-kill-or-find-buffer-fname
     :action 'helm-type-file-actions
     :help-message 'helm-generic-file-help-message
-    :keymap helm-find-map
+    :keymap 'helm-find-map
     :candidate-number-limit 9999
     :requires-pattern 3))
 

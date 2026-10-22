@@ -372,7 +372,7 @@ finally removed."
                            helm-dabbrev--already-tried)
                           :persistent-action 'ignore
                           :persistent-help "DoNothing"
-                          :keymap helm-dabbrev-map
+                          :keymap 'helm-dabbrev-map
                           :action 'helm-dabbrev-default-action
                           :group 'helm-dabbrev)
                         :buffer "*helm dabbrev*"

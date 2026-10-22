@@ -401,7 +401,7 @@ When GSHORTHANDS is nil use PATTERN unmodified."
                 :requires-pattern 2
                 :follow 1
                 :group 'helm-occur
-                :keymap helm-occur-map
+                :keymap 'helm-occur-map
                 :resume 'helm-occur-resume-fn
                 :moccur-buffers buffers)
               sources)))

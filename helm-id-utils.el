@@ -119,7 +119,7 @@ See <https://www.gnu.org/software/idutils/>."
     (helm :sources (helm-make-source "Gid" 'helm-gid-source
                      :db-dir db)
           :buffer "*helm gid*"
-          :keymap helm-grep-map
+          :keymap 'helm-grep-map
           :truncate-lines helm-grep-truncate-lines)))
 
 (provide 'helm-id-utils)

@@ -227,7 +227,7 @@ If there is no entry in cache, create one."
                       (t   candidate)))
     :fuzzy-match helm-etags-fuzzy-match
     :help-message 'helm-etags-help-message
-    :keymap helm-etags-map
+    :keymap 'helm-etags-map
     :action '(("Go to tag" . helm-etags-find-file)
               ("Go to tag in other window" . helm-etags-find-file-other-window)
               ("Go to tag in other frame" . helm-etags-find-file-other-frame))
@@ -322,7 +322,7 @@ This function aggregates three sources of tag files:
       (setq helm-source-etags-select
             (helm-etags-build-source)))
     (helm :sources 'helm-source-etags-select
-          :keymap helm-etags-map
+          :keymap 'helm-etags-map
           :default (and (stringp str)
                         (if (or helm-etags-fuzzy-match
                                 (and (eq major-mode 'haskell-mode)

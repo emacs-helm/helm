@@ -102,7 +102,7 @@
     ;; new simplified transformer of tracker search results
     :filtered-candidate-transformer #'helm-source-tracker-transformer
     ;;(multiline) ; https://github.com/emacs-helm/helm/issues/529
-    :keymap helm-generic-files-map
+    :keymap 'helm-generic-files-map
     :action 'helm-type-file-actions
     :action-transformer '(helm-transform-file-load-el
                           helm-transform-file-browse-url)

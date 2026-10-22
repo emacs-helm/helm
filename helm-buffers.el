@@ -429,7 +429,7 @@ Note that this variable is buffer-local.")
             #'helm-buffers-create-new-buffer-ow
             "Create buffer other frame (C-u choose mode)"
             #'helm-buffers-create-new-buffer-of)
-   :keymap helm-buffer-not-found-map))
+   :keymap 'helm-buffer-not-found-map))
 
 
 (defun helm-buffers-get-visible-buffers ()

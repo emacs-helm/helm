@@ -4385,7 +4385,7 @@ Do nothing when used outside of helm context.
 WARNING: Do not use this mode yourself, it is internal to Helm."
   :group 'helm
   :global t
-  :keymap helm--remap-mouse-mode-map
+  :keymap 'helm--remap-mouse-mode-map
   (unless helm-alive-p
     (setq helm--remap-mouse-mode-map nil)))
 (put 'helm--remap-mouse-mode 'helm-only t)

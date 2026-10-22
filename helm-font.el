@@ -299,7 +299,7 @@ name."
     :action 'helm-ucs-actions
     :candidates (lambda () helm-ucs-recent)
     :help-message helm-ucs-help-message
-    :keymap helm-ucs-map
+    :keymap 'helm-ucs-map
     :volatile t))
 
 (defvar helm-source-ucs
@@ -313,7 +313,7 @@ name."
     :persistent-action (lambda (candidate)
                          (helm-ucs-insert-char candidate)
                          (helm-force-update))
-    :keymap helm-ucs-map)
+    :keymap 'helm-ucs-map)
   "Source for collecting `ucs-names' math symbols.")
 
 ;;;###autoload

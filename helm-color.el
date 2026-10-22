@@ -114,7 +114,7 @@
   (helm-build-in-buffer-source "Colors"
     :init 'helm-colors-init
     :get-line 'buffer-substring
-    :keymap helm-color-map
+    :keymap 'helm-color-map
     :persistent-help "Kill entry in RGB format."
     :persistent-action 'helm-color-kill-rgb
     :help-message 'helm-colors-help-message

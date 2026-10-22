@@ -105,7 +105,7 @@ Should take one arg: the string to display."
                 (eval (read helm-pattern) t))))
          (error "Error"))))
     :nohighlight t
-    :keymap helm-eval-expression-map
+    :keymap 'helm-eval-expression-map
     :action `(("Copy result to kill-ring" . ,(lambda (candidate)
                                                (kill-new
                                                 (replace-regexp-in-string

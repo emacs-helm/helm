@@ -192,7 +192,7 @@ This affects also sorting functions in the same way."
     :help-message 'helm-top-help-message
     :mode-line 'helm-top-mode-line
     :follow 'never
-    :keymap helm-top-map
+    :keymap 'helm-top-map
     :filtered-candidate-transformer #'helm-top-sort-transformer
     :action-transformer #'helm-top-action-transformer
     :group 'helm-sys))
