@@ -157,13 +157,17 @@
 (defcustom helm-type-bookmark-actions
   (helm-make-actions
    "Jump to bookmark" 'helm-bookmark-jump
-   "Jump to BM other window" 'helm-bookmark-jump-other-window
-   "Jump to BM other frame" 'helm-bookmark-jump-other-frame
-   "Jump to BM other tab" 'helm-bookmark-jump-other-tab
+   "Jump to BM other window `\\<%s>\\[helm-bookmark-run-jump-other-window]'"
+   'helm-bookmark-jump-other-window
+   "Jump to BM other frame `\\<%s>\\[helm-bookmark-run-jump-other-frame]'"
+   'helm-bookmark-jump-other-frame
+   "Jump to BM other tab `\\<%s>\\[helm-bookmark-run-jump-other-tab]'"
+   'helm-bookmark-jump-other-tab
    "Show bookmark annotation" 'helm-bookmark-show-annotation
    "Bookmark edit annotation" 'bookmark-edit-annotation
-   "Delete marked bookmark(s)" 'helm-delete-marked-bookmarks
-   "Edit Bookmark" 'helm-bookmark-edit-bookmark
+   "Delete marked bookmark(s) `\\<%s>\\[helm-bookmark-run-delete]'"
+   'helm-delete-marked-bookmarks
+   "Edit Bookmark `\\<%s>\\[helm-bookmark-run-edit]'" 'helm-bookmark-edit-bookmark
    "Reset Bookmark to current pos" 'bookmark-set
    "Rename marked bookmark(s)" 'helm-bookmark-rename-marked
    "Relocate bookmark" 'bookmark-relocate)
@@ -179,7 +183,7 @@
 
 (cl-defmethod helm--setup-source :before ((source helm-type-bookmark))
   (setf (slot-value source 'action) 'helm-type-bookmark-actions)
-  (setf (slot-value source 'keymap) helm-bookmark-map)
+  (setf (slot-value source 'keymap) 'helm-bookmark-map)
   (setf (slot-value source 'mode-line) (list "Bookmark(s)" helm-mode-line-string))
   (setf (slot-value source 'help-message) 'helm-bookmark-help-message)
   (setf (slot-value source 'migemo) t)
