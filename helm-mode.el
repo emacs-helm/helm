@@ -301,7 +301,7 @@ Where FUNCTION is a function suitable for `helm-quit-and-find-file'.")
   :group 'helm-mode)
 
 (defface helm-completions-key-binding
-  '((t :inherit font-lock-constant-face))
+  '((t :inherit help-key-binding))
   "Face used to highlight key binding in completion."
   :group 'helm-mode)
 

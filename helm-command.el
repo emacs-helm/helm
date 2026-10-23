@@ -82,7 +82,7 @@ Helm will never appear in `helm-M-x' whatever the value of this var is."
 
 (defface helm-M-x-key
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "orange" :box (:line-width -1)))
+       :inherit help-key-binding))
   "Face used in helm-M-x to show keybinding."
   :group 'helm-command-faces)
 
