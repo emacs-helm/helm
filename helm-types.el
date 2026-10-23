@@ -211,7 +211,7 @@
    'helm-switch-to-buffer-at-linum
    "Browse project `\\<%s>\\[helm-buffers-run-browse-project]'"
    'helm-buffers-browse-project
-   "Switch to shell"
+   "Switch to shell `\\<%s>\\[helm-buffer-run-switch-to-shell]'"
    'helm-buffer-switch-to-shell
    "Query replace regexp `\\<%s>\\[helm-buffer-run-query-replace-regexp]'"
    'helm-buffer-query-replace-regexp
