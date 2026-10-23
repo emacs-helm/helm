@@ -1100,7 +1100,7 @@ Assume regexp is a pcre based regexp."
                  ;; help buffer not already displayed.
                  (ignore-error wrong-type-argument
                    (save-selected-window
-                     (with-helm-window
+                     (with-selected-helm-window
                        (let ((pos (save-excursion (end-of-visual-line) (point)))
                              (str (and popup-info-fn
                                        (funcall popup-info-fn (helm-get-selection)))))
