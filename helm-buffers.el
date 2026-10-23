@@ -425,9 +425,9 @@ Note that this variable is buffer-local.")
    :action (helm-make-actions
             "Create buffer (C-u choose mode)"
             #'helm-buffers-create-new-buffer
-            "Create buffer other window (C-u choose mode)"
+            "Create buffer other window `\\<%s>\\[helm-buffers-not-found-run-switch-ow]' (C-u choose mode)"
             #'helm-buffers-create-new-buffer-ow
-            "Create buffer other frame (C-u choose mode)"
+            "Create buffer other frame `\\<%s>\\[helm-buffers-not-found-run-switch-of]'(C-u choose mode)"
             #'helm-buffers-create-new-buffer-of)
    :keymap 'helm-buffer-not-found-map))
 
