@@ -2167,9 +2167,19 @@ That is what completion commands operate on."
   (get-buffer-window helm-action-buffer 'visible))
 
 (defmacro with-helm-window (&rest body)
-  "Be sure BODY is excuted in the helm window."
+  "Be sure BODY is excuted in the helm window.
+Note that BODY may be executed in either `helm-buffer' or `helm-action-buffer',
+to be sure BODY is executed in `helm-buffer' window, use
+`with-selected-helm-window'."
   (declare (indent 0) (debug t))
   `(with-selected-window (helm-window)
+     (let ((inhibit-read-only t))
+       ,@body)))
+
+(defmacro with-selected-helm-window (&rest body)
+  "Be sure BODY is excuted in the window displaying `helm-buffer'."
+  (declare (indent 0) (debug t))
+  `(with-selected-window (get-buffer-window helm-buffer 0)
      (let ((inhibit-read-only t))
        ,@body)))
 
