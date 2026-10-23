@@ -152,7 +152,7 @@ will be honored."
     (define-key map (kbd "C-c o")   #'helm-bookmark-run-jump-other-window)
     (define-key map (kbd "C-c C-o") #'helm-bookmark-run-jump-other-frame)
     (define-key map (kbd "C-c C-t") #'helm-bookmark-run-jump-other-tab)
-    (define-key map (kbd "C-d")     #'helm-bookmark-run-delete)
+    (define-key map (kbd "M-D")     #'helm-bookmark-run-delete)
     (define-key map (kbd "C-]")     #'helm-bookmark-toggle-filename)
     (define-key map (kbd "M-e")     #'helm-bookmark-run-edit)
     map)
