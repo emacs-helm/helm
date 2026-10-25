@@ -5904,7 +5904,7 @@ Use it for non-interactive calls of `helm-find-files'."
       (define-key map (kbd "C-c C-t")       'helm-ff-run-find-file-other-tab))
     map)
 
-  "Keymap for `helm-find-files'.")
+  "Keymap for `helm-find-files' dummy source.")
 
 (defvar helm-find-files-dummy-source
   (helm-build-dummy-source "New file or directory"
