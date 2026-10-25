@@ -5864,7 +5864,7 @@ Use it for non-interactive calls of `helm-find-files'."
    'helm-ff-find-file-other-tab
    "Find shell command `\\<%s>\\[helm-ff-run-find-sh-command]'"
    'helm-ff-find-sh-command
-   "Fd shell command `\\<%s>\\[]'helm-ff-run-fd" 'helm-ff-fd
+   "Fd shell command `\\<%s>\\[helm-ff-run-fd]'" 'helm-ff-fd
    "Browse project `\\<%s>\\[helm-ff-run-browse-project]'" 'helm-ff-browse-project)
   "Actions for `helm-find-files' dummy source."
   :type '(alist :key-type string :value-type function))
