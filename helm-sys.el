@@ -425,10 +425,7 @@ Show actions only on line starting by a PID."
                               'identity
                               (process-command (get-process c)) " ")
                if (and command (not (string= command ""))) collect
-               (cons (concat c " --> "
-                              (mapconcat 'identity
-                                         (process-command (get-process c)) " "))
-                     c)
+               (cons (concat c " --> " command) c)
                else collect c))
     :multiline t
     :persistent-action (lambda (elm)
