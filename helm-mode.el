@@ -1343,7 +1343,7 @@ is used."
     (let* ((key     (and (commandp sym) (where-is-internal sym nil 'first-only)))
            (binding (and key (key-description key))))
       (when binding
-        (propertize (format " (%s)" binding) 'face 'helm-completions-key-binding)))))
+        (propertize (format " `%s'" binding) 'face 'helm-completions-key-binding)))))
 
 (defun helm-mode--package-name-from-full-name (comp)
   "Extract the package name from a package full-name.
