@@ -1333,8 +1333,7 @@ behaviour of this function is really needed."
       (goto-char (point-min)))
     (decode-coding-string (buffer-string) 'utf-8)))
 
-(cl-defun helm-read-answer (prompt answer-list
-                            &optional (help 'helm-read-answer-default-help-fn))
+(defun helm-read-answer (prompt answer-list &optional help)
   "Prompt user for an answer.
 Arg PROMPT is the prompt to present user the different possible
 answers, ANSWER-LIST is a list of strings.
@@ -1357,6 +1356,7 @@ Example:
       (\"q\" \"quit\"))
 
 "
+  (unless help (setq help #'helm-read-answer-default-help-fn))
   (unwind-protect
        (helm-awhile (read-key (propertize
                                prompt 'face 'minibuffer-prompt))
