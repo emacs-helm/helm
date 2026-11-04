@@ -607,10 +607,11 @@ i.e. filtering filenames inside directory."
           (const :tag "extensions" ext)))
 
 (defcustom helm-ff-tooltip-horizontal-padding 0
-  "Specify amount of horizontal padding used by windowing system when
-rendering tooltips. The specified amount of padding is used to move the
-tooltip horizontally when Helm renders a file properties tool tip (`M-i'
-is pressed) to avoid the windowing system applied padding obscuring the
+  "Amount of horizontal padding used by windowing system.
+Used when rendering tooltips.
+It is used to move the tooltip horizontally when Helm renders a file properties
+tool tip with \\<helm-find-files-map>\\[helm-ff-properties-persistent].
+This to avoid the windowing system applied padding obscuring the
 end of the filename."
   :type 'integer)
 
