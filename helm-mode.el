@@ -3084,26 +3084,27 @@ Can be used for `completion-in-region-function' by advicing it with an
             (setq string (copy-sequence result))
             (helm-completion-in-region--insert-result
              result start point end base-size))
-        ;; Allow running extra property `:exit-function' (Bug#2265,
-        ;; Bug#2356). Function is called with 'exact if the return value of
-        ;; `try-completion' is a string ending with / (possibly a directory
-        ;; Bug#2274), otherwise it is always called with 'finished.  However it
-        ;; is still not clear what to use, the documentation on this beeing
-        ;; really bad (see bug#2646).
-        (when (and (stringp string) exit-fun)
-          (funcall exit-fun string
-                   (helm-acase (try-completion initial-input collection predicate)
-                     ((guard* (and (stringp it)
-                                  (or (string-match "/\\'" it)
-                                      ;; Fix bug#2669.
-                                      (string-match "/\\'" string))))
-                      'exact)
-                     (t 'finished))))
-        (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
-        (customize-set-variable 'helm-completion-style old--helm-completion-style)
-        (setq helm-completion--sorting-done nil)
-        (advice-remove 'lisp--local-variables
-                       #'helm-mode--advice-lisp--local-variables)))))
+        ;; Run `:exit-function' after completion (Bug#2265).
+        ;; Use 'exact when `try-completion' returns a string and either it or
+        ;; STRING ends in /, allowing further directory completion without an
+        ;; added space (Bug#2274, Bug#2669). Otherwise use 'finished, including
+        ;; for an already complete sole candidate (Bug#2356, Bug#2646).
+        (unwind-protect
+            (when (and (stringp string) exit-fun)
+              (funcall exit-fun string
+                       (helm-acase (try-completion initial-input collection predicate)
+                         ((guard* (and (stringp it)
+                                      (or (string-match "/\\'" it)
+                                          ;; Fix bug#2669.
+                                          (string-match "/\\'" string))))
+                          'exact)
+                         (t 'finished))))
+          ;; Clean up temporary state even if the callback fails.
+          (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
+          (customize-set-variable 'helm-completion-style old--helm-completion-style)
+          (setq helm-completion--sorting-done nil)
+          (advice-remove 'lisp--local-variables
+                         #'helm-mode--advice-lisp--local-variables))))))
 
 (defvar helm-crm-default-separator ","
   "Default separator for `completing-read-multiple'.

@@ -25,6 +25,18 @@
 
 (defvar crm-separator)
 
+(ert-deftest helm-mode-test-completion-in-region-cleans-up-after-exit-function-error ()
+  (with-temp-buffer
+    (let ((helm-before-action-hook nil)
+          (helm-completion-mark-suffix nil)
+          (completion-extra-properties '(:exit-function user-error)))
+      (cl-letf (((symbol-function 'helm-comp-read)
+                 (lambda (&rest _args) "foo"))
+                ((symbol-function 'lisp--local-variables) #'ignore))
+        (should-error (helm--completion-in-region #'ignore 1 1 '("foo"))
+                      :type 'user-error)
+        (should-not helm-before-action-hook)))))
+
 (ert-deftest helm-mode-test-crm-regexp-separator-is-not-inserted ()
   (with-temp-buffer
     (insert "Range: ")
