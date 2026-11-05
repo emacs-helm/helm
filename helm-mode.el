@@ -3244,6 +3244,13 @@ Note: This mode is incompatible with Emacs23."
         ;; disable it if user attempt to enable it while helm-mode
         ;; is running (Bug#2085).
         (add-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
+        ;; Setup `completion-styles-alist' for helm-mode.
+        ;; Previously this was done in helm-core one time for all, however if
+        ;; one modify `completion-styles-alist' and remove inadvertently the
+        ;; helm bindings, completion-at-point and friends will not work.  Doing
+        ;; this here allows one to stop and restart helm-mode to restore
+        ;; properly `completion-styles-alist'.
+        (helm--setup-completion-styles-alist)
         (when (fboundp 'ffap-read-file-or-url-internal)
           ;; `ffap-read-file-or-url-internal' have been removed in
           ;; emacs-27 and `ffap-read-file-or-url' is fixed, so no need
