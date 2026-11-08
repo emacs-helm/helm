@@ -4694,6 +4694,19 @@ Arg FILE is the real part of candidate, a filename with no props."
       (let ((generated-autoload-file file))
         (update-directory-autoloads default-directory)))))
 
+(defun helm-ff-appimage (file)
+  "Execute FILE if it is an AppImage."
+  (let ((bn (helm-basename file)))
+    (cl-assert (string= (file-name-extension file) "AppImage") nil
+               (format "File %s is not an AppImage" bn))
+    (cl-assert (file-executable-p file) nil
+               (format "File %s is not executable" bn))
+    (let* ((cmd   (read-string "Execute file: " bn))
+           (args  (cdr (split-string cmd nil t))))
+      (call-process-shell-command
+       (format "(%s %s &)" file
+               (mapconcat #'shell-quote-argument args " "))))))
+
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
   (let ((str-at-point (with-helm-current-buffer
@@ -4767,6 +4780,10 @@ Arg FILE is the real part of candidate, a filename with no props."
                                               (helm-basename file))))
            (helm-append-at-nth
             actions '(("Restore backup file(s)" . helm-ff-restore-backups)) 1))
+          ((and (string= (file-name-extension candidate) "AppImage")
+                (file-executable-p candidate))
+           (helm-append-at-nth
+            actions '(("Execute AppImage" . helm-ff-appimage)) 1))
           (t actions))))
 
 ;;; Trashing files
