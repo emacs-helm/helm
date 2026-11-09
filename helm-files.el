@@ -2566,11 +2566,12 @@ COUNT is used for incrementing new name if needed."
                                   (match-string 1 rep) it target)))
                      ;; Incremental replacement
                      ;; before or after \@.
-                     ((or (string-match "\\`\\\\#\\\\@\\'" rep)
-                          (string-match "\\`\\\\@\\\\#\\'" rep))
-                      (replace-regexp-in-string
-                       "\\\\#" (format "%03d" (1+ count))
-                       (replace-match target t t rep)))
+                     ((or (string-match "\\`\\(\\\\#\\).*\\(\\\\@\\)\\'" rep)
+                          (string-match "\\`\\(\\\\@\\).*\\(\\\\#\\)\\'" rep))
+                      (let ((to-replace (replace-match target t t rep 1)))
+                        (replace-regexp-in-string
+                         "\\\\#" (format "%03d" (1+ count))
+                         to-replace)))
                      ;; Simple incremental replacement.
                      ((or (string-match "\\`\\\\#" rep)
                           (string-match "\\\\#\\'" rep))
