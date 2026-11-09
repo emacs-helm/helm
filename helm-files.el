@@ -2557,6 +2557,8 @@ COUNT is used for incrementing new name if needed."
                       ;; replacement with \# in
                       ;; search and replace
                       ;; feature in placeholder \@.
+                      ;; e.g. "\@/[a-z]+-/foo/" which replace in "bar-001"
+                      ;; "bar-" by "foo".
                       (string-match "\\\\@/\\(.*\\)/\\(.*\\)/" rep)
                       (helm-aand (save-match-data
                                    (replace-regexp-in-string
@@ -2566,6 +2568,8 @@ COUNT is used for incrementing new name if needed."
                                   (match-string 1 rep) it target)))
                      ;; Incremental replacement
                      ;; before or after \@.
+                     ;; e.g. "\@-\#" which replace "foo" by "foo-001", "foo-002"
+                     ;; etc...
                      ((or (string-match "\\`\\(\\\\#\\).*\\(\\\\@\\)\\'" rep)
                           (string-match "\\`\\(\\\\@\\).*\\(\\\\#\\)\\'" rep))
                       (let ((to-replace (replace-match target t t rep 1)))
