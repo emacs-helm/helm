@@ -67,7 +67,7 @@ EL			:= $(sort $(wildcard helm*.el))
 ELC			:= $(EL:.el=.elc)
 
 
-.PHONY: clean autoloads batch-compile
+.PHONY: clean autoloads batch-compile test
 
 all: clean autoloads batch-compile
 
@@ -108,3 +108,7 @@ uninstall:
 	rm -vf ${DESTDIR}*.el
 	rm -vf ${DESTDIR}emacs-helm.sh
 	rm -vf ${BIN}helm
+
+test:
+	@echo Running tests for helm
+	$(EMACS) -L . --load ./test/helm-tests.el
