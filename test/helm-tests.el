@@ -26,7 +26,6 @@
   (load-file (expand-file-name "helm-mode-tests.el"
                                (file-name-directory load-file-name)))
   (let ((stats (ert-run-tests-batch "^helm")))
-    (when noninteractive
-      (kill-emacs (ert-stats-completed-unexpected stats)))))
+    (kill-emacs (ert-stats-completed-unexpected stats))))
 
 ;;; helm-tests.el ends here
