@@ -28,14 +28,18 @@
                  "foo-001.txt")))
 
 (ert-deftest helm-files-test-helm-ff--query-replace-in-fname-set-new-name-2 ()
+  (should (equal (helm-ff--query-replace-in-fname-set-new-name "foo.txt" "%." "\\#-\\@" 0)
+                 "001-foo.txt")))
+
+(ert-deftest helm-files-test-helm-ff--query-replace-in-fname-set-new-name-3 ()
   (should (equal (helm-ff--query-replace-in-fname-set-new-name "foo-bar.txt" "%." "\\@/foo/fiz/" 0)
                  "fiz-bar.txt")))
 
-(ert-deftest helm-files-test-helm-ff--query-replace-in-fname-set-new-name-3 ()
+(ert-deftest helm-files-test-helm-ff--query-replace-in-fname-set-new-name-4 ()
   (should (equal (helm-ff--query-replace-in-fname-set-new-name "foo-bar.txt" "%:4:7" "baz" 0)
                  "foo-baz.txt")))
 
-(ert-deftest helm-files-test-helm-ff--query-replace-in-fname-set-new-name-4 ()
+(ert-deftest helm-files-test-helm-ff--query-replace-in-fname-set-new-name-5 ()
   (should (equal (helm-ff--query-replace-in-fname-set-new-name "foo-bar.txt" "%." "\\@:0:3" 0)
                  "foo.txt")))
 

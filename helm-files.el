@@ -2570,9 +2570,9 @@ COUNT is used for incrementing new name if needed."
                      ;; before or after \@.
                      ;; e.g. "\@-\#" which replace "foo" by "foo-001", "foo-002"
                      ;; etc...
-                     ((or (string-match "\\`\\(\\\\#\\).*\\(\\\\@\\)\\'" rep)
-                          (string-match "\\`\\(\\\\@\\).*\\(\\\\#\\)\\'" rep))
-                      (helm-aand (replace-match target t t rep 1)
+                     ((or (string-match "\\`\\(?:\\\\#\\).*\\(?99:\\\\@\\)\\'" rep)
+                          (string-match "\\`\\(?99:\\\\@\\).*\\(?:\\\\#\\)\\'" rep))
+                      (helm-aand (replace-match target t t rep 99)
                                  (replace-regexp-in-string
                                   "\\\\#" (format "%03d" (1+ count))
                                   it)))
