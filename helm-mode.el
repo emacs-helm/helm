@@ -2902,7 +2902,11 @@ Can be used for `completion-in-region-function' by advicing it with an
     (advice-add
      'lisp--local-variables
      :around #'helm-mode--advice-lisp--local-variables)
-    (let ((old--helm-completion-style helm-completion-style)
+    ;; Timers and process filters can edit the source buffer while Helm runs (bug#2768).
+    (let ((start (copy-marker start))
+          (end (copy-marker end t))
+          (point (point-marker))
+          (old--helm-completion-style helm-completion-style)
           (exit-fun (plist-get completion-extra-properties :exit-function))
           ;; Always start with prefix to allow completing without
           ;; the need of inserting a space after cursor or
@@ -2935,7 +2939,6 @@ Can be used for `completion-in-region-function' by advicing it with an
                  (completion-styles (helm--prepare-completion-styles))
                  (input (buffer-substring-no-properties start end))
                  (prefix (and (eq helm-completion-style 'emacs) initial-input))
-                 (point (point))
                  (crm (eq current-command 'crm-complete))
                  (str-command (helm-symbol-name current-command))
                  (buf-name (format "*helm-mode-%s*" str-command))
@@ -3083,7 +3086,8 @@ Can be used for `completion-in-region-function' by advicing it with an
             ;; to not loose props.
             (setq string (copy-sequence result))
             (helm-completion-in-region--insert-result
-             result start point end base-size))
+             result (marker-position start) (marker-position point)
+             (marker-position end) base-size))
         ;; Run `:exit-function' after completion (Bug#2265).
         ;; Use 'exact when `try-completion' returns a string and either it or
         ;; STRING ends in /, allowing further directory completion without an
