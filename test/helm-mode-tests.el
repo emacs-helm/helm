@@ -25,6 +25,46 @@
 
 (defvar crm-separator)
 
+(ert-deftest helm-mode-test-completion-in-region-should-complete-after-text-before-input-is-deleted ()
+  (with-temp-buffer
+    (insert "prefix\nfoo")
+    ;; Point is at the end of "foo", so there is no suffix to preserve or mark.
+    (let ((helm-completion-mark-suffix nil))
+      ;; Simulate deleting the preceding line while completion is open,
+      ;; then selecting "foobar".
+      (cl-letf (((symbol-function 'helm-comp-read)
+                 (lambda (&rest _args)
+                   (save-excursion
+                     (goto-char (point-min))
+                     (delete-region (point) (line-beginning-position 2)))
+                   "foobar")))
+        (helm--completion-in-region #'ignore (copy-marker 8) (point) '("foobar"))
+        (should (equal (buffer-string) "foobar"))))))
+
+(ert-deftest helm-mode-test-completion-in-region-should-preserve-suffix-after-text-before-input-is-inserted ()
+  (with-temp-buffer
+    (insert "prefix\nfoo")
+    (goto-char 10)
+    ;; Point is inside "foo" (fo|o), so the trailing "o" must be preserved
+    ;; and marked after completion.
+    (let ((helm-completion-mark-suffix t)
+          (mark-suffix nil))
+      ;; Simulate inserting a line before the input, then selecting "foobar".
+      ;; Capture the suffix-marking callback to run it after completion.
+      (cl-letf (((symbol-function 'helm-comp-read)
+                 (lambda (&rest _args)
+                   (save-excursion
+                     (goto-char (point-min))
+                     (insert "prefix\n"))
+                   "foobar"))
+                ((symbol-function 'run-with-idle-timer)
+                 (lambda (_seconds _repeat function &rest args)
+                   (setq mark-suffix (lambda () (apply function args))))))
+        (helm--completion-in-region #'ignore 8 (point-max) '("foobar"))
+        (should (equal (buffer-string) "prefix\nprefix\nfoobaro"))
+        (funcall mark-suffix)
+        (should (equal (buffer-substring (point) (mark)) "o"))))))
+
 (ert-deftest helm-mode-test-completion-in-region-cleans-up-after-exit-function-error ()
   (with-temp-buffer
     (let ((helm-before-action-hook nil)
